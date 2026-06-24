@@ -24,7 +24,6 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering :: Physics",
 ]
 dependencies = [
@@ -58,8 +57,7 @@ bench = [
     "tabulate>=0.9",
     "scipy>=1.10",
 ]
-# GPU acceleration is enabled at *build* time via Cargo features
-# (`maturin build --features cuda` / `--features opencl`); these extras exist so
+# GPU acceleration is enabled at build time via Cargo features. These extras exist so
 # `pip install qector-decoder-v3[cuda]` / `[opencl]` resolve cleanly. See INSTALL.md.
 cuda = []
 opencl = []
