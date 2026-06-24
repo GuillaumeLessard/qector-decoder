@@ -110,9 +110,7 @@ def git_commit() -> str:
 
 def _safe_cmd(cmd: Sequence[str]) -> Optional[str]:
     try:
-        out = subprocess.run(
-            list(cmd), capture_output=True, text=True, timeout=10, check=False
-        )
+        out = subprocess.run(list(cmd), capture_output=True, text=True, timeout=10, check=False)
         return out.stdout.strip() or None
     except Exception:  # pragma: no cover
         return None
@@ -166,7 +164,7 @@ def summarize(samples_seconds: Sequence[float]) -> Dict[str, float]:
     mean = float(us.mean())
     std = float(us.std(ddof=1)) if n > 1 else 0.0
     # 95% normal CI on the mean.
-    half = 1.959963985 * std / (n ** 0.5) if n > 1 else 0.0
+    half = 1.959963985 * std / (n**0.5) if n > 1 else 0.0
     summary = {
         "n": int(n),
         "mean": mean,
@@ -184,9 +182,7 @@ def summarize(samples_seconds: Sequence[float]) -> Dict[str, float]:
 # ---------------------------------------------------------------------------
 # Timing primitives
 # ---------------------------------------------------------------------------
-def time_iterations(
-    fn: Callable[[], Any], n_trials: int, warmup: int = 0
-) -> List[float]:
+def time_iterations(fn: Callable[[], Any], n_trials: int, warmup: int = 0) -> List[float]:
     """Time ``fn`` per-call ``n_trials`` times after ``warmup`` untimed calls."""
     for _ in range(max(0, warmup)):
         fn()
@@ -296,9 +292,7 @@ def benchmark_decoder(
         "syndrome_faithful": valid,
         "cold_path_us": summarize(cold_samples),
         "latency_us": summarize(hot_samples),
-        "throughput_decodes_per_s": (1.0 / statistics.median(hot_samples))
-        if hot_samples
-        else None,
+        "throughput_decodes_per_s": (1.0 / statistics.median(hot_samples)) if hot_samples else None,
         "peak_python_alloc_kib": peak_kib,
     }
     return report

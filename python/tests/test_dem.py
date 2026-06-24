@@ -4,6 +4,7 @@ These run without Stim installed: DEM text is parsed directly.  They lock in the
 correct detector-graph semantics (mechanisms = columns, detectors = rows) that
 replaced the earlier broken stim_compat heuristic.
 """
+
 import numpy as np
 
 from qector_decoder_v3 import dem
@@ -122,7 +123,7 @@ def test_stim_compat_reroute_matches_dem():
 def test_collapse_merges_parallel_edges():
     text = (
         "error(0.1) D0 D1\n"
-        "error(0.2) D0 D1 L0\n"   # parallel to the first, more likely, flips L0
+        "error(0.2) D0 D1 L0\n"  # parallel to the first, more likely, flips L0
         "error(0.1) D1 D2\n"
     )
     m = dem.parse_dem(text)
@@ -140,8 +141,8 @@ def test_collapse_preserves_faithfulness_and_observables():
     # repetition-style graphlike DEM with duplicated mechanisms
     lines = ["error(0.05) D0 L0"]
     for i in range(7):
-        lines.append(f"error(0.05) D{i} D{i+1}")
-        lines.append(f"error(0.03) D{i} D{i+1}")  # parallel duplicate
+        lines.append(f"error(0.05) D{i} D{i + 1}")
+        lines.append(f"error(0.03) D{i} D{i + 1}")  # parallel duplicate
     lines.append("error(0.05) D7 L0")
     m = dem.parse_dem("\n".join(lines))
     c = m.collapse_to_graph()
@@ -168,8 +169,8 @@ def test_surface_code_dem_roundtrip_is_decodable():
     lines = ["error(0.05) D0 L0"]
     d = 8
     for i in range(d - 1):
-        lines.append(f"error(0.05) D{i} D{i+1}")
-    lines.append(f"error(0.05) D{d-2} L0")
+        lines.append(f"error(0.05) D{i} D{i + 1}")
+    lines.append(f"error(0.05) D{d - 2} L0")
     m = dem.parse_dem("\n".join(lines))
     H = m.check_matrix()
     dec = m.make_decoder("sparse_blossom")

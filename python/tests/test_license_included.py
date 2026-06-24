@@ -45,9 +45,9 @@ def test_pyproject_declares_license():
     project = pyproject["project"]
     license_field = project.get("license")
     # license points at the LICENSE file (PEP 621 table form)
-    assert isinstance(license_field, dict) and (
-        license_field.get("file") == "LICENSE" or "text" in license_field
-    ), f"pyproject [project] license not declared via file/text: {license_field!r}"
+    assert isinstance(license_field, dict) and (license_field.get("file") == "LICENSE" or "text" in license_field), (
+        f"pyproject [project] license not declared via file/text: {license_field!r}"
+    )
     classifiers = project.get("classifiers", [])
     assert any(c == "License :: Other/Proprietary License" for c in classifiers), (
         "expected the proprietary trove classifier"

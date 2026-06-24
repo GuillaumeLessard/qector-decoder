@@ -11,6 +11,7 @@ small tie/Poisson slack. Agreement proves the graph collapse preserves logical
 decoding accuracy — it does not throw away information PyMatching uses on the
 full model.
 """
+
 import math
 
 import numpy as np
@@ -35,14 +36,15 @@ def wilson(k, n, z=1.959963985):
 
 def _full_vs_collapsed(d, shots, seed, basis="x", noise=0.005):
     circ = stim.Circuit.generated(
-        f"surface_code:rotated_memory_{basis}", distance=d, rounds=d,
+        f"surface_code:rotated_memory_{basis}",
+        distance=d,
+        rounds=d,
         after_clifford_depolarization=noise,
         before_measure_flip_probability=noise,
         after_reset_flip_probability=noise,
     )
     sdem = circ.detector_error_model(decompose_errors=True)
-    det, obs = circ.compile_detector_sampler(seed=seed).sample(
-        shots=shots, separate_observables=True)
+    det, obs = circ.compile_detector_sampler(seed=seed).sample(shots=shots, separate_observables=True)
     det = det.astype(np.uint8)
     obs = obs.astype(np.uint8)
     # Reference: PyMatching on the FULL Stim DEM.
@@ -60,8 +62,7 @@ def _full_vs_collapsed(d, shots, seed, basis="x", noise=0.005):
 def test_pymatching_full_dem_vs_collapsed(d):
     """Collapsed-DEM QECTOR LER overlaps full-DEM PyMatching Wilson CI."""
     shots = 4000
-    q_err, p_err = _full_vs_collapsed(d, shots=shots, seed=20260627 + d,
-                                      basis="x", noise=0.005)
+    q_err, p_err = _full_vs_collapsed(d, shots=shots, seed=20260627 + d, basis="x", noise=0.005)
     ql, qh = wilson(q_err, shots)
     pl, ph = wilson(p_err, shots)
     overlap = not (qh < pl or ph < ql)

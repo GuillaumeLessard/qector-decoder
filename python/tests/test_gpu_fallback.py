@@ -11,6 +11,7 @@ We exercise :class:`AutoDecoder` / :class:`BackendConfig` routing:
 
 The invariant under test: the fallback must never diverge from CPU.
 """
+
 import numpy as np
 import pytest
 

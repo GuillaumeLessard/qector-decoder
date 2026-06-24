@@ -4,6 +4,7 @@ The toric code is a periodic (boundary-free) matching graph.  Both
 ``UnionFindDecoder`` and ``FastUnionFindDecoder`` are exercised on L = 4, 5, 6
 over many random reachable syndromes, asserting ``(H @ corr) & 1 == s``.
 """
+
 import numpy as np
 import pytest
 
@@ -32,9 +33,7 @@ def test_union_find_toric_faithful(L, dec_name):
         s = ((H @ e) & 1).astype(np.uint8)
         c = np.asarray(dec.decode(s), np.uint8)
         assert c.shape == (nq,)
-        assert np.array_equal((H @ c) & 1, s), (
-            f"{dec_name} on toric({L}): H@c != s"
-        )
+        assert np.array_equal((H @ c) & 1, s), f"{dec_name} on toric({L}): H@c != s"
         if s.any():
             nonzero += 1
     assert nonzero > n_shots // 4

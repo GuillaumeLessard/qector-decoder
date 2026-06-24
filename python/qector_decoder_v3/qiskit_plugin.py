@@ -33,6 +33,7 @@ from . import UnionFindDecoder, generate_surface_code_checks
 # ------------------------------------------------------------------------
 try:
     from qiskit.result import Result as _QiskitResult
+
     _HAS_QISKIT = True
 except ImportError:  # pragma: no cover
     _QiskitResult = None
@@ -51,9 +52,7 @@ def _normalize_counts(result: Any) -> Dict[str, int]:
         # get_counts() retourne un dict {bitstring: count}
         return result.get_counts()
 
-    raise TypeError(
-        f"result must be a dict or qiskit.result.Result, got {type(result).__name__}"
-    )
+    raise TypeError(f"result must be a dict or qiskit.result.Result, got {type(result).__name__}")
 
 
 def _bitstring_to_syndrome(bitstring: str, n_checks: int) -> List[int]:

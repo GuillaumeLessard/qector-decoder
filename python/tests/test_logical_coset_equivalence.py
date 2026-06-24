@@ -15,6 +15,7 @@ This directly proves that the logical outcome is a function of the coset
 only non-trivial ``ker(H)`` element is the logical itself, so it exhibits only the
 logical-flipping class; the rotated surface code exhibits both classes.
 """
+
 import numpy as np
 import pytest
 

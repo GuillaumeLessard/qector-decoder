@@ -46,12 +46,12 @@ __all__ = ["BeliefMatching", "build_matching_matrices"]
 
 @dataclass
 class _Matrices:
-    hyper_check: np.ndarray          # (num_detectors, num_hyper)
-    hyper_obs: np.ndarray            # (num_observables, num_hyper)
-    hyper_priors: np.ndarray         # (num_hyper,)
-    hyper_to_edge: np.ndarray        # (num_edges, num_hyper)
-    edge_check: np.ndarray           # (num_detectors, num_edges)
-    edge_obs: np.ndarray             # (num_observables, num_edges)
+    hyper_check: np.ndarray  # (num_detectors, num_hyper)
+    hyper_obs: np.ndarray  # (num_observables, num_hyper)
+    hyper_priors: np.ndarray  # (num_hyper,)
+    hyper_to_edge: np.ndarray  # (num_edges, num_hyper)
+    edge_check: np.ndarray  # (num_detectors, num_edges)
+    edge_obs: np.ndarray  # (num_observables, num_edges)
     num_detectors: int
     num_observables: int
 
@@ -148,8 +148,7 @@ def build_matching_matrices(dem: Any) -> _Matrices:
     for hid, p in priors.items():
         prior_arr[hid] = p
 
-    return _Matrices(hyper_check, hyper_obs_m, prior_arr, hyper_to_edge, edge_check,
-                     edge_obs_m, nD, nO)
+    return _Matrices(hyper_check, hyper_obs_m, prior_arr, hyper_to_edge, edge_check, edge_obs_m, nD, nO)
 
 
 class BeliefMatching:
@@ -176,8 +175,7 @@ class BeliefMatching:
         # Matching graph = edge check matrix.
         self._n_edges = matrices.edge_check.shape[1]
         self._edge_c2q: List[List[int]] = [
-            sorted(int(e) for e in np.nonzero(matrices.edge_check[c])[0])
-            for c in range(self.n_checks)
+            sorted(int(e) for e in np.nonzero(matrices.edge_check[c])[0]) for c in range(self.n_checks)
         ]
 
     # -- constructors ------------------------------------------------------
@@ -187,9 +185,7 @@ class BeliefMatching:
 
     @classmethod
     def from_stim_circuit(cls, circuit, max_iter: int = 20) -> "BeliefMatching":
-        return cls.from_detector_error_model(
-            circuit.detector_error_model(decompose_errors=True), max_iter=max_iter
-        )
+        return cls.from_detector_error_model(circuit.detector_error_model(decompose_errors=True), max_iter=max_iter)
 
     # -- decoding ----------------------------------------------------------
     def decode(self, syndrome) -> np.ndarray:
@@ -198,8 +194,13 @@ class BeliefMatching:
             s = np.concatenate([s, np.zeros(self.n_checks - s.shape[0], np.uint8)])
 
         posterior = sum_product_bp(
-            self._hic, self._hie, self.n_checks, self._n_hyper,
-            self._prior_llr, s, self.max_iter,
+            self._hic,
+            self._hie,
+            self.n_checks,
+            self._n_hyper,
+            self._prior_llr,
+            s,
+            self.max_iter,
         )
         if self.bp_shortcut:
             hard = (posterior < 0.0).astype(np.uint8)

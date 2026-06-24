@@ -13,6 +13,7 @@ p=0.03 over ~800 shots:
 * Wall-clock time of both is measured and the ratio is printed, but runtime is
   NOT asserted on (machine load varies) -- only that both ran faithfully.
 """
+
 import time
 
 import numpy as np
@@ -22,9 +23,7 @@ import pytest
 def _bb72():
     from qector_decoder_v3 import codes
 
-    return codes.bivariate_bicycle_code(
-        6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)]
-    )
+    return codes.bivariate_bicycle_code(6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)])
 
 
 def _gf2_rowspace_basis(M):

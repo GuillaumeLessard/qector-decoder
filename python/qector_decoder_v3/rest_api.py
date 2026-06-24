@@ -33,10 +33,12 @@ from . import UnionFindDecoder, BatchDecoder, __version__
 try:
     from fastapi import FastAPI, HTTPException
     from pydantic import BaseModel
+
     _FRAMEWORK = "fastapi"
 except ImportError:  # pragma: no cover
     try:
         from flask import Flask, request, jsonify
+
         _FRAMEWORK = "flask"
     except ImportError:
         raise ImportError(
@@ -151,28 +153,34 @@ def _create_flask_app() -> Flask:
         except Exception as exc:
             return jsonify({"error": f"Decode error: {exc}"}), 500
 
-        return jsonify({
-            "correction": correction.tolist(),
-            "n_qubits": dec.n_qubits,
-            "n_checks": dec.n_checks,
-            "version": __version__,
-        })
+        return jsonify(
+            {
+                "correction": correction.tolist(),
+                "n_qubits": dec.n_qubits,
+                "n_checks": dec.n_checks,
+                "version": __version__,
+            }
+        )
 
     @app.get("/health")
     def health() -> Any:
-        return jsonify({
-            "status": "ok",
-            "decoder": "QECTOR UnionFind",
-            "version": __version__,
-        })
+        return jsonify(
+            {
+                "status": "ok",
+                "decoder": "QECTOR UnionFind",
+                "version": __version__,
+            }
+        )
 
     @app.get("/version")
     def version() -> Any:
-        return jsonify({
-            "version": __version__,
-            "framework": "flask",
-            "decoder_backend": "rust-pyo3",
-        })
+        return jsonify(
+            {
+                "version": __version__,
+                "framework": "flask",
+                "decoder_backend": "rust-pyo3",
+            }
+        )
 
     return app
 
@@ -199,6 +207,7 @@ def run_server(host: str = "0.0.0.0", port: int = 8000, **kwargs: Any) -> None:
     app = create_app()
     if _FRAMEWORK == "fastapi":
         import uvicorn
+
         uvicorn.run(app, host=host, port=port, **kwargs)
     else:
         # Flask — threaded=True par défaut pour un minimum de concurrence

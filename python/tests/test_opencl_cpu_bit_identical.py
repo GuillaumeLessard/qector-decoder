@@ -8,6 +8,7 @@ distances and batch sizes the OpenCL correction must be byte-for-byte equal
 Skipped automatically when no OpenCL device is present so the suite stays
 portable.
 """
+
 import numpy as np
 import pytest
 

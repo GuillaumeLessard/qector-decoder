@@ -5,6 +5,7 @@ higher OSD order must never produce a *heavier* correction than OSD-0 on the
 same shot: OSD greedily improves on the order-0 pivot solution, so the Hamming
 weight is monotonically non-increasing in the order.
 """
+
 import numpy as np
 import pytest
 
@@ -13,9 +14,7 @@ from qector_decoder_v3.bposd import BpOsdDecoder
 
 
 def _bb72():
-    return codes.bivariate_bicycle_code(
-        6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)]
-    )
+    return codes.bivariate_bicycle_code(6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)])
 
 
 def test_bposd_osd_orders_faithful_and_weight_monotone():

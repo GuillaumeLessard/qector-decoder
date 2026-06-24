@@ -12,6 +12,7 @@ rather than seed-lucky -- belief edges ahead once enough shots are pooled.
 QECTOR ``BeliefMatching`` rebuilds the weighted matching per shot (slow), so
 distance is fixed to 5 and per-seed shots are kept small (<=400/seed).
 """
+
 import math
 
 import numpy as np
@@ -59,9 +60,7 @@ def test_belief_seed_sweep_pooled_le_pymatching():
     shots_total = 0
 
     for seed in seeds:
-        det, obs = circ.compile_detector_sampler(seed=seed).sample(
-            shots=N, separate_observables=True
-        )
+        det, obs = circ.compile_detector_sampler(seed=seed).sample(shots=N, separate_observables=True)
         det = det.astype(np.uint8)
         obs = obs.astype(np.uint8)
 

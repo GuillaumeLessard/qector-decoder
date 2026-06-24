@@ -5,6 +5,7 @@ same logical error rate as QECTOR decoding the *collapsed* graph on identical
 shots — collapsing parallel mechanisms is a speed optimisation that must not
 change logical outcomes.
 """
+
 import math
 
 import numpy as np
@@ -30,13 +31,15 @@ def _wilson(k, n, z=1.959963985):
 def test_full_vs_collapsed_ler_equivalent(d):
     shots = 4000
     circ = stim.Circuit.generated(
-        f"surface_code:rotated_memory_x", distance=d, rounds=d,
+        f"surface_code:rotated_memory_x",
+        distance=d,
+        rounds=d,
         after_clifford_depolarization=0.005,
         before_measure_flip_probability=0.005,
-        after_reset_flip_probability=0.005)
+        after_reset_flip_probability=0.005,
+    )
     sdem = circ.detector_error_model(decompose_errors=True)
-    det, obs = circ.compile_detector_sampler(seed=7).sample(
-        shots=shots, separate_observables=True)
+    det, obs = circ.compile_detector_sampler(seed=7).sample(shots=shots, separate_observables=True)
     det = det.astype(np.uint8)
     obs = obs.astype(np.uint8)
 
@@ -55,19 +58,19 @@ def test_full_vs_collapsed_ler_equivalent(d):
     lo_q, hi_q = _wilson(q_err, shots)
     # the two Wilson 95% intervals must overlap (statistically equivalent LER)
     assert lo_q <= hi_p and lo_p <= hi_q, (
-        f"d={d}: collapsed LER {q_err}/{shots} vs full LER {pm_err}/{shots} disjoint CIs")
+        f"d={d}: collapsed LER {q_err}/{shots} vs full LER {pm_err}/{shots} disjoint CIs"
+    )
 
 
 def test_collapsed_graph_decode_is_faithful():
     circ = stim.Circuit.generated(
-        "surface_code:rotated_memory_x", distance=5, rounds=5,
-        after_clifford_depolarization=0.006)
+        "surface_code:rotated_memory_x", distance=5, rounds=5, after_clifford_depolarization=0.006
+    )
     sdem = circ.detector_error_model(decompose_errors=True)
     model = dem.from_stim(sdem).collapse_to_graph()
     H = model.check_matrix()
     dec = model.make_decoder("blossom")
-    det, _ = circ.compile_detector_sampler(seed=3).sample(
-        shots=1000, separate_observables=True)
+    det, _ = circ.compile_detector_sampler(seed=3).sample(shots=1000, separate_observables=True)
     det = det.astype(np.uint8)
     for i in range(len(det)):
         c = np.asarray(dec.decode(det[i]), np.uint8)

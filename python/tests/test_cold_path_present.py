@@ -6,6 +6,7 @@ summary keys as ``latency_us``, and is a distinct measurement (different sample
 count and own values) -- proving construction cost is reported apart from the
 steady-state decode cost. No wall-clock thresholds are asserted.
 """
+
 import numbers
 
 import pytest

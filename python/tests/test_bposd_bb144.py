@@ -5,6 +5,7 @@ and that ``qd.bposd.BpOsdDecoder`` is syndrome-faithful over random errors at
 p=0.03.  Shot count is deliberately modest: this is a large parity-check matrix
 and the file must stay fast.
 """
+
 import numpy as np
 import pytest
 
@@ -13,9 +14,7 @@ from qector_decoder_v3.bposd import BpOsdDecoder
 
 
 def _bb144():
-    return codes.bivariate_bicycle_code(
-        12, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)]
-    )
+    return codes.bivariate_bicycle_code(12, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)])
 
 
 def test_bb144_is_valid_css():
@@ -24,9 +23,7 @@ def test_bb144_is_valid_css():
     Hz = cz.parity_check_matrix().astype(np.uint8)
     assert Hx.shape[1] == 144
     assert Hz.shape[1] == 144
-    assert np.array_equal(
-        (Hx @ Hz.T) % 2, np.zeros((Hx.shape[0], Hz.shape[0]), np.uint8)
-    )
+    assert np.array_equal((Hx @ Hz.T) % 2, np.zeros((Hx.shape[0], Hz.shape[0]), np.uint8))
 
 
 def test_bposd_bb144_faithful_per_shot():

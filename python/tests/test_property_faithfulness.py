@@ -5,6 +5,7 @@ and random / adversarial syndromes, asserting the core invariant
 ``H @ decode(s) == s (mod 2)`` for every decoder.  This is the property that the
 older shape-only tests missed.
 """
+
 import numpy as np
 import pytest
 from hypothesis import given, settings, strategies as st
@@ -74,9 +75,7 @@ def test_random_graph_faithfulness(graph, data):
     c2q, n = graph
     H = _H(c2q, n)
     # a reachable syndrome from a random error
-    e = np.array(
-        [data.draw(st.integers(0, 1)) for _ in range(n)], dtype=np.uint8
-    )
+    e = np.array([data.draw(st.integers(0, 1)) for _ in range(n)], dtype=np.uint8)
     s = (H @ e) & 1
     for name, factory in EXACT_DECODER_FACTORIES.items():
         dec = factory(c2q, n)
@@ -87,8 +86,12 @@ def test_random_graph_faithfulness(graph, data):
 
 @pytest.mark.parametrize(
     "code",
-    [codes.rotated_surface_code(5), codes.rotated_surface_code(7),
-     codes.unrotated_surface_code(5), codes.toric_code(5)],
+    [
+        codes.rotated_surface_code(5),
+        codes.rotated_surface_code(7),
+        codes.unrotated_surface_code(5),
+        codes.toric_code(5),
+    ],
     ids=lambda c: c.name,
 )
 def test_adversarial_dense_and_all_zero_syndromes(code):

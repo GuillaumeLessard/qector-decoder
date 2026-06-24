@@ -5,6 +5,7 @@ must follow the independent-error XOR rule ``p = p1(1-p2) + p2(1-p1)`` applied
 repeatedly. Covers the todo cases: zero probability, tiny probability, probability
 near 0.5, many parallel mechanisms, and nested ``repeat`` / ``shift_detectors``.
 """
+
 import math
 
 import numpy as np
@@ -34,12 +35,10 @@ def test_two_parallel_mechanisms_combine_by_xor():
 
 
 def test_three_parallel_mechanisms_combine_by_xor():
-    m = dem.parse_dem(
-        "error(0.05) D0 D1\nerror(0.07) D0 D1\nerror(0.09) D0 D1\n")
+    m = dem.parse_dem("error(0.05) D0 D1\nerror(0.07) D0 D1\nerror(0.09) D0 D1\n")
     c = m.collapse_to_graph()
     assert c.num_errors == 1
-    assert math.isclose(_merged_prob(c, (0, 1)), _xor_combine([0.05, 0.07, 0.09]),
-                        rel_tol=1e-12)
+    assert math.isclose(_merged_prob(c, (0, 1)), _xor_combine([0.05, 0.07, 0.09]), rel_tol=1e-12)
 
 
 def test_zero_probability_member_is_identity():
@@ -91,5 +90,4 @@ def test_collapse_with_repeat_and_shift_blocks():
     assert m.num_errors == 3  # all on D0,D1 (shift 0)
     c = m.collapse_to_graph()
     assert c.num_errors == 1
-    assert math.isclose(_merged_prob(c, (0, 1)), _xor_combine([0.1, 0.1, 0.1]),
-                        rel_tol=1e-12)
+    assert math.isclose(_merged_prob(c, (0, 1)), _xor_combine([0.1, 0.1, 0.1]), rel_tol=1e-12)

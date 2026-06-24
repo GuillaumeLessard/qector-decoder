@@ -10,6 +10,7 @@ wrongly flag one. These tests decode real syndromes with ``BlossomDecoder`` and 
 * There exists at least one concrete shot with ``c != e`` but ``(L @ r) & 1 == 0`` --
   a case where the naive ``c != e`` metric over-counts.
 """
+
 import numpy as np
 import pytest
 
@@ -59,10 +60,13 @@ def _decoder(code):
 # Blossom can return a correction that differs from the error by a harmless stabiliser.
 # The repetition code has no stabiliser-only ker(H) element (its only non-trivial ker
 # vector is the logical), so ``c != e`` there always coincides with a logical flip.
-@pytest.mark.parametrize("code_factory,expect_overcount", [
-    (lambda: codes.repetition_code(7), False),
-    (lambda: codes.rotated_surface_code(5), True),
-])
+@pytest.mark.parametrize(
+    "code_factory,expect_overcount",
+    [
+        (lambda: codes.repetition_code(7), False),
+        (lambda: codes.rotated_surface_code(5), True),
+    ],
+)
 def test_residual_always_in_ker_and_metric_consistent(code_factory, expect_overcount):
     code = code_factory()
     H = code.parity_check_matrix().astype(np.uint8)
@@ -130,9 +134,9 @@ def test_concrete_stabilizer_shift_is_harmless():
     r = c ^ e
 
     # Naive metric flags a failure, but it is harmless: residual is a pure stabiliser.
-    assert not np.array_equal(c, e)            # naive c != e  -> would (wrongly) flag
+    assert not np.array_equal(c, e)  # naive c != e  -> would (wrongly) flag
     assert np.array_equal((H @ r) & 1, np.zeros(H.shape[0], np.uint8))  # residual in ker(H)
-    assert not ((L @ r) & 1).any()             # observable metric -> no logical failure
+    assert not ((L @ r) & 1).any()  # observable metric -> no logical failure
 
 
 def test_all_zero_syndrome_is_no_failure():

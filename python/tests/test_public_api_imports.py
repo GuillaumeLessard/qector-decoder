@@ -4,6 +4,7 @@ Assert every expected public name on ``qector_decoder_v3`` exists, is the right
 kind (class / function / submodule), is present in ``__all__`` where applicable,
 and that ``__version__`` is a non-empty string.
 """
+
 import types
 import inspect
 

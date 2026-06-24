@@ -84,9 +84,7 @@ class DecodeResult:
             "hamming_weight": self.hamming_weight,
             "sparse_indices": self.sparse_indices.tolist(),
             "weight": self.weight,
-            "logical_flips": None
-            if self.logical_flips is None
-            else self.logical_flips.astype(int).tolist(),
+            "logical_flips": None if self.logical_flips is None else self.logical_flips.astype(int).tolist(),
             "decode_seconds": self.decode_seconds,
             "backend": self.backend,
             "fallback": self.fallback,
@@ -107,8 +105,7 @@ class DecodeResult:
             f"qubits / checks    : {self.n_qubits} / {self.n_checks}",
             f"syndrome weight    : {int(self.syndrome.sum())}",
             f"correction weight  : {self.hamming_weight}",
-            f"flipped qubits     : {self.sparse_indices.tolist()[:32]}"
-            + (" ..." if self.hamming_weight > 32 else ""),
+            f"flipped qubits     : {self.sparse_indices.tolist()[:32]}" + (" ..." if self.hamming_weight > 32 else ""),
         ]
         if self.weight is not None:
             lines.append(f"matching weight    : {self.weight:.4f}")
@@ -122,10 +119,7 @@ class DecodeResult:
         return "\n".join(lines)
 
     def __repr__(self) -> str:  # pragma: no cover - cosmetic
-        return (
-            f"DecodeResult(weight={self.hamming_weight}, backend={self.backend!r}, "
-            f"valid={self.syndrome_valid})"
-        )
+        return f"DecodeResult(weight={self.hamming_weight}, backend={self.backend!r}, valid={self.syndrome_valid})"
 
 
 def _jsonable(obj: Any) -> Any:

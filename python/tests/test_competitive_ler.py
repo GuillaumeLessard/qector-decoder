@@ -6,6 +6,7 @@ circuit-level shots, QECTOR's weighted Blossom achieves a logical error rate
 statistically indistinguishable from PyMatching's, and the DEM collapse both
 shrinks the graph and preserves faithfulness.
 """
+
 import math
 
 import numpy as np
@@ -80,8 +81,8 @@ def test_ler_parity_with_pymatching(d):
 
     # The two logical-error-rate confidence intervals must overlap (parity).
     assert q_lo <= p_hi and p_lo <= q_hi, (
-        f"d={d}: QECTOR LER {q_err/shots:.4f} [{q_lo:.4f},{q_hi:.4f}] vs "
-        f"PyMatching {p_err/shots:.4f} [{p_lo:.4f},{p_hi:.4f}] — intervals disjoint"
+        f"d={d}: QECTOR LER {q_err / shots:.4f} [{q_lo:.4f},{q_hi:.4f}] vs "
+        f"PyMatching {p_err / shots:.4f} [{p_lo:.4f},{p_hi:.4f}] — intervals disjoint"
     )
     # QECTOR should never be dramatically worse.
     assert q_err <= p_err + 3 * math.sqrt(max(p_err, 1))

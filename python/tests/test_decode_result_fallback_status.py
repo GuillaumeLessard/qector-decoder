@@ -5,6 +5,7 @@ A default ``DecodeResult`` reports ``fallback is False`` and an empty
 reflected in ``to_dict()`` and rendered by ``explain()`` (which surfaces a
 "FALLBACK" line).
 """
+
 import numpy as np
 
 from qector_decoder_v3 import result

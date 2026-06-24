@@ -36,17 +36,13 @@ def test_compiled_artifact_exists_for_current_interpreter():
     # The extension that THIS interpreter actually loaded must be a real file
     # on disk next to the package.
     loaded = getattr(core, "__file__", None)
-    assert loaded is not None and os.path.isfile(loaded), (
-        f"core.__file__ is not a real file: {loaded!r}"
-    )
+    assert loaded is not None and os.path.isfile(loaded), f"core.__file__ is not a real file: {loaded!r}"
     assert os.path.dirname(os.path.abspath(loaded)) == pkg_dir
 
     # And it must match this interpreter's extension suffix (e.g. cp311 .pyd).
     ext_suffix = sysconfig.get_config_var("EXT_SUFFIX")  # e.g. .cp311-win_amd64.pyd
     expected = os.path.join(pkg_dir, "qector_decoder_v3" + ext_suffix)
-    assert os.path.isfile(expected), (
-        f"no compiled extension for this interpreter; expected {expected}"
-    )
+    assert os.path.isfile(expected), f"no compiled extension for this interpreter; expected {expected}"
 
     # Sanity: at least one .pyd or .so for the package exists.
     artifacts = glob.glob(os.path.join(pkg_dir, "qector_decoder_v3.*.pyd"))

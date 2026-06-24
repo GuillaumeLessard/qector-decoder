@@ -4,6 +4,7 @@ Assert the ``py.typed`` marker ships, a representative set of public Python
 functions carry annotations on their (annotatable) params and return, and that
 every pure-Python submodule imports cleanly.
 """
+
 import importlib
 import inspect
 import os
@@ -19,9 +20,7 @@ def test_py_typed_marker_exists():
 
 def _assert_return_annotated(func):
     sig = inspect.signature(func)
-    assert sig.return_annotation is not inspect.Signature.empty, (
-        f"{func.__qualname__} has no return annotation"
-    )
+    assert sig.return_annotation is not inspect.Signature.empty, f"{func.__qualname__} has no return annotation"
 
 
 def test_repetition_code_annotations():
@@ -30,9 +29,7 @@ def test_repetition_code_annotations():
     sig = inspect.signature(codes.repetition_code)
     _assert_return_annotated(codes.repetition_code)
     for name, param in sig.parameters.items():
-        assert param.annotation is not inspect.Parameter.empty, (
-            f"repetition_code param {name} not annotated"
-        )
+        assert param.annotation is not inspect.Parameter.empty, f"repetition_code param {name} not annotated"
 
 
 def test_parse_dem_annotations():
@@ -41,9 +38,7 @@ def test_parse_dem_annotations():
     sig = inspect.signature(dem.parse_dem)
     _assert_return_annotated(dem.parse_dem)
     for name, param in sig.parameters.items():
-        assert param.annotation is not inspect.Parameter.empty, (
-            f"parse_dem param {name} not annotated"
-        )
+        assert param.annotation is not inspect.Parameter.empty, f"parse_dem param {name} not annotated"
 
 
 def test_decode_with_diagnostics_annotations():

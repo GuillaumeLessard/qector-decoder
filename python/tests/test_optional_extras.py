@@ -40,9 +40,7 @@ def test_expected_extras_groups_present(extras):
     present = expected & set(extras)
     assert present, f"none of {sorted(expected)} found in {sorted(extras)}"
     # All four genuinely exist in this project; assert the full set is declared.
-    assert expected.issubset(set(extras)), (
-        f"missing extras groups: {sorted(expected - set(extras))}"
-    )
+    assert expected.issubset(set(extras)), f"missing extras groups: {sorted(expected - set(extras))}"
 
 
 def test_stim_group_lists_stim_and_pymatching(extras):

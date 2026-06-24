@@ -7,6 +7,7 @@ random errors, decode with both :class:`CUDABatchDecoder` and
 
 Skipped automatically when no CUDA device is present so the suite stays portable.
 """
+
 import numpy as np
 import pytest
 

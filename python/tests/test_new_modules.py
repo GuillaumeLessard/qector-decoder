@@ -245,6 +245,7 @@ class TestRestApi:
         if qd.rest_api._FRAMEWORK != "fastapi":
             pytest.skip("FastAPI not installed")
         from fastapi.testclient import TestClient
+
         app = qd.rest_api.create_app()
         client = TestClient(app)
 
@@ -271,6 +272,7 @@ class TestRestApi:
         app = qd.rest_api.create_app()
         if qd.rest_api._FRAMEWORK == "fastapi":
             from fastapi.testclient import TestClient
+
             client = TestClient(app)
             resp = client.get("/health")
             assert resp.status_code == 200
@@ -280,10 +282,13 @@ class TestRestApi:
             assert resp.status_code == 200
             assert "version" in resp.json()
 
-            resp = client.post("/decode", json={
-                "check_to_qubits": [[0, 1], [1, 2]],
-                "syndrome": [1, 0],
-            })
+            resp = client.post(
+                "/decode",
+                json={
+                    "check_to_qubits": [[0, 1], [1, 2]],
+                    "syndrome": [1, 0],
+                },
+            )
             assert resp.status_code == 200
             assert "correction" in resp.json()
         elif qd.rest_api._FRAMEWORK == "flask":
@@ -296,20 +301,22 @@ class TestRestApi:
                 assert resp.status_code == 200
                 assert "version" in resp.json
 
-                resp = client.post("/decode", json={
-                    "check_to_qubits": [[0, 1], [1, 2]],
-                    "syndrome": [1, 0],
-                })
+                resp = client.post(
+                    "/decode",
+                    json={
+                        "check_to_qubits": [[0, 1], [1, 2]],
+                        "syndrome": [1, 0],
+                    },
+                )
                 assert resp.status_code == 200
                 assert "correction" in resp.json
         else:
-            pytest.skip(
-                f"REST API framework is '{qd.rest_api._FRAMEWORK}', expected fastapi or flask"
-            )
+            pytest.skip(f"REST API framework is '{qd.rest_api._FRAMEWORK}', expected fastapi or flask")
 
     def test_decode_error_empty_checks(self):
         if qd.rest_api._FRAMEWORK == "fastapi":
             from fastapi.testclient import TestClient
+
             app = qd.rest_api.create_app()
             client = TestClient(app)
             resp = client.post("/decode", json={"check_to_qubits": [], "syndrome": []})

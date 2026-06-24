@@ -6,6 +6,7 @@ This test builds the (defect_count, excess_weight) scatter and asserts there is 
 meaningful positive correlation and the gap stays tiny across the whole defect
 range — i.e. adaptive-k scales with defect count as intended.
 """
+
 import numpy as np
 import pytest
 
@@ -17,18 +18,20 @@ from qector_decoder_v3 import dem, pymatching_compat  # noqa: E402
 
 def _scatter(d, shots, seed=20260622, noise=0.005):
     circ = stim.Circuit.generated(
-        "surface_code:rotated_memory_x", distance=d, rounds=d,
+        "surface_code:rotated_memory_x",
+        distance=d,
+        rounds=d,
         after_clifford_depolarization=noise,
         before_measure_flip_probability=noise,
-        after_reset_flip_probability=noise)
+        after_reset_flip_probability=noise,
+    )
     sdem = circ.detector_error_model(decompose_errors=True)
     model = dem.from_stim(sdem).collapse_to_graph()
     H = np.asarray(model.check_matrix())
     w = np.asarray(model.weights(), float)
     qm = pymatching_compat.Matching.from_detector_error_model(sdem)
     pmc = pymatching.Matching.from_check_matrix(H, weights=w)
-    det, _ = circ.compile_detector_sampler(seed=seed).sample(
-        shots=shots, separate_observables=True)
+    det, _ = circ.compile_detector_sampler(seed=seed).sample(shots=shots, separate_observables=True)
     det = det.astype(np.uint8)
     defects = det.sum(1).astype(float)
     excess = np.empty(shots)

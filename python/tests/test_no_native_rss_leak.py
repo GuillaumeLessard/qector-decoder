@@ -8,6 +8,7 @@ to be bounded -- a real unbounded native leak would show monotonic RSS climb.
 Observed growth on the dev machine is ~0 MiB; the 32 MiB bound is robust to GC
 and allocator jitter while still catching a genuine leak.
 """
+
 import gc
 import os
 
@@ -34,8 +35,7 @@ def test_no_native_rss_leak():
     rng = np.random.default_rng(7)
     pool_size = 256
     pool = np.array(
-        [np.asarray(code.syndrome(code.random_error(0.08, rng)), np.uint8)
-         for _ in range(pool_size)],
+        [np.asarray(code.syndrome(code.random_error(0.08, rng)), np.uint8) for _ in range(pool_size)],
         np.uint8,
     )
 

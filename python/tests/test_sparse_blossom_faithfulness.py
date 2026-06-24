@@ -4,6 +4,7 @@ Pure-numpy / synthetic (no stim): for each code we draw many random reachable
 syndromes from random data errors (p~0.1) and assert the core invariant
 ``(H @ corr) & 1 == s`` for the region-growing SparseBlossom decoder.
 """
+
 import numpy as np
 import pytest
 

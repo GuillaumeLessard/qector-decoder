@@ -21,6 +21,7 @@ import qector_decoder_v3 as qd
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def surface_code(d):
     """Generate d×d rotated surface code checks. Returns (checks, n_qubits)."""
     checks = []
@@ -50,6 +51,7 @@ def random_batch(n_checks, batch_size, defect_prob=0.1, seed=None):
 # ---------------------------------------------------------------------------
 # UnionFindDecoder — large distance surface codes
 # ---------------------------------------------------------------------------
+
 
 class TestUnionFindLargeCodes:
     """UnionFind scales O(E·α(N)) — should handle very large codes."""
@@ -83,8 +85,8 @@ class TestUnionFindLargeCodes:
 # FastUnionFindDecoder — same tests via the fast path
 # ---------------------------------------------------------------------------
 
-class TestFastUnionFindLargeCodes:
 
+class TestFastUnionFindLargeCodes:
     @pytest.mark.parametrize("d", [11, 15, 21])
     def test_decode_large_surface_code(self, d):
         checks, nq = surface_code(d)
@@ -115,6 +117,7 @@ class TestFastUnionFindLargeCodes:
 # ---------------------------------------------------------------------------
 # BlossomDecoder — 20-defect boundary
 # ---------------------------------------------------------------------------
+
 
 class TestBlossomDefectBoundary:
     """Blossom uses exact DP for n<=20 defects, falls back to UF for >20."""
@@ -161,8 +164,8 @@ class TestBlossomDefectBoundary:
 # SparseBlossomDecoder — same 20-defect boundary, region growing
 # ---------------------------------------------------------------------------
 
-class TestSparseBlossomDefectBoundary:
 
+class TestSparseBlossomDefectBoundary:
     def test_exactly_20_defects(self):
         checks, nq = surface_code(11)
         dec = qd.SparseBlossomDecoder(checks, nq)
@@ -191,8 +194,8 @@ class TestSparseBlossomDefectBoundary:
 # LookupTableDecoder — exhaustive enumeration up to n=24
 # ---------------------------------------------------------------------------
 
-class TestLookupTableCapacity:
 
+class TestLookupTableCapacity:
     def test_exhaustive_n12(self):
         """12 qubits: 2^12=4096 entries, builds in < 1s."""
         checks, nq = surface_code(3)  # d=3: 9 qubits
@@ -233,8 +236,8 @@ class TestLookupTableCapacity:
 # BPOSD — larger codes
 # ---------------------------------------------------------------------------
 
-class TestBPOSDLargeCodes:
 
+class TestBPOSDLargeCodes:
     @pytest.mark.parametrize("d", [5, 7, 11])
     def test_bp_osd_surface_code(self, d):
         checks, nq = surface_code(d)
@@ -256,8 +259,8 @@ class TestBPOSDLargeCodes:
 # CPUBatchDecoder — large batches
 # ---------------------------------------------------------------------------
 
-class TestCPUBatchDecoderCapacity:
 
+class TestCPUBatchDecoderCapacity:
     def test_batch_10k(self):
         checks, nq = surface_code(7)
         dec = qd.CPUBatchDecoder(checks, nq)
@@ -308,8 +311,8 @@ class TestCPUBatchDecoderCapacity:
 # BatchDecoder (Rayon parallel) — large batches
 # ---------------------------------------------------------------------------
 
-class TestBatchDecoderCapacity:
 
+class TestBatchDecoderCapacity:
     def test_parallel_batch_10k(self):
         checks, nq = surface_code(7)
         dec = qd.BatchDecoder(checks, nq)
@@ -331,8 +334,8 @@ class TestBatchDecoderCapacity:
 # HybridDecoder — large code
 # ---------------------------------------------------------------------------
 
-class TestHybridDecoderLarge:
 
+class TestHybridDecoderLarge:
     def test_d11_surface_code(self):
         checks, nq = surface_code(11)
         dec = qd.HybridDecoder(checks, nq)
@@ -345,8 +348,8 @@ class TestHybridDecoderLarge:
 # Cross-decoder consistency on large codes
 # ---------------------------------------------------------------------------
 
-class TestCrossDecoderConsistencyLarge:
 
+class TestCrossDecoderConsistencyLarge:
     @pytest.mark.parametrize("d", [5, 7])
     def test_uf_vs_blossom_vs_sparse(self, d):
         """All three decoders should produce valid (same-length) corrections."""
@@ -381,6 +384,7 @@ class TestCrossDecoderConsistencyLarge:
 # GPU backends — availability + graceful degradation
 # ---------------------------------------------------------------------------
 
+
 class TestGPUCapacity:
     """GPU tests only run if hardware is available."""
 
@@ -390,8 +394,7 @@ class TestGPUCapacity:
     def test_cuda_is_available_bool(self):
         assert isinstance(qd.CUDABatchDecoder.is_available(), bool)
 
-    @pytest.mark.skipif(not qd.OpenCLBatchDecoder.is_available(),
-                        reason="OpenCL not available")
+    @pytest.mark.skipif(not qd.OpenCLBatchDecoder.is_available(), reason="OpenCL not available")
     def test_opencl_large_batch(self):
         checks, nq = surface_code(7)
         dec = qd.OpenCLBatchDecoder(checks, nq)
@@ -399,8 +402,7 @@ class TestGPUCapacity:
         results = dec.batch_decode(batch)
         assert results.shape == (10_000, nq)
 
-    @pytest.mark.skipif(not qd.CUDABatchDecoder.is_available(),
-                        reason="CUDA not available")
+    @pytest.mark.skipif(not qd.CUDABatchDecoder.is_available(), reason="CUDA not available")
     def test_cuda_large_batch(self):
         checks, nq = surface_code(7)
         dec = qd.CUDABatchDecoder(checks, nq)
@@ -408,8 +410,7 @@ class TestGPUCapacity:
         results = dec.batch_decode(batch)
         assert results.shape == (10_000, nq)
 
-    @pytest.mark.skipif(not qd.OpenCLBatchDecoder.is_available(),
-                        reason="OpenCL not available")
+    @pytest.mark.skipif(not qd.OpenCLBatchDecoder.is_available(), reason="OpenCL not available")
     def test_opencl_512_qubit_code(self):
         """Test the extended 512-qubit local-memory path."""
         checks, nq = surface_code(21)  # 441 qubits
@@ -423,8 +424,8 @@ class TestGPUCapacity:
 # Boundary validation — reject bad inputs at scale
 # ---------------------------------------------------------------------------
 
-class TestBoundaryValidationLarge:
 
+class TestBoundaryValidationLarge:
     def test_wrong_dtype_rejected(self):
         checks, nq = surface_code(11)
         dec = qd.UnionFindDecoder(checks, nq)
@@ -455,8 +456,8 @@ class TestBoundaryValidationLarge:
 # Memory stress — ensure no unbounded growth
 # ---------------------------------------------------------------------------
 
-class TestMemoryStress:
 
+class TestMemoryStress:
     def test_repeated_decode_no_leak(self):
         """100K decodes on a large code should not balloon memory."""
         checks, nq = surface_code(11)

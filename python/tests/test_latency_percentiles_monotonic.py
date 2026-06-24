@@ -8,6 +8,7 @@ those would flake under machine load.
 NOTE: ``rotated_surface_code`` takes a single ``distance`` argument in this build,
 so the spec's "(5,7)" is realized as two distances, d=5 and d=7.
 """
+
 import pytest
 
 import qector_decoder_v3 as qd

@@ -5,6 +5,7 @@ CPU decoder kind across two code families. This is the correctness gate that
 backs every reported latency/throughput number: if a benchmarked decode were
 wrong, the benchmark is meaningless. No wall-clock thresholds.
 """
+
 import pytest
 
 import qector_decoder_v3 as qd

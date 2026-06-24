@@ -1,4 +1,5 @@
 """Tests for qector_decoder_v3.backend — automatic backend selection."""
+
 import numpy as np
 import pytest
 

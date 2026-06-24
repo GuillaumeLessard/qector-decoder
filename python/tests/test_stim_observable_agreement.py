@@ -15,6 +15,7 @@ We assert:
 If the predicted-observable convention disagreed with Stim's, the LER would be ~0.5
 (random) rather than the small, matching value we require.
 """
+
 import math
 
 import numpy as np
@@ -37,15 +38,15 @@ def _decode_failures(d, N, seed, basis="x", p=0.006):
     from qector_decoder_v3 import pymatching_compat
 
     circ = stim.Circuit.generated(
-        f"surface_code:rotated_memory_{basis}", distance=d, rounds=d,
+        f"surface_code:rotated_memory_{basis}",
+        distance=d,
+        rounds=d,
         after_clifford_depolarization=p,
         before_measure_flip_probability=p,
         after_reset_flip_probability=p,
     )
     sdem = circ.detector_error_model(decompose_errors=True)
-    det, obs = circ.compile_detector_sampler(seed=seed).sample(
-        shots=N, separate_observables=True
-    )
+    det, obs = circ.compile_detector_sampler(seed=seed).sample(shots=N, separate_observables=True)
     det = det.astype(np.uint8)
     obs = obs.astype(np.uint8)
 

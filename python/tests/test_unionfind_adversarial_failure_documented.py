@@ -19,6 +19,7 @@ This test asserts, deterministically (seeded, no Hypothesis, no flakiness):
    decoders had zero failures on the adversarial set (UF's failure count there is
    reported for the record but not asserted, since it depends on the build).
 """
+
 import numpy as np
 import pytest
 
@@ -92,9 +93,7 @@ def test_union_find_faithful_on_real_qec_codes(code, dec_name):
         e = (rng.random(nq) < 0.12).astype(np.uint8)
         s = ((H @ e) & 1).astype(np.uint8)
         c = np.asarray(dec.decode(s), np.uint8)
-        assert np.array_equal((H @ c) & 1, s), (
-            f"{dec_name} unexpectedly failed on real code {code.name}"
-        )
+        assert np.array_equal((H @ c) & 1, s), f"{dec_name} unexpectedly failed on real code {code.name}"
 
 
 def test_exact_decoders_cover_arbitrary_adversarial_graphs():

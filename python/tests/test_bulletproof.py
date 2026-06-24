@@ -24,6 +24,7 @@ import qector_decoder_v3 as qd
 # CPUBatchDecoder.decode() — single-syndrome path (was missing in source)
 # ---------------------------------------------------------------------------
 
+
 class TestCPUBatchDecoderSingleDecode:
     def test_decode_returns_correct_shape_and_dtype(self):
         checks, n_qubits = qd.generate_ring_code_checks(5)
@@ -70,6 +71,7 @@ class TestCPUBatchDecoderSingleDecode:
 # HybridDecoder — full API surface (verify no stray test_method)
 # ---------------------------------------------------------------------------
 
+
 class TestHybridDecoderAPI:
     def test_no_stray_test_method(self):
         checks, n_qubits = qd.generate_ring_code_checks(5)
@@ -115,6 +117,7 @@ class TestHybridDecoderAPI:
 # GPU resilience — verify counters behave correctly on both backends
 # ---------------------------------------------------------------------------
 
+
 class TestGPUBackends:
     @pytest.fixture
     def small_code(self):
@@ -126,8 +129,7 @@ class TestGPUBackends:
     def test_opencl_is_available_bool(self):
         assert isinstance(qd.OpenCLBatchDecoder.is_available(), bool)
 
-    @pytest.mark.skipif(not qd.CUDABatchDecoder.is_available(),
-                        reason="CUDA not available")
+    @pytest.mark.skipif(not qd.CUDABatchDecoder.is_available(), reason="CUDA not available")
     def test_cuda_resilience_fields_initial(self, small_code):
         checks, n_qubits = small_code
         dec = qd.CUDABatchDecoder(checks, n_qubits)
@@ -139,8 +141,7 @@ class TestGPUBackends:
         cc = dec.compute_capability
         assert isinstance(cc, tuple) and len(cc) == 2
 
-    @pytest.mark.skipif(not qd.CUDABatchDecoder.is_available(),
-                        reason="CUDA not available")
+    @pytest.mark.skipif(not qd.CUDABatchDecoder.is_available(), reason="CUDA not available")
     def test_cuda_reset_clears_counters(self, small_code):
         checks, n_qubits = small_code
         dec = qd.CUDABatchDecoder(checks, n_qubits)
@@ -149,16 +150,14 @@ class TestGPUBackends:
         assert dec.total_failures == 0
         assert dec.is_degraded is False
 
-    @pytest.mark.skipif(not qd.CUDABatchDecoder.is_available(),
-                        reason="CUDA not available")
+    @pytest.mark.skipif(not qd.CUDABatchDecoder.is_available(), reason="CUDA not available")
     def test_cuda_rejects_wrong_shape(self, small_code):
         checks, n_qubits = small_code
         dec = qd.CUDABatchDecoder(checks, n_qubits)
         with pytest.raises(ValueError):
             dec.batch_decode(np.zeros((8, len(checks) + 1), dtype=np.uint8))
 
-    @pytest.mark.skipif(not qd.CUDABatchDecoder.is_available(),
-                        reason="CUDA not available")
+    @pytest.mark.skipif(not qd.CUDABatchDecoder.is_available(), reason="CUDA not available")
     def test_cuda_matches_cpu(self, small_code):
         checks, n_qubits = small_code
         cpu = qd.CPUBatchDecoder(checks, n_qubits)
@@ -167,8 +166,7 @@ class TestGPUBackends:
         synd = rng.integers(0, 2, size=(1024, len(checks)), dtype=np.uint8)
         assert np.array_equal(cuda.batch_decode(synd), cpu.batch_decode(synd))
 
-    @pytest.mark.skipif(not qd.OpenCLBatchDecoder.is_available(),
-                        reason="OpenCL not available")
+    @pytest.mark.skipif(not qd.OpenCLBatchDecoder.is_available(), reason="OpenCL not available")
     def test_opencl_resilience_fields_initial(self, small_code):
         checks, n_qubits = small_code
         dec = qd.OpenCLBatchDecoder(checks, n_qubits)
@@ -177,16 +175,14 @@ class TestGPUBackends:
         assert dec.is_degraded is False
         assert dec.gpu_recoveries == 0
 
-    @pytest.mark.skipif(not qd.OpenCLBatchDecoder.is_available(),
-                        reason="OpenCL not available")
+    @pytest.mark.skipif(not qd.OpenCLBatchDecoder.is_available(), reason="OpenCL not available")
     def test_opencl_reset(self, small_code):
         checks, n_qubits = small_code
         dec = qd.OpenCLBatchDecoder(checks, n_qubits)
         dec.reset()
         assert dec.is_degraded is False
 
-    @pytest.mark.skipif(not qd.OpenCLBatchDecoder.is_available(),
-                        reason="OpenCL not available")
+    @pytest.mark.skipif(not qd.OpenCLBatchDecoder.is_available(), reason="OpenCL not available")
     def test_opencl_matches_cpu(self, small_code):
         checks, n_qubits = small_code
         cpu = qd.CPUBatchDecoder(checks, n_qubits)
@@ -195,8 +191,7 @@ class TestGPUBackends:
         synd = rng.integers(0, 2, size=(1024, len(checks)), dtype=np.uint8)
         assert np.array_equal(ocl.batch_decode(synd), cpu.batch_decode(synd))
 
-    @pytest.mark.skipif(not qd.OpenCLBatchDecoder.is_available(),
-                        reason="OpenCL not available")
+    @pytest.mark.skipif(not qd.OpenCLBatchDecoder.is_available(), reason="OpenCL not available")
     def test_opencl_rejects_wrong_shape(self, small_code):
         checks, n_qubits = small_code
         dec = qd.OpenCLBatchDecoder(checks, n_qubits)
@@ -208,23 +203,31 @@ class TestGPUBackends:
 # MCP server protocol — JSON-RPC over stdio
 # ---------------------------------------------------------------------------
 
+
 class TestMCPServer:
     def _call(self, *requests):
         """Spawn the MCP server, send requests, return responses."""
         payload = "\n".join(json.dumps(r) for r in requests) + "\n"
         proc = subprocess.run(
-            [sys.executable, "-c",
-             "import qector_decoder_v3 as qd; qd.run_mcp_server()"],
-            input=payload, capture_output=True, text=True, timeout=30,
+            [sys.executable, "-c", "import qector_decoder_v3 as qd; qd.run_mcp_server()"],
+            input=payload,
+            capture_output=True,
+            text=True,
+            timeout=30,
         )
         lines = [ln for ln in proc.stdout.splitlines() if ln.strip()]
         return [json.loads(ln) for ln in lines]
 
     def test_initialize_returns_capabilities(self):
         req = {
-            "jsonrpc": "2.0", "id": 1, "method": "initialize",
-            "params": {"protocolVersion": "2024-11-05", "capabilities": {},
-                       "clientInfo": {"name": "test", "version": "1"}},
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "initialize",
+            "params": {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {},
+                "clientInfo": {"name": "test", "version": "1"},
+            },
         }
         responses = self._call(req)
         assert len(responses) >= 1
@@ -239,9 +242,16 @@ class TestMCPServer:
 
     def test_tools_list_advertises_decode(self):
         reqs = [
-            {"jsonrpc": "2.0", "id": 1, "method": "initialize",
-             "params": {"protocolVersion": "2024-11-05", "capabilities": {},
-                        "clientInfo": {"name": "t", "version": "1"}}},
+            {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "initialize",
+                "params": {
+                    "protocolVersion": "2024-11-05",
+                    "capabilities": {},
+                    "clientInfo": {"name": "t", "version": "1"},
+                },
+            },
             {"jsonrpc": "2.0", "id": 2, "method": "tools/list"},
         ]
         responses = self._call(*reqs)
@@ -256,11 +266,13 @@ class TestMCPServer:
 # gRPC server exposure (only when built with --features grpc)
 # ---------------------------------------------------------------------------
 
+
 class TestGRPCExposure:
     def test_grpc_optional_import(self):
         """run_grpc_server is only present when built with the grpc feature."""
         try:
             from qector_decoder_v3.qector_decoder_v3 import run_grpc_server  # noqa: F401
+
             grpc_exposed = True
         except ImportError:
             grpc_exposed = False
@@ -271,6 +283,7 @@ class TestGRPCExposure:
 # ---------------------------------------------------------------------------
 # Cross-decoder consistency — every decoder must agree on simple syndromes
 # ---------------------------------------------------------------------------
+
 
 class TestCrossDecoderConsistency:
     def test_uf_and_fast_uf_agree(self):
@@ -289,7 +302,7 @@ class TestCrossDecoderConsistency:
         batch = rng.integers(0, 2, size=(50, len(checks)), dtype=np.uint8)
         out_batch = dec.parallel_batch_decode(batch)
         for i in range(50):
-            assert np.array_equal(out_batch[i], dec.parallel_batch_decode(batch[i:i+1])[0])
+            assert np.array_equal(out_batch[i], dec.parallel_batch_decode(batch[i : i + 1])[0])
 
     def test_blossom_matches_sparse_blossom_on_ring(self):
         checks, n_qubits = qd.generate_ring_code_checks(5)
@@ -317,6 +330,7 @@ class TestCrossDecoderConsistency:
 # ---------------------------------------------------------------------------
 # Boundary validation — every decoder must validate input shape & dtype
 # ---------------------------------------------------------------------------
+
 
 class TestBoundaryValidation:
     @pytest.fixture

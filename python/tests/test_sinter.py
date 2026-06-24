@@ -4,6 +4,7 @@ Runs a small real ``sinter.collect`` with QECTOR decoders. The key assertions:
 the decoders are accepted by Sinter, bit-packing is correct (sane LERs, not ~0.5),
 and belief-matching is competitive with PyMatching through the standard harness.
 """
+
 import pytest
 
 stim = pytest.importorskip("stim")
@@ -17,7 +18,9 @@ def _tasks():
     tasks = []
     for d in (3, 5):
         circ = stim.Circuit.generated(
-            "surface_code:rotated_memory_x", distance=d, rounds=d,
+            "surface_code:rotated_memory_x",
+            distance=d,
+            rounds=d,
             after_clifford_depolarization=0.005,
             before_measure_flip_probability=0.005,
             after_reset_flip_probability=0.005,

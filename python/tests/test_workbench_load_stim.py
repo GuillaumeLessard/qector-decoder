@@ -1,4 +1,5 @@
 """Workbench: loading a Stim circuit (file path, text, and Circuit object)."""
+
 import numpy as np
 import pytest
 
@@ -9,8 +10,8 @@ stim = pytest.importorskip("stim")
 
 def _circuit(d=3):
     return stim.Circuit.generated(
-        "surface_code:rotated_memory_x", distance=d, rounds=d,
-        after_clifford_depolarization=0.01)
+        "surface_code:rotated_memory_x", distance=d, rounds=d, after_clifford_depolarization=0.01
+    )
 
 
 def test_load_stim_from_circuit_object():

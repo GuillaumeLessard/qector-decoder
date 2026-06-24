@@ -4,6 +4,7 @@
 A valid 2-D batch must return shape ``(n_shots, n_qubits)`` with every row
 syndrome-faithful.
 """
+
 import numpy as np
 import pytest
 

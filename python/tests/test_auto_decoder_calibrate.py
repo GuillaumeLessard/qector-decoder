@@ -9,6 +9,7 @@ We calibrate the CPU/GPU crossover on this machine and assert:
     and bit-identical to :class:`CPUBatchDecoder`;
   * ``diagnostics()`` reports ``calibrated == True``.
 """
+
 import numpy as np
 import pytest
 

@@ -7,6 +7,7 @@ older tests only asserted output *shape*. These tests assert correctness itself,
 across rotated-surface, unrotated/planar-surface, ring (toric) and repetition
 codes, so the regression cannot recur silently.
 """
+
 import numpy as np
 import pytest
 import qector_decoder_v3 as qd
@@ -28,8 +29,7 @@ def rotated_surface_code(d):
     for r in range(d - 1):
         for c in range(d - 1):
             if (r + c) % 2 == 0:
-                checks.append([r * d + c, r * d + c + 1,
-                               (r + 1) * d + c, (r + 1) * d + c + 1])
+                checks.append([r * d + c, r * d + c + 1, (r + 1) * d + c, (r + 1) * d + c + 1])
     return checks, d * d
 
 
@@ -83,8 +83,7 @@ def _reachable_syndromes(H, n_qubits, n_shots, p, seed):
     return errors, (errors @ H.T) & 1
 
 
-SINGLE_DECODERS = ["UnionFind", "FastUnionFind", "Blossom", "SparseBlossom",
-                   "BPOSD", "CPUBatch"]
+SINGLE_DECODERS = ["UnionFind", "FastUnionFind", "Blossom", "SparseBlossom", "BPOSD", "CPUBatch"]
 
 
 def _make(name, c2q, n):
@@ -113,8 +112,7 @@ def test_single_decode_is_syndrome_faithful(decoder_name, code):
     for s in syndromes:
         corr = np.asarray(dec.decode(s.astype(np.uint8))).astype(np.uint8)
         assert corr.shape == (n,)
-        assert np.array_equal((H @ corr) & 1, s), (
-            f"{decoder_name} on {name}: H@c != s")
+        assert np.array_equal((H @ corr) & 1, s), f"{decoder_name} on {name}: H@c != s"
 
 
 @pytest.mark.parametrize("code", CODES, ids=[c[0] for c in CODES])
@@ -123,13 +121,11 @@ def test_batch_decoders_are_syndrome_faithful(code):
     H = _H(c2q, n)
     _, syndromes = _reachable_syndromes(H, n, 256, p=0.08, seed=99)
     syndromes = syndromes.astype(np.uint8)
-    for dname, dec in [("BatchDecoder", qd.BatchDecoder(c2q, n)),
-                       ("CPUBatch", qd.CPUBatchDecoder(c2q, n))]:
+    for dname, dec in [("BatchDecoder", qd.BatchDecoder(c2q, n)), ("CPUBatch", qd.CPUBatchDecoder(c2q, n))]:
         out = np.asarray(dec.batch_decode(syndromes))
         assert out.shape == (len(syndromes), n)
         for i in range(len(syndromes)):
-            assert np.array_equal((H @ out[i]) & 1, syndromes[i]), (
-                f"{dname} on {name}: row {i} H@c != s")
+            assert np.array_equal((H @ out[i]) & 1, syndromes[i]), f"{dname} on {name}: row {i} H@c != s"
 
 
 @pytest.mark.parametrize("code", CODES, ids=[c[0] for c in CODES])
@@ -156,8 +152,7 @@ def test_lookup_table_is_syndrome_faithful():
         assert np.array_equal((H @ corr) & 1, s), "LookupTable: H@c != s"
 
 
-@pytest.mark.skipif(not qd.CUDABatchDecoder.is_available(),
-                    reason="CUDA not available")
+@pytest.mark.skipif(not qd.CUDABatchDecoder.is_available(), reason="CUDA not available")
 @pytest.mark.parametrize("code", CODES, ids=[c[0] for c in CODES])
 def test_cuda_bit_identical_and_faithful(code):
     name, c2q, n = code
@@ -173,8 +168,7 @@ def test_cuda_bit_identical_and_faithful(code):
         assert np.array_equal((H @ got[i]) & 1, syndromes[i])
 
 
-@pytest.mark.skipif(not qd.OpenCLBatchDecoder.is_available(),
-                    reason="OpenCL not available")
+@pytest.mark.skipif(not qd.OpenCLBatchDecoder.is_available(), reason="OpenCL not available")
 @pytest.mark.parametrize("code", CODES, ids=[c[0] for c in CODES])
 def test_opencl_bit_identical_and_faithful(code):
     name, c2q, n = code

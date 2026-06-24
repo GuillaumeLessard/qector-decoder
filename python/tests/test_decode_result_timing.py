@@ -5,6 +5,7 @@ and ``explain()`` renders a decode-time line. No absolute wall-clock thresholds
 are asserted (those would flake under load); only the type, sign and presence
 of the rendered line.
 """
+
 import numpy as np
 
 from qector_decoder_v3 import codes, result

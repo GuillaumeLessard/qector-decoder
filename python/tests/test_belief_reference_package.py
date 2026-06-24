@@ -7,6 +7,7 @@ reference ``beliefmatching`` package's LER closely:
 NOTE: the reference uses keyword ``max_bp_iters`` (not ``max_iter``). Both
 implementations are slow, so shots are kept small (<=600 total at each d).
 """
+
 import numpy as np
 import pytest
 
@@ -41,9 +42,7 @@ def test_belief_tracks_reference_package(d, N):
     ref = RefBM.from_detector_error_model(sdem, max_bp_iters=20)
     no = qbm.num_observables
 
-    det, obs = circ.compile_detector_sampler(seed=seed).sample(
-        shots=N, separate_observables=True
-    )
+    det, obs = circ.compile_detector_sampler(seed=seed).sample(shots=N, separate_observables=True)
     det = det.astype(np.uint8)
     obs = obs.astype(np.uint8)
 

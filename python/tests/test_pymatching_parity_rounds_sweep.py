@@ -7,6 +7,7 @@ reference ``pymatching.Matching`` on IDENTICAL seeded Stim shots at every round
 count: overlapping Wilson 95% intervals AND QECTOR no worse than PyMatching
 beyond a small tie/Poisson slack.
 """
+
 import math
 
 import numpy as np
@@ -31,14 +32,15 @@ def wilson(k, n, z=1.959963985):
 
 def _logical_errors(d, rounds, shots, seed, basis="x", noise=0.005):
     circ = stim.Circuit.generated(
-        f"surface_code:rotated_memory_{basis}", distance=d, rounds=rounds,
+        f"surface_code:rotated_memory_{basis}",
+        distance=d,
+        rounds=rounds,
         after_clifford_depolarization=noise,
         before_measure_flip_probability=noise,
         after_reset_flip_probability=noise,
     )
     sdem = circ.detector_error_model(decompose_errors=True)
-    det, obs = circ.compile_detector_sampler(seed=seed).sample(
-        shots=shots, separate_observables=True)
+    det, obs = circ.compile_detector_sampler(seed=seed).sample(shots=shots, separate_observables=True)
     det = det.astype(np.uint8)
     obs = obs.astype(np.uint8)
     qm = pymatching_compat.Matching.from_detector_error_model(sdem)
@@ -56,8 +58,7 @@ def test_pymatching_parity_rounds_sweep(rounds):
     d = 5
     shots = 3000
     seed = 20260626 + rounds
-    q_err, p_err = _logical_errors(
-        d, rounds, shots=shots, seed=seed, basis="x", noise=0.005)
+    q_err, p_err = _logical_errors(d, rounds, shots=shots, seed=seed, basis="x", noise=0.005)
     ql, qh = wilson(q_err, shots)
     pl, ph = wilson(p_err, shots)
     overlap = not (qh < pl or ph < ql)
@@ -68,6 +69,5 @@ def test_pymatching_parity_rounds_sweep(rounds):
     )
     slack = max(4, int(0.3 * p_err))
     assert q_err <= p_err + slack, (
-        f"d={d} rounds={rounds}: QECTOR {q_err} logical errors vs "
-        f"PyMatching {p_err} (+{slack} slack)"
+        f"d={d} rounds={rounds}: QECTOR {q_err} logical errors vs PyMatching {p_err} (+{slack} slack)"
     )

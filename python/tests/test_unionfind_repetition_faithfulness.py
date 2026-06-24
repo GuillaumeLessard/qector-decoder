@@ -4,6 +4,7 @@ Both ``UnionFindDecoder`` and ``FastUnionFindDecoder`` are exercised on
 repetition codes of distance 7, 11 and 21 over many random reachable syndromes,
 asserting the core invariant ``(H @ corr) & 1 == s``.
 """
+
 import numpy as np
 import pytest
 
@@ -32,9 +33,7 @@ def test_union_find_repetition_faithful(d, dec_name):
         s = ((H @ e) & 1).astype(np.uint8)
         c = np.asarray(dec.decode(s), np.uint8)
         assert c.shape == (nq,)
-        assert np.array_equal((H @ c) & 1, s), (
-            f"{dec_name} on rep({d}): H@c != s"
-        )
+        assert np.array_equal((H @ c) & 1, s), f"{dec_name} on rep({d}): H@c != s"
         if s.any():
             nonzero += 1
     assert nonzero > n_shots // 4
@@ -53,6 +52,4 @@ def test_union_find_repetition_every_single_defect(d, dec_name):
         s = np.zeros(nc, np.uint8)
         s[ci] = 1
         c = np.asarray(dec.decode(s), np.uint8)
-        assert np.array_equal((H @ c) & 1, s), (
-            f"{dec_name} on rep({d}): defect {ci} not faithful"
-        )
+        assert np.array_equal((H @ c) & 1, s), f"{dec_name} on rep({d}): defect {ci} not faithful"

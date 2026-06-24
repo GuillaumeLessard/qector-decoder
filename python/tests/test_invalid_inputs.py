@@ -3,6 +3,7 @@
 Invalid inputs must raise a clean ValueError/TypeError -- never panic, abort or
 segfault. Each case is wrapped in ``pytest.raises``.
 """
+
 import numpy as np
 import pytest
 
@@ -11,11 +12,7 @@ from qector_decoder_v3 import codes, dem, result, bposd, pymatching_compat
 
 
 def _small_dem():
-    text = (
-        "error(0.1) D0 L0\n"
-        "error(0.1) D0 D1\n"
-        "error(0.1) D1 L0\n"
-    )
+    text = "error(0.1) D0 L0\nerror(0.1) D0 D1\nerror(0.1) D1 L0\n"
     return dem.parse_dem(text)
 
 

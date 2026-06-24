@@ -13,6 +13,7 @@ The naive ``c != e`` metric over-counts, because a non-zero residual that lies i
 
 Code: bivariate-bicycle ``[[72, 12]]``.
 """
+
 import numpy as np
 import pytest
 
@@ -41,9 +42,7 @@ def _in_span(basis, v):
 
 
 def _bb72():
-    return codes.bivariate_bicycle_code(
-        6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)]
-    )
+    return codes.bivariate_bicycle_code(6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)])
 
 
 def test_residual_always_in_ker_hx():
@@ -58,9 +57,9 @@ def test_residual_always_in_ker_hx():
         e = (rng.random(nq) < p).astype(np.uint8)
         s = ((Hx @ e) & 1).astype(np.uint8)
         c = np.asarray(dec.decode(s), np.uint8)
-        assert np.array_equal((Hx @ c) & 1, s)        # syndrome-faithful
+        assert np.array_equal((Hx @ c) & 1, s)  # syndrome-faithful
         r = c ^ e
-        assert np.array_equal((Hx @ r) & 1, zero)     # residual in ker(Hx) always
+        assert np.array_equal((Hx @ r) & 1, zero)  # residual in ker(Hx) always
 
 
 def test_logical_failure_is_rowspace_membership():
@@ -123,8 +122,8 @@ def test_harmless_stabilizer_residual_exists_deterministically():
             found += 1
             # The rowspace metric correctly reports NO logical failure here,
             # whereas naive c != e would (wrongly) count a failure.
-            assert _in_span(Zbasis, r)            # no logical failure
-            assert not np.array_equal(c, st)      # but c != e
+            assert _in_span(Zbasis, r)  # no logical failure
+            assert not np.array_equal(c, st)  # but c != e
 
     assert found > 0, "expected at least one non-zero in-rowspace residual"
 

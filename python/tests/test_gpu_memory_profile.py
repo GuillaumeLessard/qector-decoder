@@ -11,6 +11,7 @@ growth check compares from the *second* call onward.
 
 Requires psutil and a CUDA device; skipped otherwise.
 """
+
 import numpy as np
 import pytest
 

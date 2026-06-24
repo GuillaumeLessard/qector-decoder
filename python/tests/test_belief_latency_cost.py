@@ -8,6 +8,7 @@ records the latency multiplier. It does NOT hard-fail on wall-clock: it only
 asserts belief ran, produced valid output, and took measurable, non-negative
 time -- per cheatsheet rule 8 (no absolute wall-clock thresholds).
 """
+
 import time
 
 import numpy as np
@@ -37,9 +38,7 @@ def test_belief_latency_cost_characterization():
     mwpm = pymatching_compat.Matching.from_detector_error_model(sdem)
     no = bm.num_observables
 
-    det, obs = circ.compile_detector_sampler(seed=seed).sample(
-        shots=N, separate_observables=True
-    )
+    det, obs = circ.compile_detector_sampler(seed=seed).sample(shots=N, separate_observables=True)
     det = det.astype(np.uint8)
     obs = obs.astype(np.uint8)
 

@@ -7,6 +7,7 @@ Rules locked here:
   * mechanisms on different detector sets keep their own masks;
   * boundary edges (single detector) and hyperedges retain masks.
 """
+
 import numpy as np
 
 from qector_decoder_v3 import dem
@@ -40,8 +41,8 @@ def test_masks_are_not_xored_together():
     m = dem.parse_dem("error(0.3) D0 D1 L0\nerror(0.1) D0 D1 L1\n")
     c = m.collapse_to_graph()
     obs = _edge(c, (0, 1)).observables
-    assert obs == (0,)            # most likely (p=0.3) carried L0
-    assert obs != (0, 1)          # NOT the XOR of both masks
+    assert obs == (0,)  # most likely (p=0.3) carried L0
+    assert obs != (0, 1)  # NOT the XOR of both masks
 
 
 def test_different_pairs_keep_separate_masks():
@@ -52,8 +53,7 @@ def test_different_pairs_keep_separate_masks():
 
 
 def test_observables_matrix_consistent_after_collapse():
-    m = dem.parse_dem(
-        "error(0.1) D0 L0\nerror(0.1) D0 D1\nerror(0.2) D0 D1 L0\nerror(0.1) D1 L0\n")
+    m = dem.parse_dem("error(0.1) D0 L0\nerror(0.1) D0 D1\nerror(0.2) D0 D1 L0\nerror(0.1) D1 L0\n")
     c = m.collapse_to_graph()
     L = c.observables_matrix()
     assert L.shape == (1, c.num_errors)

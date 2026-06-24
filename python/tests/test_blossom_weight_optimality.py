@@ -11,6 +11,7 @@ QECTOR and PyMatching decoding the IDENTICAL collapsed graph.
 The comparison is on logical outcomes (not raw matching weight), which is the
 quantity that matters and is immune to QECTOR's internal weight quantization.
 """
+
 import numpy as np
 import pytest
 
@@ -22,14 +23,15 @@ from qector_decoder_v3 import dem, pymatching_compat  # noqa: E402
 
 def _logical_errors(d, shots, seed, basis="x", noise=0.005):
     circ = stim.Circuit.generated(
-        f"surface_code:rotated_memory_{basis}", distance=d, rounds=d,
+        f"surface_code:rotated_memory_{basis}",
+        distance=d,
+        rounds=d,
         after_clifford_depolarization=noise,
         before_measure_flip_probability=noise,
         after_reset_flip_probability=noise,
     )
     sdem = circ.detector_error_model(decompose_errors=True)
-    det, obs = circ.compile_detector_sampler(seed=seed).sample(
-        shots=shots, separate_observables=True)
+    det, obs = circ.compile_detector_sampler(seed=seed).sample(shots=shots, separate_observables=True)
     det = det.astype(np.uint8)
     obs = obs.astype(np.uint8)
     qm = pymatching_compat.Matching.from_detector_error_model(sdem)

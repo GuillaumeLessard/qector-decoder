@@ -10,6 +10,7 @@ minimum-weight correction for each reachable syndrome and check that:
 This is the strongest correctness statement available and would catch any
 regression that returns a valid-but-suboptimal or invalid matching.
 """
+
 import itertools
 
 import numpy as np
@@ -50,8 +51,7 @@ def test_exact_blossom_is_weight_optimal(code):
         c = np.asarray(blossom.decode(s)).astype(np.uint8)
         assert np.array_equal((H @ c) & 1, s), f"Blossom {code.name}: not faithful"
         assert int(c.sum()) == min_w, (
-            f"Blossom {code.name}: weight {int(c.sum())} != optimal {min_w} "
-            f"for syndrome {s_tuple}"
+            f"Blossom {code.name}: weight {int(c.sum())} != optimal {min_w} for syndrome {s_tuple}"
         )
 
 

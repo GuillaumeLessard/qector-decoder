@@ -8,6 +8,7 @@ graphlike DEM) decodes the SAME seeded Stim shots as the reference
 small tie/Poisson slack). This guards against accuracy drift as the DEM edge
 weights shift with p.
 """
+
 import math
 
 import numpy as np
@@ -32,14 +33,15 @@ def wilson(k, n, z=1.959963985):
 
 def _logical_errors(d, shots, seed, basis="x", noise=0.005):
     circ = stim.Circuit.generated(
-        f"surface_code:rotated_memory_{basis}", distance=d, rounds=d,
+        f"surface_code:rotated_memory_{basis}",
+        distance=d,
+        rounds=d,
         after_clifford_depolarization=noise,
         before_measure_flip_probability=noise,
         after_reset_flip_probability=noise,
     )
     sdem = circ.detector_error_model(decompose_errors=True)
-    det, obs = circ.compile_detector_sampler(seed=seed).sample(
-        shots=shots, separate_observables=True)
+    det, obs = circ.compile_detector_sampler(seed=seed).sample(shots=shots, separate_observables=True)
     det = det.astype(np.uint8)
     obs = obs.astype(np.uint8)
     qm = pymatching_compat.Matching.from_detector_error_model(sdem)
@@ -63,8 +65,7 @@ def _assert_parity(d, shots, seed, basis, noise):
     )
     slack = max(4, int(0.3 * p_err))
     assert q_err <= p_err + slack, (
-        f"d={d} p={noise}: QECTOR {q_err} logical errors vs "
-        f"PyMatching {p_err} (+{slack} slack)"
+        f"d={d} p={noise}: QECTOR {q_err} logical errors vs PyMatching {p_err} (+{slack} slack)"
     )
 
 

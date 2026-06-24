@@ -1,4 +1,5 @@
 """Workbench: backend detection reports CPU and any available GPU honestly."""
+
 import qector_decoder_v3 as qd
 from qector_decoder_v3.workbench import Workbench
 

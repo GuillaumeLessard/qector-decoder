@@ -168,11 +168,7 @@ class AutoDecoder:
         """Return the backend that *would* run for a given batch size."""
         if self.config.force is not None:
             return self.config.force
-        if (
-            self.config.allow_gpu
-            and batch_size >= self.config.gpu_threshold
-            and (self._cuda_ok or self._opencl_ok)
-        ):
+        if self.config.allow_gpu and batch_size >= self.config.gpu_threshold and (self._cuda_ok or self._opencl_ok):
             if self.config.prefer == Backend.OPENCL and self._opencl_ok:
                 return Backend.OPENCL
             if self._cuda_ok:
@@ -271,9 +267,7 @@ class AutoDecoder:
             self._diag.warnings.append("no GPU available for calibration; GPU disabled")
             self.config.gpu_threshold = 1 << 62
         elif crossover is None:
-            self._diag.warnings.append(
-                "GPU never beat CPU in calibration; keeping CPU for all sizes"
-            )
+            self._diag.warnings.append("GPU never beat CPU in calibration; keeping CPU for all sizes")
             self.config.gpu_threshold = 1 << 62
         else:
             self.config.gpu_threshold = int(crossover)

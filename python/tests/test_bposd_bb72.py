@@ -4,6 +4,7 @@ Validates that the BB(6,6) construction is a well-formed CSS code on 72 qubits
 and that ``qd.bposd.BpOsdDecoder`` is syndrome-faithful (``(H @ c) & 1 == s``)
 over many random errors at p=0.05, both per-shot and in batch mode.
 """
+
 import numpy as np
 import pytest
 
@@ -12,9 +13,7 @@ from qector_decoder_v3.bposd import BpOsdDecoder
 
 
 def _bb72():
-    return codes.bivariate_bicycle_code(
-        6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)]
-    )
+    return codes.bivariate_bicycle_code(6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)])
 
 
 def test_bb72_is_valid_css():
@@ -24,9 +23,7 @@ def test_bb72_is_valid_css():
     assert Hx.shape[1] == 72
     assert Hz.shape[1] == 72
     # CSS commutation: Hx @ Hz.T == 0 (mod 2).
-    assert np.array_equal(
-        (Hx @ Hz.T) % 2, np.zeros((Hx.shape[0], Hz.shape[0]), np.uint8)
-    )
+    assert np.array_equal((Hx @ Hz.T) % 2, np.zeros((Hx.shape[0], Hz.shape[0]), np.uint8))
 
 
 def test_bposd_bb72_faithful_per_shot():

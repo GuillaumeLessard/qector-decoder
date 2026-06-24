@@ -40,11 +40,14 @@ except ImportError:
     def cuda_is_available():
         return False
 
+
 try:
     from .qector_decoder_v3 import opencl_is_available
 except ImportError:
+
     def opencl_is_available():
         return False
+
 
 try:
     from .qector_decoder_v3 import run_grpc_server
@@ -64,10 +67,9 @@ except (ImportError, AttributeError):
     __version__ = "0.5.0"
 
 
-
 class UnionFindDecoder:
     """Production-ready Union-Find quantum error correction decoder.
-    
+
     Rust core with PyO3 bindings. Zero-copy NumPy interop.
     GIL is released during decode for true parallelism.
     """
@@ -242,7 +244,7 @@ class SlidingWindowDecoder:
 
 class StreamingDecoder:
     """Streaming decoder that accumulates syndromes over multiple rounds.
-    
+
     Rust core with circular history buffer and OR accumulation.
     """
 
@@ -281,7 +283,7 @@ class StreamingDecoder:
 
 class BatchDecoder:
     """Parallel batch decoder using Rayon (Rust data parallelism).
-    
+
     Distributes batch decoding across all CPU cores.
     """
 
@@ -486,7 +488,7 @@ class CUDABatchDecoder:
 
 class SparseBlossomDecoder:
     """Region-growing Sparse Blossom decoder with RadixHeap.
-    
+
     Supports dynamic weight overrides from GNN Pre-Decoder for enriched decoding.
     """
 
@@ -506,11 +508,11 @@ class SparseBlossomDecoder:
 
     def decode_with_weights(self, syndrome, weights):
         """Decode with per-qubit dynamic weight overrides.
-        
+
         Args:
             syndrome: np.ndarray of shape (n_checks,) with dtype uint8.
             weights: List of (qubit_id, weight) tuples.
-        
+
         Returns:
             np.ndarray of shape (n_qubits,) with correction.
         """
@@ -542,7 +544,7 @@ class SparseBlossomDecoder:
 
 class BPOSDDecoder:
     """Belief Propagation + Ordered Statistics Decoding.
-    
+
     Min-sum BP with OSD stage for improved LER on complex codes.
     """
 
@@ -630,9 +632,9 @@ class GNNPredecoder:
     """Graph Neural Network Pre-Decoder for dynamic edge weight prediction.
 
     MPNN 3 layers + MLP readout. Predicts adjusted edge weights for SparseBlossom.
-    
+
     **v2.0** : Full backpropagation through MPNN layers (P0). All layers are trainable.
-    
+
     Dimensions must match the DetectorGraph:
     - node_feat_dim = 10 (NodeFeatures::DIM)
     - edge_feat_dim = 8 (EdgeFeatures::DIM)
@@ -644,7 +646,7 @@ class GNNPredecoder:
 
     def __init__(self, node_feat_dim=None, edge_feat_dim=None, hidden_size=16, n_layers=2):
         """Create a GNNPredecoder.
-        
+
         If node_feat_dim and edge_feat_dim are not provided, uses the standard
         dimensions matching DetectorGraph (10 and 8).
         """
@@ -763,19 +765,28 @@ class GNNTrainer:
 
 class HybridDecoder:
     """GNN Pre-Decoder + SparseBlossom hybrid decoder.
-    
+
     Uses a lightweight MPNN to estimate dynamic edge weights, then passes
     them to SparseBlossom for enriched region-growing decoding.
     """
 
-    def __init__(self, check_to_qubits, n_qubits=None, check_positions=None,
-                 check_types=None, base_weights=None, gnn_hidden_size=64, gnn_n_layers=3):
+    def __init__(
+        self,
+        check_to_qubits,
+        n_qubits=None,
+        check_positions=None,
+        check_types=None,
+        base_weights=None,
+        gnn_hidden_size=64,
+        gnn_n_layers=3,
+    ):
         if not check_to_qubits:
             raise ValueError("check_to_qubits must be non-empty")
         c2q = [[int(q) for q in check] for check in check_to_qubits]
         nq = None if n_qubits is None else int(n_qubits)
-        self._inner = _RustHybridDecoder(c2q, nq, check_positions, check_types,
-                                         base_weights, gnn_hidden_size, gnn_n_layers)
+        self._inner = _RustHybridDecoder(
+            c2q, nq, check_positions, check_types, base_weights, gnn_hidden_size, gnn_n_layers
+        )
 
     def decode_hybrid(self, syndrome):
         if not isinstance(syndrome, np.ndarray):
@@ -965,12 +976,14 @@ class BenchmarkSuite:
 
     def run(self):
         import json
+
         raw = self._inner.run()
         return json.loads(raw)
 
     def save(self, path, results):
         import json
         from pathlib import Path
+
         Path(path).write_text(json.dumps(results, indent=2), encoding="utf-8")
 
 

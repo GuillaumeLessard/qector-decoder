@@ -35,9 +35,7 @@ def test_fresh_subprocess_import_version_parity():
     )
     assert proc.returncode == 0, f"import failed:\nSTDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}"
     printed = proc.stdout.strip().splitlines()[-1].strip()
-    assert printed == in_proc_version, (
-        f"subprocess __version__ {printed!r} != in-process {in_proc_version!r}"
-    )
+    assert printed == in_proc_version, f"subprocess __version__ {printed!r} != in-process {in_proc_version!r}"
 
 
 def test_import_does_not_require_stim_ecosystem():
@@ -74,9 +72,7 @@ def test_import_does_not_require_stim_ecosystem():
         text=True,
         timeout=120,
     )
-    assert proc.returncode == 0, (
-        f"qd import requires stim/pymatching:\nSTDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}"
-    )
+    assert proc.returncode == 0, f"qd import requires stim/pymatching:\nSTDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}"
     out = proc.stdout
     assert f"VERSION {qector_decoder_v3.__version__}" in out, out
     assert "CORE_OK" in out, out

@@ -4,6 +4,7 @@ Every matching-graph generator is validated for (a) graphlikeness and (b)
 syndrome-faithfulness against the live decoders.  The hypergraph-product helper
 is checked for the CSS commutation condition ``Hx Hz^T = 0 (mod 2)``.
 """
+
 import numpy as np
 import pytest
 
@@ -112,7 +113,7 @@ def test_repetition_logical_observable_is_valid():
         e = (rng.random(code.n_qubits) < 0.03).astype(np.uint8)
         s = (H @ e) & 1
         c = np.asarray(dec.decode(s.astype(np.uint8))).astype(np.uint8)
-        residue = (c ^ e)
+        residue = c ^ e
         if bool(((L @ residue) & 1).any()):
             failures += 1
     # Logical failure rate must be well below chance (0.5) for a working observable.

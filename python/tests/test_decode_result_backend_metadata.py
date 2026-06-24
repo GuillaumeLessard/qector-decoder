@@ -4,6 +4,7 @@ When built via ``kind="blossom"`` the backend label is the kind string; when a
 prebuilt decoder is supplied via ``decoder=`` the backend label is the decoder's
 class name. ``metadata`` is always a dict.
 """
+
 import numpy as np
 
 import qector_decoder_v3 as qd

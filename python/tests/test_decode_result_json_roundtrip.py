@@ -4,6 +4,7 @@
 must contain the documented diagnostic keys and be fully JSON-serializable
 (re-dumpable with ``json.dumps``).
 """
+
 import json
 
 import numpy as np

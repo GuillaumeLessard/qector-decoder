@@ -5,6 +5,7 @@ belief-matching achieves a lower (never higher) logical error rate than plain
 PyMatching. A seeded detector sampler makes the comparison deterministic, so the
 assertion is not flaky.
 """
+
 import numpy as np
 import pytest
 
@@ -16,7 +17,9 @@ from qector_decoder_v3.belief_matching import BeliefMatching, build_matching_mat
 
 def _circ(d, p=0.005):
     return stim.Circuit.generated(
-        "surface_code:rotated_memory_x", distance=d, rounds=d,
+        "surface_code:rotated_memory_x",
+        distance=d,
+        rounds=d,
         after_clifford_depolarization=p,
         before_measure_flip_probability=p,
         after_reset_flip_probability=p,
@@ -42,8 +45,7 @@ def test_belief_matching_beats_pymatching_d5():
     circ = _circ(5)
     sdem = circ.detector_error_model(decompose_errors=True)
     shots = 5000
-    det, obs = circ.compile_detector_sampler(seed=20240601).sample(
-        shots=shots, separate_observables=True)
+    det, obs = circ.compile_detector_sampler(seed=20240601).sample(shots=shots, separate_observables=True)
     det = det.astype(np.uint8)
     obs = obs.astype(np.uint8)
 
@@ -61,8 +63,7 @@ def test_belief_matching_not_worse_d3():
     circ = _circ(3)
     sdem = circ.detector_error_model(decompose_errors=True)
     shots = 5000
-    det, obs = circ.compile_detector_sampler(seed=7).sample(
-        shots=shots, separate_observables=True)
+    det, obs = circ.compile_detector_sampler(seed=7).sample(shots=shots, separate_observables=True)
     det = det.astype(np.uint8)
     obs = obs.astype(np.uint8)
     pm = pymatching.Matching.from_detector_error_model(sdem)
@@ -76,8 +77,7 @@ def test_belief_matching_not_worse_d3():
 def test_belief_matching_observable_shape():
     sdem = _circ(3).detector_error_model(decompose_errors=True)
     bm = BeliefMatching.from_detector_error_model(sdem)
-    det, _ = _circ(3).compile_detector_sampler(seed=1).sample(
-        shots=10, separate_observables=True)
+    det, _ = _circ(3).compile_detector_sampler(seed=1).sample(shots=10, separate_observables=True)
     out = bm.decode_batch(det.astype(np.uint8))
     assert out.shape == (10, sdem.num_observables)
     assert out.dtype == np.uint8

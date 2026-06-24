@@ -6,6 +6,7 @@ collapsed graph. If the candidate set always contains the optimal matching, the
 weight gap is zero. At small/medium distance QECTOR is exactly optimal; we lock
 that and require the median gap to be zero at every tested distance.
 """
+
 import numpy as np
 import pytest
 
@@ -21,18 +22,20 @@ TOL = 1e-3
 
 def _gaps(d, shots, seed=123, noise=0.005):
     circ = stim.Circuit.generated(
-        "surface_code:rotated_memory_x", distance=d, rounds=d,
+        "surface_code:rotated_memory_x",
+        distance=d,
+        rounds=d,
         after_clifford_depolarization=noise,
         before_measure_flip_probability=noise,
-        after_reset_flip_probability=noise)
+        after_reset_flip_probability=noise,
+    )
     sdem = circ.detector_error_model(decompose_errors=True)
     model = dem.from_stim(sdem).collapse_to_graph()
     H = np.asarray(model.check_matrix())
     w = np.asarray(model.weights(), float)
     qm = pymatching_compat.Matching.from_detector_error_model(sdem)
     pmc = pymatching.Matching.from_check_matrix(H, weights=w)
-    det, _ = circ.compile_detector_sampler(seed=seed).sample(
-        shots=shots, separate_observables=True)
+    det, _ = circ.compile_detector_sampler(seed=seed).sample(shots=shots, separate_observables=True)
     det = det.astype(np.uint8)
     gaps = np.empty(shots)
     for i in range(shots):
@@ -53,7 +56,7 @@ def test_exactly_optimal_at_small_distance(d):
 def test_near_exact_at_d7():
     gaps = _gaps(7, shots=2000)
     assert np.median(gaps) <= TOL
-    assert (gaps <= TOL).mean() >= 0.99   # >=99% of shots optimal
+    assert (gaps <= TOL).mean() >= 0.99  # >=99% of shots optimal
 
 
 def test_median_gap_zero_at_d9():

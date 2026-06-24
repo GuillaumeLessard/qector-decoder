@@ -13,6 +13,7 @@ MWPM weight (``BlossomDecoder``) for:
   exact, almost always equal, occasionally heavier by a small bounded amount
   when region growing pairs a defect to the boundary instead of to its partner.
 """
+
 import numpy as np
 import pytest
 
@@ -40,8 +41,7 @@ def test_isolated_defect_pairs_to_nearest_boundary(d):
         assert np.array_equal((H @ cs) & 1, s), f"d={d}: sparse not faithful @ {ci}"
         assert np.array_equal((H @ cb) & 1, s), f"d={d}: exact not faithful @ {ci}"
         assert int(cs.sum()) == int(cb.sum()), (
-            f"d={d}: isolated defect {ci} sparse weight {int(cs.sum())} "
-            f"!= exact {int(cb.sum())}"
+            f"d={d}: isolated defect {ci} sparse weight {int(cs.sum())} != exact {int(cb.sum())}"
         )
 
     # the boundary checks (first and last) must be minimal weight 1
@@ -93,7 +93,4 @@ def test_defect_pairs_near_optimal_vs_exact_weight(d):
             n_equal += 1
 
     frac_equal = n_equal / len(pairs)
-    assert frac_equal >= 0.9, (
-        f"d={d}: only {frac_equal:.2%} of defect pairs matched exact "
-        f"(max_gap={max_gap})"
-    )
+    assert frac_equal >= 0.9, f"d={d}: only {frac_equal:.2%} of defect pairs matched exact (max_gap={max_gap})"

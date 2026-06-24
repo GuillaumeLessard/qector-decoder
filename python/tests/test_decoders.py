@@ -30,7 +30,7 @@ class TestUnionFindDecoder:
         syndrome = np.array([1, 0, 0], dtype=np.uint8)
         corr = dec.decode(syndrome)
         # At least one of the two qubits in the active check must be marked
-        assert (corr[0] == 1 or corr[1] == 1)
+        assert corr[0] == 1 or corr[1] == 1
 
     def test_multiple_active_checks(self, simple_checks):
         checks, n_qubits = simple_checks

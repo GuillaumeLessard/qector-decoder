@@ -3,6 +3,7 @@
 Faithfulness is checked directly; where the `ldpc` package is installed, QECTOR's
 BP-OSD logical error rate is cross-validated against the reference BP-OSD.
 """
+
 import numpy as np
 import pytest
 
@@ -11,9 +12,7 @@ from qector_decoder_v3.bposd import BpOsdDecoder
 
 
 def _bb72():
-    return codes.bivariate_bicycle_code(
-        6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)]
-    )
+    return codes.bivariate_bicycle_code(6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)])
 
 
 def test_bb_code_is_valid_css():
@@ -112,8 +111,7 @@ def test_bposd_logical_error_rate_competitive_with_ldpc():
     syns = ((errs @ Hx.T) & 1).astype(np.uint8)
 
     q = BpOsdDecoder(Hx, error_rate=p, max_iter=30, osd_order=10)
-    ref = RefBpOsd(Hx, error_rate=p, max_iter=30, osd_order=10,
-                   bp_method="product_sum", osd_method="osd_cs")
+    ref = RefBpOsd(Hx, error_rate=p, max_iter=30, osd_order=10, bp_method="product_sum", osd_method="osd_cs")
 
     q_fail = r_fail = 0
     for i in range(shots):

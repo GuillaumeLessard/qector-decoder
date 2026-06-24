@@ -10,6 +10,7 @@ Weights are float sums whose summation order differs between QECTOR and
 PyMatching, so a shot is "optimal" when the gap is within TOL (1e-3) — far above
 that floating-point noise (~1e-7) and far below a real sub-optimality (~1.0).
 """
+
 import numpy as np
 import pytest
 
@@ -23,18 +24,20 @@ TOL = 1e-3
 
 def _gaps(d, shots, seed=20260622, noise=0.005):
     circ = stim.Circuit.generated(
-        "surface_code:rotated_memory_x", distance=d, rounds=d,
+        "surface_code:rotated_memory_x",
+        distance=d,
+        rounds=d,
         after_clifford_depolarization=noise,
         before_measure_flip_probability=noise,
-        after_reset_flip_probability=noise)
+        after_reset_flip_probability=noise,
+    )
     sdem = circ.detector_error_model(decompose_errors=True)
     model = dem.from_stim(sdem).collapse_to_graph()
     H = np.asarray(model.check_matrix())
     w = np.asarray(model.weights(), float)
     qm = pymatching_compat.Matching.from_detector_error_model(sdem)
     pmc = pymatching.Matching.from_check_matrix(H, weights=w)
-    det, _ = circ.compile_detector_sampler(seed=seed).sample(
-        shots=shots, separate_observables=True)
+    det, _ = circ.compile_detector_sampler(seed=seed).sample(shots=shots, separate_observables=True)
     det = det.astype(np.uint8)
     gaps = np.empty(shots)
     for i in range(shots):
@@ -60,4 +63,4 @@ def test_weight_gap_concentrated_at_zero(d):
 
 def test_histogram_p99_small_at_d13():
     gaps = _gaps(13, shots=2500)
-    assert np.percentile(gaps, 99) <= 2.0   # tiny tail even at d=13
+    assert np.percentile(gaps, 99) <= 2.0  # tiny tail even at d=13

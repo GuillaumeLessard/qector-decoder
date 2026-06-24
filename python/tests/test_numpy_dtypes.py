@@ -6,6 +6,7 @@ internally; the single-decode path accepts native uint8 directly. Faithfulness
 is asserted via the core invariant ``(H @ c) & 1 == s`` against the canonical
 uint8 syndrome.
 """
+
 import numpy as np
 import pytest
 
@@ -31,10 +32,13 @@ def _build_case(code, seed=0, p=0.12):
     return H, s
 
 
-@pytest.mark.parametrize("code_factory", [
-    lambda: codes.repetition_code(5),
-    lambda: codes.rotated_surface_code(3),
-])
+@pytest.mark.parametrize(
+    "code_factory",
+    [
+        lambda: codes.repetition_code(5),
+        lambda: codes.rotated_surface_code(3),
+    ],
+)
 @pytest.mark.parametrize("DecCls", DECODER_CLASSES)
 @pytest.mark.parametrize("dtype", DTYPES)
 def test_batch_decode_accepts_each_dtype(code_factory, DecCls, dtype):
@@ -46,15 +50,16 @@ def test_batch_decode_accepts_each_dtype(code_factory, DecCls, dtype):
     batch = np.ascontiguousarray(s.reshape(1, -1).astype(dtype))
     out = np.asarray(dec.batch_decode(batch), np.uint8).reshape(1, -1)
     corr = out[0]
-    assert np.array_equal((H @ corr) & 1, s), (
-        f"{DecCls.__name__} dtype={np.dtype(dtype)} not syndrome-faithful"
-    )
+    assert np.array_equal((H @ corr) & 1, s), f"{DecCls.__name__} dtype={np.dtype(dtype)} not syndrome-faithful"
 
 
-@pytest.mark.parametrize("code_factory", [
-    lambda: codes.repetition_code(5),
-    lambda: codes.rotated_surface_code(3),
-])
+@pytest.mark.parametrize(
+    "code_factory",
+    [
+        lambda: codes.repetition_code(5),
+        lambda: codes.rotated_surface_code(3),
+    ],
+)
 @pytest.mark.parametrize("DecCls", DECODER_CLASSES)
 def test_single_decode_uint8(code_factory, DecCls):
     code = code_factory()

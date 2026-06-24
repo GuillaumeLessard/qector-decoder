@@ -11,6 +11,7 @@ and that the fraction of shots with ``sparse_w == exact_w`` is high (>= 0.9).
 SparseBlossom is never *lighter* than exact MWPM, so we also assert
 ``sparse_w >= exact_w`` (exact is the true minimum).
 """
+
 import numpy as np
 import pytest
 
@@ -64,7 +65,4 @@ def test_sparse_blossom_weight_within_bound(code):
             n_equal += 1
 
     frac_equal = n_equal / n_shots
-    assert frac_equal >= 0.9, (
-        f"{code.name}: only {frac_equal:.2%} of shots had sparse_w == exact_w "
-        f"(max_gap={max_gap})"
-    )
+    assert frac_equal >= 0.9, f"{code.name}: only {frac_equal:.2%} of shots had sparse_w == exact_w (max_gap={max_gap})"

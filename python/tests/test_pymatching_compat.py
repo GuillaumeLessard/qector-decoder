@@ -5,6 +5,7 @@ the real ``pymatching`` package when installed and assert the strong invariant
 that QECTOR's matching is **never heavier** than PyMatching's (both find a
 minimum-weight matching; ties may pick different representatives).
 """
+
 import numpy as np
 import pytest
 
@@ -70,8 +71,7 @@ def test_decode_batch():
 
 @pytest.mark.parametrize(
     "code",
-    [codes.repetition_code(11), codes.rotated_surface_code(5),
-     codes.rotated_surface_code(7), codes.toric_code(4)],
+    [codes.repetition_code(11), codes.rotated_surface_code(5), codes.rotated_surface_code(7), codes.toric_code(4)],
     ids=lambda c: c.name,
 )
 def test_weight_optimal_vs_pymatching(code):

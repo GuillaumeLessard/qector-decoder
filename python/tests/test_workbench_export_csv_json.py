@@ -1,4 +1,5 @@
 """Workbench: CSV and JSON export are reproducible and faithful to the artifact."""
+
 import json
 import os
 
@@ -6,9 +7,15 @@ from qector_decoder_v3.workbench import Workbench
 
 
 def _artifact(wb):
-    return wb.run_benchmark({
-        "code": "rotated_surface", "distances": [3, 5],
-        "decoders": ["blossom", "union_find"], "trials": 200, "warmup": 30})
+    return wb.run_benchmark(
+        {
+            "code": "rotated_surface",
+            "distances": [3, 5],
+            "decoders": ["blossom", "union_find"],
+            "trials": 200,
+            "warmup": 30,
+        }
+    )
 
 
 def test_export_json_roundtrip(tmp_path):

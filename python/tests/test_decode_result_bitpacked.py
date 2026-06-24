@@ -3,6 +3,7 @@
 ``np.unpackbits(res.bit_packed)[:n_qubits]`` must reproduce the dense
 correction, and a manual dense->packed->dense round-trip must be lossless.
 """
+
 import numpy as np
 import pytest
 

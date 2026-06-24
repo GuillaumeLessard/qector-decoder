@@ -1,4 +1,5 @@
 """Tests for qector_decoder_v3.benchmarking — reproducible harness."""
+
 import json
 
 import pytest

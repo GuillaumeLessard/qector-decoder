@@ -6,6 +6,7 @@ several history sizes (1, 5, 20) and assert each decodes faithfully via the core
 invariant ``(H @ corr) & 1 == s``, and that the per-syndrome ``decode`` result is
 independent of history_size.
 """
+
 import numpy as np
 import pytest
 
@@ -32,9 +33,7 @@ def test_decode_faithful_regardless_of_history_size(history_size):
         s = _reachable(H, nq, rng)
         c = np.asarray(dec.decode(s), np.uint8)
         assert c.shape == (nq,)
-        assert np.array_equal((H @ c) & 1, s), (
-            f"history_size={history_size}: H@c != s"
-        )
+        assert np.array_equal((H @ c) & 1, s), f"history_size={history_size}: H@c != s"
 
 
 @pytest.mark.parametrize("history_size", [1, 5, 20])
@@ -58,8 +57,7 @@ def test_per_syndrome_decode_independent_of_history_size():
     H = code.parity_check_matrix()
     nq = code.n_qubits
 
-    decs = {h: qd.StreamingDecoder(code.check_to_qubits, nq, history_size=h)
-            for h in (1, 5, 20)}
+    decs = {h: qd.StreamingDecoder(code.check_to_qubits, nq, history_size=h) for h in (1, 5, 20)}
 
     rng = np.random.default_rng(4242)
     for _ in range(80):
@@ -68,6 +66,4 @@ def test_per_syndrome_decode_independent_of_history_size():
         assert np.array_equal((H @ ref) & 1, s)
         for h in (5, 20):
             c = np.asarray(decs[h].decode(s), np.uint8)
-            assert np.array_equal(c, ref), (
-                f"decode differs between history_size 1 and {h}"
-            )
+            assert np.array_equal(c, ref), f"decode differs between history_size 1 and {h}"

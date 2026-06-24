@@ -3,6 +3,7 @@
 Locks the exact circuit-level mechanism / collapsed-edge counts the report
 quotes for the distance-15 rotated surface code.
 """
+
 import pytest
 
 stim = pytest.importorskip("stim")
@@ -12,10 +13,13 @@ from qector_decoder_v3 import dem  # noqa: E402
 
 def _model(basis):
     circ = stim.Circuit.generated(
-        f"surface_code:rotated_memory_{basis}", distance=15, rounds=15,
+        f"surface_code:rotated_memory_{basis}",
+        distance=15,
+        rounds=15,
         after_clifford_depolarization=0.005,
         before_measure_flip_probability=0.005,
-        after_reset_flip_probability=0.005)
+        after_reset_flip_probability=0.005,
+    )
     sdem = circ.detector_error_model(decompose_errors=True)
     return dem.from_stim(sdem)
 

@@ -6,6 +6,7 @@ and assert the structural health of every result: syndrome-faithful, monotonic
 percentiles, positive throughput, and a recorded peak Python allocation.
 NO wall-clock thresholds -- only invariants that hold by construction.
 """
+
 import pytest
 
 import qector_decoder_v3 as qd

@@ -10,6 +10,7 @@ faithful to a single round's syndrome once several rounds are buffered.  But:
 
 Both facts are asserted here with the core invariant ``(H @ corr) & 1 == s``.
 """
+
 import numpy as np
 import pytest
 
@@ -67,9 +68,7 @@ def test_flushed_update_equals_fresh_decode(code):
         fresh = qd.StreamingDecoder(code.check_to_qubits, nq, history_size=8)
         ref = np.asarray(fresh.decode(s), np.uint8)
         assert np.array_equal((H @ ref) & 1, s)
-        assert np.array_equal(upd, ref), (
-            f"{code.name}: flushed update != fresh decode for s={s}"
-        )
+        assert np.array_equal(upd, ref), f"{code.name}: flushed update != fresh decode for s={s}"
         matches += 1
     assert matches == 60
 

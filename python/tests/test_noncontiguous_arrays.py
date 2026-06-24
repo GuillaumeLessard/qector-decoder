@@ -8,6 +8,7 @@ decode. It also asserts that handing a raw non-contiguous array to the layer
 never crashes the process -- it either decodes faithfully or raises a clean
 Python exception.
 """
+
 import numpy as np
 import pytest
 

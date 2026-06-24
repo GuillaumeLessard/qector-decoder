@@ -3,6 +3,7 @@
 ``sparse_indices`` must equal ``np.nonzero(correction)[0]`` and its length must
 equal ``hamming_weight``.
 """
+
 import numpy as np
 import pytest
 

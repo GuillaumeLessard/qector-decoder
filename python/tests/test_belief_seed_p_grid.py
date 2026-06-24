@@ -5,6 +5,7 @@ per cell) and asserts pooled-over-grid belief LER <= pooled PyMatching LER.
 Pooling many small cells keeps the comparison statistically meaningful while
 total shots stay small (QECTOR ``BeliefMatching`` rebuilds matching per shot).
 """
+
 import numpy as np
 import pytest
 
@@ -46,9 +47,7 @@ def test_belief_seed_p_grid_pooled_le_pymatching():
     for p in ps:
         circ, bm, pm, no = decoders[p]
         for seed in seeds:
-            det, obs = circ.compile_detector_sampler(seed=seed).sample(
-                shots=N, separate_observables=True
-            )
+            det, obs = circ.compile_detector_sampler(seed=seed).sample(shots=N, separate_observables=True)
             det = det.astype(np.uint8)
             obs = obs.astype(np.uint8)
 

@@ -10,6 +10,7 @@ Exercises the belief-propagation inner loop:
 
 Distance fixed to 3 and shots small (QECTOR rebuilds matching per shot).
 """
+
 import numpy as np
 import pytest
 
@@ -42,9 +43,7 @@ def test_belief_bp_convergence():
     no = bm_small.num_observables
     assert bm_large.num_observables == no
 
-    det, obs = circ.compile_detector_sampler(seed=seed).sample(
-        shots=N, separate_observables=True
-    )
+    det, obs = circ.compile_detector_sampler(seed=seed).sample(shots=N, separate_observables=True)
     det = det.astype(np.uint8)
     obs = obs.astype(np.uint8)
 
@@ -65,10 +64,7 @@ def test_belief_bp_convergence():
     # (c) More BP iterations must not degrade accuracy (pooled, small slack).
     err_small = int(np.any(pred_small != obs, axis=1).sum())
     err_large = int(np.any(pred_large != obs, axis=1).sum())
-    print(
-        f"[bp_conv] shots={N} err(max_iter=5)={err_small} "
-        f"err(max_iter=40)={err_large}"
-    )
+    print(f"[bp_conv] shots={N} err(max_iter=5)={err_small} err(max_iter=40)={err_large}")
     slack = max(3, int(0.10 * err_small))
     assert err_large <= err_small + slack
 
@@ -82,8 +78,6 @@ def test_belief_bp_convergence():
     assert np.all(np.isfinite(prior_llr))
 
     for i in range(min(8, N)):
-        posterior = sum_product_bp(
-            hic, hie, n_checks, n_hyper, prior_llr, det[i].astype(np.uint8), 20
-        )
+        posterior = sum_product_bp(hic, hie, n_checks, n_hyper, prior_llr, det[i].astype(np.uint8), 20)
         assert posterior.shape == (n_hyper,)
         assert np.all(np.isfinite(posterior)), f"non-finite BP posterior on shot {i}"

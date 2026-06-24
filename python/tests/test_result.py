@@ -1,4 +1,5 @@
 """Tests for qector_decoder_v3.result — DecodeResult and diagnostics."""
+
 import json
 
 import numpy as np

@@ -69,8 +69,7 @@ def test_script_help_parses(script):
         timeout=60,
     )
     assert proc.returncode == 0, (
-        f"`{script} --help` exited {proc.returncode}\n"
-        f"STDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}"
+        f"`{script} --help` exited {proc.returncode}\nSTDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}"
     )
     # argparse prints a usage line on --help.
     combined = (proc.stdout + proc.stderr).lower()

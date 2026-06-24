@@ -132,9 +132,7 @@ class Matching:
         self._num_detectors = max(self._num_detectors, int(node1) + 1, int(node2) + 1)
         self._decoder = None
 
-    def add_boundary_edge(
-        self, node: int, fault_ids: Any = None, weight: float = 1.0, **_: Any
-    ) -> None:
+    def add_boundary_edge(self, node: int, fault_ids: Any = None, weight: float = 1.0, **_: Any) -> None:
         """Add an edge from a detector node to the boundary."""
         self._edges.append(
             {
@@ -167,10 +165,7 @@ class Matching:
 
     def edges(self) -> List[Tuple[Optional[int], Optional[int], dict]]:
         """PyMatching-style edge list: ``(u, v, {"fault_ids":..., "weight":...})``."""
-        return [
-            (e["u"], e["v"], {"fault_ids": set(e["fault_ids"]), "weight": e["weight"]})
-            for e in self._edges
-        ]
+        return [(e["u"], e["v"], {"fault_ids": set(e["fault_ids"]), "weight": e["weight"]}) for e in self._edges]
 
     def check_matrix(self) -> np.ndarray:
         """The parity-check matrix (rows=detectors, cols=edges)."""
@@ -198,9 +193,7 @@ class Matching:
             # weights are equal, pass None so the uniform-weight fast path runs.
             weights = [e["weight"] for e in self._edges]
             uniform = len(set(round(w, 12) for w in weights)) <= 1
-            self._decoder = BlossomDecoder(
-                c2q, len(self._edges), None if uniform else weights
-            )
+            self._decoder = BlossomDecoder(c2q, len(self._edges), None if uniform else weights)
         return self._decoder
 
     def _edge_correction(self, syndrome: np.ndarray) -> np.ndarray:

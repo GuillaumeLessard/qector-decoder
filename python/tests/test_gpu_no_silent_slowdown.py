@@ -11,6 +11,7 @@ Two failure modes are ruled out here:
      4096-shot ``CUDABatchDecoder`` call, must be bit-identical to the CPU
      reference.
 """
+
 import numpy as np
 import pytest
 

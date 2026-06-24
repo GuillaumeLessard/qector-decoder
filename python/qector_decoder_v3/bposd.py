@@ -72,13 +72,24 @@ class BpOsdDecoder:
             s = np.concatenate([s, np.zeros(self.n_checks - s.shape[0], np.uint8)])
         if self.bp_method == "sum_product":
             posterior = sum_product_bp(
-                self.ic, self.ie, self.n_checks, self.n_qubits,
-                self.prior_llr, s, self.max_iter,
+                self.ic,
+                self.ie,
+                self.n_checks,
+                self.n_qubits,
+                self.prior_llr,
+                s,
+                self.max_iter,
             )
         else:
             posterior = min_sum_bp(
-                self.ic, self.ie, self.n_checks, self.n_qubits,
-                self.prior_llr, s, self.max_iter, self.ms_scale,
+                self.ic,
+                self.ie,
+                self.n_checks,
+                self.n_qubits,
+                self.prior_llr,
+                s,
+                self.max_iter,
+                self.ms_scale,
             )
         hard = (posterior < 0.0).astype(np.uint8)
         if np.array_equal((self.H @ hard) & 1, s):

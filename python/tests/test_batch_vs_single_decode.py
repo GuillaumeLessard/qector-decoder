@@ -14,6 +14,7 @@ NOTE: ``rotated_surface_code`` takes a single ``distance`` here, so the spec's
 (SparseBlossom / UnionFind) may legitimately differ batch-vs-single if internal
 state is order-dependent, so they are intentionally not asserted here.
 """
+
 import numpy as np
 import pytest
 

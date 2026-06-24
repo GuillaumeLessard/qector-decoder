@@ -4,6 +4,7 @@ Both ``UnionFindDecoder`` and the SIMD ``FastUnionFindDecoder`` are exercised on
 rotated (d=5, d=7) and unrotated (d=5) surface codes over many random reachable
 syndromes (p~0.1), asserting the core invariant ``(H @ corr) & 1 == s``.
 """
+
 import numpy as np
 import pytest
 
@@ -39,9 +40,7 @@ def test_union_find_surface_faithful(code, dec_name):
         s = ((H @ e) & 1).astype(np.uint8)
         c = np.asarray(dec.decode(s), np.uint8)
         assert c.shape == (nq,)
-        assert np.array_equal((H @ c) & 1, s), (
-            f"{dec_name} on {code.name}: H@c != s"
-        )
+        assert np.array_equal((H @ c) & 1, s), f"{dec_name} on {code.name}: H@c != s"
         if s.any():
             nonzero += 1
     assert nonzero > n_shots // 4

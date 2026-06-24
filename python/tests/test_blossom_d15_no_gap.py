@@ -5,6 +5,7 @@ This test locks that specific claim: on identical seeded d=15 shots decoded over
 the identical collapsed graph, QECTOR's logical error count overlaps PyMatching's
 Wilson 95% interval.
 """
+
 import math
 
 import numpy as np
@@ -29,13 +30,15 @@ def _wilson(k, n, z=1.959963985):
 def test_d15_logical_error_parity():
     d, shots = 15, 4000
     circ = stim.Circuit.generated(
-        "surface_code:rotated_memory_x", distance=d, rounds=d,
+        "surface_code:rotated_memory_x",
+        distance=d,
+        rounds=d,
         after_clifford_depolarization=0.005,
         before_measure_flip_probability=0.005,
-        after_reset_flip_probability=0.005)
+        after_reset_flip_probability=0.005,
+    )
     sdem = circ.detector_error_model(decompose_errors=True)
-    det, obs = circ.compile_detector_sampler(seed=20260622).sample(
-        shots=shots, separate_observables=True)
+    det, obs = circ.compile_detector_sampler(seed=20260622).sample(shots=shots, separate_observables=True)
     det = det.astype(np.uint8)
     obs = obs.astype(np.uint8)
 
@@ -49,6 +52,7 @@ def test_d15_logical_error_parity():
     # Wilson intervals overlap -> statistically no gap
     assert lo_q <= hi_p and lo_p <= hi_q, (
         f"d=15 LER gap: QECTOR {q_err}/{shots} CI[{lo_q:.4f},{hi_q:.4f}] vs "
-        f"PyMatching {p_err}/{shots} CI[{lo_p:.4f},{hi_p:.4f}]")
+        f"PyMatching {p_err}/{shots} CI[{lo_p:.4f},{hi_p:.4f}]"
+    )
     # and QECTOR not materially worse in raw count
     assert q_err <= p_err + max(4, int(0.30 * p_err))

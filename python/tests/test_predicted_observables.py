@@ -11,6 +11,7 @@ convention down two ways:
   from ``.decode(s)``, exactly the observable flips ``(L @ edge_correction) & 1`` where
   ``edge_correction = .decode_to_edges_array(s)``.
 """
+
 import numpy as np
 import pytest
 
@@ -44,7 +45,9 @@ def test_predicted_observables_hand_dem():
 def test_predicted_observables_stim_dem():
     stim = pytest.importorskip("stim")
     circ = stim.Circuit.generated(
-        "surface_code:rotated_memory_x", distance=3, rounds=3,
+        "surface_code:rotated_memory_x",
+        distance=3,
+        rounds=3,
         after_clifford_depolarization=0.01,
         before_measure_flip_probability=0.01,
         after_reset_flip_probability=0.01,
@@ -66,15 +69,11 @@ def test_matching_decode_equals_faults_matrix_times_edge_correction():
     # A small repetition-style matching graph with two logical observables defined
     # over the qubit (=column / edge) index by the faults_matrix L.
     H = np.array(
-        [[1, 1, 0, 0, 0],
-         [0, 1, 1, 0, 0],
-         [0, 0, 1, 1, 0],
-         [0, 0, 0, 1, 1]],
+        [[1, 1, 0, 0, 0], [0, 1, 1, 0, 0], [0, 0, 1, 1, 0], [0, 0, 0, 1, 1]],
         dtype=np.uint8,
     )
     L = np.array(
-        [[1, 0, 0, 0, 0],
-         [0, 0, 1, 0, 1]],
+        [[1, 0, 0, 0, 0], [0, 0, 1, 0, 1]],
         dtype=np.uint8,
     )
     m = pymatching_compat.Matching.from_check_matrix(H, faults_matrix=L)

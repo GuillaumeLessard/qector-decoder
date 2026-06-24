@@ -29,6 +29,7 @@ Example
 ...                         "decoders": ["blossom"], "trials": 500})
 >>> wb.export_json(art, "out.json"); wb.export_csv(art, "out.csv")
 """
+
 from __future__ import annotations
 
 import json
@@ -61,7 +62,12 @@ _CODE_FAMILIES = {
 }
 
 _DECODER_KINDS = (
-    "union_find", "fast_union_find", "blossom", "sparse_blossom", "cpu_batch", "bp_osd",
+    "union_find",
+    "fast_union_find",
+    "blossom",
+    "sparse_blossom",
+    "cpu_batch",
+    "bp_osd",
 )
 
 
@@ -71,11 +77,11 @@ class Job:
 
     job_id: str
     spec: dict
-    status: str = "queued"          # queued | running | completed | cancelled | failed
+    status: str = "queued"  # queued | running | completed | cancelled | failed
     submitted_unix: float = 0.0
     started_unix: Optional[float] = None
     finished_unix: Optional[float] = None
-    progress: float = 0.0           # 0..1
+    progress: float = 0.0  # 0..1
     units_done: int = 0
     units_total: int = 0
     error: str = ""
@@ -84,11 +90,17 @@ class Job:
 
     def to_dict(self) -> dict:
         return {
-            "job_id": self.job_id, "status": self.status, "spec": self.spec,
-            "submitted_unix": self.submitted_unix, "started_unix": self.started_unix,
-            "finished_unix": self.finished_unix, "progress": self.progress,
-            "units_done": self.units_done, "units_total": self.units_total,
-            "error": self.error, "has_artifact": self.artifact is not None,
+            "job_id": self.job_id,
+            "status": self.status,
+            "spec": self.spec,
+            "submitted_unix": self.submitted_unix,
+            "started_unix": self.started_unix,
+            "finished_unix": self.finished_unix,
+            "progress": self.progress,
+            "units_done": self.units_done,
+            "units_total": self.units_total,
+            "error": self.error,
+            "has_artifact": self.artifact is not None,
         }
 
 
@@ -96,7 +108,7 @@ class Workbench:
     """Controller for the QECTOR Workbench (load → benchmark → export)."""
 
     def __init__(self) -> None:
-        self._loaded: Optional[dict] = None     # last loaded stim/dem problem
+        self._loaded: Optional[dict] = None  # last loaded stim/dem problem
         self._jobs: Dict[str, Job] = {}
         self._queue: List[str] = []
         self._lock = threading.Lock()
@@ -113,7 +125,7 @@ class Workbench:
         """
         import stim
 
-        if hasattr(source, "detector_error_model"):           # a stim.Circuit
+        if hasattr(source, "detector_error_model"):  # a stim.Circuit
             circuit = source
         elif isinstance(source, str) and os.path.exists(source):
             with open(source, "r", encoding="utf-8") as fh:
@@ -125,7 +137,7 @@ class Workbench:
 
         try:
             sdem = circuit.detector_error_model(decompose_errors=True)
-        except Exception:                                     # not decomposable
+        except Exception:  # not decomposable
             sdem = circuit.detector_error_model()
         desc = {
             "kind": "stim",
@@ -151,7 +163,7 @@ class Workbench:
             model = _dem.load_dem_file(source)
         elif isinstance(source, str):
             model = _dem.parse_dem(source)
-        elif hasattr(source, "num_detectors"):                # stim.DetectorErrorModel
+        elif hasattr(source, "num_detectors"):  # stim.DetectorErrorModel
             model = _dem.from_stim(source)
         else:
             raise WorkbenchError(f"cannot load DEM from {type(source).__name__}")
@@ -243,8 +255,8 @@ class Workbench:
                 if job is not None and job._cancel.is_set():
                     raise _Cancelled()
                 rep = _bm.benchmark_decoder(
-                    kind, code, n_trials=trials, warmup=warmup, p=p,
-                    seed=int(spec.get("seed", 1)), measure_memory=True)
+                    kind, code, n_trials=trials, warmup=warmup, p=p, seed=int(spec.get("seed", 1)), measure_memory=True
+                )
                 if ler_ctx is not None:
                     rep["logical_error_rate"] = self._ler(kind, code, ler_ctx, trials)
                 results.append(rep)
@@ -274,12 +286,13 @@ class Workbench:
         if source == "loaded":
             if self._loaded is None:
                 raise WorkbenchError("no problem loaded; call load_stim/load_dem first")
-            if "_model" in self._loaded:                      # DEM problem
+            if "_model" in self._loaded:  # DEM problem
                 model = self._loaded["_model"]
                 code = model.to_code()
                 return [(code, None)]
-            if "_sdem" in self._loaded:                       # Stim problem
+            if "_sdem" in self._loaded:  # Stim problem
                 from . import dem as _dem
+
                 model = _dem.from_stim(self._loaded["_sdem"])
                 code = (model.collapse_to_graph() if model.is_graphlike else model).to_code()
                 return [(code, {"circuit": self._loaded["_circuit"]})]
@@ -296,10 +309,10 @@ class Workbench:
         try:
             import stim  # noqa: F401
             from . import pymatching_compat
+
             circuit = ler_ctx["circuit"]
             sdem = circuit.detector_error_model(decompose_errors=True)
-            det, obs = circuit.compile_detector_sampler(seed=1).sample(
-                shots=shots, separate_observables=True)
+            det, obs = circuit.compile_detector_sampler(seed=1).sample(shots=shots, separate_observables=True)
             det = det.astype(np.uint8)
             obs = obs.astype(np.uint8)
             m = pymatching_compat.Matching.from_detector_error_model(sdem)
@@ -311,8 +324,7 @@ class Workbench:
     # ------------------------------------------------------------- job queue
     def submit_job(self, spec: dict) -> str:
         """Queue a benchmark job; returns a job id. Runs on a FIFO worker."""
-        job = Job(job_id=uuid.uuid4().hex[:12], spec=dict(spec),
-                  submitted_unix=time.time())
+        job = Job(job_id=uuid.uuid4().hex[:12], spec=dict(spec), submitted_unix=time.time())
         with self._cv:
             self._jobs[job.job_id] = job
             self._queue.append(job.job_id)
@@ -419,21 +431,44 @@ class Workbench:
     def export_csv(self, artifact: dict, path: str) -> str:
         _ensure_parent(path)
         rows = artifact.get("results", [])
-        cols = ["decoder", "code", "distance", "n_qubits", "n_checks",
-                "physical_error_rate", "syndrome_faithful", "logical_error_rate",
-                "lat_mean_us", "lat_p50_us", "lat_p99_us", "throughput_per_s",
-                "peak_python_alloc_kib"]
+        cols = [
+            "decoder",
+            "code",
+            "distance",
+            "n_qubits",
+            "n_checks",
+            "physical_error_rate",
+            "syndrome_faithful",
+            "logical_error_rate",
+            "lat_mean_us",
+            "lat_p50_us",
+            "lat_p99_us",
+            "throughput_per_s",
+            "peak_python_alloc_kib",
+        ]
         lines = [",".join(cols)]
         for r in rows:
             lat = r.get("latency_us", {})
-            lines.append(",".join(str(x) for x in [
-                r.get("decoder", ""), r.get("code", ""), r.get("distance", ""),
-                r.get("n_qubits", ""), r.get("n_checks", ""),
-                r.get("physical_error_rate", ""), r.get("syndrome_faithful", ""),
-                _fmt(r.get("logical_error_rate")), _fmt(lat.get("mean")),
-                _fmt(lat.get("p50")), _fmt(lat.get("p99")),
-                _fmt(r.get("throughput_decodes_per_s")),
-                _fmt(r.get("peak_python_alloc_kib"))]))
+            lines.append(
+                ",".join(
+                    str(x)
+                    for x in [
+                        r.get("decoder", ""),
+                        r.get("code", ""),
+                        r.get("distance", ""),
+                        r.get("n_qubits", ""),
+                        r.get("n_checks", ""),
+                        r.get("physical_error_rate", ""),
+                        r.get("syndrome_faithful", ""),
+                        _fmt(r.get("logical_error_rate")),
+                        _fmt(lat.get("mean")),
+                        _fmt(lat.get("p50")),
+                        _fmt(lat.get("p99")),
+                        _fmt(r.get("throughput_decodes_per_s")),
+                        _fmt(r.get("peak_python_alloc_kib")),
+                    ]
+                )
+            )
         with open(path, "w", encoding="utf-8", newline="") as fh:
             fh.write("\n".join(lines) + "\n")
         return path
@@ -446,6 +481,7 @@ class Workbench:
         """
         try:
             import matplotlib
+
             matplotlib.use("Agg")
             import matplotlib.pyplot as plt
             from matplotlib.backends.backend_pdf import PdfPages
@@ -459,16 +495,22 @@ class Workbench:
             # Title / environment page.
             fig = plt.figure(figsize=(8.27, 11.69))
             fig.clf()
-            txt = ["QECTOR Workbench — Benchmark Report", "",
-                   f"git commit : {env.get('git_commit')}",
-                   f"platform   : {env.get('platform')}",
-                   f"python     : {env.get('python_version')}",
-                   f"cuda/opencl: {env.get('cuda_available')}/{env.get('opencl_available')}",
-                   f"results    : {len(rows)} decoder runs", ""]
+            txt = [
+                "QECTOR Workbench — Benchmark Report",
+                "",
+                f"git commit : {env.get('git_commit')}",
+                f"platform   : {env.get('platform')}",
+                f"python     : {env.get('python_version')}",
+                f"cuda/opencl: {env.get('cuda_available')}/{env.get('opencl_available')}",
+                f"results    : {len(rows)} decoder runs",
+                "",
+            ]
             for r in rows[:30]:
-                txt.append(f"  {r.get('decoder'):16s} {str(r.get('code')):18s} "
-                           f"faithful={r.get('syndrome_faithful')} "
-                           f"p50={r.get('latency_us', {}).get('p50', 0):.2f}us")
+                txt.append(
+                    f"  {r.get('decoder'):16s} {str(r.get('code')):18s} "
+                    f"faithful={r.get('syndrome_faithful')} "
+                    f"p50={r.get('latency_us', {}).get('p50', 0):.2f}us"
+                )
             fig.text(0.07, 0.95, "\n".join(txt), va="top", family="monospace", fontsize=9)
             pdf.savefig(fig)
             plt.close(fig)
@@ -495,10 +537,11 @@ class Workbench:
             ler_rows = [r for r in rows if r.get("logical_error_rate") is not None]
             if len(ler_rows) >= 2:
                 fig, ax = plt.subplots(figsize=(8.27, 5))
-                ax.plot([r.get("distance") for r in ler_rows],
-                        [r.get("logical_error_rate") for r in ler_rows], "o-")
-                ax.set_xlabel("distance"); ax.set_ylabel("logical error rate")
-                ax.set_yscale("log"); ax.set_title("Logical error rate vs distance")
+                ax.plot([r.get("distance") for r in ler_rows], [r.get("logical_error_rate") for r in ler_rows], "o-")
+                ax.set_xlabel("distance")
+                ax.set_ylabel("logical error rate")
+                ax.set_yscale("log")
+                ax.set_title("Logical error rate vs distance")
                 fig.tight_layout()
                 pdf.savefig(fig)
                 plt.close(fig)
