@@ -1,7 +1,8 @@
 # CI -- Build wheels on Linux/Windows/macOS, publish to PyPI on tag.
 #
-# Rust source is injected at build time from two GitHub Actions secrets
-# (RUST_SRC_B64_1 + RUST_SRC_B64_2) to keep the proprietary core private.
+# Rust source is injected at build time from three GitHub Actions secrets
+# (RUST_SRC_B64_1 + RUST_SRC_B64_2 + RUST_SRC_B64_3) to keep the proprietary
+# core private. Secrets are base64 chunks that reassemble to src.tar.gz.
 # On forks / external PRs the secrets will be empty and wheel builds are skipped.
 #
 # Trigger: push to main/master, any tag v*, pull_request, manual dispatch.
@@ -41,12 +42,13 @@ jobs:
         env:
           PART1: ${{ secrets.RUST_SRC_B64_1 }}
           PART2: ${{ secrets.RUST_SRC_B64_2 }}
+          PART3: ${{ secrets.RUST_SRC_B64_3 }}
         run: |
           if [ -z "$PART1" ]; then
             echo "::warning::RUST_SRC_B64_1 secret not set -- skipping wheel build"
             echo "SKIP_BUILD=1" >> "$GITHUB_ENV"
           else
-            echo "${PART1}${PART2}" | base64 -d | tar -xzf - -C .
+            echo "${PART1}${PART2}${PART3}" | base64 -d | tar -xzf - -C .
             echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
           fi
 
@@ -87,13 +89,14 @@ jobs:
         env:
           PART1: ${{ secrets.RUST_SRC_B64_1 }}
           PART2: ${{ secrets.RUST_SRC_B64_2 }}
+          PART3: ${{ secrets.RUST_SRC_B64_3 }}
         shell: bash
         run: |
           if [ -z "$PART1" ]; then
             echo "::warning::RUST_SRC_B64_1 secret not set -- skipping wheel build"
             echo "SKIP_BUILD=1" >> "$GITHUB_ENV"
           else
-            echo "${PART1}${PART2}" | base64 -d | tar -xzf - -C .
+            echo "${PART1}${PART2}${PART3}" | base64 -d | tar -xzf - -C .
             echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
           fi
 
@@ -134,12 +137,13 @@ jobs:
         env:
           PART1: ${{ secrets.RUST_SRC_B64_1 }}
           PART2: ${{ secrets.RUST_SRC_B64_2 }}
+          PART3: ${{ secrets.RUST_SRC_B64_3 }}
         run: |
           if [ -z "$PART1" ]; then
             echo "::warning::RUST_SRC_B64_1 secret not set -- skipping wheel build"
             echo "SKIP_BUILD=1" >> "$GITHUB_ENV"
           else
-            echo "${PART1}${PART2}" | base64 -d | tar -xzf - -C .
+            echo "${PART1}${PART2}${PART3}" | base64 -d | tar -xzf - -C .
             echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
           fi
 
@@ -179,12 +183,13 @@ jobs:
         env:
           PART1: ${{ secrets.RUST_SRC_B64_1 }}
           PART2: ${{ secrets.RUST_SRC_B64_2 }}
+          PART3: ${{ secrets.RUST_SRC_B64_3 }}
         run: |
           if [ -z "$PART1" ]; then
             echo "::warning::RUST_SRC_B64_1 secret not set -- skipping wheel build"
             echo "SKIP_BUILD=1" >> "$GITHUB_ENV"
           else
-            echo "${PART1}${PART2}" | base64 -d | tar -xzf - -C .
+            echo "${PART1}${PART2}${PART3}" | base64 -d | tar -xzf - -C .
             echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
           fi
 
@@ -220,11 +225,12 @@ jobs:
         env:
           PART1: ${{ secrets.RUST_SRC_B64_1 }}
           PART2: ${{ secrets.RUST_SRC_B64_2 }}
+          PART3: ${{ secrets.RUST_SRC_B64_3 }}
         run: |
           if [ -z "$PART1" ]; then
             echo "SKIP_BUILD=1" >> "$GITHUB_ENV"
           else
-            echo "${PART1}${PART2}" | base64 -d | tar -xzf - -C .
+            echo "${PART1}${PART2}${PART3}" | base64 -d | tar -xzf - -C .
             echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
           fi
 

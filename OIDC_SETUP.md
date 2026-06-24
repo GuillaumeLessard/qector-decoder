@@ -34,20 +34,13 @@ Complete these steps **once** in a browser before pushing the first release tag.
 
 ---
 
-## Step 3: Add GitHub Secrets (2 minutes)
+## Step 3: Add GitHub Secrets (already done via API)
 
-The Rust source archive is split across two secrets.
+The Rust source archive was split across **three** secrets and uploaded automatically.
+To verify they are present, go to:
+<https://github.com/qectorlab/qector-decoder/settings/secrets/actions>
 
-1. Go to <https://github.com/qectorlab/qector-decoder/settings/secrets/actions>
-2. Add secret **`RUST_SRC_B64_1`**:
-   - Content: copy the **entire content** of `C:\Users\Admin\Desktop\qector_src_b64_part1.txt`
-3. Add secret **`RUST_SRC_B64_2`**:
-   - Content: copy the **entire content** of `C:\Users\Admin\Desktop\qector_src_b64_part2.txt`
-
-> The CI workflow concatenates `RUST_SRC_B64_1 + RUST_SRC_B64_2`, base64-decodes
-> the result, and extracts `src/`, `build.rs`, and `proto/` before running maturin.
-> Forks and external PRs will not have these secrets so their wheel builds are
-> gracefully skipped (lint and Docker checks still run).
+You should see: `RUST_SRC_B64_1`, `RUST_SRC_B64_2`, `RUST_SRC_B64_3`
 
 ---
 
@@ -59,12 +52,14 @@ tar -czf C:\Users\Admin\Desktop\qector_src_only.tar.gz `
     -C C:\Users\Admin\Desktop\qector-decoder-main src build.rs proto
 
 $b64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\Users\Admin\Desktop\qector_src_only.tar.gz"))
-$half = [int]($b64.Length / 2)
-[IO.File]::WriteAllText("C:\Users\Admin\Desktop\qector_src_b64_part1.txt", $b64.Substring(0, $half))
-[IO.File]::WriteAllText("C:\Users\Admin\Desktop\qector_src_b64_part2.txt", $b64.Substring($half))
-```
+$third = [int]($b64.Length / 3)
+[IO.File]::WriteAllText("C:\Users\Admin\Desktop\src_p1.txt", $b64.Substring(0, $third))
+[IO.File]::WriteAllText("C:\Users\Admin\Desktop\src_p2.txt", $b64.Substring($third, $third))
+[IO.File]::WriteAllText("C:\Users\Admin\Desktop\src_p3.txt", $b64.Substring($third * 2))
 
-Then update both GitHub secrets with the new content.
+# Then re-run the upload script:
+python C:\Users\Admin\Desktop\upload_secrets.py <GITHUB_TOKEN> <KEY_ID> <PUB_KEY>
+```
 
 ---
 
