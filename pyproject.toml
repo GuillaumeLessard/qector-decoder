@@ -122,8 +122,10 @@ target-version = "py39"
 
 [tool.ruff.lint]
 # E702: semicolons used intentionally for chained one-liners in plotting helpers.
+# E731: lambda assignments used for compact callback tables in a few helpers.
+# E741: single-letter variable names (l, I, O) are domain-conventional in QEC math.
 # These are minor style choices that do not affect correctness.
-ignore = ["E702"]
+ignore = ["E702", "E731", "E741"]
 
 [tool.ruff.lint.per-file-ignores]
 # __init__: late imports (E402) are intentional (runtime optional deps).
