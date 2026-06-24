@@ -6,23 +6,24 @@ QECTOR Decoder v3 provides a Python package backed by a native Rust extension fo
 
 Website: https://www.qector.store  
 Repository: https://github.com/GuillaumeLessard/qector-decoder  
+PyPI: https://pypi.org/project/qector-decoder-v3/  
 Commercial licensing: https://www.qector.store
 
 ---
 
 ## Installation
 
+Recommended command:
+
 ```bash
 pip install qector-decoder-v3
 ```
 
-Supported package target for the public release workflow:
+Verify the install:
 
-- Python 3.9 to 3.13
-- Linux x86_64 wheels
-- Windows x64 wheels
-- macOS arm64 wheels
-- Source distribution for custom/source builds
+```bash
+python -c "from qector_decoder_v3 import UnionFindDecoder, BlossomDecoder; print('QECTOR OK')"
+```
 
 Optional research and validation extras:
 
@@ -35,6 +36,35 @@ pip install "qector-decoder-v3[bench]"
 
 # Full validation environment
 pip install "qector-decoder-v3[all]"
+```
+
+---
+
+## Supported public wheels
+
+QECTOR v0.5.x public releases target standard CPython wheels for:
+
+| Platform | Wheel status |
+|---|---|
+| Linux x86_64 | Published |
+| Windows x64 | Published |
+| macOS arm64 / Apple Silicon | Published |
+| macOS Intel x86_64 | Not published in v0.5.x public CI |
+| CPython free-threaded builds such as `cp313t` | Not published in v0.5.x |
+
+Supported Python classifiers are standard CPython 3.9 to 3.13.
+
+Windows note: do not force `py -m pip` unless you have checked which interpreter the Windows launcher selected. If `py` selects a free-threaded interpreter such as `python3.13t.exe`, pip may fall back to a source build and fail because the public repository does not ship the proprietary Rust core. Use the standard active Python environment instead:
+
+```powershell
+pip install qector-decoder-v3
+python -c "from qector_decoder_v3 import UnionFindDecoder, BlossomDecoder; print('QECTOR OK')"
+```
+
+Check your Python launcher targets with:
+
+```powershell
+py -0p
 ```
 
 ---
@@ -156,7 +186,7 @@ QECTOR Decoder v3 is source-available.
 
 Personal, academic, educational and non-commercial research use is allowed under the repository license. Company use, funded institutional work, SaaS, hosted API deployment, OEM integration, redistribution, paid consulting, or commercial benchmarking requires a commercial license.
 
-Commercial licensing:
+Website and commercial licensing:
 
 https://www.qector.store
 
