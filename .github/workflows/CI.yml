@@ -1,4 +1,4 @@
-# CI -- Build wheels on Linux/Windows/macOS, publish to PyPI on tag.
+# CI -- Build wheels on Linux/Windows/macOS ARM, publish to PyPI on tag.
 #
 # Rust source is injected at build time from three GitHub Actions secrets
 # (RUST_SRC_B64_1 + RUST_SRC_B64_2 + RUST_SRC_B64_3) to keep the proprietary
@@ -121,52 +121,6 @@ jobs:
           path: dist
 
   # ------------------------------------------------------------------
-  # macOS Intel (x86_64) wheels
-  # ------------------------------------------------------------------
-  macos-intel:
-    name: macos-x86_64-py${{ matrix.python-version }}
-    runs-on: macos-13
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Inject Rust source
-        env:
-          PART1: ${{ secrets.RUST_SRC_B64_1 }}
-          PART2: ${{ secrets.RUST_SRC_B64_2 }}
-          PART3: ${{ secrets.RUST_SRC_B64_3 }}
-        run: |
-          if [ -z "$PART1" ]; then
-            echo "::warning::RUST_SRC_B64_1 secret not set -- skipping wheel build"
-            echo "SKIP_BUILD=1" >> "$GITHUB_ENV"
-          else
-            echo "${PART1}${PART2}${PART3}" | base64 -d | tar -xzf - -C .
-            echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
-          fi
-
-      - uses: actions/setup-python@v5
-        if: env.SKIP_BUILD == '0'
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Build macOS Intel wheel
-        if: env.SKIP_BUILD == '0'
-        uses: PyO3/maturin-action@v1
-        with:
-          target: x86_64
-          args: ${{ env.MATURIN_ARGS }} -i python
-          sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
-
-      - uses: actions/upload-artifact@v4
-        if: env.SKIP_BUILD == '0'
-        with:
-          name: wheels-macos-x86_64-py${{ matrix.python-version }}
-          path: dist
-
-  # ------------------------------------------------------------------
   # macOS Apple Silicon (aarch64) wheels
   # ------------------------------------------------------------------
   macos-arm:
@@ -258,7 +212,7 @@ jobs:
       startsWith(github.ref, 'refs/tags/v') &&
       github.repository == 'GuillaumeLessard/qector-decoder' &&
       github.event_name != 'pull_request'
-    needs: [linux-x86_64, windows-x64, macos-intel, macos-arm, sdist]
+    needs: [linux-x86_64, windows-x64, macos-arm, sdist]
     environment: pypi
     permissions:
       id-token: write
