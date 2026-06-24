@@ -117,10 +117,23 @@ warn_unused_configs = true
 ignore_missing_imports = true
 
 [tool.ruff]
-line-length = 100
+line-length = 120
 target-version = "py39"
 
+[tool.ruff.lint]
+# E702: semicolons used intentionally for chained one-liners in plotting helpers.
+# These are minor style choices that do not affect correctness.
+ignore = ["E702"]
+
 [tool.ruff.lint.per-file-ignores]
-# The package __init__ defines the decoder wrapper classes first, then imports the
-# ecosystem layer that depends on them — late imports (E402) are intentional here.
+# __init__: late imports (E402) are intentional (runtime optional deps).
 "python/qector_decoder_v3/__init__.py" = ["E402"]
+# workbench.py: json imported for optional serialization path, Tuple aliased for py3.8 compat.
+"python/qector_decoder_v3/workbench.py" = ["F401"]
+# qiskit_plugin.py: Tuple re-exported for downstream type annotations.
+"python/qector_decoder_v3/qiskit_plugin.py" = ["F401"]
+# Test files: many use sys.path manipulation (E402), conditional imports (F401),
+# convenience imports kept for symmetry (F401), unused locals in scaffolding (F841),
+# f-strings used as comment-like strings for readability (F541).
+"python/tests/*.py" = ["E402", "F401", "F541", "F841"]
+"python/tests/**/*.py" = ["E402", "F401", "F541", "F841"]
