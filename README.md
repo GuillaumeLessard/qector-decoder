@@ -12,7 +12,7 @@
 
 PyMatching-compatible MWPM validation · Belief-matching accuracy mode · BP-OSD for LDPC/qLDPC · CPU/GPU batch decoding · Artifact-backed benchmark evidence
 
-[Website](https://www.qector.store) · [PyPI](https://pypi.org/project/qector-decoder-v3/) · [Commercial licensing](mailto:admin@qector.store)
+[Website](https://www.qector.store) · [PyPI](https://pypi.org/project/qector-decoder-v3/) · [Repository](https://github.com/GuillaumeLessard/qector-decoder) · [Commercial licensing](https://www.qector.store)
 
 </div>
 
@@ -20,13 +20,57 @@ PyMatching-compatible MWPM validation · Belief-matching accuracy mode · BP-OSD
 
 ## Install
 
-### Stable package
+### Recommended PyPI command
 
 ```bash
 pip install qector-decoder-v3
 ```
 
-Supported public wheel target: **Python 3.9 to 3.13** on Linux, Windows, and macOS where wheels are published for the release.
+This is the command shown on PyPI and the safest command for normal users because it uses the `pip` bound to the active Python environment.
+
+Verify the install with the same Python environment:
+
+```bash
+python -c "from qector_decoder_v3 import UnionFindDecoder, BlossomDecoder; print('QECTOR OK')"
+```
+
+Check which Python and pip are being used:
+
+```bash
+python --version
+pip --version
+```
+
+### Windows note
+
+Do not force `py -m pip` unless you have checked which interpreter the Windows launcher selected. On some systems, `py` can select a free-threaded interpreter such as `python3.13t.exe`. QECTOR v0.5.x publishes standard CPython wheels, not `cp313t` free-threaded wheels. If pip cannot find a matching wheel, it may fall back to a source build and fail because the public repository does not ship the proprietary Rust core.
+
+Inspect installed Python launchers with:
+
+```powershell
+py -0p
+```
+
+Use the working PyPI command from the active standard Python environment:
+
+```powershell
+pip install qector-decoder-v3
+python -c "from qector_decoder_v3 import UnionFindDecoder, BlossomDecoder; print('QECTOR OK')"
+```
+
+### Supported public wheel targets
+
+QECTOR v0.5.x public releases target standard CPython wheels for:
+
+| Platform | Wheel status |
+|---|---|
+| Linux x86_64 | Published |
+| Windows x64 | Published |
+| macOS arm64 / Apple Silicon | Published |
+| macOS Intel x86_64 | Not published in v0.5.x public CI |
+| CPython free-threaded builds such as `cp313t` | Not published in v0.5.x |
+
+Supported Python version classifiers are standard CPython **3.9 to 3.13**.
 
 ### Optional Python extras
 
@@ -54,18 +98,18 @@ print("OpenCL:", OpenCLBatchDecoder.is_available())
 
 ### Licensed source build
 
-The public repository contains the Python layer and a Rust source stub. The proprietary Rust core is injected during trusted CI/release builds or provided under commercial license.
+The public repository contains the Python layer and a Rust source stub. The proprietary Rust core is injected during trusted CI/release builds or provided under commercial license. A full native source build requires the licensed Rust source bundle.
 
 ```bash
 git clone https://github.com/GuillaumeLessard/qector-decoder.git
 cd qector-decoder
 python -m venv .venv
 source .venv/bin/activate  # Windows PowerShell: .\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip maturin
-python -m pip install -e "[stim,bench]"
+pip install --upgrade pip maturin
+pip install -e ".[stim,bench]"
 ```
 
-For a full native Rust extension build, use the licensed Rust source bundle and the commands in [`INSTALL.md`](INSTALL.md).
+For a full native Rust extension build, unpack the licensed Rust source bundle first, then follow [`INSTALL.md`](INSTALL.md).
 
 ---
 
@@ -283,7 +327,7 @@ qector_decoder_v3/
     └── codes.py
 ```
 
-The Rust core is compiled into release wheels. The `src/` directory in this public repository is a placeholder/stub; commercial builds use the licensed source bundle or trusted CI injection.
+The Rust core is compiled into release wheels. The public `src/` directory is a placeholder/stub and is not enough for a standalone native source build. Commercial builds use the licensed source bundle or trusted CI injection.
 
 ---
 
@@ -364,7 +408,7 @@ The REST API is for local experiments, partner review, or controlled internal de
 | Workflow | Purpose | Notes |
 |---|---|---|
 | `tests.yml` | Ruff, format check, advisory MyPy, Docker smoke, import smoke | Rust source stub means Docker/native build checks can be informational in this workflow. |
-| `CI.yml` | Linux, Windows, macOS wheels and sdist, PyPI publish on `v*` tags | Rust core is injected from GitHub Actions secrets for trusted release builds. |
+| `CI.yml` | Linux x86_64, Windows x64, macOS arm64 wheels, PyPI publish on `v*` tags | Rust core is injected from GitHub Actions secrets for trusted release builds. Public sdist upload is intentionally avoided for wheel-only releases. |
 
 PyPI release uses OIDC Trusted Publisher and does not require a stored PyPI API token.
 
@@ -387,9 +431,9 @@ QECTOR Decoder v3 is source-available.
 | SaaS, hosted API, OEM embedding, product integration, redistribution | Paid commercial license |
 | Commercial benchmarking, paid consulting, revenue-linked work | Paid commercial license |
 
-Commercial contact: [admin@qector.store](mailto:admin@qector.store)
+Website and commercial licensing: [https://www.qector.store](https://www.qector.store)
 
-Website: [https://www.qector.store](https://www.qector.store)
+Commercial contact: admin@qector.store
 
 See [`COMMERCIAL.md`](COMMERCIAL.md) and [`LICENSE`](LICENSE) for full terms.
 
@@ -414,6 +458,6 @@ See [`COMMERCIAL.md`](COMMERCIAL.md) and [`LICENSE`](LICENSE) for full terms.
 
 **Copyright © 2026 Guillaume Lessard / iD01t Productions. All rights reserved.**
 
-[https://www.qector.store](https://www.qector.store) · [admin@qector.store](mailto:admin@qector.store)
+[https://www.qector.store](https://www.qector.store) · admin@qector.store
 
 </div>
