@@ -7,6 +7,7 @@
 [![PyPI](https://img.shields.io/pypi/v/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
 [![Python](https://img.shields.io/pypi/pyversions/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
 [![License](https://img.shields.io/badge/license-Source--Available-blue.svg)](LICENSE)
+[![DOI](https://doi.org/10.5281/zenodo.20825980)](DOI)
 
 **Source-available Rust/Python quantum error correction decoding platform.**
 
