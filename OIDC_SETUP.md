@@ -24,7 +24,7 @@ Complete these steps **once** in a browser before pushing the first release tag.
 
 ## Step 2: GitHub Environment (1 minute)
 
-1. Go to <https://github.com/qectorlab/qector-decoder/settings/environments>
+1. Go to <https://github.com/GuillaumeLessard/qector-decoder/settings/environments>
 2. Click **New environment**
 3. Name it exactly: `pypi`
 4. Click **Configure environment**
@@ -38,7 +38,7 @@ Complete these steps **once** in a browser before pushing the first release tag.
 
 The Rust source archive was split across **three** secrets and uploaded automatically.
 To verify they are present, go to:
-<https://github.com/qectorlab/qector-decoder/settings/secrets/actions>
+<https://github.com/GuillaumeLessard/qector-decoder/settings/secrets/actions>
 
 You should see: `RUST_SRC_B64_1`, `RUST_SRC_B64_2`, `RUST_SRC_B64_3`
 

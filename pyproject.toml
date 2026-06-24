@@ -77,8 +77,8 @@ all = [
 
 [project.urls]
 Homepage = "https://www.qector.store"
-Repository = "https://github.com/qectorlab/qector-decoder.git"
-Issues = "https://github.com/qectorlab/qector-decoder/issues"
+Repository = "https://github.com/GuillaumeLessard/qector-decoder.git"
+Issues = "https://github.com/GuillaumeLessard/qector-decoder/issues"
 "Commercial licensing" = "mailto:admin@qector.store"
 
 [tool.maturin]

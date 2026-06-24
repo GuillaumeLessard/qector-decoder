@@ -256,7 +256,7 @@ jobs:
     runs-on: ubuntu-latest
     if: >
       startsWith(github.ref, 'refs/tags/v') &&
-      github.repository == 'qectorlab/qector-decoder' &&
+      github.repository == 'GuillaumeLessard/qector-decoder' &&
       github.event_name != 'pull_request'
     needs: [linux-x86_64, windows-x64, macos-intel, macos-arm, sdist]
     environment: pypi
