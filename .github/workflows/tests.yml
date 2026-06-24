@@ -25,7 +25,10 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install linting tools
-        run: pip install ruff mypy numpy
+        # numpy is intentionally omitted: numpy 2.x stubs use `type` syntax
+        # (Python 3.12+) which mypy rejects in py3.9 mode. --ignore-missing-imports
+        # in pyproject.toml handles the missing stubs gracefully.
+        run: pip install ruff mypy
       - name: Ruff lint
         run: ruff check python/
       - name: Ruff format check
