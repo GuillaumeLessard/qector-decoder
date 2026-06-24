@@ -167,43 +167,10 @@ jobs:
           path: dist
 
   # ------------------------------------------------------------------
-  # Source distribution (sdist) -- pure Python, no Rust needed
-  # ------------------------------------------------------------------
-  sdist:
-    name: sdist
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Inject Rust source (needed by maturin sdist to embed Cargo.toml)
-        env:
-          PART1: ${{ secrets.RUST_SRC_B64_1 }}
-          PART2: ${{ secrets.RUST_SRC_B64_2 }}
-          PART3: ${{ secrets.RUST_SRC_B64_3 }}
-        run: |
-          if [ -z "$PART1" ]; then
-            echo "SKIP_BUILD=1" >> "$GITHUB_ENV"
-          else
-            echo "${PART1}${PART2}${PART3}" | base64 -d | tar -xzf - -C .
-            echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
-          fi
-
-      - name: Build sdist
-        if: env.SKIP_BUILD == '0'
-        uses: PyO3/maturin-action@v1
-        with:
-          command: sdist
-          args: --out dist
-
-      - uses: actions/upload-artifact@v4
-        if: env.SKIP_BUILD == '0'
-        with:
-          name: wheels-sdist
-          path: dist
-
-  # ------------------------------------------------------------------
   # Publish to PyPI via OIDC Trusted Publisher (no token required)
-  # Runs only on version tags pushed to the main repo (not forks)
+  # Runs only on version tags pushed to the main repo (not forks).
+  # Public releases are wheel-only to prevent unsupported interpreters from
+  # falling back to a source build without the proprietary Rust core.
   # ------------------------------------------------------------------
   release:
     name: publish-to-pypi
@@ -212,7 +179,7 @@ jobs:
       startsWith(github.ref, 'refs/tags/v') &&
       github.repository == 'GuillaumeLessard/qector-decoder' &&
       github.event_name != 'pull_request'
-    needs: [linux-x86_64, windows-x64, macos-arm, sdist]
+    needs: [linux-x86_64, windows-x64, macos-arm]
     environment: pypi
     permissions:
       id-token: write
