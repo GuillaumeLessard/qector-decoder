@@ -81,6 +81,7 @@ Repository = "https://github.com/GuillaumeLessard/qector-decoder"
 Source = "https://github.com/GuillaumeLessard/qector-decoder"
 Issues = "https://github.com/GuillaumeLessard/qector-decoder/issues"
 PyPI = "https://pypi.org/project/qector-decoder-v3/"
+DOI = "https://doi.org/10.5281/zenodo.20825980"
 "Commercial Licensing" = "https://www.qector.store"
 
 [tool.maturin]
