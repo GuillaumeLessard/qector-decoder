@@ -4,10 +4,10 @@ build-backend = "maturin"
 
 [project]
 name = "qector-decoder-v3"
-version = "0.5.0"
-description = "Source-available Rust/Python QEC R&D platform: PyMatching-compatible validation, belief-matching, BP-OSD (LDPC/qLDPC), CPU/GPU batch decoding, and artifact-hashed benchmark evidence"
+version = "0.5.1"
+description = "Source-available Rust/Python QEC R&D platform with PyMatching-compatible validation, belief-matching, BP-OSD/qLDPC workflows, CPU/GPU batch decoding, and artifact-backed benchmark evidence"
 readme = {file = "PYPI_README.md", content-type = "text/markdown"}
-requires-python = ">=3.9"
+requires-python = ">=3.9,<3.14"
 license = {file = "LICENSE"}
 authors = [
     {name = "Guillaume Lessard / iD01t Productions", email = "admin@qector.store"}
@@ -75,10 +75,13 @@ all = [
 
 [project.urls]
 Homepage = "https://www.qector.store"
-Repository = "https://github.com/GuillaumeLessard/qector-decoder.git"
-Issues = "https://github.com/GuillaumeLessard/qector-decoder/issues"
+Website = "https://www.qector.store"
 Documentation = "https://github.com/GuillaumeLessard/qector-decoder#readme"
-"Commercial licensing" = "https://www.qector.store"
+Repository = "https://github.com/GuillaumeLessard/qector-decoder"
+Source = "https://github.com/GuillaumeLessard/qector-decoder"
+Issues = "https://github.com/GuillaumeLessard/qector-decoder/issues"
+PyPI = "https://pypi.org/project/qector-decoder-v3/"
+"Commercial Licensing" = "https://www.qector.store"
 
 [tool.maturin]
 python-source = "python"
