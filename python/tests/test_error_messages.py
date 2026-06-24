@@ -4,6 +4,7 @@ Error messages from the validation layer must help the caller fix the input:
 they mention "unknown", the offending kind, and (for the benchmark dispatcher)
 the list of valid choices.
 """
+
 import numpy as np
 import pytest
 
@@ -11,11 +12,7 @@ from qector_decoder_v3 import codes, dem, result, benchmarking
 
 
 def _small_dem():
-    text = (
-        "error(0.1) D0 L0\n"
-        "error(0.1) D0 D1\n"
-        "error(0.1) D1 L0\n"
-    )
+    text = "error(0.1) D0 L0\nerror(0.1) D0 D1\nerror(0.1) D1 L0\n"
     return dem.parse_dem(text)
 
 
@@ -45,6 +42,4 @@ def test_benchmark_decoder_message_lists_choices():
     msg = str(excinfo.value)
     assert "zzz" in msg
     # message enumerates valid decoder kinds
-    assert "blossom" in msg and "union_find" in msg, (
-        f"message should list valid choices: {msg!r}"
-    )
+    assert "blossom" in msg and "union_find" in msg, f"message should list valid choices: {msg!r}"
