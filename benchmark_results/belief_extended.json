@@ -1,0 +1,312 @@
+{
+  "environment": {
+    "timestamp_unix": 1782215902,
+    "python_version": "3.11.0",
+    "python_implementation": "CPython",
+    "platform": "Windows-10-10.0.26100-SP0",
+    "system": "Windows",
+    "machine": "AMD64",
+    "processor": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+    "cpu_count_logical": 16,
+    "numpy_version": "2.2.6",
+    "rust_version": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+    "cargo_version": "cargo 1.96.0 (30a34c682 2026-05-25)",
+    "git_commit": "729282fabffdd8b3fafb45c22f0d4b6b6adeac7d",
+    "qector_decoder_v3_version": "0.5.0",
+    "pymatching_version": "2.4.0",
+    "stim_version": "1.16.0",
+    "scipy_version": "1.17.1",
+    "ram_total_gb": 16.51,
+    "ram_available_gb": 5.72,
+    "cuda_available": true,
+    "opencl_available": true,
+    "command": "D:\\QECTOR\\Qiskit\\qector-decoder-v3\\scripts\\belief_extended.py --ms-distances 3 5 --ms-seeds 8 --ms-shots 1200 --ps-shots 1500 --mz-distances 3 5 7 --mz-shots 2500 --out D:\\QECTOR\\Qiskit\\qector-decoder-v3\\benchmark_results\\belief_extended"
+  },
+  "multiseed": {
+    "basis": "x",
+    "noise": 0.005,
+    "shots": 1200,
+    "n_seeds": 8,
+    "rows": [
+      {
+        "d": 3,
+        "seed": 0,
+        "pm_ler": 0.0125,
+        "belief_ler": 0.01,
+        "reduction_pct": 20.000000000000007
+      },
+      {
+        "d": 3,
+        "seed": 1,
+        "pm_ler": 0.010833333333333334,
+        "belief_ler": 0.0125,
+        "reduction_pct": -15.384615384615397
+      },
+      {
+        "d": 3,
+        "seed": 2,
+        "pm_ler": 0.009166666666666667,
+        "belief_ler": 0.01,
+        "reduction_pct": -9.090909090909083
+      },
+      {
+        "d": 3,
+        "seed": 3,
+        "pm_ler": 0.01,
+        "belief_ler": 0.0125,
+        "reduction_pct": -25.0
+      },
+      {
+        "d": 3,
+        "seed": 4,
+        "pm_ler": 0.013333333333333334,
+        "belief_ler": 0.011666666666666667,
+        "reduction_pct": 12.5
+      },
+      {
+        "d": 3,
+        "seed": 5,
+        "pm_ler": 0.0125,
+        "belief_ler": 0.015,
+        "reduction_pct": -19.999999999999996
+      },
+      {
+        "d": 3,
+        "seed": 6,
+        "pm_ler": 0.008333333333333333,
+        "belief_ler": 0.010833333333333334,
+        "reduction_pct": -30.000000000000004
+      },
+      {
+        "d": 3,
+        "seed": 7,
+        "pm_ler": 0.014166666666666666,
+        "belief_ler": 0.010833333333333334,
+        "reduction_pct": 23.529411764705877
+      },
+      {
+        "d": 5,
+        "seed": 0,
+        "pm_ler": 0.010833333333333334,
+        "belief_ler": 0.005833333333333334,
+        "reduction_pct": 46.15384615384615
+      },
+      {
+        "d": 5,
+        "seed": 1,
+        "pm_ler": 0.0075,
+        "belief_ler": 0.005,
+        "reduction_pct": 33.33333333333333
+      },
+      {
+        "d": 5,
+        "seed": 2,
+        "pm_ler": 0.006666666666666667,
+        "belief_ler": 0.006666666666666667,
+        "reduction_pct": 0.0
+      },
+      {
+        "d": 5,
+        "seed": 3,
+        "pm_ler": 0.01,
+        "belief_ler": 0.009166666666666667,
+        "reduction_pct": 8.333333333333337
+      },
+      {
+        "d": 5,
+        "seed": 4,
+        "pm_ler": 0.008333333333333333,
+        "belief_ler": 0.005,
+        "reduction_pct": 40.0
+      },
+      {
+        "d": 5,
+        "seed": 5,
+        "pm_ler": 0.0075,
+        "belief_ler": 0.004166666666666667,
+        "reduction_pct": 44.44444444444444
+      },
+      {
+        "d": 5,
+        "seed": 6,
+        "pm_ler": 0.008333333333333333,
+        "belief_ler": 0.006666666666666667,
+        "reduction_pct": 19.999999999999996
+      },
+      {
+        "d": 5,
+        "seed": 7,
+        "pm_ler": 0.0075,
+        "belief_ler": 0.005,
+        "reduction_pct": 33.33333333333333
+      }
+    ],
+    "summary": [
+      {
+        "d": 3,
+        "n_seeds": 8,
+        "belief_strictly_better": 3,
+        "belief_le_pm": 3,
+        "mean_reduction_pct": -5.430764088852324,
+        "pooled_pm_ler": 0.011354166666666667,
+        "pooled_belief_ler": 0.011666666666666667,
+        "pooled_reduction_pct": -2.752293577981657
+      },
+      {
+        "d": 5,
+        "n_seeds": 8,
+        "belief_strictly_better": 7,
+        "belief_le_pm": 8,
+        "mean_reduction_pct": 28.199786324786324,
+        "pooled_pm_ler": 0.008333333333333333,
+        "pooled_belief_ler": 0.0059375,
+        "pooled_reduction_pct": 28.749999999999996
+      }
+    ]
+  },
+  "psweep": {
+    "basis": "x",
+    "distance": 5,
+    "shots": 1500,
+    "seed": 12345,
+    "rows": [
+      {
+        "p": 0.002,
+        "pm_ler": 0.0,
+        "pm_ci95": [
+          0.0,
+          0.0025544307213773254
+        ],
+        "belief_ler": 0.0,
+        "belief_ci95": [
+          0.0,
+          0.0025544307213773254
+        ],
+        "reduction_pct": 0.0
+      },
+      {
+        "p": 0.004,
+        "pm_ler": 0.006666666666666667,
+        "pm_ci95": [
+          0.0036252160336789005,
+          0.012228488944746728
+        ],
+        "belief_ler": 0.0013333333333333333,
+        "belief_ci95": [
+          0.00036572427548635204,
+          0.004848561297300634
+        ],
+        "reduction_pct": 80.0
+      },
+      {
+        "p": 0.005,
+        "pm_ler": 0.01,
+        "pm_ci95": [
+          0.006069437503378708,
+          0.01643390460357107
+        ],
+        "belief_ler": 0.006666666666666667,
+        "belief_ci95": [
+          0.0036252160336789005,
+          0.012228488944746728
+        ],
+        "reduction_pct": 33.33333333333333
+      },
+      {
+        "p": 0.006,
+        "pm_ler": 0.015333333333333332,
+        "pm_ci95": [
+          0.010238914877655278,
+          0.022903846634933146
+        ],
+        "belief_ler": 0.013333333333333334,
+        "belief_ci95": [
+          0.008647712946673238,
+          0.020505266288800693
+        ],
+        "reduction_pct": 13.043478260869556
+      },
+      {
+        "p": 0.008,
+        "pm_ler": 0.03,
+        "pm_ci95": [
+          0.02249567967192645,
+          0.03990548520616824
+        ],
+        "belief_ler": 0.022,
+        "belief_ci95": [
+          0.015707562216738538,
+          0.03073447355289819
+        ],
+        "reduction_pct": 26.66666666666667
+      },
+      {
+        "p": 0.01,
+        "pm_ler": 0.04933333333333333,
+        "pm_ci95": [
+          0.039478762553221976,
+          0.0614902976703128
+        ],
+        "belief_ler": 0.050666666666666665,
+        "belief_ci95": [
+          0.04067065180160213,
+          0.06295826327334231
+        ],
+        "reduction_pct": -2.7027027027026973
+      }
+    ]
+  },
+  "memz": {
+    "basis": "z",
+    "noise": 0.005,
+    "shots": 2500,
+    "seed": 2026,
+    "rows": [
+      {
+        "d": 3,
+        "pm_ler": 0.0128,
+        "pm_ci95": [
+          0.009081442606335349,
+          0.018013507268966045
+        ],
+        "qmwpm_ler": 0.0128,
+        "belief_ler": 0.0128,
+        "belief_ci95": [
+          0.009081442606335349,
+          0.018013507268966045
+        ],
+        "reduction_pct": 0.0
+      },
+      {
+        "d": 5,
+        "pm_ler": 0.0088,
+        "pm_ci95": [
+          0.005818600504302723,
+          0.013288623179498684
+        ],
+        "qmwpm_ler": 0.0088,
+        "belief_ler": 0.006,
+        "belief_ci95": [
+          0.0036394868757541328,
+          0.00987632847399728
+        ],
+        "reduction_pct": 31.818181818181824
+      },
+      {
+        "d": 7,
+        "pm_ler": 0.0024,
+        "pm_ci95": [
+          0.0011003913520689522,
+          0.005226470425332472
+        ],
+        "qmwpm_ler": 0.0024,
+        "belief_ler": 0.0032,
+        "belief_ci95": [
+          0.0016223814820324014,
+          0.00630202553366902
+        ],
+        "reduction_pct": -33.33333333333335
+      }
+    ]
+  }
+}

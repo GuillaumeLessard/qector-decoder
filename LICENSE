@@ -1,0 +1,241 @@
+# QECTOR Decoder Source-Available License
+
+Version 1.0
+
+Copyright (c) 2026 Guillaume Lessard / iD01t Productions.
+All rights reserved.
+
+This license governs the use of the QECTOR Decoder software, including all source code, binaries, documentation, examples, benchmarks, models, scripts, and related materials distributed in this repository.
+
+By downloading, copying, using, modifying, or accessing this software, you agree to the terms of this license.
+
+---
+
+## 1. Ownership
+
+QECTOR Decoder is proprietary software.
+
+All rights, title, and interest in and to the software remain exclusively with Guillaume Lessard / iD01t Productions.
+
+This license does not transfer ownership of the software, source code, algorithms, documentation, trademarks, branding, research results, benchmarks, or related intellectual property.
+
+No rights are granted except those expressly stated in this license.
+
+---
+
+## 2. Free Permitted Use
+
+You may use QECTOR Decoder for free only for the following purposes:
+
+1. Personal learning
+2. Private experimentation
+3. Non-commercial research
+4. Academic evaluation
+5. Internal non-commercial testing
+6. Educational demonstrations
+7. Benchmark reproduction
+8. Reviewing or studying the source code
+
+This free permission is limited, revocable, non-exclusive, non-transferable, and non-sublicensable.
+
+---
+
+## 3. Commercial Use Requires a Paid License
+
+Commercial use is not permitted under this free license.
+
+You must obtain a separate written commercial license from the copyright holder before using QECTOR Decoder for any commercial, business, government, institutional, product, service, consulting, revenue-generating, or production purpose.
+
+Commercial use includes, but is not limited to:
+
+1. Using QECTOR Decoder inside a commercial product
+2. Using QECTOR Decoder inside a paid service
+3. Using QECTOR Decoder in SaaS, cloud, hosted, or API services
+4. Using QECTOR Decoder for paid consulting
+5. Using QECTOR Decoder in internal business operations
+6. Using QECTOR Decoder to support commercial research and development
+7. Using QECTOR Decoder in a company, startup, lab, institution, or government project
+8. Using QECTOR Decoder to train, validate, benchmark, or improve a commercial system
+9. Selling, licensing, renting, or distributing software that includes or depends on QECTOR Decoder
+10. Using QECTOR Decoder to obtain funding, investment, contracts, grants, or commercial advantage
+
+For commercial licensing, contact:
+
+**Guillaume Lessard / iD01t Productions**
+Email: [guiliguili2705@gmail.com](mailto:guiliguili2705@gmail.com)
+
+---
+
+## 4. Restrictions
+
+You may not:
+
+1. Sell, rent, sublicense, lease, or commercially distribute QECTOR Decoder without written permission.
+2. Use QECTOR Decoder commercially without a paid commercial license.
+3. Remove or alter copyright notices, license notices, attribution, disclaimers, or ownership statements.
+4. Claim ownership of QECTOR Decoder or any derivative work based on it.
+5. Re-license QECTOR Decoder under an open-source license or any other license.
+6. Publish modified versions as if they were official releases.
+7. Use QECTOR Decoder in a way that competes with the copyright holder’s commercial licensing rights.
+8. Use QECTOR Decoder as part of a hosted service, API, SaaS platform, or cloud product without a commercial license.
+9. Use QECTOR Decoder in safety-critical, medical, military, nuclear, aerospace, financial, or legally regulated systems without a separate written agreement.
+10. Use QECTOR Decoder to violate laws, infringe rights, or misrepresent scientific results.
+
+---
+
+## 5. Modifications
+
+You may modify QECTOR Decoder only for permitted non-commercial use.
+
+Modified versions must:
+
+1. Keep this license file.
+2. Keep all copyright notices.
+3. Clearly state that the version was modified.
+4. Not use the official QECTOR name, logo, or branding to imply endorsement.
+5. Not be distributed commercially without a separate written license.
+
+You may submit modifications, patches, or pull requests to the official repository. By submitting a contribution, you grant the copyright holder a perpetual, worldwide, royalty-free, irrevocable license to use, modify, reproduce, distribute, sublicense, and commercialize that contribution as part of QECTOR Decoder.
+
+---
+
+## 6. Redistribution
+
+You may share unmodified copies of QECTOR Decoder for non-commercial purposes only, provided that:
+
+1. This license is included.
+2. All copyright notices remain intact.
+3. No fee is charged.
+4. The software is not bundled with a commercial product or service.
+5. The distribution does not imply official endorsement.
+
+Commercial redistribution is prohibited without a separate written commercial license.
+
+---
+
+## 7. Research and Citation
+
+If you use QECTOR Decoder in academic work, research papers, benchmarks, reports, presentations, or public comparisons, you must provide attribution:
+
+```text
+QECTOR Decoder by Guillaume Lessard / iD01t Productions
+```
+
+If a citation file is provided in the repository, you should cite the project using the recommended citation metadata.
+
+Benchmark results must be presented honestly and must not remove stated limitations, hardware details, confidence intervals, methodology notes, or competing baseline results.
+
+---
+
+## 8. No Trademark Rights
+
+This license does not grant permission to use the names, logos, marks, or branding of:
+
+```text
+QECTOR
+QECTOR Decoder
+iD01t Productions
+Guillaume Lessard
+```
+
+except for accurate attribution and non-commercial reference.
+
+---
+
+## 9. No Patent License
+
+No patent rights are granted under this license.
+
+Any use of patented or patent-pending methods, algorithms, optimizations, architectures, workflows, or implementations contained in QECTOR Decoder may require a separate written patent license.
+
+---
+
+## 10. No Warranty
+
+QECTOR Decoder is provided “as is” and “as available,” without warranty of any kind.
+
+The copyright holder makes no warranties, express or implied, including but not limited to warranties of:
+
+1. Merchantability
+2. Fitness for a particular purpose
+3. Non-infringement
+4. Accuracy
+5. Reliability
+6. Security
+7. Availability
+8. Suitability for production use
+9. Suitability for quantum hardware, quantum error correction, or scientific conclusions
+
+You use the software at your own risk.
+
+---
+
+## 11. Limitation of Liability
+
+To the maximum extent permitted by law, the copyright holder shall not be liable for any direct, indirect, incidental, special, consequential, exemplary, or punitive damages arising from or related to the use of QECTOR Decoder.
+
+This includes, but is not limited to:
+
+1. Loss of data
+2. Loss of profits
+3. Loss of revenue
+4. Business interruption
+5. Research errors
+6. Incorrect benchmark results
+7. Hardware failures
+8. Security incidents
+9. Scientific, commercial, or operational decisions based on the software
+
+---
+
+## 12. Termination
+
+Your rights under this license terminate automatically if you violate any term of this license.
+
+Upon termination, you must immediately stop using QECTOR Decoder and delete all copies in your possession or control, unless you have obtained a separate written commercial license.
+
+Sections concerning ownership, restrictions, commercial licensing, attribution, warranty disclaimer, liability limitation, and termination survive termination.
+
+---
+
+## 13. Commercial Licensing
+
+Commercial licenses are available separately.
+
+A commercial license may include, depending on the agreement:
+
+1. Production use rights
+2. SaaS or hosted service rights
+3. Enterprise redistribution rights
+4. Private support
+5. Custom integration
+6. Priority bug fixes
+7. Patent rights, if applicable
+8. OEM or embedded use
+9. Research partnership terms
+10. Confidential roadmap access
+
+Contact:
+
+**Guillaume Lessard / iD01t Productions**
+Email: [guiliguili2705@gmail.com](mailto:guiliguili2705@gmail.com)
+
+---
+
+## 14. Governing Law
+
+Unless otherwise agreed in a separate written commercial license, this license shall be governed by the laws of the Province of Québec and the applicable laws of Canada.
+
+Any dispute arising from this license shall be resolved in the courts located in Québec, Canada, unless otherwise required by law.
+
+---
+
+## 15. Summary
+
+You may use QECTOR Decoder for free for personal, academic, educational, and non-commercial research purposes.
+
+You may not use QECTOR Decoder commercially without a paid commercial license.
+
+All rights remain reserved by Guillaume Lessard / iD01t Productions.
+
+www.qector.store

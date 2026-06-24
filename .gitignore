@@ -1,0 +1,80 @@
+# QECTOR Decoder v3 -- .gitignore
+# =================================
+
+# --- Build artifacts ---
+/target/
+/dist/
+*.whl
+*.tar.gz
+*.pyd
+*.so
+*.dll
+*.dylib
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+.eggs/
+build/
+develop-eggs/
+downloads/
+eggs/
+.installed.cfg
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.spec
+pip-wheel-metadata/
+share/python-wheels/
+MANIFEST
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Rust ---
+Cargo.lock.bak
+
+# --- Generated lib artifacts (only OpenCL.def is tracked) ---
+lib/OpenCL.lib
+lib/OpenCL.exp
+
+# --- Local build/dev directories ---
+actions-runner/
+artifacts/
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Benchmark outputs (tracked selectively) ---
+# benchmark_results/ is tracked intentionally for reproducibility evidence
+
+# --- Testing ---
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# --- Temporary ---
+*.tmp
+*.bak
+*.orig

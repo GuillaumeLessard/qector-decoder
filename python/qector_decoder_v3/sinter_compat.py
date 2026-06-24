@@ -1,0 +1,131 @@
+"""
+qector_decoder_v3.sinter_compat — plug QECTOR into Sinter.
+
+`sinter <https://github.com/quantumlib/Stim/tree/main/glue/sample>`_ is the
+standard harness for Monte-Carlo logical-error-rate sampling of Stim circuits.
+Exposing QECTOR through Sinter's decoder interface makes QECTOR's accuracy
+**externally verifiable with the community-standard tool** — the same harness
+people use to benchmark PyMatching, fusion-blossom, etc.
+
+Usage
+-----
+>>> import sinter, stim
+>>> from qector_decoder_v3.sinter_compat import qector_sinter_decoders
+>>> tasks = [sinter.Task(circuit=c, json_metadata={"d": d}) for ...]
+>>> samples = sinter.collect(
+...     num_workers=4, tasks=tasks,
+...     decoders=["qector_belief"],
+...     custom_decoders=qector_sinter_decoders(),
+... )
+
+Decoders provided: ``qector_blossom`` (weighted exact MWPM),
+``qector_belief`` (belief-matching), ``qector_unionfind`` (fast, unweighted).
+"""
+
+from __future__ import annotations
+
+from typing import Dict
+
+import numpy as np
+
+__all__ = ["QectorSinterDecoder", "qector_sinter_decoders"]
+
+try:
+    import sinter
+
+    _SINTER_BASE = sinter.Decoder
+    _COMPILED_BASE = sinter.CompiledDecoder
+    _HAS_SINTER = True
+except Exception:  # pragma: no cover - sinter optional
+    _SINTER_BASE = object
+    _COMPILED_BASE = object
+    _HAS_SINTER = False
+
+
+class _CompiledQectorDecoder(_COMPILED_BASE):
+    """A compiled QECTOR decoder bound to one detector error model."""
+
+    def __init__(self, matcher, num_detectors: int, num_observables: int):
+        self.matcher = matcher
+        self.num_detectors = int(num_detectors)
+        self.num_observables = int(num_observables)
+
+    def decode_shots_bit_packed(self, *, bit_packed_detection_event_data: np.ndarray) -> np.ndarray:
+        # Sinter/Stim use little-endian bit packing.
+        dets = np.unpackbits(
+            np.ascontiguousarray(bit_packed_detection_event_data),
+            axis=1,
+            count=self.num_detectors,
+            bitorder="little",
+        ).astype(np.uint8)
+        preds = np.asarray(self.matcher.decode_batch(dets), dtype=np.uint8)
+        if preds.ndim == 1:
+            preds = preds.reshape(-1, 1)
+        if preds.shape[1] != self.num_observables:
+            # pad/truncate defensively to the declared observable count
+            fixed = np.zeros((preds.shape[0], self.num_observables), np.uint8)
+            k = min(self.num_observables, preds.shape[1])
+            fixed[:, :k] = preds[:, :k]
+            preds = fixed
+        return np.packbits(preds, axis=1, bitorder="little")
+
+
+class QectorSinterDecoder(_SINTER_BASE):
+    """A Sinter ``Decoder`` backed by QECTOR.
+
+    ``kind`` selects the backend: ``"blossom"`` (weighted exact MWPM),
+    ``"belief"`` (belief-matching), or ``"unionfind"`` (fast, unweighted).
+    """
+
+    def __init__(self, kind: str = "belief"):
+        if not _HAS_SINTER:  # pragma: no cover
+            raise ImportError("sinter is not installed (pip install sinter)")
+        self.kind = kind
+
+    def compile_decoder_for_dem(self, *, dem) -> "_CompiledQectorDecoder":
+        matcher = _build_matcher(self.kind, dem)
+        return _CompiledQectorDecoder(matcher, dem.num_detectors, dem.num_observables)
+
+
+def _build_matcher(kind: str, dem):
+    kind = kind.lower()
+    if kind in ("belief", "belief_matching", "bp"):
+        from .belief_matching import BeliefMatching
+
+        return BeliefMatching.from_detector_error_model(dem)
+    if kind in ("blossom", "mwpm", "matching"):
+        from .pymatching_compat import Matching
+
+        return Matching.from_detector_error_model(dem)
+    if kind in ("unionfind", "uf", "union_find"):
+        return _UnionFindSinter(dem)
+    raise ValueError(f"unknown QECTOR sinter decoder kind: {kind!r}")
+
+
+class _UnionFindSinter:
+    """Fast unweighted UF path with observable mapping (for Sinter)."""
+
+    def __init__(self, dem):
+        from . import UnionFindDecoder
+        from .dem import from_stim
+
+        model = from_stim(dem)
+        if model.is_graphlike:
+            model = model.collapse_to_graph()
+        self._L = model.observables_matrix()
+        self._dec = UnionFindDecoder(model.check_to_qubits(), model.num_errors)
+
+    def decode_batch(self, shots):
+        corr = np.asarray(self._dec.batch_decode(np.asarray(shots, np.uint8)), dtype=np.uint8)
+        return ((self._L @ corr.T) & 1).T.astype(np.uint8)
+
+
+def qector_sinter_decoders() -> Dict[str, "QectorSinterDecoder"]:
+    """Return the ``custom_decoders`` mapping to pass to ``sinter.collect``."""
+    if not _HAS_SINTER:  # pragma: no cover
+        raise ImportError("sinter is not installed (pip install sinter)")
+    return {
+        "qector_blossom": QectorSinterDecoder("blossom"),
+        "qector_belief": QectorSinterDecoder("belief"),
+        "qector_unionfind": QectorSinterDecoder("unionfind"),
+    }

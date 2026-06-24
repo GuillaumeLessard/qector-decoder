@@ -1,0 +1,44 @@
+syntax = "proto3";
+package qector;
+
+service QectorDecoder {
+    rpc Decode(DecodeRequest) returns (DecodeResponse);
+    rpc BatchDecode(BatchDecodeRequest) returns (BatchDecodeResponse);
+    rpc Health(HealthRequest) returns (HealthResponse);
+}
+
+message DecodeRequest {
+    repeated uint32 check_to_qubits_flat = 1;
+    uint32 n_checks = 2;
+    uint32 qubits_per_check = 3;
+    repeated uint32 syndrome = 4;
+    uint32 n_qubits = 5;
+}
+
+message DecodeResponse {
+    repeated uint32 correction = 1;
+    uint32 n_qubits = 2;
+    uint32 n_checks = 3;
+}
+
+message BatchDecodeRequest {
+    repeated uint32 check_to_qubits_flat = 1;
+    uint32 n_checks = 2;
+    uint32 qubits_per_check = 3;
+    repeated uint32 syndromes_flat = 4;
+    uint32 n_qubits = 5;
+    uint32 batch_size = 6;
+}
+
+message BatchDecodeResponse {
+    repeated uint32 corrections_flat = 1;
+    uint32 n_qubits = 2;
+    uint32 n_checks = 3;
+    uint32 batch_size = 4;
+}
+
+message HealthRequest {}
+message HealthResponse {
+    string status = 1;
+    string version = 2;
+}

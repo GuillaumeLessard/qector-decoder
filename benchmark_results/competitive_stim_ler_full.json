@@ -1,0 +1,227 @@
+{
+  "environment": {
+    "timestamp_unix": 1782211226,
+    "python_version": "3.11.0",
+    "python_implementation": "CPython",
+    "platform": "Windows-10-10.0.26100-SP0",
+    "system": "Windows",
+    "machine": "AMD64",
+    "processor": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+    "cpu_count_logical": 16,
+    "numpy_version": "2.2.6",
+    "rust_version": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+    "cargo_version": "cargo 1.96.0 (30a34c682 2026-05-25)",
+    "git_commit": "729282fabffdd8b3fafb45c22f0d4b6b6adeac7d",
+    "qector_decoder_v3_version": "0.5.0",
+    "pymatching_version": "2.4.0",
+    "stim_version": "1.16.0",
+    "scipy_version": "1.17.1",
+    "ram_total_gb": 16.51,
+    "ram_available_gb": 5.37,
+    "cuda_available": true,
+    "opencl_available": true,
+    "command": "scripts/competitive_stim_ler.py --distances 3 5 7 9 11 --noise 0.005 --shots 10000 --out benchmark_results/competitive_stim_ler_full"
+  },
+  "results": [
+    {
+      "distance": 3,
+      "rounds": 3,
+      "noise": 0.005,
+      "shots": 10000,
+      "detectors": 24,
+      "raw_mechanisms": 568,
+      "collapsed_edges": 78,
+      "graphlike": true,
+      "qector_blossom_weighted": {
+        "logical_errors": 122,
+        "ler": 0.0122,
+        "ler_ci95": [
+          0.010227982913066471,
+          0.014546645897541377
+        ],
+        "decode_us_per_shot": 0.6371499999659136,
+        "shots_per_s": 1569489.1313717307
+      },
+      "qector_unionfind": {
+        "logical_errors": 145,
+        "ler": 0.0145,
+        "ler_ci95": [
+          0.01233653816560015,
+          0.017036324252501758
+        ],
+        "decode_us_per_shot": 0.43208999995840713,
+        "shots_per_s": 2314332.6623996384
+      },
+      "pymatching": {
+        "logical_errors": 122,
+        "ler": 0.0122,
+        "ler_ci95": [
+          0.010227982913066471,
+          0.014546645897541377
+        ],
+        "decode_us_per_shot": 0.46065999995335005,
+        "shots_per_s": 2170798.419878582
+      }
+    },
+    {
+      "distance": 5,
+      "rounds": 5,
+      "noise": 0.005,
+      "shots": 10000,
+      "detectors": 120,
+      "raw_mechanisms": 3718,
+      "collapsed_edges": 502,
+      "graphlike": true,
+      "qector_blossom_weighted": {
+        "logical_errors": 84,
+        "ler": 0.0084,
+        "ler_ci95": [
+          0.006790405766362823,
+          0.010387141431863537
+        ],
+        "decode_us_per_shot": 7.0635500000207685,
+        "shots_per_s": 141571.87249995538
+      },
+      "qector_unionfind": {
+        "logical_errors": 430,
+        "ler": 0.043,
+        "ler_ci95": [
+          0.03919645310936483,
+          0.04715452140159823
+        ],
+        "decode_us_per_shot": 2.0994699996663257,
+        "shots_per_s": 476310.6880112279
+      },
+      "pymatching": {
+        "logical_errors": 82,
+        "ler": 0.0082,
+        "ler_ci95": [
+          0.00661159660045378,
+          0.010166104197120922
+        ],
+        "decode_us_per_shot": 3.4774300002027303,
+        "shots_per_s": 287568.69295476866
+      }
+    },
+    {
+      "distance": 7,
+      "rounds": 7,
+      "noise": 0.005,
+      "shots": 10000,
+      "detectors": 336,
+      "raw_mechanisms": 11982,
+      "collapsed_edges": 1558,
+      "graphlike": true,
+      "qector_blossom_weighted": {
+        "logical_errors": 41,
+        "ler": 0.0041,
+        "ler_ci95": [
+          0.0030238546561312148,
+          0.005556994928084513
+        ],
+        "decode_us_per_shot": 42.34199999991688,
+        "shots_per_s": 23617.212224315408
+      },
+      "qector_unionfind": {
+        "logical_errors": 230,
+        "ler": 0.023,
+        "ler_ci95": [
+          0.020239975482106626,
+          0.026126358963690713
+        ],
+        "decode_us_per_shot": 6.622179999976652,
+        "shots_per_s": 151007.67421053577
+      },
+      "pymatching": {
+        "logical_errors": 41,
+        "ler": 0.0041,
+        "ler_ci95": [
+          0.0030238546561312148,
+          0.005556994928084513
+        ],
+        "decode_us_per_shot": 12.040310000156751,
+        "shots_per_s": 83054.33996192632
+      }
+    },
+    {
+      "distance": 9,
+      "rounds": 9,
+      "noise": 0.005,
+      "shots": 10000,
+      "detectors": 720,
+      "raw_mechanisms": 26823,
+      "collapsed_edges": 3534,
+      "graphlike": true,
+      "qector_blossom_weighted": {
+        "logical_errors": 28,
+        "ler": 0.0028,
+        "ler_ci95": [
+          0.001938005730520096,
+          0.004043842249459858
+        ],
+        "decode_us_per_shot": 115.38177999973414,
+        "shots_per_s": 8666.87964080901
+      },
+      "qector_unionfind": {
+        "logical_errors": 185,
+        "ler": 0.0185,
+        "ler_ci95": [
+          0.016037871857309427,
+          0.021331918573825617
+        ],
+        "decode_us_per_shot": 15.429070000391219,
+        "shots_per_s": 64812.720402113926
+      },
+      "pymatching": {
+        "logical_errors": 28,
+        "ler": 0.0028,
+        "ler_ci95": [
+          0.001938005730520096,
+          0.004043842249459858
+        ],
+        "decode_us_per_shot": 26.828830000158632,
+        "shots_per_s": 37273.33618328072
+      }
+    },
+    {
+      "distance": 11,
+      "rounds": 11,
+      "noise": 0.005,
+      "shots": 10000,
+      "detectors": 1320,
+      "raw_mechanisms": 50484,
+      "collapsed_edges": 6718,
+      "graphlike": true,
+      "qector_blossom_weighted": {
+        "logical_errors": 15,
+        "ler": 0.0015,
+        "ler_ci95": [
+          0.0009092618254884616,
+          0.002473584550255721
+        ],
+        "decode_us_per_shot": 309.36479000010877,
+        "shots_per_s": 3232.4299090392556
+      },
+      "qector_unionfind": {
+        "logical_errors": 162,
+        "ler": 0.0162,
+        "ler_ci95": [
+          0.013904949781356413,
+          0.018866607042284576
+        ],
+        "decode_us_per_shot": 29.529080000065733,
+        "shots_per_s": 33864.92230701986
+      },
+      "pymatching": {
+        "logical_errors": 15,
+        "ler": 0.0015,
+        "ler_ci95": [
+          0.0009092618254884616,
+          0.002473584550255721
+        ],
+        "decode_us_per_shot": 39.69063999975333,
+        "shots_per_s": 25194.85702438194
+      }
+    }
+  ]
+}

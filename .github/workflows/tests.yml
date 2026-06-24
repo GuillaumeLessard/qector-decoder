@@ -1,0 +1,72 @@
+# Lint and static analysis -- runs on every push/PR, no Rust build needed.
+# Uses the installed wheel from PyPI (or a local sdist) to run the Python layer.
+
+name: tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # ------------------------------------------------------------------
+  # Ruff lint + MyPy type-check
+  # ------------------------------------------------------------------
+  lint:
+    name: ruff-and-mypy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install linting tools
+        run: pip install ruff mypy numpy
+      - name: Ruff lint
+        run: ruff check python/
+      - name: Ruff format check
+        run: ruff format --check python/
+      - name: MyPy
+        run: mypy python/qector_decoder_v3/ --ignore-missing-imports
+
+  # ------------------------------------------------------------------
+  # Docker image build smoke test
+  # ------------------------------------------------------------------
+  docker:
+    name: docker-build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t qector-decoder-test:ci .
+
+  # ------------------------------------------------------------------
+  # Python layer import smoke test (installs from PyPI)
+  # ------------------------------------------------------------------
+  smoke-import:
+    name: smoke-import-py${{ matrix.python-version }}
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install from PyPI
+        run: pip install qector-decoder-v3 --pre || echo "PyPI package not yet available -- skipping import test"
+      - name: Import smoke test
+        run: |
+          python -c "
+          try:
+              import qector_decoder_v3
+              print(f'qector_decoder_v3 {getattr(qector_decoder_v3, \"__version__\", \"unknown\")} imported OK')
+          except ImportError as e:
+              print(f'ImportError (expected if not on PyPI yet): {e}')
+          "

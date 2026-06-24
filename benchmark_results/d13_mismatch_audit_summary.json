@@ -1,0 +1,23 @@
+{
+  "distance": 13,
+  "basis": "x",
+  "shots": 15000,
+  "seed": 20260622,
+  "noise": 0.005,
+  "collapse_edges": 11398,
+  "ler_qector_collapsed": 0.0012,
+  "ler_pm_collapsed": 0.0012,
+  "ler_pm_full": 0.0012,
+  "errors_qector": 18,
+  "errors_pm_collapsed": 18,
+  "errors_pm_full": 18,
+  "shots_qector_heavier": 3573,
+  "shots_qector_lighter": 518,
+  "gap_shots": 0,
+  "cause_breakdown": {
+    "QECTOR_suboptimal_weight": 0,
+    "same_weight_diff_coset": 0,
+    "collapse_effect": 0,
+    "other": 0
+  }
+}

@@ -1,0 +1,276 @@
+# CI -- Build wheels on Linux/Windows/macOS, publish to PyPI on tag.
+#
+# Rust source is injected at build time from two GitHub Actions secrets
+# (RUST_SRC_B64_1 + RUST_SRC_B64_2) to keep the proprietary core private.
+# On forks / external PRs the secrets will be empty and wheel builds are skipped.
+#
+# Trigger: push to main/master, any tag v*, pull_request, manual dispatch.
+
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # Build without OpenCL (SDK not on runners). CUDA is runtime-loaded via
+  # libloading so no CUDA toolkit is needed at build time.
+  MATURIN_ARGS: --release --no-default-features --features cuda --out dist
+
+jobs:
+  # ------------------------------------------------------------------
+  # Linux x86_64 manylinux wheels
+  # ------------------------------------------------------------------
+  linux-x86_64:
+    name: linux-x86_64-py${{ matrix.python-version }}
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Inject Rust source
+        env:
+          PART1: ${{ secrets.RUST_SRC_B64_1 }}
+          PART2: ${{ secrets.RUST_SRC_B64_2 }}
+        run: |
+          if [ -z "$PART1" ]; then
+            echo "::warning::RUST_SRC_B64_1 secret not set -- skipping wheel build"
+            echo "SKIP_BUILD=1" >> "$GITHUB_ENV"
+          else
+            echo "${PART1}${PART2}" | base64 -d | tar -xzf - -C .
+            echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
+          fi
+
+      - uses: actions/setup-python@v5
+        if: env.SKIP_BUILD == '0'
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Build manylinux wheel
+        if: env.SKIP_BUILD == '0'
+        uses: PyO3/maturin-action@v1
+        with:
+          target: x86_64
+          manylinux: auto
+          args: ${{ env.MATURIN_ARGS }} -i python${{ matrix.python-version }}
+          sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+      - uses: actions/upload-artifact@v4
+        if: env.SKIP_BUILD == '0'
+        with:
+          name: wheels-linux-x86_64-py${{ matrix.python-version }}
+          path: dist
+
+  # ------------------------------------------------------------------
+  # Windows x64 wheels
+  # ------------------------------------------------------------------
+  windows-x64:
+    name: windows-x64-py${{ matrix.python-version }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Inject Rust source
+        env:
+          PART1: ${{ secrets.RUST_SRC_B64_1 }}
+          PART2: ${{ secrets.RUST_SRC_B64_2 }}
+        shell: bash
+        run: |
+          if [ -z "$PART1" ]; then
+            echo "::warning::RUST_SRC_B64_1 secret not set -- skipping wheel build"
+            echo "SKIP_BUILD=1" >> "$GITHUB_ENV"
+          else
+            echo "${PART1}${PART2}" | base64 -d | tar -xzf - -C .
+            echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
+          fi
+
+      - uses: actions/setup-python@v5
+        if: env.SKIP_BUILD == '0'
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+
+      - name: Build Windows wheel
+        if: env.SKIP_BUILD == '0'
+        uses: PyO3/maturin-action@v1
+        with:
+          target: x64
+          args: ${{ env.MATURIN_ARGS }} -i python
+          sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+      - uses: actions/upload-artifact@v4
+        if: env.SKIP_BUILD == '0'
+        with:
+          name: wheels-windows-x64-py${{ matrix.python-version }}
+          path: dist
+
+  # ------------------------------------------------------------------
+  # macOS Intel (x86_64) wheels
+  # ------------------------------------------------------------------
+  macos-intel:
+    name: macos-x86_64-py${{ matrix.python-version }}
+    runs-on: macos-13
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Inject Rust source
+        env:
+          PART1: ${{ secrets.RUST_SRC_B64_1 }}
+          PART2: ${{ secrets.RUST_SRC_B64_2 }}
+        run: |
+          if [ -z "$PART1" ]; then
+            echo "::warning::RUST_SRC_B64_1 secret not set -- skipping wheel build"
+            echo "SKIP_BUILD=1" >> "$GITHUB_ENV"
+          else
+            echo "${PART1}${PART2}" | base64 -d | tar -xzf - -C .
+            echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
+          fi
+
+      - uses: actions/setup-python@v5
+        if: env.SKIP_BUILD == '0'
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Build macOS Intel wheel
+        if: env.SKIP_BUILD == '0'
+        uses: PyO3/maturin-action@v1
+        with:
+          target: x86_64
+          args: ${{ env.MATURIN_ARGS }} -i python
+          sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+      - uses: actions/upload-artifact@v4
+        if: env.SKIP_BUILD == '0'
+        with:
+          name: wheels-macos-x86_64-py${{ matrix.python-version }}
+          path: dist
+
+  # ------------------------------------------------------------------
+  # macOS Apple Silicon (aarch64) wheels
+  # ------------------------------------------------------------------
+  macos-arm:
+    name: macos-aarch64-py${{ matrix.python-version }}
+    runs-on: macos-14
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Inject Rust source
+        env:
+          PART1: ${{ secrets.RUST_SRC_B64_1 }}
+          PART2: ${{ secrets.RUST_SRC_B64_2 }}
+        run: |
+          if [ -z "$PART1" ]; then
+            echo "::warning::RUST_SRC_B64_1 secret not set -- skipping wheel build"
+            echo "SKIP_BUILD=1" >> "$GITHUB_ENV"
+          else
+            echo "${PART1}${PART2}" | base64 -d | tar -xzf - -C .
+            echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
+          fi
+
+      - uses: actions/setup-python@v5
+        if: env.SKIP_BUILD == '0'
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Build macOS ARM wheel
+        if: env.SKIP_BUILD == '0'
+        uses: PyO3/maturin-action@v1
+        with:
+          target: aarch64
+          args: ${{ env.MATURIN_ARGS }} -i python
+          sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+      - uses: actions/upload-artifact@v4
+        if: env.SKIP_BUILD == '0'
+        with:
+          name: wheels-macos-aarch64-py${{ matrix.python-version }}
+          path: dist
+
+  # ------------------------------------------------------------------
+  # Source distribution (sdist) -- pure Python, no Rust needed
+  # ------------------------------------------------------------------
+  sdist:
+    name: sdist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Inject Rust source (needed by maturin sdist to embed Cargo.toml)
+        env:
+          PART1: ${{ secrets.RUST_SRC_B64_1 }}
+          PART2: ${{ secrets.RUST_SRC_B64_2 }}
+        run: |
+          if [ -z "$PART1" ]; then
+            echo "SKIP_BUILD=1" >> "$GITHUB_ENV"
+          else
+            echo "${PART1}${PART2}" | base64 -d | tar -xzf - -C .
+            echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build sdist
+        if: env.SKIP_BUILD == '0'
+        uses: PyO3/maturin-action@v1
+        with:
+          command: sdist
+          args: --out dist
+
+      - uses: actions/upload-artifact@v4
+        if: env.SKIP_BUILD == '0'
+        with:
+          name: wheels-sdist
+          path: dist
+
+  # ------------------------------------------------------------------
+  # Publish to PyPI via OIDC Trusted Publisher (no token required)
+  # Runs only on version tags pushed to the main repo (not forks)
+  # ------------------------------------------------------------------
+  release:
+    name: publish-to-pypi
+    runs-on: ubuntu-latest
+    if: >
+      startsWith(github.ref, 'refs/tags/v') &&
+      github.repository == 'qectorlab/qector-decoder' &&
+      github.event_name != 'pull_request'
+    needs: [linux-x86_64, windows-x64, macos-intel, macos-arm, sdist]
+    environment: pypi
+    permissions:
+      id-token: write
+      contents: write
+      attestations: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Generate artifact attestations
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: "dist/*"
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+          skip-existing: true

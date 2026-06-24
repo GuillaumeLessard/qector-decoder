@@ -1,0 +1,72 @@
+[package]
+name = "qector_decoder_v3"
+version = "0.5.0"
+edition = "2021"
+authors = ["Guillaume Lessard / iD01t Productions <guiliguili2705@gmail.com>"]
+description = "Source-available Rust QEC decoder core (Union-Find, exact polynomial MWPM/Blossom, Sparse Blossom, BP-OSD) with CPU/CUDA/OpenCL batch decoding and PyO3 bindings"
+license-file = "LICENSE"
+publish = true
+homepage = "https://www.qector.store"
+repository = "https://github.com/qectorlab/qector-decoder"
+readme = "README.md"
+keywords = ["quantum", "error-correction", "decoder", "mwpm", "qec"]
+categories = ["science", "algorithms"]
+
+[lib]
+name = "qector_decoder_v3"
+crate-type = ["cdylib"]
+
+# Feature flags for optional infrastructure
+[features]
+default = ["opencl", "cuda"]
+opencl = ["ocl"]
+cuda = ["libloading"]
+grpc = ["tonic", "tonic-prost", "prost", "tokio", "metrics", "metrics-exporter-prometheus"]
+full = ["opencl", "cuda", "grpc"]
+
+[dependencies]
+pyo3 = { version = "0.29.0", features = ["extension-module"] }
+numpy = "0.29.0"
+ndarray = { version = "0.17", features = ["rayon"] }
+rayon = "1.12"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+fastrand = "2.4"
+chrono = "0.4"
+
+# OpenCL (GPU batch decoder)
+ocl = { version = "0.19", optional = true }
+
+# CUDA driver API loader for native CUDA batch decoding
+libloading = { version = "0.8", optional = true }
+
+# Infrastructure gRPC + Prometheus + MCP
+tonic = { version = "0.14", optional = true }
+tonic-prost = { version = "0.14", optional = true }
+prost = { version = "0.14", optional = true }
+tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
+metrics = { version = "0.24", optional = true }
+metrics-exporter-prometheus = { version = "0.18", optional = true }
+rand_distr = "0.4"
+
+[build-dependencies]
+tonic-prost-build = "0.14"
+prost-build = { version = "0.14" }
+# Vendored `protoc` so the `grpc`/`full` builds compile the gRPC proto with no
+# system install. Only invoked by build.rs when the `grpc` feature is enabled.
+protoc-bin-vendored = "3"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
+
+[profile.release.build-override]
+opt-level = 3
+
+[profile.bench]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
