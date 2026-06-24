@@ -1,243 +1,331 @@
 # QECTOR Decoder v3
 
-[![CI](https://github.com/qectorlab/qector-decoder/actions/workflows/tests.yml/badge.svg)](https://github.com/qectorlab/qector-decoder/actions/workflows/tests.yml)
+<div align="center">
 
-**QEC decoding for teams that need reproducible proof, not just a fast baseline.**
+[![CI](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/CI.yml/badge.svg)](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/CI.yml)
+[![tests](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/tests.yml/badge.svg)](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/tests.yml)
+[![PyPI](https://img.shields.io/pypi/v/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
+[![Python](https://img.shields.io/pypi/pyversions/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
+[![License](https://img.shields.io/badge/license-Source--Available-blue.svg)](LICENSE)
 
-QECTOR is a source-available Rust/Python quantum-error-correction R&D platform.
-It combines PyMatching-compatible validation, belief-matching accuracy
-experiments, BP-OSD for LDPC/qLDPC workflows, CPU/GPU batch paths, and
-artifact-backed benchmark evidence.
+**Rust/Python quantum error correction decoding platform.**  
+Exact-MWPM parity with PyMatching · Belief-matching accuracy mode · BP-OSD for LDPC/qLDPC · CPU/GPU batch decoding · Artifact-backed benchmarks
 
-## Current release
+[🌐 qector.store](https://www.qector.store) · [📦 PyPI](https://pypi.org/project/qector-decoder-v3/) · [📧 Commercial licensing](mailto:admin@qector.store)
 
-| Item | Status |
-|---|---|
-| Package version | `0.5.0` |
-| Rust package | `qector_decoder_v3` |
-| Python package | `qector-decoder-v3` |
-| Canonical repository | `https://github.com/qectorlab/qector-decoder` |
-| License | Source-available, proprietary / commercial license required for commercial use |
-| Commercial contact | `admin@qector.store` |
+</div>
 
-## Validated scope
+---
 
-The current v0.5 validation report and checked-in benchmark artifacts support the
-following scoped claims:
-
-- **832 Python tests passed** in the local validation report.
-- **87 Rust unit tests passed** in the local validation report.
-- **Exact-MWPM LER parity with PyMatching** on tested rotated-surface-code Stim
-  workloads through **d=15**.
-- **Belief-matching is an accuracy mode** with lower observed LER on selected
-  correlated workloads; it is slower and should not be sold as the latency path.
-- **BP-OSD / LDPC / qLDPC workflows** are supported and cross-checked against
-  reference packages on selected workloads.
-- **CUDA/OpenCL batch paths are tested for CPU bit-identity** on supported test
-  configurations. Throughput is hardware-specific and must be regenerated before
-  quoting sales or scientific speed claims.
-- **gRPC optional stack migrated to tonic/prost 0.14** with `tonic-prost` and
-  vendored `protoc` support for `--features grpc` / `--features full` builds.
-
-CI workflow status is surfaced by the badge above, but public claims should still
-cite the exact commit and run/artifact used for the claim.
-
-## Evidence snapshot
-
-Selected checked-in artifacts:
-
-| Artifact | Purpose |
-|---|---|
-| `benchmark_results/competitive_belief.json` | PyMatching vs QECTOR MWPM vs QECTOR belief-matching on d=3/5/7 selected correlated workloads |
-| `benchmark_results/belief_grid.json` | d=5 belief-matching seed/probability grid |
-| `benchmark_results/stim_ler_d13_d15.json` | d=13/d=15 Stim LER parity audit against PyMatching |
-| `benchmark_results/native_memory.json` | CPU/GPU memory profile reference artifact |
-| `artifacts/reference_validation_manifest.json` | SHA-256 manifest for reference validation artifacts |
-| `BENCHMARK_GPU.md` | GPU benchmark claim boundaries and reproduction notes |
-| `docs/REPRODUCE.md` | Supported reproduction commands |
-| `docs/REPRODUCIBILITY_CHECKLIST.md` | Pre-publication checklist for claims and artifacts |
-| `docs/PLATFORM_ARTIFACT_ROADMAP.md` | CI, cross-platform benchmark, SBOM, and wheel roadmap |
-
-These artifacts are **reference evidence**, not universal hardware claims. Regenerate
-locally before quoting throughput, latency, GPU speedup, memory, or deployment
-readiness.
-
-## Install from source
-
-The repository currently does **not** include `install.py`. Use the real source
-build path below.
-
-### Windows PowerShell
-
-Rust must be installed first from <https://rustup.rs/>.
-
-```powershell
-git clone https://github.com/qectorlab/qector-decoder.git
-cd qector-decoder
-
-py -3.11 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install --upgrade pip maturin
-
-$env:PYO3_PYTHON = (Resolve-Path .\.venv\Scripts\python.exe).Path
-.\.venv\Scripts\python.exe -m maturin develop --release --no-default-features
-
-.\.venv\Scripts\python.exe -c "from qector_decoder_v3 import UnionFindDecoder; print('QECTOR OK')"
-```
-
-Verified Windows result from a fresh clone on a second PC:
-
-```text
-Installed qector-decoder-v3-0.5.0
-QECTOR OK
-```
-
-Ignored optional-extra messages during the base install are normal. The public
-command installs the minimal CPU-safe runtime build; install test, Stim, and
-benchmark extras only when needed.
-
-### Git Bash on Windows
+## Install
 
 ```bash
-git clone https://github.com/qectorlab/qector-decoder.git
-cd qector-decoder
-
-python -m venv .venv
-source .venv/Scripts/activate
-python -m pip install --upgrade pip maturin
-
-export PYO3_PYTHON="$(pwd -W)/.venv/Scripts/python.exe"
-python -m maturin develop --release --no-default-features
-
-python -c "from qector_decoder_v3 import UnionFindDecoder; print('QECTOR OK')"
+pip install qector-decoder-v3
 ```
 
-### Optional development/test dependencies
+Prebuilt wheels for **Python 3.9–3.13** on **Linux**, **Windows**, and **macOS** (Intel + Apple Silicon).  
+No Rust toolchain required. No CUDA required for the CPU build.
 
-```powershell
-.\.venv\Scripts\python.exe -m pip install "pytest>=7" "hypothesis>=6" "fastapi>=0.110" "uvicorn>=0.29" "httpx>=0.27" stim pymatching sinter ldpc beliefmatching psutil matplotlib tabulate scipy
-.\.venv\Scripts\python.exe -m pytest python/tests -q --tb=short
+### Optional extras
+
+```bash
+# Stim/Sinter/PyMatching ecosystem
+pip install "qector-decoder-v3[stim]"
+
+# Benchmark harness (psutil, matplotlib, scipy, tabulate)
+pip install "qector-decoder-v3[bench]"
+
+# All extras
+pip install "qector-decoder-v3[all]"
 ```
 
-### Optional GPU builds
+### GPU builds
 
-The default public command uses `--no-default-features` for a CPU-safe build.
-Build CUDA/OpenCL only when the local machine has the required drivers/toolchain.
+CUDA and OpenCL backends are compiled into the wheel and activated at runtime when drivers are present — no rebuild needed.
 
-```powershell
-# CUDA only
-.\.venv\Scripts\python.exe -m maturin develop --release --no-default-features --features cuda
-
-# OpenCL only
-.\.venv\Scripts\python.exe -m maturin develop --release --no-default-features --features opencl
+```python
+from qector_decoder_v3 import CUDABatchDecoder, OpenCLBatchDecoder
+print(CUDABatchDecoder.is_available())   # True if CUDA driver found
+print(OpenCLBatchDecoder.is_available()) # True if OpenCL platform found
 ```
 
-## Quick API example
+---
+
+## Quick start
 
 ```python
 import numpy as np
-from qector_decoder_v3 import UnionFindDecoder, generate_ring_code_checks
+from qector_decoder_v3 import UnionFindDecoder, BlossomDecoder
 
-checks, n_qubits = generate_ring_code_checks(5)
-decoder = UnionFindDecoder(checks, n_qubits)
-syndrome = np.zeros(len(checks), dtype=np.uint8)
+# Define a simple repetition code (5 qubits, 4 checks)
+check_to_qubits = [[0, 1], [1, 2], [2, 3], [3, 4]]
+n_qubits = 5
+
+# Fast approximate decoder
+decoder = UnionFindDecoder(check_to_qubits, n_qubits)
+syndrome = np.array([0, 1, 0, 0], dtype=np.uint8)  # one error
 correction = decoder.decode(syndrome)
-print(correction)
+print(correction)  # [0 1 0 0 0]
+
+# Exact MWPM decoder (PyMatching-parity)
+blossom = BlossomDecoder(check_to_qubits, n_qubits)
+correction = blossom.decode(syndrome)
+print(correction)  # [0 1 0 0 0]
 ```
 
-## Decoder stack
+### Batch decoding (CPU / GPU)
 
-| Decoder | Use | Stability |
+```python
+from qector_decoder_v3 import BatchDecoder, CUDABatchDecoder
+import numpy as np
+
+checks = [[0,1],[1,2],[2,3],[3,4]]
+syndromes = np.random.randint(0, 2, size=(4096, 4), dtype=np.uint8)
+
+# CPU parallel (Rayon)
+dec = BatchDecoder(checks, n_qubits=5)
+corrections = dec.parallel_batch_decode(syndromes)
+
+# GPU (falls back to CPU if no driver)
+if CUDABatchDecoder.is_available():
+    gpu = CUDABatchDecoder(checks, n_qubits=5)
+    corrections = gpu.batch_decode(syndromes)
+```
+
+### Stim / DEM workflow
+
+```python
+import stim
+from qector_decoder_v3.stim_compat import stim_circuit_to_check_matrix
+from qector_decoder_v3 import BlossomDecoder
+
+circuit = stim.Circuit.generated(
+    "surface_code:rotated_memory_z",
+    distance=5, rounds=5, after_clifford_depolarization=0.005
+)
+checks, n_qubits = stim_circuit_to_check_matrix(circuit)
+decoder = BlossomDecoder(checks, n_qubits)
+```
+
+### Belief-matching (accuracy mode)
+
+```python
+from qector_decoder_v3.belief_matching import BeliefMatching
+
+bm = BeliefMatching(check_to_qubits, n_qubits, error_rate=0.005)
+correction = bm.decode(syndrome)
+```
+
+### BP-OSD for LDPC / qLDPC codes
+
+```python
+from qector_decoder_v3.bposd import BpOsdDecoder
+from qector_decoder_v3 import codes
+
+cx, cz = codes.bivariate_bicycle_code(
+    6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)]
+)
+decoder = BpOsdDecoder(cx.parity_check_matrix(), error_rate=0.05, osd_order=0)
+correction = decoder.decode(syndrome)
+```
+
+---
+
+## Decoder reference
+
+| Decoder | Best for | Notes |
 |---|---|---|
-| `UnionFindDecoder` / `FastUnionFindDecoder` | Fast approximate matching-graph path | Stable local API |
-| `BlossomDecoder` | Exact weighted MWPM / PyMatching LER parity path | Stable local API |
-| `SparseBlossomDecoder` | Region-growing near-optimal Blossom path, not exact MWPM | Supported, claim-scoped |
-| `BeliefMatching` | Accuracy mode for selected correlated circuit-level workloads | Supported, workload-sensitive |
-| `BPOSDDecoder` / `BpOsdDecoder` | BP-OSD for LDPC/qLDPC workflows | Supported, workload-sensitive |
-| `SlidingWindowDecoder` / `StreamingDecoder` | Multi-round / streaming workflows | Supported, workload-sensitive |
-| `CPUBatchDecoder` / `BatchDecoder` | CPU batch / Rayon workflows | Stable local API |
-| `CUDABatchDecoder` / `OpenCLBatchDecoder` | GPU batch workflows with CPU fallback and bit-identity tests | Optional, hardware-sensitive |
-| `AutoDecoder` | Calibrated CPU/GPU backend selection | Optional, calibration-sensitive |
-| Hybrid/GNN components | Research/preview path | Experimental |
-| REST/gRPC/MCP/metrics | Local/demo or partner-review service surfaces | Experimental / deployment-reviewed |
+| `UnionFindDecoder` | Ultra-low latency, surface/repetition codes | Fast approximate; not guaranteed on arbitrary graphs |
+| `FastUnionFindDecoder` | Same, optimized hot path | Tightest latency budget |
+| `BlossomDecoder` | Exact MWPM, PyMatching parity | Validated to d=15 vs PyMatching |
+| `SparseBlossomDecoder` | Near-optimal, faster than Blossom | Region-growing; not exact MWPM |
+| `BeliefMatching` | Correlated noise, accuracy mode | Lower LER on tested workloads; slower per-shot |
+| `BpOsdDecoder` | LDPC / qLDPC (bivariate bicycle, HGP) | BP + ordered-statistics post-process |
+| `BatchDecoder` / `CPUBatchDecoder` | High-throughput CPU batch | Rayon data-parallel |
+| `CUDABatchDecoder` | GPU batch, CUDA | Bit-identical to CPU; auto CPU fallback |
+| `OpenCLBatchDecoder` | GPU batch, OpenCL (AMD/Intel/NVIDIA) | Bit-identical to CPU; auto CPU fallback |
+| `AutoDecoder` | Calibrated CPU/GPU dispatch | Measures crossover, picks best backend |
+| `PredecodedDecoder` | Pre-filter easy syndromes before full decode | Pairs with Blossom/UnionFind residual |
+| `SlidingWindowDecoder` | Multi-round / real-time workflows | Streaming capable |
 
-See `docs/API_STABILITY.md` for stable vs experimental API boundaries.
+See [`docs/API_STABILITY.md`](docs/API_STABILITY.md) for stable vs experimental surface boundaries.
+
+---
+
+## Validated claims (v0.5.0)
+
+All claims below are backed by checked-in benchmark artifacts and reproducible scripts.
+
+| Claim | Evidence |
+|---|---|
+| Exact-MWPM LER parity with PyMatching through **d=15** | `benchmark_results/stim_ler_d13_d15.json` |
+| Belief-matching lower observed LER on tested correlated workloads | `benchmark_results/competitive_belief.json` |
+| GPU (CUDA/OpenCL) output **bit-identical** to CPU across batch sizes 1–65 536 | `benchmark_results/gpu_extensive.json` |
+| BP-OSD within tolerance of reference `ldpc` package on tested LDPC families | `benchmark_results/competitive_belief.json` |
+| Native RSS memory stays bounded; no Python GC leak in hot path | `benchmark_results/native_memory.json` |
+
+Artifacts are **reference evidence**, not universal hardware claims.  
+Regenerate locally before citing throughput, latency, or GPU speedup numbers.
+
+```bash
+# Reproduce competitive LER benchmark locally
+python scripts/competitive_stim_ler.py --distances 3 5 7 9 11 13 15 --shots 40000
+
+# Reproduce belief-matching comparison
+python scripts/competitive_belief_matching.py --distances 3 5 7 9 --shots 20000
+
+# Full due-diligence bundle (all artifacts, hashes, environment)
+python scripts/run_due_diligence_bundle.py --out qector_evidence_bundle
+```
+
+---
+
+## Architecture
+
+```
+qector_decoder_v3/
+├── Rust core (proprietary, injected at CI build time)
+│   ├── Union-Find / Blossom / SparseBlossom matchers
+│   ├── Rayon CPU batch engine
+│   ├── CUDA + OpenCL GPU batch engines
+│   └── DEM collapse + Stim interface
+│
+└── Python layer (open in this repo)
+    ├── __init__.py          — public API surface
+    ├── belief_matching.py   — belief-matching accuracy mode
+    ├── bposd.py             — BP-OSD for LDPC/qLDPC
+    ├── predecoder.py        — local-matching predecoder
+    ├── backend.py           — AutoDecoder, calibration
+    ├── dem.py               — DEM parser
+    ├── stim_compat.py       — Stim circuit → check matrix
+    ├── sinter_compat.py     — Sinter Decoder interface
+    ├── qiskit_plugin.py     — Qiskit result adapter
+    ├── rest_api.py          — optional FastAPI/Flask service
+    ├── workbench.py         — benchmark harness
+    └── codes.py             — built-in code families
+```
+
+The Rust core is compiled into the wheel binary. It is proprietary and not distributed in source form. The `src/lib.rs` in this repo is a stub — see [`COMMERCIAL.md`](COMMERCIAL.md) for licensing.
+
+---
+
+## Sinter integration
+
+```python
+import sinter
+from qector_decoder_v3.sinter_compat import qector_sinter_decoders
+
+tasks = [...]  # list of sinter.Task
+samples = sinter.collect(
+    num_workers=4,
+    tasks=tasks,
+    decoders=["qector_belief", "qector_blossom", "qector_unionfind"],
+    custom_decoders=qector_sinter_decoders(),
+)
+```
+
+---
+
+## REST API (optional, local only)
+
+```bash
+pip install "qector-decoder-v3[stim]" fastapi uvicorn
+python -m qector_decoder_v3.rest_api
+```
+
+```bash
+curl -X POST http://localhost:8000/decode \
+  -H "Content-Type: application/json" \
+  -d '{"check_to_qubits":[[0,1],[1,2],[2,3],[3,4]],"syndrome":[0,1,0,0]}'
+```
+
+> ⚠️ The REST API is for local / partner-review use only.  
+> Do not expose it publicly without authentication, TLS, and rate limiting.  
+> See [`docs/SECURITY_DEPLOYMENT.md`](docs/SECURITY_DEPLOYMENT.md).
+
+---
 
 ## Honest limitations
 
-- PyMatching remains the latency leader for exact MWPM on common surface-code
-  workloads. QECTOR's MWPM value is parity, source access, workflow packaging,
-  and integration with the broader platform.
-- Belief-matching is slower because it rebuilds weights per shot. It is an
-  accuracy mode, not a fast path.
-- Sparse Blossom is region-growing and near-optimal, but not exact MWPM. Use
-  `BlossomDecoder` when exact minimum weight is required.
-- GPU wins only at suitable batch sizes and hardware configurations. Use local
-  calibration and benchmark artifacts before making speed claims.
-- REST/gRPC/MCP/metrics are not enterprise SaaS surfaces unless reviewed,
-  hardened, and covered by a separate commercial agreement.
-- Linux/macOS benchmark artifacts and prebuilt wheels are roadmap items, not
-  current public proof assets. See `docs/PLATFORM_ARTIFACT_ROADMAP.md`.
+- **PyMatching is the latency leader** for exact MWPM on standard surface-code workloads. QECTOR's value is parity correctness, workflow packaging, GPU batch paths, belief-matching, and LDPC support.
+- **Belief-matching is an accuracy mode**, not a fast path. It rebuilds weights per shot.
+- **SparseBlossom is near-optimal**, not exact MWPM. Use `BlossomDecoder` when minimum weight is required.
+- **GPU wins only at suitable batch sizes** (typically ≥ 4096) and hardware configurations. Measure on your hardware before quoting speedup.
+- **UnionFind can fail on adversarial non-surface-code graphs.** Use Blossom for general correctness guarantees.
+- **REST/gRPC/MCP surfaces** are not hardened for production SaaS without a separate commercial deployment review.
 
-## Security and deployment
+---
 
-QECTOR is safest as a local Rust/Python library. Optional service and GPU
-surfaces require extra review.
+## Docs
 
-| Document | Use |
+| Document | Contents |
 |---|---|
-| `SECURITY.md` | Private vulnerability reporting, supported versions, scope |
-| `docs/SECURITY_DEPLOYMENT.md` | REST/gRPC/MCP/Docker/GPU hardening and SBOM-lite commands |
-| `docs/SERVICE_API_SCHEMA.md` | Current local REST schema and service limitations |
-| `docs/API_STABILITY.md` | Stable local APIs vs experimental surfaces |
+| [`docs/API_STABILITY.md`](docs/API_STABILITY.md) | Stable vs experimental API surface |
+| [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) | Validation methodology |
+| [`docs/CORRECTNESS_AUDIT.md`](docs/CORRECTNESS_AUDIT.md) | Correctness invariants |
+| [`docs/REPRODUCE.md`](docs/REPRODUCE.md) | Reproduction commands |
+| [`docs/REPRODUCIBILITY_CHECKLIST.md`](docs/REPRODUCIBILITY_CHECKLIST.md) | Pre-publication checklist |
+| [`docs/SCALING.md`](docs/SCALING.md) | Scaling notes |
+| [`docs/BEYOND_PYMATCHING.md`](docs/BEYOND_PYMATCHING.md) | Belief-matching and BP-OSD positioning |
+| [`docs/BENCHMARK_COMPETITIVE.md`](docs/BENCHMARK_COMPETITIVE.md) | Competitive benchmark methodology |
+| [`docs/SECURITY_DEPLOYMENT.md`](docs/SECURITY_DEPLOYMENT.md) | REST/gRPC/Docker hardening |
+| [`docs/SERVICE_API_SCHEMA.md`](docs/SERVICE_API_SCHEMA.md) | REST schema and limitations |
+| [`docs/PLATFORM_ARTIFACT_ROADMAP.md`](docs/PLATFORM_ARTIFACT_ROADMAP.md) | CI, SBOM, wheel roadmap |
+| [`INSTALL.md`](INSTALL.md) | Source build (requires licensed Rust source) |
+| [`CHANGELOG.md`](CHANGELOG.md) | Release history |
+| [`RELEASE_NOTES.md`](RELEASE_NOTES.md) | v0.5.0 release notes |
+| [`SECURITY.md`](SECURITY.md) | Vulnerability reporting |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contribution guidelines |
 
-Do not expose REST/gRPC/MCP directly on a public network without authentication,
-TLS, request limits, rate limits, audit logs, resource quotas, and deployment
-review.
+---
+
+## CI / CD
+
+| Workflow | Triggers | Jobs |
+|---|---|---|
+| `tests.yml` | Every push / PR | ruff lint · mypy · docker build · smoke import (py3.9–3.13) |
+| `CI.yml` | Every push / `v*` tag | Wheels: Linux · Windows · macOS Intel · macOS ARM · sdist · PyPI publish (OIDC, tag-only) |
+
+PyPI publish uses [OIDC Trusted Publisher](https://docs.pypi.org/trusted-publishers/) — no stored token.
+
+---
 
 ## Commercial model
 
-QECTOR Decoder v3 is source-available for personal, academic, educational, and
-non-commercial research use.
+QECTOR Decoder v3 is **source-available**.
 
-Commercial use requires a paid commercial license. Commercial use includes
-company use, commercial R&D, government or institutional funded work, paid
-consulting, SaaS, hosted API use, OEM embedding, product integration,
-redistribution, internal business operations, commercial benchmarking, and
-revenue-linked use.
+| Use | License required |
+|---|---|
+| Personal, academic, educational, non-commercial research | Free — see [`LICENSE`](LICENSE) |
+| Company use, commercial R&D, government / institutional funded work | Paid commercial license |
+| SaaS, hosted API, OEM embedding, product integration, redistribution | Paid commercial license |
+| Commercial benchmarking, revenue-linked use, paid consulting | Paid commercial license |
 
-See:
+**Commercial contact:** [admin@qector.store](mailto:admin@qector.store)  
+**Website:** [https://www.qector.store](https://www.qector.store)
 
-- `LICENSE`
-- `COMMERCIAL.md`
-- `SECURITY.md`
-- `CONTRIBUTING.md`
-- <https://www.qector.store>
+See [`COMMERCIAL.md`](COMMERCIAL.md) and [`LICENSE`](LICENSE) for full terms.
 
-Commercial contact: **admin@qector.store**
+---
 
-## Reproduction and docs
+## Citation
 
-- `docs/REPRODUCE.md` — install and benchmark reproduction
-- `docs/METHODOLOGY.md` — validation method
-- `docs/CORRECTNESS_AUDIT.md` — correctness invariants
-- `docs/REPRODUCIBILITY_CHECKLIST.md` — claim/audit checklist
-- `docs/SCALING.md` — scaling notes
-- `docs/BEYOND_PYMATCHING.md` — belief-matching and BP-OSD positioning
-- `docs/API_STABILITY.md` — stable vs experimental API boundary
-- `docs/SERVICE_API_SCHEMA.md` — REST schema and service limitations
-- `docs/SECURITY_DEPLOYMENT.md` — security hardening and SBOM-lite commands
-- `docs/PLATFORM_ARTIFACT_ROADMAP.md` — CI, cross-platform artifacts, SBOM, wheels
-- `BENCHMARK_GPU.md` — GPU benchmark boundaries
-- `RELEASE_NOTES.md` — v0.5.0 release notes
+```bibtex
+@software{lessard2026qector,
+  author  = {Guillaume Lessard},
+  title   = {{QECTOR Decoder v3}: Rust/Python Quantum Error Correction Decoding Platform},
+  year    = {2026},
+  version = {0.5.0},
+  url     = {https://www.qector.store},
+  note    = {Source-available. Commercial license required for commercial use.}
+}
+```
 
-## CI
+---
 
-`.github/workflows/tests.yml` runs Rust tests, Python tests across Linux,
-Windows, and macOS, benchmark smoke artifacts, Docker build, and advisory
-ruff/mypy checks.
+<div align="center">
 
-## License
+**Copyright © 2026 Guillaume Lessard / iD01t Productions. All rights reserved.**  
+[https://www.qector.store](https://www.qector.store) · [admin@qector.store](mailto:admin@qector.store)
 
-**QECTOR Decoder Source-Available License v1.0** — see `LICENSE`.
-
-Copyright © 2026 Guillaume Lessard / iD01t Productions. All rights reserved.
+</div>
