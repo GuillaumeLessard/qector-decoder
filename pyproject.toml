@@ -116,6 +116,12 @@ warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true
 
+# numpy 2.x stubs use `type` statement (Python 3.12+ syntax); ignore stub
+# errors from third-party packages so mypy only checks our own code.
+[[tool.mypy.overrides]]
+module = ["numpy", "numpy.*"]
+ignore_errors = true
+
 [tool.ruff]
 line-length = 120
 target-version = "py39"
