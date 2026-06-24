@@ -23,7 +23,7 @@ Ou avec uvicorn directement (FastAPI) ::
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 
@@ -89,21 +89,23 @@ def _create_fastapi_app() -> FastAPI:
             raise HTTPException(status_code=400, detail="check_to_qubits must be non-empty")
 
         try:
+            dec_any: Union[BatchDecoder, UnionFindDecoder]
             if req.use_batch:
-                dec = BatchDecoder(req.check_to_qubits, req.n_qubits)
+                dec_any = BatchDecoder(req.check_to_qubits, req.n_qubits)
                 syndrome_arr = np.array([req.syndrome], dtype=np.uint8)
-                correction = dec.parallel_batch_decode(syndrome_arr)[0]
+                correction = dec_any.parallel_batch_decode(syndrome_arr)[0]
             else:
-                dec = UnionFindDecoder(req.check_to_qubits, req.n_qubits)
+                uf_dec = UnionFindDecoder(req.check_to_qubits, req.n_qubits)
+                dec_any = uf_dec
                 syndrome_arr = np.array(req.syndrome, dtype=np.uint8)
-                correction = dec.decode(syndrome_arr)
+                correction = uf_dec.decode(syndrome_arr)
         except Exception as exc:
             raise HTTPException(status_code=500, detail=f"Decode error: {exc}")
 
         return {
             "correction": correction.tolist(),
-            "n_qubits": dec.n_qubits,
-            "n_checks": dec.n_checks,
+            "n_qubits": dec_any.n_qubits,
+            "n_checks": dec_any.n_checks,
             "version": __version__,
         }
 
@@ -142,22 +144,24 @@ def _create_flask_app() -> Flask:
             return jsonify({"error": "check_to_qubits must be non-empty"}), 400
 
         try:
+            dec_any: Union[BatchDecoder, UnionFindDecoder]
             if use_batch:
-                dec = BatchDecoder(c2q, n_qubits)
+                dec_any = BatchDecoder(c2q, n_qubits)
                 syndrome_arr = np.array([syndrome], dtype=np.uint8)
-                correction = dec.parallel_batch_decode(syndrome_arr)[0]
+                correction = dec_any.parallel_batch_decode(syndrome_arr)[0]
             else:
-                dec = UnionFindDecoder(c2q, n_qubits)
+                uf_dec = UnionFindDecoder(c2q, n_qubits)
+                dec_any = uf_dec
                 syndrome_arr = np.array(syndrome, dtype=np.uint8)
-                correction = dec.decode(syndrome_arr)
+                correction = uf_dec.decode(syndrome_arr)
         except Exception as exc:
             return jsonify({"error": f"Decode error: {exc}"}), 500
 
         return jsonify(
             {
                 "correction": correction.tolist(),
-                "n_qubits": dec.n_qubits,
-                "n_checks": dec.n_checks,
+                "n_qubits": dec_any.n_qubits,
+                "n_checks": dec_any.n_checks,
                 "version": __version__,
             }
         )

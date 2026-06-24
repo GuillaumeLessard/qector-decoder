@@ -265,8 +265,8 @@ def parse_dem(text: str) -> DemModel:
     coords: dict = {}
     state = {"det_offset": 0, "coord_offset": None, "max_det": -1, "max_obs": -1}
     _exec_block(tokens, 0, len(tokens), state, errors, coords)
-    num_detectors = state["max_det"] + 1
-    num_observables = state["max_obs"] + 1
+    num_detectors = (state["max_det"] if state["max_det"] is not None else -1) + 1
+    num_observables = (state["max_obs"] if state["max_obs"] is not None else -1) + 1
     return DemModel(
         errors=errors,
         num_detectors=max(num_detectors, 0),

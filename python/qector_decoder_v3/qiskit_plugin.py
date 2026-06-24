@@ -50,7 +50,7 @@ def _normalize_counts(result: Any) -> Dict[str, int]:
 
     if _HAS_QISKIT and isinstance(result, _QiskitResult):
         # get_counts() retourne un dict {bitstring: count}
-        return result.get_counts()
+        return {str(k): int(v) for k, v in result.get_counts().items()}
 
     raise TypeError(f"result must be a dict or qiskit.result.Result, got {type(result).__name__}")
 

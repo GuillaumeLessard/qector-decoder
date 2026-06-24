@@ -239,9 +239,9 @@ class AutoDecoder:
         """
         rng = np.random.default_rng(seed)
         n_checks = len(self._c2q)
-        timings = {"cpu": {}, "gpu": {}}
+        timings: dict[str, dict[int, float]] = {"cpu": {}, "gpu": {}}
         gpu_name = None
-        gpu_dec = None
+        gpu_dec: Optional[CUDABatchDecoder | OpenCLBatchDecoder] = None
         if self._cuda_ok:
             gpu_dec, gpu_name = self._get_cuda(), Backend.CUDA
         elif self._opencl_ok:
@@ -308,7 +308,7 @@ class AutoDecoder:
 
     @property
     def n_qubits(self) -> int:
-        return self._get_cpu_single().n_qubits
+        return int(self._get_cpu_single().n_qubits)
 
     @property
     def n_checks(self) -> int:

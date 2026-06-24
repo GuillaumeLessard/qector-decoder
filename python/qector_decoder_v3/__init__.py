@@ -393,6 +393,10 @@ class OpenCLBatchDecoder:
         return self._inner.n_checks
 
     @property
+    def device_name(self) -> str:
+        return str(self._inner.device_name)
+
+    @property
     def consecutive_failures(self):
         """Number of consecutive GPU failures since last success."""
         return self._inner.consecutive_failures
@@ -455,8 +459,8 @@ class CUDABatchDecoder:
         return self._inner.n_checks
 
     @property
-    def device_name(self):
-        return self._inner.device_name
+    def device_name(self) -> str:
+        return str(self._inner.device_name)
 
     @property
     def compute_capability(self):

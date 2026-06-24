@@ -23,9 +23,12 @@ Example
 
 from __future__ import annotations
 
-from typing import List
+from typing import TYPE_CHECKING, List, Union
 
 import numpy as np
+
+if TYPE_CHECKING:
+    from . import BlossomDecoder, SparseBlossomDecoder, UnionFindDecoder
 
 __all__ = ["PredecodedDecoder", "quantize_weights"]
 
@@ -73,15 +76,18 @@ class PredecodedDecoder:
                 key = (min(chk), max(chk))
                 self._pair_edge.setdefault(key, q)
 
-        builders = {
-            "blossom": lambda: BlossomDecoder(self._c2q, self.n_qubits),
-            "union_find": lambda: UnionFindDecoder(self._c2q, self.n_qubits),
-            "sparse_blossom": lambda: SparseBlossomDecoder(self._c2q, self.n_qubits),
-        }
-        if backend not in builders:
-            raise ValueError(f"backend must be one of {list(builders)}")
+        _valid_backends = ("blossom", "union_find", "sparse_blossom")
+        if backend not in _valid_backends:
+            raise ValueError(f"backend must be one of {list(_valid_backends)}")
         self.backend = backend
-        self._residual = builders[backend]()
+        residual: Union[BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder]
+        if backend == "blossom":
+            residual = BlossomDecoder(self._c2q, self.n_qubits)
+        elif backend == "union_find":
+            residual = UnionFindDecoder(self._c2q, self.n_qubits)
+        else:
+            residual = SparseBlossomDecoder(self._c2q, self.n_qubits)
+        self._residual: Union[BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder] = residual
         self.last_predecoded = 0  # number of defects resolved by the predecoder
 
     def _predecode(self, syndrome: np.ndarray):

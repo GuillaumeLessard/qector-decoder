@@ -49,7 +49,9 @@ class BpOsdDecoder:
         self.H = _to_dense_binary(H)
         if self.H.ndim != 2:
             raise ValueError(f"H must be 2D, got {self.H.shape}")
-        self.n_checks, self.n_qubits = self.H.shape
+        self.n_checks: int
+        self.n_qubits: int
+        self.n_checks, self.n_qubits = (int(x) for x in self.H.shape)
         self.ic, self.ie = build_incidence(self.H)
         if priors is None:
             p = np.full(self.n_qubits, float(error_rate), dtype=np.float64)

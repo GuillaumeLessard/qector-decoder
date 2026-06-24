@@ -24,17 +24,20 @@ Decoders provided: ``qector_blossom`` (weighted exact MWPM),
 
 from __future__ import annotations
 
-from typing import Dict
+from typing import TYPE_CHECKING, Dict
 
 import numpy as np
+
+if TYPE_CHECKING:
+    pass  # sinter types used only at runtime
 
 __all__ = ["QectorSinterDecoder", "qector_sinter_decoders"]
 
 try:
     import sinter
 
-    _SINTER_BASE = sinter.Decoder
-    _COMPILED_BASE = sinter.CompiledDecoder
+    _SINTER_BASE: type = sinter.Decoder
+    _COMPILED_BASE: type = sinter.CompiledDecoder
     _HAS_SINTER = True
 except Exception:  # pragma: no cover - sinter optional
     _SINTER_BASE = object
@@ -42,7 +45,7 @@ except Exception:  # pragma: no cover - sinter optional
     _HAS_SINTER = False
 
 
-class _CompiledQectorDecoder(_COMPILED_BASE):
+class _CompiledQectorDecoder(_COMPILED_BASE):  # type: ignore[misc,valid-type]
     """A compiled QECTOR decoder bound to one detector error model."""
 
     def __init__(self, matcher, num_detectors: int, num_observables: int):
@@ -70,7 +73,7 @@ class _CompiledQectorDecoder(_COMPILED_BASE):
         return np.packbits(preds, axis=1, bitorder="little")
 
 
-class QectorSinterDecoder(_SINTER_BASE):
+class QectorSinterDecoder(_SINTER_BASE):  # type: ignore[misc,valid-type]
     """A Sinter ``Decoder`` backed by QECTOR.
 
     ``kind`` selects the backend: ``"blossom"`` (weighted exact MWPM),
