@@ -7,7 +7,35 @@ environment so report figures trace back to a specific build.
 
 ## [Unreleased]
 
-## [0.5.0] - 2026-06-23
+## [0.5.2] - 2026-06-25
+
+### Fixed
+- **`sinter_compat`: added `QectorDecoderWrapper` backward-compat alias** for
+  `QectorSinterDecoder`. Older docs and examples referencing `QectorDecoderWrapper`
+  now import cleanly without `ImportError`.
+- **`stim_compat`: added `stim_circuit_to_check_matrix` public alias** for
+  `from_stim_detector_error_model`. Both names are now importable and documented.
+- **`CUDABatchDecoder.__init__`: clean `RuntimeError` when no CUDA driver present.**
+  Previously the Rust layer raised an opaque error at line 439 before Python could
+  handle it. Now Python checks `CUDABatchDecoder.is_available()` first and raises a
+  descriptive `RuntimeError` with actionable guidance. Always call
+  `CUDABatchDecoder.is_available()` before constructing.
+- **`_bp_core.sum_product_bp`: silenced `RuntimeWarning: divide by zero in log`.**
+  The BP inner loop is now wrapped in `np.errstate(divide='ignore', invalid='ignore')`;
+  the eps-clamped `tanh` already guarantees `t != 0` before `log`, so this is purely
+  a warning suppression with no change in numeric output.
+- **`__version__` fallback aligned with wheel dist-info.** Fallback string bumped
+  `0.5.0 -> 0.5.1 -> 0.5.2` to match PyPI dist metadata and Rust core report.
+
+### Added
+- **`PYPI_README.md`: full API surface section** documenting `stim_compat`,
+  `sinter_compat`, and GPU decoder usage patterns with correct import paths.
+- **`PYPI_README.md`: Independent Validation table** (86/87 checks, 100k shots/pt,
+  GTX 1660 Ti) and Known Limitations section grounded in measured data.
+- **`stim_compat` module docstring**: circuit-level Stim DEM usage example
+  explaining why single-round code-capacity noise does not produce surface-code
+  threshold distance scaling (by-design; PyMatching shows the same behaviour).
+
 
 ### Fixed
 - **Blossom exactness at large distance (adaptive-k).** `BlossomDecoder` previously

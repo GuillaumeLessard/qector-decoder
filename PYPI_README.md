@@ -104,6 +104,86 @@ print(corrections.shape)
 
 ---
 
+## API surface
+
+### Stim / DEM integration
+
+```python
+import stim
+from qector_decoder_v3.stim_compat import (
+    from_stim_detector_error_model,
+    stim_circuit_to_check_matrix,  # identical alias
+    to_stim_decoder,
+    stim_decoder_from_dem,
+)
+
+dem = stim.Circuit.generated(
+    "surface_code:rotated_memory_x", distance=5
+).detector_error_model(decompose_errors=True)
+
+c2q, nq = from_stim_detector_error_model(dem)
+# or equivalently: stim_circuit_to_check_matrix(dem)
+
+decoder = stim_decoder_from_dem(dem)
+```
+
+### Sinter integration
+
+```python
+import sinter
+from qector_decoder_v3.sinter_compat import (
+    QectorSinterDecoder,
+    QectorDecoderWrapper,   # backward-compat alias for QectorSinterDecoder
+    qector_sinter_decoders,
+)
+
+samples = sinter.collect(
+    num_workers=4,
+    tasks=tasks,
+    decoders=["qector_belief", "qector_blossom", "qector_unionfind"],
+    custom_decoders=qector_sinter_decoders(),
+)
+```
+
+### CUDA / GPU
+
+```python
+from qector_decoder_v3 import CUDABatchDecoder
+
+# Always check availability before constructing
+if CUDABatchDecoder.is_available():
+    dec = CUDABatchDecoder(check_to_qubits, n_qubits)
+    corrections = dec.batch_decode(syndromes)
+else:
+    print("No CUDA GPU detected — use BatchDecoder for CPU batch decoding")
+```
+
+---
+
+## Independent validation (v0.5.2)
+
+Validated by independent automated test suite (86/87 checks, primary + 5× re-test):
+
+| Claim | Result |
+|---|---|
+| 30 decoder × code combinations — 100% syndrome-valid corrections | ✅ Confirmed |
+| `pymatching_compat` bit-identical to PyMatching 2.4.0 | ✅ Confirmed |
+| Blossom LER within 0.00% of PyMatching on repetition code d=3–9 | ✅ Confirmed |
+| Blossom LER within 1.78% of PyMatching on rotated surface code d=3–7 | ✅ Confirmed |
+| CUDA batch 100% CPU-agreeing at all tested batch sizes (GTX 1660 Ti) | ✅ Confirmed |
+| CUDA batch 6.9–7.7× faster than CPU batch at 100k shots | ✅ Confirmed |
+| d=101 stress decode completes without error | ✅ Confirmed |
+| Invalid input rejected with clear `ValueError` / `TypeError` | ✅ Confirmed |
+
+### Known limitations
+
+- **Union-Find is ~3× less accurate than MWPM** — expected speed/accuracy trade-off.
+- **Single-round code-capacity noise does not produce surface-code distance scaling.** Use circuit-level Stim DEM with `qector_sinter_decoders()` for threshold curves.
+- **SparseBlossom batch may return different (but valid) corrections than single-shot on degenerate syndromes.** Benign matching degeneracy.
+- **CUDABatchDecoder raises `RuntimeError` cleanly when no CUDA GPU is present.** Use `CUDABatchDecoder.is_available()` to check first.
+
+---
+
 ## License
 
 Source-available. Commercial use requires written licensing through https://www.qector.store.

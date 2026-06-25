@@ -64,7 +64,7 @@ import numpy as np
 try:
     from .qector_decoder_v3 import __version__
 except (ImportError, AttributeError):
-    __version__ = "0.5.1"
+    __version__ = "0.5.2"
 
 
 class UnionFindDecoder:
