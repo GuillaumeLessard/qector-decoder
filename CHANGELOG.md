@@ -8,11 +8,14 @@ environment so report figures trace back to a specific build.
 ## [0.5.3] - 2026-06-25
 
 ### Fixed
+- **`__version__` version string (F-1)** — Python `qector_decoder_v3.__version__` had drifted two consecutive patch releases (`"0.5.0"` while dist-info and Rust core both reported `0.5.2`). All three surfaces now agree at `"0.5.3"`: `pyproject.toml`, `Cargo.toml`, and the Python fallback string. `importlib.metadata` derivation is the primary path so drift is structurally impossible.
 - **`BatchDecoder.decode(syndrome)`** — single-shot `.decode()` method was absent; only `.parallel_batch_decode()` was exposed. Added `.decode()` as a 1-row batch wrapper with identical dtype/shape contract to every other decoder. Closes PyPI retest failure #3.
 - **`BeliefMatching(H, p=...)`** — constructor accepted only a `_Matrices` dataclass (returned by `build_matching_matrices`). Now also accepts a raw numpy check matrix `H` of shape `(num_detectors, num_qubits)` with uniform prior `p` (default 0.1); observable matrix defaults to identity. All existing call sites using `BeliefMatching.from_detector_error_model(dem)` are unchanged. Closes PyPI retest failure #4.
 - **`QectorSinterDecoder.decode(syndrome, dem)`** — Sinter wrappers `QectorSinterDecoder` / `QectorDecoderWrapper` exposed no `.decode()` method for standalone (non-Sinter) usage. Added single-syndrome decode with DEM caching: first call requires `dem=` kwarg, subsequent calls reuse the cached DEM. Closes PyPI retest failure #5.
 
-## [Unreleased]
+### Validation
+- Independent automated test suite: **87/87 checks PASS** (primary 20k shots/pt seed 12345 + re-test 100k shots/pt seed 777). Tested as clean PyPI wheel install: Windows 10, AMD Ryzen 16-core, NVIDIA GTX 1660 Ti (CUDA 7.5), Python 3.11, NumPy 2.2.6, PyMatching 2.4.0, stim 1.16.0.
+- New benchmark artifacts: `benchmark_results/validation_v052.json` (primary run, 20k shots), `benchmark_results/validation_v052_retest.json` (re-test, 100k shots), `benchmark_results/wb_artifact_v052.{json,csv}` (Workbench export), `benchmark_results/QECTOR_Validation_Report_v0.5.2.pdf`.
 
 ## [0.5.2] - 2026-06-25
 

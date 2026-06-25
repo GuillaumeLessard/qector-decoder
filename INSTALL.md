@@ -1,4 +1,4 @@
-# Installation Guide — QECTOR Decoder v0.5.0
+# Installation Guide — QECTOR Decoder v0.5.3
 
 The current repository does **not** include `install.py`. Use the source build path below.
 
@@ -7,7 +7,7 @@ The current repository does **not** include `install.py`. Use the source build p
 Install Rust first from rustup, then run:
 
 ```powershell
-git clone https://github.com/qectorlab/qector-decoder.git
+git clone https://github.com/GuillaumeLessard/qector-decoder.git
 cd qector-decoder
 
 py -3.11 -m venv .venv
@@ -24,7 +24,7 @@ $env:PYO3_PYTHON = (Resolve-Path .\.venv\Scripts\python.exe).Path
 This command has been verified from a fresh clone on a second Windows PC with Python 3.11. The expected successful ending is:
 
 ```text
-Installed qector-decoder-v3-0.5.0
+Installed qector-decoder-v3-0.5.3
 QECTOR OK
 ```
 
@@ -33,7 +33,7 @@ During the base install, pip may print ignored optional-extra messages for packa
 ## Git Bash on Windows
 
 ```bash
-git clone https://github.com/qectorlab/qector-decoder.git
+git clone https://github.com/GuillaumeLessard/qector-decoder.git
 cd qector-decoder
 
 python -m venv .venv

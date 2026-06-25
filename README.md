@@ -55,11 +55,24 @@ mwpm = BlossomDecoder(check_to_qubits, n_qubits)
 print(mwpm.decode(syndrome))
 ```
 
-## Independent validation v0.5.3
+## Independent validation (v0.5.3)
 
-Validated by independent automated test suite: 86/87 checks passing on v0.5.2 baseline; all 5 API failures closed in v0.5.3, post-fix 33/33 PASS + 1 SKIP.
+Validated by independent automated test suite (87/87 checks PASS on v0.5.3).
+Platform: Windows 10, AMD Ryzen 16-core, NVIDIA GTX 1660 Ti (CUDA 7.5), Python 3.11, PyMatching 2.4.0, stim 1.16.0.
+Full machine-readable artifact: `benchmark_results/results_v053_retest.json`.
 
-Artifact: benchmark_results/validation_v051.json
+| Claim | Result |
+|---|---|
+| All 30 decoder × code combinations produce 100% syndrome-valid corrections | ✅ Confirmed |
+| `pymatching_compat` bit-identical to PyMatching 2.4.0 | ✅ Confirmed |
+| Blossom LER within 0.00% of PyMatching on repetition code (d=3–9) | ✅ Confirmed |
+| Blossom LER within 1.78% of PyMatching on rotated surface code (d=3–7) | ✅ Confirmed |
+| CUDA batch output 100% CPU-agreeing across all batch sizes, GTX 1660 Ti | ✅ Confirmed |
+| CUDA batch 6.9–7.7× faster than CPU batch at 100k shots | ✅ Confirmed |
+| Workbench single-decode (rep d=5, Blossom): 285,713 dec/s · p50 3.50 µs · p99 9.50 µs | ✅ Confirmed |
+| AutoDecoder backends detected: cpu, cuda (GTX 1660 Ti), opencl=False | ✅ Confirmed |
+| Workbench JSON/CSV/PDF export pipeline end-to-end functional | ✅ Confirmed |
+| LookupTableDecoder table_size for rep d=5: 64 entries | ✅ Confirmed |
 
 ## Honest limitations
 

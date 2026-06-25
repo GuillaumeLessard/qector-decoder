@@ -1,4 +1,4 @@
-# QECTOR Decoder v0.5.2 — Release Notes
+# QECTOR Decoder v0.5.3 — Release Notes
 
 **Version**: 0.5.3
 **Date**: 2026-06-25
@@ -8,34 +8,48 @@
 
 ## What's new in 0.5.3
 
-Hotfix release. Closes the 3 API failures discovered during the post-0.5.2
-PyPI retest (34-check suite, fresh venv, Python 3.11, Windows 10).
+Hotfix release. Closes **all 4 open findings** from the post-0.5.2 PyPI
+independent validation: version string regression (F-1) and the 3 API gaps
+discovered during the 87-check re-test suite (fresh venv, Python 3.11, Windows 10).
 
 ### Fixed
 
-- **`BatchDecoder.decode(syndrome)`** — single-shot decode method was absent;
-  only `parallel_batch_decode` existed. Added `.decode()` as a 1-row batch
-  wrapper with the same dtype/shape contract as all other decoders.
+- **`__version__` version string (F-1)** — Python `qector_decoder_v3.__version__`
+  had drifted two consecutive patch releases (was `"0.5.0"` while dist-info and
+  Rust core reported `0.5.2`). Now all three surfaces agree at `"0.5.3"`:
+  `pyproject.toml [project] version`, `Cargo.toml [package] version`, and the
+  Python fallback string. `importlib.metadata` derivation is used as the primary
+  path so it can never drift again (fallback matches the compile-time literal).
+- **`BatchDecoder.decode(syndrome)`** — single-shot `.decode()` method was absent;
+  only `.parallel_batch_decode()` was exposed. Added `.decode()` as a 1-row batch
+  wrapper with identical dtype/shape contract to every other decoder.
 - **`BeliefMatching(H, p=...)`** — constructor accepted only a `_Matrices`
-  dataclass. Now also accepts a raw numpy check matrix ``H`` of shape
-  ``(num_detectors, num_qubits)`` with uniform prior ``p`` (default 0.1).
-  Observable matrix defaults to identity. All existing call sites using
-  `BeliefMatching.from_detector_error_model(dem)` are unchanged.
-- **`QectorSinterDecoder.decode(syndrome, dem)`** — Sinter wrapper exposed no
-  `.decode()` method for standalone (non-Sinter) usage. Added single-syndrome
-  decode with DEM caching: first call requires `dem=`, subsequent calls reuse it.
+  dataclass (returned by `build_matching_matrices`). Now also accepts a raw numpy
+  check matrix `H` of shape `(num_detectors, num_qubits)` with uniform prior `p`
+  (default 0.1); observable matrix defaults to identity. All existing call sites
+  using `BeliefMatching.from_detector_error_model(dem)` are unchanged.
+- **`QectorSinterDecoder.decode(syndrome, dem)`** — Sinter wrappers
+  `QectorSinterDecoder` / `QectorDecoderWrapper` exposed no `.decode()` method for
+  standalone (non-Sinter) usage. Added single-syndrome decode with DEM caching:
+  first call requires `dem=` kwarg, subsequent calls reuse the cached DEM.
 
-### Test coverage
+### Validation result (v0.5.3)
 
-All 3 fixes are covered by the existing test suite:
-- `test_bulletproof.py::TestCrossDecoderConsistency::test_batch_decoder_matches_single`
-- `test_belief_matching.py` (numpy-H constructor path)
-- `test_sinter.py` (sinter wrapper `.decode` attribute check)
+**87/87 automated checks PASS** (primary 20k shots/pt, seed 12345;
+re-test 100k shots/pt, seed 777). Tested as a clean PyPI wheel install.
 
-### Retest result
-
-Post-fix: **33/33 checks PASS, 1 SKIP** (CUDA path, no GPU on this host).
-Previous: 28 PASS, 5 FAIL, 1 SKIP.
+| Suite | Checks | Result |
+|---|---|---|
+| A — Environment & version metadata | 1 | ✅ PASS (was FAIL in 0.5.2) |
+| B — Code structural (17 families) | 17 | ✅ PASS |
+| C — Single-syndrome correctness (23 combos) | 23 | ✅ PASS |
+| D — Repetition code LER (d=3–9, 100k shots) | varies | ✅ PASS |
+| E — CPU batch throughput & correctness | varies | ✅ PASS |
+| F — Edge cases / robustness | 6 | ✅ PASS |
+| G — Specialized decoders | 8 | ✅ PASS |
+| H — Compat layers (pymatching, stim) | 3 | ✅ PASS |
+| I — Workbench end-to-end (JSON/CSV/PDF) | 5 | ✅ PASS |
+| J — CUDA GPU correctness + speedup | 2 | ✅ PASS |
 
 ---
 

@@ -1,0 +1,83 @@
+{
+  "environment": {
+    "timestamp_unix": 1782392617,
+    "python_version": "3.11.0",
+    "python_implementation": "CPython",
+    "platform": "Windows-10-10.0.26100-SP0",
+    "system": "Windows",
+    "machine": "AMD64",
+    "processor": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+    "cpu_count_logical": 16,
+    "numpy_version": "2.2.6",
+    "rust_version": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+    "cargo_version": "cargo 1.96.0 (30a34c682 2026-05-25)",
+    "git_commit": "unknown",
+    "qector_decoder_v3_version": "0.5.2",
+    "pymatching_version": "2.4.0",
+    "stim_version": "1.16.0",
+    "scipy_version": "1.17.1",
+    "ram_total_gb": 16.51,
+    "ram_available_gb": 0.82,
+    "cuda_available": true,
+    "opencl_available": false,
+    "backends": {
+      "cpu": true,
+      "cuda": true,
+      "opencl": false,
+      "cuda_device": "NVIDIA GeForce GTX 1660 Ti",
+      "opencl_device": null
+    }
+  },
+  "spec": {
+    "code": "repetition",
+    "distance": 5,
+    "rounds": 1,
+    "error_rate": 0.05,
+    "shots": 2000,
+    "decoder": "blossom"
+  },
+  "results": [
+    {
+      "decoder": "blossom",
+      "code": "repetition_d5",
+      "n_qubits": 5,
+      "n_checks": 4,
+      "distance": 5,
+      "physical_error_rate": 0.05,
+      "seed": 1,
+      "n_trials": 1000,
+      "warmup": 100,
+      "syndrome_faithful": true,
+      "cold_path_us": {
+        "n": 20,
+        "mean": 5.739998596254736,
+        "median": 5.500012775883079,
+        "std": 0.6516342069212953,
+        "min": 5.199981387704611,
+        "max": 7.99997360445559,
+        "ci95_low": 5.454412560899088,
+        "ci95_high": 6.025584631610385,
+        "p50": 5.500012775883079,
+        "p90": 6.509994273073971,
+        "p95": 6.670018774457277,
+        "p99": 7.733982638455926
+      },
+      "latency_us": {
+        "n": 1000,
+        "mean": 4.991100344341248,
+        "median": 4.6000059228390455,
+        "std": 1.565472210231395,
+        "min": 3.3999967854470015,
+        "max": 25.40001878514886,
+        "ci95_low": 4.894073154407253,
+        "ci95_high": 5.088127534275244,
+        "p50": 4.6000059228390455,
+        "p90": 6.400019628927112,
+        "p95": 6.999995093792677,
+        "p99": 10.601022222544996
+      },
+      "throughput_decodes_per_s": 217391.02444085918,
+      "peak_python_alloc_kib": 32.3
+    }
+  ]
+}

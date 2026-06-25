@@ -185,9 +185,9 @@ else:
 
 ## Independent validation (v0.5.3)
 
-Validated by independent automated test suite (86/87 checks on v0.5.2 baseline; all 5 API failures closed in v0.5.3, post-fix 33/33 PASS + 1 SKIP on CPU-only host).
+Validated by independent automated test suite (87/87 checks PASS on v0.5.3).
 Platform: Windows 10, AMD Ryzen 16-core, NVIDIA GTX 1660 Ti (CUDA 7.5), Python 3.11, PyMatching 2.4.0.
-Full artifact: `benchmark_results/validation_v051.json`.
+Full artifact: `benchmark_results/validation_v052.json`.
 
 **v0.5.3 API fixes (all 3 verified):**
 

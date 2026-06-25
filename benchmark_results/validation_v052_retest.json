@@ -1,0 +1,2037 @@
+{
+  "meta": {
+    "timestamp_note": "captured by harness run",
+    "python": "3.11.0",
+    "platform": "Windows-10-10.0.26100-SP0",
+    "machine": "AMD64",
+    "processor": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+    "pip_version_reported": "0.5.2",
+    "module___version__": "0.5.0",
+    "numpy": "2.2.6",
+    "scipy": "1.17.1",
+    "stim": "1.16.0",
+    "pymatching": "2.4.0",
+    "sinter": "1.16.0",
+    "matplotlib": "3.11.0",
+    "mc_samples": 100000,
+    "seed": 777,
+    "cuda_is_available": true,
+    "opencl_is_available": false,
+    "CUDABatchDecoder.is_available": true,
+    "OpenCLBatchDecoder.is_available": false,
+    "total_seconds": 85.04
+  },
+  "suites": {
+    "A_environment": [
+      {
+        "name": "version_metadata_consistency",
+        "passed": false,
+        "detail": "pip=0.5.2 vs __version__=0.5.0"
+      }
+    ],
+    "B_codes": [
+      {
+        "name": "repetition_code(d=3)",
+        "passed": true,
+        "n_qubits": 3,
+        "n_checks": 2,
+        "H_shape": [
+          2,
+          3
+        ],
+        "H_rank": 2,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 3,
+        "max_qubit_degree": 2
+      },
+      {
+        "name": "repetition_code(d=5)",
+        "passed": true,
+        "n_qubits": 5,
+        "n_checks": 4,
+        "H_shape": [
+          4,
+          5
+        ],
+        "H_rank": 4,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 5,
+        "max_qubit_degree": 2
+      },
+      {
+        "name": "repetition_code(d=7)",
+        "passed": true,
+        "n_qubits": 7,
+        "n_checks": 6,
+        "H_shape": [
+          6,
+          7
+        ],
+        "H_rank": 6,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 7,
+        "max_qubit_degree": 2
+      },
+      {
+        "name": "repetition_code(d=9)",
+        "passed": true,
+        "n_qubits": 9,
+        "n_checks": 8,
+        "H_shape": [
+          8,
+          9
+        ],
+        "H_rank": 8,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 9,
+        "max_qubit_degree": 2
+      },
+      {
+        "name": "repetition_code(d=11)",
+        "passed": true,
+        "n_qubits": 11,
+        "n_checks": 10,
+        "H_shape": [
+          10,
+          11
+        ],
+        "H_rank": 10,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 11,
+        "max_qubit_degree": 2
+      },
+      {
+        "name": "ring_code(d=3)",
+        "passed": true,
+        "n_qubits": 3,
+        "n_checks": 3,
+        "H_shape": [
+          3,
+          3
+        ],
+        "H_rank": 3,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 3,
+        "max_qubit_degree": 2
+      },
+      {
+        "name": "ring_code(d=5)",
+        "passed": true,
+        "n_qubits": 5,
+        "n_checks": 5,
+        "H_shape": [
+          5,
+          5
+        ],
+        "H_rank": 5,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 5,
+        "max_qubit_degree": 2
+      },
+      {
+        "name": "ring_code(d=7)",
+        "passed": true,
+        "n_qubits": 7,
+        "n_checks": 7,
+        "H_shape": [
+          7,
+          7
+        ],
+        "H_rank": 7,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 7,
+        "max_qubit_degree": 2
+      },
+      {
+        "name": "rotated_surface_code(d=3)",
+        "passed": true,
+        "n_qubits": 9,
+        "n_checks": 4,
+        "H_shape": [
+          4,
+          9
+        ],
+        "H_rank": 4,
+        "n_logicals": 1,
+        "logicals_commute": true,
+        "is_matching_graph": true,
+        "distance_meta": 3,
+        "max_qubit_degree": 2
+      },
+      {
+        "name": "rotated_surface_code(d=5)",
+        "passed": true,
+        "n_qubits": 25,
+        "n_checks": 12,
+        "H_shape": [
+          12,
+          25
+        ],
+        "H_rank": 12,
+        "n_logicals": 1,
+        "logicals_commute": true,
+        "is_matching_graph": true,
+        "distance_meta": 5,
+        "max_qubit_degree": 2
+      },
+      {
+        "name": "rotated_surface_code(d=7)",
+        "passed": true,
+        "n_qubits": 49,
+        "n_checks": 24,
+        "H_shape": [
+          24,
+          49
+        ],
+        "H_rank": 24,
+        "n_logicals": 1,
+        "logicals_commute": true,
+        "is_matching_graph": true,
+        "distance_meta": 7,
+        "max_qubit_degree": 2
+      },
+      {
+        "name": "unrotated_surface_code(d=3)",
+        "passed": true,
+        "n_qubits": 12,
+        "n_checks": 9,
+        "H_shape": [
+          9,
+          12
+        ],
+        "H_rank": 8,
+        "n_logicals": 0,
+        "logicals_commute": null,
+        "is_matching_graph": true,
+        "distance_meta": 3,
+        "max_qubit_degree": 2
+      },
+      {
+        "name": "unrotated_surface_code(d=5)",
+        "passed": true,
+        "n_qubits": 40,
+        "n_checks": 25,
+        "H_shape": [
+          25,
+          40
+        ],
+        "H_rank": 24,
+        "n_logicals": 0,
+        "logicals_commute": null,
+        "is_matching_graph": true,
+        "distance_meta": 5,
+        "max_qubit_degree": 2
+      },
+      {
+        "name": "toric_code(d=3)",
+        "passed": true,
+        "n_qubits": 18,
+        "n_checks": 9,
+        "H_shape": [
+          9,
+          18
+        ],
+        "H_rank": 9,
+        "n_logicals": 0,
+        "logicals_commute": null,
+        "is_matching_graph": true,
+        "distance_meta": 3,
+        "max_qubit_degree": 2
+      },
+      {
+        "name": "toric_code(d=5)",
+        "passed": true,
+        "n_qubits": 50,
+        "n_checks": 25,
+        "H_shape": [
+          25,
+          50
+        ],
+        "H_rank": 25,
+        "n_logicals": 0,
+        "logicals_commute": null,
+        "is_matching_graph": true,
+        "distance_meta": 5,
+        "max_qubit_degree": 2
+      },
+      {
+        "name": "heavy_hex_code(d=3)",
+        "passed": true,
+        "n_qubits": 9,
+        "n_checks": 6,
+        "H_shape": [
+          6,
+          9
+        ],
+        "H_rank": 6,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 3,
+        "max_qubit_degree": 2
+      },
+      {
+        "name": "heavy_hex_code(d=5)",
+        "passed": true,
+        "n_qubits": 25,
+        "n_checks": 20,
+        "H_shape": [
+          20,
+          25
+        ],
+        "H_rank": 20,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 5,
+        "max_qubit_degree": 2
+      }
+    ],
+    "C_validity": [
+      {
+        "name": "UnionFindDecoder|repetition_code(d=5)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 13.47
+      },
+      {
+        "name": "FastUnionFindDecoder|repetition_code(d=5)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 10.7
+      },
+      {
+        "name": "BlossomDecoder|repetition_code(d=5)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 11.85
+      },
+      {
+        "name": "SparseBlossomDecoder|repetition_code(d=5)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 10.72
+      },
+      {
+        "name": "CPUBatchDecoder|repetition_code(d=5)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 10.4
+      },
+      {
+        "name": "LookupTableDecoder|repetition_code(d=5)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 10.96
+      },
+      {
+        "name": "UnionFindDecoder|repetition_code(d=9)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 9.82
+      },
+      {
+        "name": "FastUnionFindDecoder|repetition_code(d=9)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 11.56
+      },
+      {
+        "name": "BlossomDecoder|repetition_code(d=9)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 10.91
+      },
+      {
+        "name": "SparseBlossomDecoder|repetition_code(d=9)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 11.03
+      },
+      {
+        "name": "CPUBatchDecoder|repetition_code(d=9)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 11.77
+      },
+      {
+        "name": "LookupTableDecoder|repetition_code(d=9)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 14.72
+      },
+      {
+        "name": "UnionFindDecoder|rotated_surface_code(d=3)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 11.31
+      },
+      {
+        "name": "FastUnionFindDecoder|rotated_surface_code(d=3)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 10.11
+      },
+      {
+        "name": "BlossomDecoder|rotated_surface_code(d=3)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 8.21
+      },
+      {
+        "name": "SparseBlossomDecoder|rotated_surface_code(d=3)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 11.41
+      },
+      {
+        "name": "CPUBatchDecoder|rotated_surface_code(d=3)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 10.97
+      },
+      {
+        "name": "LookupTableDecoder|rotated_surface_code(d=3)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 14.09
+      },
+      {
+        "name": "UnionFindDecoder|rotated_surface_code(d=5)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 14.73
+      },
+      {
+        "name": "FastUnionFindDecoder|rotated_surface_code(d=5)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 13.53
+      },
+      {
+        "name": "BlossomDecoder|rotated_surface_code(d=5)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 13.2
+      },
+      {
+        "name": "SparseBlossomDecoder|rotated_surface_code(d=5)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 19.85
+      },
+      {
+        "name": "CPUBatchDecoder|rotated_surface_code(d=5)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 11.97
+      },
+      {
+        "name": "LookupTableDecoder|rotated_surface_code(d=5)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 15.92
+      },
+      {
+        "name": "UnionFindDecoder|ring_code(d=5)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 13.14
+      },
+      {
+        "name": "FastUnionFindDecoder|ring_code(d=5)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 8.72
+      },
+      {
+        "name": "BlossomDecoder|ring_code(d=5)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 9.48
+      },
+      {
+        "name": "SparseBlossomDecoder|ring_code(d=5)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 12.28
+      },
+      {
+        "name": "CPUBatchDecoder|ring_code(d=5)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 8.78
+      },
+      {
+        "name": "LookupTableDecoder|ring_code(d=5)",
+        "passed": true,
+        "validity_rate": 1.0,
+        "n": 2000,
+        "us_per_decode": 8.2
+      }
+    ],
+    "D_montecarlo": [
+      {
+        "name": "repetition_code(d=3)@p=0.01",
+        "code": "repetition_code",
+        "d": 3,
+        "p": 0.01,
+        "samples": 100000,
+        "n_qubits": 3,
+        "UnionFindDecoder": {
+          "logical_errors": 29,
+          "ler": 0.00029,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 29,
+          "ler": 0.00029,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 29,
+          "ler": 0.00029,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 29,
+          "ler": 0.00029
+        }
+      },
+      {
+        "name": "repetition_code(d=3)@p=0.03",
+        "code": "repetition_code",
+        "d": 3,
+        "p": 0.03,
+        "samples": 100000,
+        "n_qubits": 3,
+        "UnionFindDecoder": {
+          "logical_errors": 263,
+          "ler": 0.00263,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 263,
+          "ler": 0.00263,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 263,
+          "ler": 0.00263,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 263,
+          "ler": 0.00263
+        }
+      },
+      {
+        "name": "repetition_code(d=3)@p=0.05",
+        "code": "repetition_code",
+        "d": 3,
+        "p": 0.05,
+        "samples": 100000,
+        "n_qubits": 3,
+        "UnionFindDecoder": {
+          "logical_errors": 694,
+          "ler": 0.00694,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 694,
+          "ler": 0.00694,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 694,
+          "ler": 0.00694,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 694,
+          "ler": 0.00694
+        }
+      },
+      {
+        "name": "repetition_code(d=3)@p=0.08",
+        "code": "repetition_code",
+        "d": 3,
+        "p": 0.08,
+        "samples": 100000,
+        "n_qubits": 3,
+        "UnionFindDecoder": {
+          "logical_errors": 1836,
+          "ler": 0.01836,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 1836,
+          "ler": 0.01836,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 1836,
+          "ler": 0.01836,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 1836,
+          "ler": 0.01836
+        }
+      },
+      {
+        "name": "repetition_code(d=3)@p=0.1",
+        "code": "repetition_code",
+        "d": 3,
+        "p": 0.1,
+        "samples": 100000,
+        "n_qubits": 3,
+        "UnionFindDecoder": {
+          "logical_errors": 2863,
+          "ler": 0.02863,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 2863,
+          "ler": 0.02863,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 2863,
+          "ler": 0.02863,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 2863,
+          "ler": 0.02863
+        }
+      },
+      {
+        "name": "repetition_code(d=3)@p=0.15",
+        "code": "repetition_code",
+        "d": 3,
+        "p": 0.15,
+        "samples": 100000,
+        "n_qubits": 3,
+        "UnionFindDecoder": {
+          "logical_errors": 6127,
+          "ler": 0.06127,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 6127,
+          "ler": 0.06127,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 6127,
+          "ler": 0.06127,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 6127,
+          "ler": 0.06127
+        }
+      },
+      {
+        "name": "repetition_code(d=5)@p=0.01",
+        "code": "repetition_code",
+        "d": 5,
+        "p": 0.01,
+        "samples": 100000,
+        "n_qubits": 5,
+        "UnionFindDecoder": {
+          "logical_errors": 38,
+          "ler": 0.00038,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 3,
+          "ler": 3e-05,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 3,
+          "ler": 3e-05,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 3,
+          "ler": 3e-05
+        }
+      },
+      {
+        "name": "repetition_code(d=5)@p=0.03",
+        "code": "repetition_code",
+        "d": 5,
+        "p": 0.03,
+        "samples": 100000,
+        "n_qubits": 5,
+        "UnionFindDecoder": {
+          "logical_errors": 341,
+          "ler": 0.00341,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 20,
+          "ler": 0.0002,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 20,
+          "ler": 0.0002,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 20,
+          "ler": 0.0002
+        }
+      },
+      {
+        "name": "repetition_code(d=5)@p=0.05",
+        "code": "repetition_code",
+        "d": 5,
+        "p": 0.05,
+        "samples": 100000,
+        "n_qubits": 5,
+        "UnionFindDecoder": {
+          "logical_errors": 913,
+          "ler": 0.00913,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 107,
+          "ler": 0.00107,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 107,
+          "ler": 0.00107,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 107,
+          "ler": 0.00107
+        }
+      },
+      {
+        "name": "repetition_code(d=5)@p=0.08",
+        "code": "repetition_code",
+        "d": 5,
+        "p": 0.08,
+        "samples": 100000,
+        "n_qubits": 5,
+        "UnionFindDecoder": {
+          "logical_errors": 2279,
+          "ler": 0.02279,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 454,
+          "ler": 0.00454,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 454,
+          "ler": 0.00454,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 454,
+          "ler": 0.00454
+        }
+      },
+      {
+        "name": "repetition_code(d=5)@p=0.1",
+        "code": "repetition_code",
+        "d": 5,
+        "p": 0.1,
+        "samples": 100000,
+        "n_qubits": 5,
+        "UnionFindDecoder": {
+          "logical_errors": 3352,
+          "ler": 0.03352,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 815,
+          "ler": 0.00815,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 815,
+          "ler": 0.00815,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 815,
+          "ler": 0.00815
+        }
+      },
+      {
+        "name": "repetition_code(d=5)@p=0.15",
+        "code": "repetition_code",
+        "d": 5,
+        "p": 0.15,
+        "samples": 100000,
+        "n_qubits": 5,
+        "UnionFindDecoder": {
+          "logical_errors": 7177,
+          "ler": 0.07177,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 2660,
+          "ler": 0.0266,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 2660,
+          "ler": 0.0266,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 2660,
+          "ler": 0.0266
+        }
+      },
+      {
+        "name": "repetition_code(d=7)@p=0.01",
+        "code": "repetition_code",
+        "d": 7,
+        "p": 0.01,
+        "samples": 100000,
+        "n_qubits": 7,
+        "UnionFindDecoder": {
+          "logical_errors": 0,
+          "ler": 0.0,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 0,
+          "ler": 0.0,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 0,
+          "ler": 0.0,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 0,
+          "ler": 0.0
+        }
+      },
+      {
+        "name": "repetition_code(d=7)@p=0.03",
+        "code": "repetition_code",
+        "d": 7,
+        "p": 0.03,
+        "samples": 100000,
+        "n_qubits": 7,
+        "UnionFindDecoder": {
+          "logical_errors": 19,
+          "ler": 0.00019,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 2,
+          "ler": 2e-05,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 2,
+          "ler": 2e-05,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 2,
+          "ler": 2e-05
+        }
+      },
+      {
+        "name": "repetition_code(d=7)@p=0.05",
+        "code": "repetition_code",
+        "d": 7,
+        "p": 0.05,
+        "samples": 100000,
+        "n_qubits": 7,
+        "UnionFindDecoder": {
+          "logical_errors": 129,
+          "ler": 0.00129,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 19,
+          "ler": 0.00019,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 19,
+          "ler": 0.00019,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 19,
+          "ler": 0.00019
+        }
+      },
+      {
+        "name": "repetition_code(d=7)@p=0.08",
+        "code": "repetition_code",
+        "d": 7,
+        "p": 0.08,
+        "samples": 100000,
+        "n_qubits": 7,
+        "UnionFindDecoder": {
+          "logical_errors": 454,
+          "ler": 0.00454,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 124,
+          "ler": 0.00124,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 124,
+          "ler": 0.00124,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 124,
+          "ler": 0.00124
+        }
+      },
+      {
+        "name": "repetition_code(d=7)@p=0.1",
+        "code": "repetition_code",
+        "d": 7,
+        "p": 0.1,
+        "samples": 100000,
+        "n_qubits": 7,
+        "UnionFindDecoder": {
+          "logical_errors": 912,
+          "ler": 0.00912,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 269,
+          "ler": 0.00269,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 269,
+          "ler": 0.00269,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 269,
+          "ler": 0.00269
+        }
+      },
+      {
+        "name": "repetition_code(d=7)@p=0.15",
+        "code": "repetition_code",
+        "d": 7,
+        "p": 0.15,
+        "samples": 100000,
+        "n_qubits": 7,
+        "UnionFindDecoder": {
+          "logical_errors": 2695,
+          "ler": 0.02695,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 1144,
+          "ler": 0.01144,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 1144,
+          "ler": 0.01144,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 1144,
+          "ler": 0.01144
+        }
+      },
+      {
+        "name": "repetition_code(d=9)@p=0.01",
+        "code": "repetition_code",
+        "d": 9,
+        "p": 0.01,
+        "samples": 100000,
+        "n_qubits": 9,
+        "UnionFindDecoder": {
+          "logical_errors": 0,
+          "ler": 0.0,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 0,
+          "ler": 0.0,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 0,
+          "ler": 0.0,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 0,
+          "ler": 0.0
+        }
+      },
+      {
+        "name": "repetition_code(d=9)@p=0.03",
+        "code": "repetition_code",
+        "d": 9,
+        "p": 0.03,
+        "samples": 100000,
+        "n_qubits": 9,
+        "UnionFindDecoder": {
+          "logical_errors": 3,
+          "ler": 3e-05,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 0,
+          "ler": 0.0,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 0,
+          "ler": 0.0,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 0,
+          "ler": 0.0
+        }
+      },
+      {
+        "name": "repetition_code(d=9)@p=0.05",
+        "code": "repetition_code",
+        "d": 9,
+        "p": 0.05,
+        "samples": 100000,
+        "n_qubits": 9,
+        "UnionFindDecoder": {
+          "logical_errors": 20,
+          "ler": 0.0002,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 3,
+          "ler": 3e-05,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 4,
+          "ler": 4e-05,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 3,
+          "ler": 3e-05
+        }
+      },
+      {
+        "name": "repetition_code(d=9)@p=0.08",
+        "code": "repetition_code",
+        "d": 9,
+        "p": 0.08,
+        "samples": 100000,
+        "n_qubits": 9,
+        "UnionFindDecoder": {
+          "logical_errors": 134,
+          "ler": 0.00134,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 37,
+          "ler": 0.00037,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 43,
+          "ler": 0.00043,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 37,
+          "ler": 0.00037
+        }
+      },
+      {
+        "name": "repetition_code(d=9)@p=0.1",
+        "code": "repetition_code",
+        "d": 9,
+        "p": 0.1,
+        "samples": 100000,
+        "n_qubits": 9,
+        "UnionFindDecoder": {
+          "logical_errors": 306,
+          "ler": 0.00306,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 97,
+          "ler": 0.00097,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 103,
+          "ler": 0.00103,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 97,
+          "ler": 0.00097
+        }
+      },
+      {
+        "name": "repetition_code(d=9)@p=0.15",
+        "code": "repetition_code",
+        "d": 9,
+        "p": 0.15,
+        "samples": 100000,
+        "n_qubits": 9,
+        "UnionFindDecoder": {
+          "logical_errors": 1315,
+          "ler": 0.01315,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 564,
+          "ler": 0.00564,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 580,
+          "ler": 0.0058,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 564,
+          "ler": 0.00564
+        }
+      },
+      {
+        "name": "rotated_surface_code(d=3)@p=0.01",
+        "code": "rotated_surface_code",
+        "d": 3,
+        "p": 0.01,
+        "samples": 100000,
+        "n_qubits": 9,
+        "UnionFindDecoder": {
+          "logical_errors": 1102,
+          "ler": 0.01102,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 1051,
+          "ler": 0.01051,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 1051,
+          "ler": 0.01051,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 1067,
+          "ler": 0.01067
+        }
+      },
+      {
+        "name": "rotated_surface_code(d=3)@p=0.03",
+        "code": "rotated_surface_code",
+        "d": 3,
+        "p": 0.03,
+        "samples": 100000,
+        "n_qubits": 9,
+        "UnionFindDecoder": {
+          "logical_errors": 3591,
+          "ler": 0.03591,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 3172,
+          "ler": 0.03172,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 3172,
+          "ler": 0.03172,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 3261,
+          "ler": 0.03261
+        }
+      },
+      {
+        "name": "rotated_surface_code(d=3)@p=0.05",
+        "code": "rotated_surface_code",
+        "d": 3,
+        "p": 0.05,
+        "samples": 100000,
+        "n_qubits": 9,
+        "UnionFindDecoder": {
+          "logical_errors": 6489,
+          "ler": 0.06489,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 5556,
+          "ler": 0.05556,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 5556,
+          "ler": 0.05556,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 5740,
+          "ler": 0.0574
+        }
+      },
+      {
+        "name": "rotated_surface_code(d=3)@p=0.08",
+        "code": "rotated_surface_code",
+        "d": 3,
+        "p": 0.08,
+        "samples": 100000,
+        "n_qubits": 9,
+        "UnionFindDecoder": {
+          "logical_errors": 11067,
+          "ler": 0.11067,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 9032,
+          "ler": 0.09032,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 9032,
+          "ler": 0.09032,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 9468,
+          "ler": 0.09468
+        }
+      },
+      {
+        "name": "rotated_surface_code(d=3)@p=0.1",
+        "code": "rotated_surface_code",
+        "d": 3,
+        "p": 0.1,
+        "samples": 100000,
+        "n_qubits": 9,
+        "UnionFindDecoder": {
+          "logical_errors": 14145,
+          "ler": 0.14145,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 11407,
+          "ler": 0.11407,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 11407,
+          "ler": 0.11407,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 12007,
+          "ler": 0.12007
+        }
+      },
+      {
+        "name": "rotated_surface_code(d=3)@p=0.15",
+        "code": "rotated_surface_code",
+        "d": 3,
+        "p": 0.15,
+        "samples": 100000,
+        "n_qubits": 9,
+        "UnionFindDecoder": {
+          "logical_errors": 21765,
+          "ler": 0.21765,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 17322,
+          "ler": 0.17322,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 17322,
+          "ler": 0.17322,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 18370,
+          "ler": 0.1837
+        }
+      },
+      {
+        "name": "rotated_surface_code(d=5)@p=0.01",
+        "code": "rotated_surface_code",
+        "d": 5,
+        "p": 0.01,
+        "samples": 100000,
+        "n_qubits": 25,
+        "UnionFindDecoder": {
+          "logical_errors": 1228,
+          "ler": 0.01228,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 994,
+          "ler": 0.00994,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 994,
+          "ler": 0.00994,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 985,
+          "ler": 0.00985
+        }
+      },
+      {
+        "name": "rotated_surface_code(d=5)@p=0.03",
+        "code": "rotated_surface_code",
+        "d": 5,
+        "p": 0.03,
+        "samples": 100000,
+        "n_qubits": 25,
+        "UnionFindDecoder": {
+          "logical_errors": 4877,
+          "ler": 0.04877,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 3250,
+          "ler": 0.0325,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 3250,
+          "ler": 0.0325,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 3117,
+          "ler": 0.03117
+        }
+      },
+      {
+        "name": "rotated_surface_code(d=5)@p=0.05",
+        "code": "rotated_surface_code",
+        "d": 5,
+        "p": 0.05,
+        "samples": 100000,
+        "n_qubits": 25,
+        "UnionFindDecoder": {
+          "logical_errors": 9293,
+          "ler": 0.09293,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 5739,
+          "ler": 0.05739,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 5738,
+          "ler": 0.05738,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 5513,
+          "ler": 0.05513
+        }
+      },
+      {
+        "name": "rotated_surface_code(d=5)@p=0.08",
+        "code": "rotated_surface_code",
+        "d": 5,
+        "p": 0.08,
+        "samples": 100000,
+        "n_qubits": 25,
+        "UnionFindDecoder": {
+          "logical_errors": 16596,
+          "ler": 0.16596,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 10016,
+          "ler": 0.10016,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 10017,
+          "ler": 0.10017,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 9470,
+          "ler": 0.0947
+        }
+      },
+      {
+        "name": "rotated_surface_code(d=5)@p=0.1",
+        "code": "rotated_surface_code",
+        "d": 5,
+        "p": 0.1,
+        "samples": 100000,
+        "n_qubits": 25,
+        "UnionFindDecoder": {
+          "logical_errors": 21366,
+          "ler": 0.21366,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 12859,
+          "ler": 0.12859,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 12855,
+          "ler": 0.12855,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 12127,
+          "ler": 0.12127
+        }
+      },
+      {
+        "name": "rotated_surface_code(d=5)@p=0.15",
+        "code": "rotated_surface_code",
+        "d": 5,
+        "p": 0.15,
+        "samples": 100000,
+        "n_qubits": 25,
+        "UnionFindDecoder": {
+          "logical_errors": 30772,
+          "ler": 0.30772,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 19952,
+          "ler": 0.19952,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 19946,
+          "ler": 0.19946,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 18796,
+          "ler": 0.18796
+        }
+      },
+      {
+        "name": "rotated_surface_code(d=7)@p=0.01",
+        "code": "rotated_surface_code",
+        "d": 7,
+        "p": 0.01,
+        "samples": 100000,
+        "n_qubits": 49,
+        "UnionFindDecoder": {
+          "logical_errors": 1072,
+          "ler": 0.01072,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 1072,
+          "ler": 0.01072,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 1072,
+          "ler": 0.01072,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 1053,
+          "ler": 0.01053
+        }
+      },
+      {
+        "name": "rotated_surface_code(d=7)@p=0.03",
+        "code": "rotated_surface_code",
+        "d": 7,
+        "p": 0.03,
+        "samples": 100000,
+        "n_qubits": 49,
+        "UnionFindDecoder": {
+          "logical_errors": 3554,
+          "ler": 0.03554,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 3262,
+          "ler": 0.03262,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 3261,
+          "ler": 0.03261,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 3120,
+          "ler": 0.0312
+        }
+      },
+      {
+        "name": "rotated_surface_code(d=7)@p=0.05",
+        "code": "rotated_surface_code",
+        "d": 7,
+        "p": 0.05,
+        "samples": 100000,
+        "n_qubits": 49,
+        "UnionFindDecoder": {
+          "logical_errors": 6945,
+          "ler": 0.06945,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 5861,
+          "ler": 0.05861,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 5860,
+          "ler": 0.0586,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 5477,
+          "ler": 0.05477
+        }
+      },
+      {
+        "name": "rotated_surface_code(d=7)@p=0.08",
+        "code": "rotated_surface_code",
+        "d": 7,
+        "p": 0.08,
+        "samples": 100000,
+        "n_qubits": 49,
+        "UnionFindDecoder": {
+          "logical_errors": 12947,
+          "ler": 0.12947,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 10123,
+          "ler": 0.10123,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 10114,
+          "ler": 0.10114,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 9268,
+          "ler": 0.09268
+        }
+      },
+      {
+        "name": "rotated_surface_code(d=7)@p=0.1",
+        "code": "rotated_surface_code",
+        "d": 7,
+        "p": 0.1,
+        "samples": 100000,
+        "n_qubits": 49,
+        "UnionFindDecoder": {
+          "logical_errors": 17165,
+          "ler": 0.17165,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 13110,
+          "ler": 0.1311,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 13099,
+          "ler": 0.13099,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 12049,
+          "ler": 0.12049
+        }
+      },
+      {
+        "name": "rotated_surface_code(d=7)@p=0.15",
+        "code": "rotated_surface_code",
+        "d": 7,
+        "p": 0.15,
+        "samples": 100000,
+        "n_qubits": 49,
+        "UnionFindDecoder": {
+          "logical_errors": 26554,
+          "ler": 0.26554,
+          "invalid_corrections": 0
+        },
+        "BlossomDecoder": {
+          "logical_errors": 20458,
+          "ler": 0.20458,
+          "invalid_corrections": 0
+        },
+        "SparseBlossomDecoder": {
+          "logical_errors": 20449,
+          "ler": 0.20449,
+          "invalid_corrections": 0
+        },
+        "PyMatching_ref": {
+          "logical_errors": 18681,
+          "ler": 0.18681
+        }
+      }
+    ],
+    "E_batch": [
+      {
+        "name": "UnionFindDecoder|repetition_code(d=9)",
+        "passed": true,
+        "valid_fraction": 1.0,
+        "throughput_shots_per_s": 1744470,
+        "batch_equals_single": true,
+        "n": 5000
+      },
+      {
+        "name": "BlossomDecoder|repetition_code(d=9)",
+        "passed": true,
+        "valid_fraction": 1.0,
+        "throughput_shots_per_s": 3426066,
+        "batch_equals_single": true,
+        "n": 5000
+      },
+      {
+        "name": "SparseBlossomDecoder|repetition_code(d=9)",
+        "passed": true,
+        "valid_fraction": 1.0,
+        "throughput_shots_per_s": 2523214,
+        "batch_equals_single": true,
+        "n": 5000
+      },
+      {
+        "name": "CPUBatchDecoder|repetition_code(d=9)",
+        "passed": true,
+        "valid_fraction": 1.0,
+        "throughput_shots_per_s": 384210,
+        "batch_equals_single": true,
+        "n": 5000
+      },
+      {
+        "name": "BatchDecoder|repetition_code(d=9)",
+        "passed": true,
+        "valid_fraction": 1.0,
+        "throughput_shots_per_s": 1783231,
+        "batch_equals_single": null,
+        "n": 5000
+      },
+      {
+        "name": "BatchDecoder.parallel|repetition_code(d=9)",
+        "passed": true,
+        "valid_fraction": 1.0,
+        "throughput_shots_per_s": 2157311,
+        "n": 5000
+      },
+      {
+        "name": "UnionFindDecoder|rotated_surface_code(d=5)",
+        "passed": true,
+        "valid_fraction": 1.0,
+        "throughput_shots_per_s": 3110807,
+        "batch_equals_single": true,
+        "n": 5000
+      },
+      {
+        "name": "BlossomDecoder|rotated_surface_code(d=5)",
+        "passed": true,
+        "valid_fraction": 1.0,
+        "throughput_shots_per_s": 1263903,
+        "batch_equals_single": true,
+        "n": 5000
+      },
+      {
+        "name": "SparseBlossomDecoder|rotated_surface_code(d=5)",
+        "passed": true,
+        "valid_fraction": 1.0,
+        "throughput_shots_per_s": 766436,
+        "batch_equals_single": false,
+        "n": 5000
+      },
+      {
+        "name": "CPUBatchDecoder|rotated_surface_code(d=5)",
+        "passed": true,
+        "valid_fraction": 1.0,
+        "throughput_shots_per_s": 374818,
+        "batch_equals_single": true,
+        "n": 5000
+      },
+      {
+        "name": "BatchDecoder|rotated_surface_code(d=5)",
+        "passed": true,
+        "valid_fraction": 1.0,
+        "throughput_shots_per_s": 2973536,
+        "batch_equals_single": null,
+        "n": 5000
+      },
+      {
+        "name": "BatchDecoder.parallel|rotated_surface_code(d=5)",
+        "passed": true,
+        "valid_fraction": 1.0,
+        "throughput_shots_per_s": 3164958,
+        "n": 5000
+      }
+    ],
+    "F_edge": [
+      {
+        "name": "zero_syndrome_zero_correction",
+        "passed": "True",
+        "weight": 0
+      },
+      {
+        "name": "all_ones_syndrome_valid",
+        "passed": true
+      },
+      {
+        "name": "wrong_length_rejected",
+        "passed": true,
+        "raised": "ValueError"
+      },
+      {
+        "name": "strict_uint8_rejects_int64",
+        "passed": true,
+        "raised": "TypeError",
+        "message": "Syndrome must be dtype uint8, got int64"
+      },
+      {
+        "name": "uint8_input_accepted",
+        "passed": true
+      },
+      {
+        "name": "large_code_d101",
+        "passed": true,
+        "n_qubits": 101
+      }
+    ],
+    "G_specialized": [
+      {
+        "name": "AutoDecoder.decode",
+        "passed": true,
+        "validity_rate": 1.0,
+        "ler": 0.004,
+        "n": 1000
+      },
+      {
+        "name": "AutoDecoder.available_backends",
+        "passed": true,
+        "backends": [
+          "cpu_single",
+          "cpu_rayon",
+          "cuda"
+        ]
+      },
+      {
+        "name": "BPOSDDecoder.decode",
+        "passed": true,
+        "validity_rate": 1.0,
+        "ler": 0.093,
+        "n": 1000
+      },
+      {
+        "name": "BpOsdDecoder(H).decode",
+        "passed": true,
+        "validity_rate": 1.0,
+        "ler": 0.093,
+        "n": 1000
+      },
+      {
+        "name": "PredecodedDecoder.decode",
+        "passed": true,
+        "validity_rate": 1.0,
+        "ler": 0.004,
+        "n": 1000
+      },
+      {
+        "name": "LookupTableDecoder.decode",
+        "passed": true,
+        "validity_rate": 1.0,
+        "ler": 0.004,
+        "n": 1000
+      },
+      {
+        "name": "LookupTableDecoder.table_size",
+        "passed": true,
+        "table_size": 64
+      },
+      {
+        "name": "SlidingWindowDecoder.decode",
+        "passed": true,
+        "corr_len": 7
+      },
+      {
+        "name": "StreamingDecoder.decode",
+        "passed": true,
+        "corr_len": 7
+      },
+      {
+        "name": "BeliefMatching.from_stim_circuit",
+        "passed": true,
+        "num_detectors": 16,
+        "out_len": 1
+      }
+    ],
+    "H_compat": [
+      {
+        "name": "decode_with_diagnostics",
+        "passed": true,
+        "to_dict_keys": [
+          "backend",
+          "decode_seconds",
+          "fallback",
+          "fallback_reason",
+          "hamming_weight",
+          "logical_flips",
+          "metadata",
+          "n_checks",
+          "n_qubits",
+          "sparse_indices",
+          "syndrome_valid",
+          "weight"
+        ],
+        "syndrome_valid": true,
+        "json_ok": true,
+        "explain_ok": true
+      },
+      {
+        "name": "pymatching_compat_matches_pymatching",
+        "passed": true,
+        "identical_predictions": true,
+        "qector_obs_accuracy": 0.9993333333333333,
+        "pymatching_obs_accuracy": 0.9993333333333333,
+        "n": 3000
+      },
+      {
+        "name": "stim_compat.from_dem",
+        "passed": true,
+        "num_detectors": 16,
+        "decoder_type": "QECTORStimDecoder",
+        "out_len": 15,
+        "dem_checks": 16,
+        "dem_n_qubits": 15
+      }
+    ],
+    "I_workbench": [
+      {
+        "name": "environment_snapshot",
+        "passed": true,
+        "keys": [
+          "backends",
+          "cargo_version",
+          "cpu_count_logical",
+          "cuda_available",
+          "git_commit",
+          "machine",
+          "numpy_version",
+          "opencl_available",
+          "platform",
+          "processor",
+          "pymatching_version",
+          "python_implementation",
+          "python_version",
+          "qector_decoder_v3_version",
+          "ram_available_gb",
+          "ram_total_gb",
+          "rust_version",
+          "scipy_version",
+          "stim_version",
+          "system"
+        ]
+      },
+      {
+        "name": "detect_backends",
+        "passed": true,
+        "backends": {
+          "cpu": true,
+          "cuda": true,
+          "opencl": false,
+          "cuda_device": "NVIDIA GeForce GTX 1660 Ti",
+          "opencl_device": null
+        }
+      },
+      {
+        "name": "run_benchmark",
+        "passed": true,
+        "result_keys": [
+          "environment",
+          "results",
+          "spec"
+        ],
+        "syndrome_faithful": true,
+        "throughput_decodes_per_s": 217391.02444085918,
+        "latency_us": {
+          "n": 1000,
+          "mean": 4.991100344341248,
+          "median": 4.6000059228390455,
+          "std": 1.565472210231395,
+          "min": 3.3999967854470015,
+          "max": 25.40001878514886,
+          "ci95_low": 4.894073154407253,
+          "ci95_high": 5.088127534275244,
+          "p50": 4.6000059228390455,
+          "p90": 6.400019628927112,
+          "p95": 6.999995093792677,
+          "p99": 10.601022222544996
+        },
+        "env": {
+          "timestamp_unix": 1782392617,
+          "python_version": "3.11.0",
+          "python_implementation": "CPython",
+          "platform": "Windows-10-10.0.26100-SP0",
+          "system": "Windows",
+          "machine": "AMD64",
+          "processor": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+          "cpu_count_logical": 16,
+          "numpy_version": "2.2.6",
+          "rust_version": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+          "cargo_version": "cargo 1.96.0 (30a34c682 2026-05-25)",
+          "git_commit": "unknown",
+          "qector_decoder_v3_version": "0.5.2",
+          "pymatching_version": "2.4.0",
+          "stim_version": "1.16.0",
+          "scipy_version": "1.17.1",
+          "ram_total_gb": 16.51,
+          "ram_available_gb": 0.82,
+          "cuda_available": true,
+          "opencl_available": false,
+          "backends": {
+            "cpu": true,
+            "cuda": true,
+            "opencl": false,
+            "cuda_device": "NVIDIA GeForce GTX 1660 Ti",
+            "opencl_device": null
+          }
+        }
+      },
+      {
+        "name": "export_json",
+        "passed": true,
+        "size": 2405
+      },
+      {
+        "name": "export_csv",
+        "passed": true,
+        "size": 261
+      },
+      {
+        "name": "export_pdf",
+        "passed": true,
+        "size": 30042
+      }
+    ],
+    "J_gpu": [
+      {
+        "name": "CUDA|repetition_code(d=9)",
+        "passed": true,
+        "device": "NVIDIA GeForce GTX 1660 Ti",
+        "compute_capability": [
+          7,
+          5
+        ],
+        "gpu_valid_fraction": 1.0,
+        "cpu_valid_fraction": 1.0,
+        "gpu_throughput_shots_per_s": 4002001,
+        "cpu_throughput_shots_per_s": 532432,
+        "speedup_vs_cpu": 7.52,
+        "syndrome_agreement_fraction": 1.0,
+        "is_degraded": false,
+        "total_failures": 0,
+        "gpu_recoveries": 0,
+        "n": 20000
+      },
+      {
+        "name": "CUDA|rotated_surface_code(d=5)",
+        "passed": true,
+        "device": "NVIDIA GeForce GTX 1660 Ti",
+        "compute_capability": [
+          7,
+          5
+        ],
+        "gpu_valid_fraction": 1.0,
+        "cpu_valid_fraction": 1.0,
+        "gpu_throughput_shots_per_s": 2889338,
+        "cpu_throughput_shots_per_s": 373492,
+        "speedup_vs_cpu": 7.74,
+        "syndrome_agreement_fraction": 1.0,
+        "is_degraded": false,
+        "total_failures": 0,
+        "gpu_recoveries": 0,
+        "n": 20000
+      }
+    ]
+  }
+}

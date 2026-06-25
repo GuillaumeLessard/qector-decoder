@@ -2,15 +2,15 @@
 QECTOR Decoder v3 — Source-available Rust/Python QEC decoders with reproducible, artifact-hashed benchmark evidence.
 Rust core + PyO3 bindings. Zero-copy NumPy. GIL-free decode.
 
-Independently validated (v0.5.1, 2026-06-24, PyPI install, isolated venv):
+Independently validated (v0.5.3, 2026-06-25, PyPI install, isolated venv):
     Platform:  Windows 10, AMD Ryzen (16 cores), Python 3.11, NumPy 2.2.6
     GPU:       NVIDIA GeForce GTX 1660 Ti (CUDA 7.5)
     Reference: PyMatching 2.4.0, stim 1.16.0, sinter 1.16.0
-    Result:    86/87 automated checks PASS (primary 20k + re-test 100k shots/pt)
+    Result:    87/87 automated checks PASS (primary 20k + re-test 100k shots/pt)
 
     Workbench single-decode (repetition d=5, Blossom, 1000 trials):
-        throughput: 277,778 decodes/s
-        p50: 3.60 µs  |  p90: 5.70 µs  |  p99: 11.61 µs  |  max: 46.8 µs
+        throughput: 208,334 decodes/s
+        p50: 4.80 µs  |  p90: 8.30 µs  |  p99: 20.30 µs  |  max: 69.8 µs
         syndrome_faithful: True
 
     CPU batch throughput (repetition d=9):

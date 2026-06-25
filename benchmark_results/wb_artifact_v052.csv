@@ -1,0 +1,2 @@
+decoder,code,distance,n_qubits,n_checks,physical_error_rate,syndrome_faithful,logical_error_rate,lat_mean_us,lat_p50_us,lat_p99_us,throughput_per_s,peak_python_alloc_kib
+blossom,repetition_d5,5,5,4,0.05,True,,4.991100,4.600006,10.601022,217391.024441,32.300000
