@@ -90,8 +90,6 @@ dev = [
     "ruff>=0.1.0",
     "pytest-cov>=4.0.0",
 ]
-# Stim ecosystem: DEM loading, syndrome sampling, Sinter harness, and
-# PyMatching / belief-matching / BP-OSD cross-checks.
 stim = [
     "stim>=1.12",
     "pymatching>=2.0",
@@ -99,15 +97,12 @@ stim = [
     "ldpc>=2.0",
     "beliefmatching>=0.2",
 ]
-# Reproducible benchmark harness: memory probing, plots and tables.
 bench = [
     "psutil>=5.9",
     "matplotlib>=3.7",
     "tabulate>=0.9",
     "scipy>=1.10",
 ]
-# GPU acceleration is enabled at build time via Cargo features. These extras exist so
-# `pip install qector-decoder-v3[cuda]` / `[opencl]` resolve cleanly. See INSTALL.md.
 cuda = []
 opencl = []
 all = [
@@ -123,15 +118,18 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://www.qector.store"
-Website = "https://www.qector.store"
-Documentation = "https://github.com/GuillaumeLessard/qector-decoder#readme"
+Homepage = "https://qector.store"
+Website = "https://qector.store"
+Documentation = "https://qector.store/docs.html"
 Repository = "https://github.com/GuillaumeLessard/qector-decoder"
 Source = "https://github.com/GuillaumeLessard/qector-decoder"
 Issues = "https://github.com/GuillaumeLessard/qector-decoder/issues"
 PyPI = "https://pypi.org/project/qector-decoder-v3/"
 DOI = "https://doi.org/10.5281/zenodo.20825980"
-"Commercial Licensing" = "https://www.qector.store"
+"Commercial Licensing" = "https://qector.store/commercial.html"
+"Official User Manual" = "https://qector.store/manual.html"
+"Google Books Manual" = "https://play.google.com/store/books/details?id=dGXuEQAAQBAJ"
+"Itch Manual Download" = "https://id01t.itch.io/qector-decoder-v3-the-official-user-manual"
 "Benchmark Artifacts" = "https://github.com/GuillaumeLessard/qector-decoder/tree/main/benchmark_results"
 "Zenodo Record" = "https://doi.org/10.5281/zenodo.20825980"
 
@@ -139,9 +137,6 @@ DOI = "https://doi.org/10.5281/zenodo.20825980"
 python-source = "python"
 module-name = "qector_decoder_v3.qector_decoder_v3"
 manifest-path = "Cargo.toml"
-# Exclude all Rust source from sdist / wheel metadata -- compiled .so/.pyd only.
-# The src/ in this repo contains only a stub compile_error! placeholder.
-# The real source is injected at CI build time via encrypted Actions secrets.
 exclude = [
   "src/**",
   "tests/**",
@@ -150,7 +145,6 @@ exclude = [
   "target/**",
   ".venv/**",
 ]
-# Strip debug symbols from compiled extension
 strip = true
 
 [tool.pytest.ini_options]
@@ -159,8 +153,6 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 filterwarnings = [
-    # Starlette's TestClient warns that httpx is deprecated in favor of httpx2;
-    # this is upstream noise, not actionable from this project.
     "ignore::starlette.exceptions.StarletteDeprecationWarning",
 ]
 
