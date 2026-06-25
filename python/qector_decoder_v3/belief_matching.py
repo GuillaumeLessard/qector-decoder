@@ -152,9 +152,39 @@ def build_matching_matrices(dem: Any) -> _Matrices:
 
 
 class BeliefMatching:
-    """Belief-propagation + minimum-weight perfect matching decoder."""
+    """Belief-propagation + minimum-weight perfect matching decoder.
 
-    def __init__(self, matrices: _Matrices, max_iter: int = 30, bp_shortcut: bool = False):
+    Can be constructed from:
+    - A :class:`_Matrices` object (returned by :func:`build_matching_matrices`).
+    - A raw numpy check matrix ``H`` of shape ``(num_detectors, num_qubits)``
+      with uniform priors (each column weight ``-log(p/(1-p))`` at ``p=0.1``).
+      This is the convenience constructor: ``BeliefMatching(H)`` or
+      ``BeliefMatching(H, p=0.05)``.  Observable matrix is assumed to be
+      identity (each qubit is its own logical).
+    """
+
+    def __init__(self, matrices, max_iter: int = 30, bp_shortcut: bool = False, p: float = 0.1):
+        # Accept a raw numpy H matrix as a convenience shortcut.
+        if isinstance(matrices, np.ndarray):
+            H = np.asarray(matrices, dtype=np.uint8)
+            if H.ndim != 2:
+                raise ValueError(f"H must be 2D, got shape {H.shape}")
+            num_detectors, num_qubits = H.shape
+            # Uniform prior p for all mechanisms
+            prior_arr = np.full(num_qubits, float(p), dtype=np.float64)
+            # Observable matrix: identity (each qubit is its own logical)
+            obs_m = np.eye(num_qubits, dtype=np.uint8)
+            # No hyperedge structure: hyper == edge
+            matrices = _Matrices(
+                hyper_check=H.copy(),
+                hyper_obs=obs_m,
+                hyper_priors=prior_arr,
+                hyper_to_edge=np.eye(num_qubits, dtype=np.uint8),
+                edge_check=H.copy(),
+                edge_obs=obs_m,
+                num_detectors=num_detectors,
+                num_observables=num_qubits,
+            )
         self._m = matrices
         self.max_iter = int(max_iter)
         # Trusting BP's hard decision when it merely satisfies the syndrome can

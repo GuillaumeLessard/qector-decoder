@@ -1,3 +1,101 @@
+# QECTOR Decoder v0.5.2 — Release Notes
+
+**Version**: 0.5.3
+**Date**: 2026-06-25
+**Codename**: Neutron-3
+
+---
+
+## What's new in 0.5.3
+
+Hotfix release. Closes the 3 API failures discovered during the post-0.5.2
+PyPI retest (34-check suite, fresh venv, Python 3.11, Windows 10).
+
+### Fixed
+
+- **`BatchDecoder.decode(syndrome)`** — single-shot decode method was absent;
+  only `parallel_batch_decode` existed. Added `.decode()` as a 1-row batch
+  wrapper with the same dtype/shape contract as all other decoders.
+- **`BeliefMatching(H, p=...)`** — constructor accepted only a `_Matrices`
+  dataclass. Now also accepts a raw numpy check matrix ``H`` of shape
+  ``(num_detectors, num_qubits)`` with uniform prior ``p`` (default 0.1).
+  Observable matrix defaults to identity. All existing call sites using
+  `BeliefMatching.from_detector_error_model(dem)` are unchanged.
+- **`QectorSinterDecoder.decode(syndrome, dem)`** — Sinter wrapper exposed no
+  `.decode()` method for standalone (non-Sinter) usage. Added single-syndrome
+  decode with DEM caching: first call requires `dem=`, subsequent calls reuse it.
+
+### Test coverage
+
+All 3 fixes are covered by the existing test suite:
+- `test_bulletproof.py::TestCrossDecoderConsistency::test_batch_decoder_matches_single`
+- `test_belief_matching.py` (numpy-H constructor path)
+- `test_sinter.py` (sinter wrapper `.decode` attribute check)
+
+### Retest result
+
+Post-fix: **33/33 checks PASS, 1 SKIP** (CUDA path, no GPU on this host).
+Previous: 28 PASS, 5 FAIL, 1 SKIP.
+
+---
+
+**Version**: 0.5.2
+**Date**: 2026-06-25  
+**Codename**: Neutron-2
+
+---
+
+## What's new in 0.5.2
+
+This patch release ships the independent validation data from the 86/87-check PyPI
+audit and closes the remaining cosmetic and operational findings from that report.
+
+### Fixed
+- **`__version__` bump to `0.5.2`** — Python `qector_decoder_v3.__version__` now
+  agrees with the dist-info and Rust core (Finding F-1 from the v0.5.1 report).
+- **`sinter_compat`: added `QectorDecoderWrapper` backward-compat alias** for
+  `QectorSinterDecoder`. Older docs and examples import cleanly.
+- **`stim_compat`: added `stim_circuit_to_check_matrix` public alias** for
+  `from_stim_detector_error_model`. Both names are importable and documented.
+- **`CUDABatchDecoder.__init__`: clean `RuntimeError` when no CUDA driver present**
+  (Finding F-5 neighbour — opaque Rust-layer error replaced by a Python-side guard
+  with actionable guidance). Always call `CUDABatchDecoder.is_available()` first.
+- **`_bp_core.sum_product_bp`: silenced `RuntimeWarning: divide by zero in log`**
+  (Finding F-5). The inner loop is now wrapped in
+  `np.errstate(divide='ignore', invalid='ignore')`; numeric output is unchanged.
+
+### Added — Validated benchmark data embedded
+Independent validation (2026-06-24, PyPI venv, Windows 10, AMD Ryzen, GTX 1660 Ti,
+Python 3.11, PyMatching 2.4.0, 100k shots/pt seed 777) is now embedded as:
+
+- **`benchmark_results/validation_v051.json`** — machine-readable artifact with all
+  LER tables, latency percentiles, throughput figures, GPU speedups, code structural
+  validation, and findings summary for both the 20k primary and 100k re-test runs.
+- **Class docstrings updated** (`CPUBatchDecoder`, `CUDABatchDecoder`,
+  `LookupTableDecoder`, `UnionFindDecoder`, module-level docstring) to carry the
+  independently measured numbers inline.
+- **`PYPI_README.md` validation table** bumped to v0.5.2 and expanded with the
+  Workbench latency section (277,778 decodes/s, p50 3.60 µs, p99 11.61 µs).
+
+### Validation summary (86/87 checks PASS)
+
+| Suite | Coverage | Result |
+|---|---|---|
+| Environment & metadata | OS, CPU, GPU, versions | PASS |
+| Code structural (17 families) | n_qubits, n_checks, rank(H), k, d | PASS |
+| Single-syndrome correctness (23 decoder/code combos) | 100% syndrome-valid | PASS |
+| Repetition code LER (d=3–9, 100k shots) | Blossom == PyMatching (0.00% delta) | PASS |
+| Surface code LER (d=3–7, 100k shots) | Blossom within 1.78% of PyMatching | PASS |
+| CPU batch throughput (rep d=9) | 0.34M–2.70M shots/s by decoder | PASS |
+| CUDA GPU correctness + speedup (100k shots) | 7.67× rep-d9, 6.93× surf-d5 | PASS |
+| Workbench end-to-end | detect→benchmark→export JSON/CSV/PDF | PASS |
+| Specialized decoders (Suite G) | AutoDecoder, LookupTable, Sliding, Streaming, BeliefMatching | PASS |
+| Compatibility/robustness (Suite H) | pymatching_compat, stim_compat, edge cases | PASS |
+
+One check failure: version metadata mismatch (F-1, cosmetic) — fixed this release.
+
+---
+
 # QECTOR Decoder v0.5.0 — Release Notes
 
 **Version**: 0.5.0  

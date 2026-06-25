@@ -44,6 +44,59 @@ The v0.5 local validation report records:
 | Rust unit tests | Core Rust modules and backend internals | 87 passed |
 | Total | Python + Rust | 919 passed, 0 deferred |
 
+## 3a. Independent PyPI validation (v0.5.1 package, 2026-06-24)
+
+86/87 automated checks passed across a primary 20k-shot run and a 5× re-test at
+100k shots/pt (seed 777). Platform: Windows 10, AMD Ryzen 16-core, NVIDIA GTX
+1660 Ti CUDA 7.5, Python 3.11.0, NumPy 2.2.6, PyMatching 2.4.0, stim/sinter 1.16.0.
+Full artifact: `benchmark_results/validation_v051.json`.
+
+### Structural validation (17 code constructions, Suite B)
+
+All 17 code families validate: `repetition_code(d=3–11)`, `ring_code(d=3–7)`,
+`rotated_surface_code(d=3–7)`, `unrotated_surface_code(d=3–5)`, `toric_code(d=3–5)`,
+`heavy_hex_code(d=3–5)`. Every construction passes `n_qubits`, `n_checks`, `rank(H)`,
+`k`, `d`, and matching-graph shape checks.
+
+### Single-syndrome correctness (Suite C) — 100% syndrome-valid across all 23 entries
+
+| Decoder | Code | µs/decode | Valid |
+|---|---|---|---|
+| UnionFindDecoder | rep d=5 | 9.3 | 100% |
+| FastUnionFindDecoder | rep d=5 | 9.5 | 100% |
+| BlossomDecoder | rep d=5 | 10.6 | 100% |
+| SparseBlossomDecoder | rep d=5 | 11.8 | 100% |
+| CPUBatchDecoder | rep d=5 | 11.2 | 100% |
+| LookupTableDecoder | rep d=5 | 8.7 | 100% |
+| UnionFindDecoder | rep d=9 | 10.0 | 100% |
+| FastUnionFindDecoder | rep d=9 | 10.2 | 100% |
+| BlossomDecoder | rep d=9 | 10.6 | 100% |
+| SparseBlossomDecoder | rep d=9 | 10.6 | 100% |
+| CPUBatchDecoder | rep d=9 | 9.7 | 100% |
+| LookupTableDecoder | rep d=9 | 10.7 | 100% |
+| UnionFindDecoder | surf d=3 | 12.2 | 100% |
+| FastUnionFindDecoder | surf d=3 | 11.4 | 100% |
+| BlossomDecoder | surf d=3 | 14.8 | 100% |
+| SparseBlossomDecoder | surf d=3 | 11.5 | 100% |
+| CPUBatchDecoder | surf d=3 | 9.5 | 100% |
+| LookupTableDecoder | surf d=3 | 9.5 | 100% |
+| UnionFindDecoder | surf d=5 | 10.1 | 100% |
+| FastUnionFindDecoder | surf d=5 | 12.1 | 100% |
+| BlossomDecoder | surf d=5 | 16.8 | 100% |
+| SparseBlossomDecoder | surf d=5 | 29.2 | 100% |
+| CPUBatchDecoder | surf d=5 | 10.7 | 100% |
+
+### Workbench latency (Suite I — repetition d=5, Blossom, 1000 trials)
+
+throughput: 277,778 dec/s · p50 3.60 µs · p90 5.70 µs · p99 11.61 µs · max 46.8 µs · syndrome_faithful: True
+
+### GPU validation (Suite J — GTX 1660 Ti, 100k shots)
+
+| Code | CUDA speedup vs CPU batch | GPU valid | CPU-agreeing |
+|---|---|---|---|
+| repetition d=9 | 7.67× | ✅ | ✅ |
+| rotated_surface d=5 | 6.93× | ✅ | ✅ |
+
 Representative Python coverage:
 
 | Test file | What it proves |

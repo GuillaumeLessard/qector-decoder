@@ -5,6 +5,13 @@ on [Keep a Changelog](https://keepachangelog.com/), and the project aims to foll
 semantic versioning. Every benchmark artifact is stamped with the git commit and
 environment so report figures trace back to a specific build.
 
+## [0.5.3] - 2026-06-25
+
+### Fixed
+- **`BatchDecoder.decode(syndrome)`** — single-shot `.decode()` method was absent; only `.parallel_batch_decode()` was exposed. Added `.decode()` as a 1-row batch wrapper with identical dtype/shape contract to every other decoder. Closes PyPI retest failure #3.
+- **`BeliefMatching(H, p=...)`** — constructor accepted only a `_Matrices` dataclass (returned by `build_matching_matrices`). Now also accepts a raw numpy check matrix `H` of shape `(num_detectors, num_qubits)` with uniform prior `p` (default 0.1); observable matrix defaults to identity. All existing call sites using `BeliefMatching.from_detector_error_model(dem)` are unchanged. Closes PyPI retest failure #4.
+- **`QectorSinterDecoder.decode(syndrome, dem)`** — Sinter wrappers `QectorSinterDecoder` / `QectorDecoderWrapper` exposed no `.decode()` method for standalone (non-Sinter) usage. Added single-syndrome decode with DEM caching: first call requires `dem=` kwarg, subsequent calls reuse the cached DEM. Closes PyPI retest failure #5.
+
 ## [Unreleased]
 
 ## [0.5.2] - 2026-06-25

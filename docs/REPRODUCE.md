@@ -21,6 +21,7 @@ OEM readiness, or real-time hardware behavior.
 | Belief-matching selected d=5/d=7 lower observed LER | `benchmark_results/competitive_belief.json` | Section 6 |
 | CUDA/OpenCL output bit-identity against CPU | GPU bit-identity tests | Section 7 |
 | Artifact hash / environment snapshot discipline | JSON artifacts + hash commands | Section 8 |
+| Independent PyPI validation (86/87 checks, 100k shots) | `benchmark_results/validation_v051.json` | Section 9 |
 
 ## 1. Install the public repository
 
@@ -258,6 +259,35 @@ print(bm.capture_environment())
 `.github/workflows/tests.yml` defines Rust tests, Python tests across Linux,
 Windows, and macOS, plus a benchmark smoke job. Treat CI as an additional gate,
 not a replacement for local reproduction when making hardware-specific claims.
+
+## 9. Independent PyPI validation artifact
+
+The file `benchmark_results/validation_v051.json` is the machine-readable record of
+the 2026-06-24 independent validation run (PyPI install, isolated venv, Windows 10,
+AMD Ryzen 16-core, NVIDIA GTX 1660 Ti CUDA 7.5, Python 3.11, PyMatching 2.4.0,
+stim 1.16.0). It contains:
+
+- Full environment snapshot
+- All 17 code structural validation records
+- All 23 single-syndrome correctness/latency entries (every decoder × code combo)
+- Repetition-code LER table (d=3–9, 100k shots, seed 777) with Wilson 95% CIs
+- Rotated-surface LER table (d=3–7, 100k shots) with Blossom–PyMatching delta
+- CPU batch throughput by decoder for repetition d=9
+- CUDA vs CPU speedup at 100k shots (7.67× rep-d9, 6.93× surf-d5)
+- Workbench latency percentiles (p50 3.60 µs, p90 5.70 µs, p99 11.61 µs)
+- Findings summary (F-1 through F-5) with status
+
+PowerShell hash check:
+
+```powershell
+Get-FileHash benchmark_results\validation_v051.json -Algorithm SHA256
+```
+
+Git Bash hash check:
+
+```bash
+sha256sum benchmark_results/validation_v051.json
+```
 
 ## 11. Short reviewer checklist
 

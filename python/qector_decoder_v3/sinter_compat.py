@@ -81,6 +81,8 @@ class QectorSinterDecoder(_SINTER_BASE):  # type: ignore[misc,valid-type]
 
     ``kind`` selects the backend: ``"blossom"`` (weighted exact MWPM),
     ``"belief"`` (belief-matching), or ``"unionfind"`` (fast, unweighted).
+
+    Also usable standalone via ``.decode(syndrome, dem)`` for non-Sinter testing.
     """
 
     def __init__(self, kind: str = "belief"):
@@ -91,6 +93,39 @@ class QectorSinterDecoder(_SINTER_BASE):  # type: ignore[misc,valid-type]
     def compile_decoder_for_dem(self, *, dem) -> "_CompiledQectorDecoder":
         matcher = _build_matcher(self.kind, dem)
         return _CompiledQectorDecoder(matcher, dem.num_detectors, dem.num_observables)
+
+    def decode(self, syndrome, dem=None) -> np.ndarray:
+        """Decode a single syndrome vector.
+
+        Parameters
+        ----------
+        syndrome : array-like
+            Binary detection event vector of length ``num_detectors``.
+        dem : stim.DetectorErrorModel, optional
+            DEM to build the decoder from. Required on the first call; cached
+            for subsequent calls with the same instance.
+
+        Returns
+        -------
+        np.ndarray
+            Predicted observable flips, shape ``(num_observables,)``.
+        """
+        if dem is not None:
+            self._cached_dem = dem
+        if not hasattr(self, "_cached_dem") or self._cached_dem is None:
+            raise ValueError("dem must be provided on the first call to .decode()")
+        compiled = self.compile_decoder_for_dem(dem=self._cached_dem)
+        s = np.asarray(syndrome, dtype=np.uint8).reshape(1, -1)
+        # pack -> decode -> unpack
+        n_det = compiled.num_detectors
+        packed = np.packbits(
+            np.pad(s, ((0, 0), (0, (8 - n_det % 8) % 8)), mode="constant"),
+            axis=1,
+            bitorder="little",
+        )
+        result_packed = compiled.decode_shots_bit_packed(bit_packed_detection_event_data=packed)
+        result = np.unpackbits(result_packed, axis=1, count=compiled.num_observables, bitorder="little")
+        return result[0].astype(np.uint8)
 
 
 def _build_matcher(kind: str, dem):

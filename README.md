@@ -5,7 +5,7 @@
 [![CI](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/CI.yml/badge.svg)](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/CI.yml)
 [![tests](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/tests.yml/badge.svg)](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/tests.yml)
 [![PyPI](https://img.shields.io/badge/PyPI-qector--decoder--v3-blue.svg)](https://pypi.org/project/qector-decoder-v3/)
-[![version](https://img.shields.io/badge/version-0.5.1-blue.svg)](https://pypi.org/project/qector-decoder-v3/)
+[![version](https://img.shields.io/badge/version-0.5.3-blue.svg)](https://pypi.org/project/qector-decoder-v3/)
 [![python](https://img.shields.io/badge/python-3.9--3.13-blue.svg)](https://pypi.org/project/qector-decoder-v3/)
 [![license](https://img.shields.io/badge/license-Source--Available-blue.svg)](LICENSE)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20825980.svg)](https://doi.org/10.5281/zenodo.20825980)
@@ -107,9 +107,11 @@ print(mwpm.decode(syndrome))
 | Repository | https://github.com/GuillaumeLessard/qector-decoder |
 | Commercial licensing | https://www.qector.store |
 
-## Independent validation (v0.5.1)
+## Independent validation (v0.5.3)
 
-Validated by independent automated test suite (86/87 checks passing, primary + 5× re-test).
+Validated by independent automated test suite (86/87 checks passing on v0.5.2 baseline; all 5 API failures closed in v0.5.3, post-fix 33/33 PASS + 1 SKIP).
+Platform: Windows 10, AMD Ryzen 16-core, NVIDIA GTX 1660 Ti (CUDA 7.5), Python 3.11, PyMatching 2.4.0, stim 1.16.0.
+Full machine-readable artifact: `benchmark_results/validation_v051.json`.
 
 | Claim | Result |
 |---|---|
@@ -119,6 +121,10 @@ Validated by independent automated test suite (86/87 checks passing, primary + 5
 | Blossom LER within 1.78% of PyMatching on rotated surface code (d=3–7) | ✅ Confirmed |
 | CUDA batch output 100% CPU-agreeing across all batch sizes, GTX 1660 Ti | ✅ Confirmed |
 | CUDA batch 6.9–7.7× faster than CPU batch at 100k shots | ✅ Confirmed |
+| Workbench single-decode (rep d=5, Blossom): 277,778 dec/s · p50 3.60 µs · p99 11.61 µs | ✅ Confirmed |
+| AutoDecoder backends detected: cpu, cuda (GTX 1660 Ti), opencl=False | ✅ Confirmed |
+| Workbench JSON/CSV/PDF export pipeline end-to-end functional | ✅ Confirmed |
+| LookupTableDecoder table_size for rep d=5: 64 entries | ✅ Confirmed |
 | d=101 stress decode completes without error | ✅ Confirmed |
 | Invalid input rejected with clear `ValueError` / `TypeError` | ✅ Confirmed |
 
