@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+title: QECTOR Decoder v3
+message: If you use QECTOR Decoder v3, please cite this software record.
+type: software
+authors:
+  - family-names: Lessard
+    given-names: Guillaume
+    affiliation: iD01t Productions
+version: 0.5.2
+date-released: 2026-06-25
+url: https://www.qector.store
+repository-code: https://github.com/GuillaumeLessard/qector-decoder
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.20825980
+abstract: Source-available Rust and Python quantum error correction decoder package for QEC research, PyMatching-compatible validation, belief-matching, BP-OSD and qLDPC workflows, CPU/GPU batch decoding, and reproducible benchmark evidence.
+keywords:
+  - quantum error correction
+  - QEC
+  - quantum computing
+  - decoder
+  - MWPM
+  - PyMatching
+  - Stim
+  - LDPC
+  - qLDPC
+  - BP-OSD
+  - Rust
+  - Python
+  - QECTOR
+license: LicenseRef-Source-Available
