@@ -200,6 +200,50 @@ def stim_decoder_from_dem(dem: Any, use_batch: bool = False):
     return to_stim_decoder(c2q, n_qubits=nq, use_batch=use_batch)
 
 
-# Public alias: README and older examples used stim_circuit_to_check_matrix
-# to mirror the naming convention "circuit -> check matrix".
-stim_circuit_to_check_matrix = from_stim_detector_error_model
+# ---------------------------------------------------------------------------
+# stim_circuit_to_check_matrix — the documented entry-point for Stim circuits
+# ---------------------------------------------------------------------------
+
+
+def stim_circuit_to_check_matrix(circuit_or_dem: Any) -> Tuple[List[List[int]], int]:
+    """Convert a ``stim.Circuit`` **or** ``stim.DetectorErrorModel`` to QECTOR format.
+
+    This is the canonical public function for getting a QECTOR
+    ``(check_to_qubits, n_qubits)`` pair from any Stim object.
+
+    Unlike the original plain alias (which silently returned ``num_errors == 0``
+    when given a Circuit because both Circuit and DetectorErrorModel expose
+    ``num_detectors``), this function correctly identifies Circuit objects by the
+    presence of the ``detector_error_model()`` method and derives the DEM first.
+
+    Parameters
+    ----------
+    circuit_or_dem : stim.Circuit | stim.DetectorErrorModel | str
+        * ``stim.Circuit`` — the DEM is derived with ``decompose_errors=True``
+          before conversion.
+        * ``stim.DetectorErrorModel`` — converted directly.
+        * ``str`` — parsed as raw DEM text.
+
+    Returns
+    -------
+    tuple[list[list[int]], int]
+        ``(check_to_qubits, n_qubits)`` as expected by all QECTOR decoder
+        constructors.
+
+    Examples
+    --------
+    >>> import stim
+    >>> from qector_decoder_v3.stim_compat import stim_circuit_to_check_matrix
+    >>> circuit = stim.Circuit.generated(
+    ...     "surface_code:rotated_memory_x", distance=3, rounds=3,
+    ...     after_clifford_depolarization=0.001,
+    ... )
+    >>> c2q, n_errors = stim_circuit_to_check_matrix(circuit)
+    >>> assert n_errors > 0          # was 0 in v0.5.2 — fixed in v0.5.3
+    """
+    # KEY FIX (v0.5.3): stim.Circuit has detector_error_model(); DetectorErrorModel
+    # does not.  Both have num_detectors, so we cannot use that alone.
+    if _HAS_STIM and hasattr(circuit_or_dem, "detector_error_model"):
+        dem = circuit_or_dem.detector_error_model(decompose_errors=True)
+        return from_stim_detector_error_model(dem)
+    return from_stim_detector_error_model(circuit_or_dem)

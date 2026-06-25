@@ -211,11 +211,83 @@ class BeliefMatching:
     # -- constructors ------------------------------------------------------
     @classmethod
     def from_detector_error_model(cls, dem: Any, max_iter: int = 20) -> "BeliefMatching":
+        """Construct from a ``stim.DetectorErrorModel`` (or DEM text string)."""
         return cls(build_matching_matrices(dem), max_iter=max_iter)
 
     @classmethod
     def from_stim_circuit(cls, circuit, max_iter: int = 20) -> "BeliefMatching":
-        return cls.from_detector_error_model(circuit.detector_error_model(decompose_errors=True), max_iter=max_iter)
+        """Construct directly from a ``stim.Circuit`` object."""
+        return cls.from_detector_error_model(
+            circuit.detector_error_model(decompose_errors=True), max_iter=max_iter
+        )
+
+    @classmethod
+    def from_beliefmatching_matrices(
+        cls, bm_matrices: Any, max_iter: int = 20
+    ) -> "BeliefMatching":
+        """Construct from a ``beliefmatching.DemMatrices`` object.
+
+        ``beliefmatching.DemMatrices`` is the struct returned by
+        ``beliefmatching.detector_error_model_to_check_matrices(dem)``.  Its
+        attributes are sparse scipy CSC matrices; this constructor converts them
+        to the dense NumPy arrays QECTOR's belief engine requires.
+
+        .. code-block:: python
+
+            import stim, beliefmatching
+            from qector_decoder_v3.belief_matching import BeliefMatching
+
+            dem = stim.Circuit.generated(
+                "surface_code:rotated_memory_x", distance=5,
+                rounds=5, after_clifford_depolarization=0.005,
+            ).detector_error_model(decompose_errors=True)
+
+            # Correct way to build a beliefmatching.DemMatrices:
+            bm_mats = beliefmatching.detector_error_model_to_check_matrices(dem)
+            qbm = BeliefMatching.from_beliefmatching_matrices(bm_mats)
+
+        Parameters
+        ----------
+        bm_matrices : beliefmatching.DemMatrices
+            A ``DemMatrices`` produced by
+            ``beliefmatching.detector_error_model_to_check_matrices(dem)``.
+            **Not** constructed via ``beliefmatching.DemMatrices(dem)`` directly —
+            that constructor requires five explicit sparse matrix arguments.
+        max_iter : int
+            Maximum BP iterations.
+
+        Returns
+        -------
+        BeliefMatching
+        """
+        # Convert sparse scipy matrices to dense uint8 NumPy arrays.
+        def _to_dense(m) -> np.ndarray:
+            try:
+                return np.asarray(m.todense(), dtype=np.uint8)
+            except AttributeError:
+                return np.asarray(m, dtype=np.uint8)
+
+        hyper_check = _to_dense(bm_matrices.check_matrix)
+        hyper_obs = _to_dense(bm_matrices.observables_matrix)
+        edge_check = _to_dense(bm_matrices.edge_check_matrix)
+        edge_obs = _to_dense(bm_matrices.edge_observables_matrix)
+        hyper_to_edge = _to_dense(bm_matrices.hyperedge_to_edge_matrix)
+        priors = np.asarray(bm_matrices.priors, dtype=np.float64)
+
+        nD, nH = hyper_check.shape
+        nO = hyper_obs.shape[0]
+
+        mats = _Matrices(
+            hyper_check=hyper_check,
+            hyper_obs=hyper_obs,
+            hyper_priors=priors,
+            hyper_to_edge=hyper_to_edge,
+            edge_check=edge_check,
+            edge_obs=edge_obs,
+            num_detectors=nD,
+            num_observables=nO,
+        )
+        return cls(mats, max_iter=max_iter)
 
     # -- decoding ----------------------------------------------------------
     def decode(self, syndrome) -> np.ndarray:
