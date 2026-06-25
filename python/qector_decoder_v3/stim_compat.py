@@ -5,11 +5,12 @@ Stim (https://github.com/quantumlib/stim) est un simulateur de circuits QEC
 trépidant. Ce module permet d'utiliser QECTOR comme back-end de décodage
 pour des modèles d'erreurs produits par Stim.
 
-Usage ::
+Usage — code-capacity (matching graph) ::
 
     import stim
     from qector_decoder_v3.stim_compat import (
         from_stim_detector_error_model,
+        stim_circuit_to_check_matrix,   # alias for from_stim_detector_error_model
         to_stim_decoder,
         stim_decoder_from_dem,
     )
@@ -18,10 +19,40 @@ Usage ::
     circuit = stim.Circuit.generated("surface_code:rotated_memory_x", distance=5)
     dem = circuit.detector_error_model(decompose_errors=True)
     c2q, nq = from_stim_detector_error_model(dem)
+    # stim_circuit_to_check_matrix(dem) is an identical alias
 
     # 2. Créer un wrapper QECTOR compatible stim.Decoder
     decoder = stim_decoder_from_dem(dem)
     correction = decoder.decode(syndrome)
+
+Usage — circuit-level noise (surface-code threshold, recommended) ::
+
+    # For genuine surface-code threshold curves, use circuit-level Stim DEMs
+    # (depolarizing / phenomenological / circuit noise) rather than a single-round
+    # code-capacity check matrix.  The single-sector code-capacity model does NOT
+    # produce distance-scaling threshold curves for the bundled rotated_surface_code
+    # because the logical and physical error rates converge without additional rounds.
+    # BeliefMatching and the Sinter interface handle circuit-level noise natively:
+
+    import stim, sinter
+    from qector_decoder_v3.sinter_compat import qector_sinter_decoders
+
+    tasks = [
+        sinter.Task(
+            circuit=stim.Circuit.generated(
+                "surface_code:rotated_memory_z",
+                distance=d, rounds=d,
+                after_clifford_depolarization=0.005,
+            ),
+            json_metadata={"d": d},
+        )
+        for d in (3, 5, 7)
+    ]
+    samples = sinter.collect(
+        num_workers=4, tasks=tasks,
+        decoders=["qector_belief", "qector_blossom"],
+        custom_decoders=qector_sinter_decoders(),
+    )
 """
 
 from __future__ import annotations
@@ -167,3 +198,8 @@ def stim_decoder_from_dem(dem: Any, use_batch: bool = False):
     """
     c2q, nq = from_stim_detector_error_model(dem)
     return to_stim_decoder(c2q, n_qubits=nq, use_batch=use_batch)
+
+
+# Public alias: README and older examples used stim_circuit_to_check_matrix
+# to mirror the naming convention "circuit -> check matrix".
+stim_circuit_to_check_matrix = from_stim_detector_error_model

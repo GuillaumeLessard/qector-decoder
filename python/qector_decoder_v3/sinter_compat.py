@@ -31,7 +31,10 @@ import numpy as np
 if TYPE_CHECKING:
     pass  # sinter types used only at runtime
 
-__all__ = ["QectorSinterDecoder", "qector_sinter_decoders"]
+__all__ = ["QectorSinterDecoder", "qector_sinter_decoders", "QectorDecoderWrapper"]
+
+# Backward-compat alias — some docs and older examples used this name
+# (defined after QectorSinterDecoder class below)
 
 try:
     import sinter
@@ -132,3 +135,7 @@ def qector_sinter_decoders() -> Dict[str, "QectorSinterDecoder"]:
         "qector_belief": QectorSinterDecoder("belief"),
         "qector_unionfind": QectorSinterDecoder("unionfind"),
     }
+
+
+# Backward-compatibility alias — older docs and examples used QectorDecoderWrapper
+QectorDecoderWrapper = QectorSinterDecoder

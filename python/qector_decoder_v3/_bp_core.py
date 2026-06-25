@@ -90,30 +90,34 @@ def sum_product_bp(
     synd_sign = np.where(syndrome[ic] == 1, -1.0, 1.0)
     c2v = np.zeros(M, dtype=np.float64)
     S_e = np.zeros(n_edges, dtype=np.float64)
+    # eps guards: tanh saturates to ±1 at large LLR; clip before log prevents
+    # divide-by-zero / -inf from log(0). All such cases are numerically ±inf
+    # LLR (certainty), handled correctly by the subsequent clip.
     eps = 1e-12
 
-    for _ in range(max_iter):
-        S_e.fill(0.0)
-        np.add.at(S_e, ie, c2v)
-        v2c = prior_llr[ie] + S_e[ie] - c2v
+    with np.errstate(divide="ignore", invalid="ignore"):
+        for _ in range(max_iter):
+            S_e.fill(0.0)
+            np.add.at(S_e, ie, c2v)
+            v2c = prior_llr[ie] + S_e[ie] - c2v
 
-        t = np.tanh(np.clip(0.5 * v2c, -30.0, 30.0))
-        t = np.clip(t, -1.0 + eps, 1.0 - eps)
-        sgn = np.where(t < 0.0, -1.0, 1.0)
-        logabs = np.log(np.abs(t))
+            t = np.tanh(np.clip(0.5 * v2c, -30.0, 30.0))
+            t = np.clip(t, -1.0 + eps, 1.0 - eps)
+            sgn = np.where(t < 0.0, -1.0, 1.0)
+            logabs = np.log(np.abs(t))  # safe: t clipped away from 0
 
-        sum_log = np.zeros(n_checks, dtype=np.float64)
-        np.add.at(sum_log, ic, logabs)
-        negcount = np.zeros(n_checks, dtype=np.int64)
-        np.add.at(negcount, ic, (sgn < 0).astype(np.int64))
-        total_sign = np.where(negcount % 2 == 0, 1.0, -1.0)
+            sum_log = np.zeros(n_checks, dtype=np.float64)
+            np.add.at(sum_log, ic, logabs)
+            negcount = np.zeros(n_checks, dtype=np.int64)
+            np.add.at(negcount, ic, (sgn < 0).astype(np.int64))
+            total_sign = np.where(negcount % 2 == 0, 1.0, -1.0)
 
-        loo_log = sum_log[ic] - logabs
-        loo_sign = total_sign[ic] * sgn
-        loo = loo_sign * np.exp(np.clip(loo_log, -60.0, 0.0))
-        loo = np.clip(loo, -1.0 + eps, 1.0 - eps)
-        c2v = synd_sign * 2.0 * np.arctanh(loo)
-        np.clip(c2v, -1e6, 1e6, out=c2v)
+            loo_log = sum_log[ic] - logabs
+            loo_sign = total_sign[ic] * sgn
+            loo = loo_sign * np.exp(np.clip(loo_log, -60.0, 0.0))
+            loo = np.clip(loo, -1.0 + eps, 1.0 - eps)
+            c2v = synd_sign * 2.0 * np.arctanh(loo)
+            np.clip(c2v, -1e6, 1e6, out=c2v)
 
     S_e.fill(0.0)
     np.add.at(S_e, ie, c2v)

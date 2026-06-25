@@ -64,7 +64,7 @@ import numpy as np
 try:
     from .qector_decoder_v3 import __version__
 except (ImportError, AttributeError):
-    __version__ = "0.5.0"
+    __version__ = "0.5.1"
 
 
 class UnionFindDecoder:
@@ -431,7 +431,17 @@ class CUDABatchDecoder:
 
     def __init__(self, check_to_qubits, n_qubits=None):
         if _RustCUDABatchDecoder is None:
-            raise RuntimeError("qector-decoder-v3 was built without the 'cuda' feature")
+            raise RuntimeError(
+                "CUDA is not available: this build of qector-decoder-v3 was compiled "
+                "without the 'cuda' feature. Install a CUDA-enabled wheel or use "
+                "CUDABatchDecoder.is_available() to check before constructing."
+            )
+        if not CUDABatchDecoder.is_available():
+            raise RuntimeError(
+                "CUDA is not available on this system: no CUDA-capable GPU or driver "
+                "was detected. Use CUDABatchDecoder.is_available() to check before "
+                "constructing, or use BatchDecoder for CPU-based batch decoding."
+            )
         if not check_to_qubits:
             raise ValueError("check_to_qubits must be non-empty")
         c2q = [[int(q) for q in check] for check in check_to_qubits]

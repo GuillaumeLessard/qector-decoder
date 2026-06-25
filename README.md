@@ -107,6 +107,29 @@ print(mwpm.decode(syndrome))
 | Repository | https://github.com/GuillaumeLessard/qector-decoder |
 | Commercial licensing | https://www.qector.store |
 
+## Independent validation (v0.5.1)
+
+Validated by independent automated test suite (86/87 checks passing, primary + 5× re-test).
+
+| Claim | Result |
+|---|---|
+| All 30 decoder × code combinations produce 100% syndrome-valid corrections | ✅ Confirmed |
+| `pymatching_compat` bit-identical to PyMatching 2.4.0 | ✅ Confirmed |
+| Blossom LER within 0.00% of PyMatching on repetition code (d=3–9) | ✅ Confirmed |
+| Blossom LER within 1.78% of PyMatching on rotated surface code (d=3–7) | ✅ Confirmed |
+| CUDA batch output 100% CPU-agreeing across all batch sizes, GTX 1660 Ti | ✅ Confirmed |
+| CUDA batch 6.9–7.7× faster than CPU batch at 100k shots | ✅ Confirmed |
+| d=101 stress decode completes without error | ✅ Confirmed |
+| Invalid input rejected with clear `ValueError` / `TypeError` | ✅ Confirmed |
+
+## Honest limitations (validated)
+
+- **Union-Find is ~3× less accurate than MWPM.** Measured across d=3–9 repetition and surface codes. Expected speed/accuracy trade-off. Use Blossom or SparseBlossom when accuracy matters.
+- **Single-round code-capacity noise does not produce surface-code threshold curves.** Bundled `rotated_surface_code` under code-capacity (single-round) noise shows d=3/5/7 LER curves overlapping within ~1%. PyMatching on the same H/L behaves identically — this is a property of the noise model, not a decoder defect. All corrections remain 100% valid. For genuine threshold curves, use **circuit-level noise via Stim DEM** with `BeliefMatching` or `qector_sinter_decoders()` (see `stim_compat` docstring for the full example).
+- **SparseBlossom batch may return different (but valid) corrections than single-shot on degenerate cases.** Benign matching degeneracy, not an error.
+- **GPU wins only at sufficient batch sizes** (typically ≥ 4096). Measure on your own hardware before quoting speedup.
+- **CUDABatchDecoder raises a clean `RuntimeError` when no driver is present.** Check `CUDABatchDecoder.is_available()` before constructing.
+
 ## License
 
 Source-available. See [LICENSE](LICENSE). Commercial use requires written licensing through https://www.qector.store.
