@@ -5,26 +5,69 @@ build-backend = "maturin"
 [project]
 name = "qector-decoder-v3"
 version = "0.5.2"
-description = "Source-available Rust/Python QEC R&D platform with PyMatching-compatible validation, belief-matching, BP-OSD/qLDPC workflows, CPU/GPU batch decoding, and artifact-backed benchmark evidence"
+description = "Source-available Rust/Python quantum error correction decoder package for QEC research, PyMatching-compatible validation, belief-matching, BP-OSD/qLDPC workflows, CPU/GPU batch decoding, and reproducible benchmark evidence"
 readme = {file = "PYPI_README.md", content-type = "text/markdown"}
 requires-python = ">=3.9,<3.14"
 license = {file = "LICENSE"}
 authors = [
     {name = "Guillaume Lessard / iD01t Productions", email = "admin@qector.store"}
 ]
-keywords = ["quantum", "error correction", "decoder", "union-find", "QEC", "rust", "MWPM", "Stim", "PyMatching", "LDPC", "qLDPC"]
+keywords = [
+    "quantum error correction",
+    "QEC",
+    "quantum computing",
+    "fault tolerant quantum computing",
+    "decoder",
+    "quantum decoder",
+    "MWPM",
+    "minimum weight perfect matching",
+    "PyMatching",
+    "Stim",
+    "Sinter",
+    "union find decoder",
+    "belief matching",
+    "BP OSD",
+    "belief propagation",
+    "ordered statistics decoding",
+    "LDPC",
+    "qLDPC",
+    "surface code",
+    "rotated surface code",
+    "syndrome decoding",
+    "Rust",
+    "Python",
+    "PyO3",
+    "maturin",
+    "research software",
+    "benchmark artifacts",
+    "reproducibility",
+    "QECTOR"
+]
 classifiers = [
     "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
     "Intended Audience :: Science/Research",
     "License :: Other/Proprietary License",
-    "Programming Language :: Rust",
+    "Natural Language :: English",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Rust",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Mathematics",
     "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
     "numpy>=1.24.0",
@@ -83,6 +126,8 @@ Issues = "https://github.com/GuillaumeLessard/qector-decoder/issues"
 PyPI = "https://pypi.org/project/qector-decoder-v3/"
 DOI = "https://doi.org/10.5281/zenodo.20825980"
 "Commercial Licensing" = "https://www.qector.store"
+"Benchmark Artifacts" = "https://github.com/GuillaumeLessard/qector-decoder/tree/main/benchmark_results"
+"Zenodo Record" = "https://doi.org/10.5281/zenodo.20825980"
 
 [tool.maturin]
 python-source = "python"
@@ -118,27 +163,3 @@ python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true
-
-[tool.ruff]
-line-length = 120
-target-version = "py39"
-
-[tool.ruff.lint]
-# E702: semicolons used intentionally for chained one-liners in plotting helpers.
-# E731: lambda assignments used for compact callback tables in a few helpers.
-# E741: single-letter variable names (l, I, O) are domain-conventional in QEC math.
-# These are minor style choices that do not affect correctness.
-ignore = ["E702", "E731", "E741"]
-
-[tool.ruff.lint.per-file-ignores]
-# __init__: late imports (E402) are intentional (runtime optional deps).
-"python/qector_decoder_v3/__init__.py" = ["E402"]
-# workbench.py: json imported for optional serialization path, Tuple aliased for py3.8 compat.
-"python/qector_decoder_v3/workbench.py" = ["F401"]
-# qiskit_plugin.py: Tuple re-exported for downstream type annotations.
-"python/qector_decoder_v3/qiskit_plugin.py" = ["F401"]
-# Test files: many use sys.path manipulation (E402), conditional imports (F401),
-# convenience imports kept for symmetry (F401), unused locals in scaffolding (F841),
-# f-strings used as comment-like strings for readability (F541).
-"python/tests/*.py" = ["E402", "F401", "F541", "F841"]
-"python/tests/**/*.py" = ["E402", "F401", "F541", "F841"]
