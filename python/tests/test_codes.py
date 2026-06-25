@@ -42,7 +42,9 @@ def test_parity_check_matrix_shape(code):
         assert sorted(np.nonzero(H[ci])[0].tolist()) == sorted(qs)
 
 
-@pytest.mark.parametrize("decoder", ["UnionFind", "FastUnionFind", "Blossom", "SparseBlossom"])
+@pytest.mark.parametrize(
+    "decoder", ["UnionFind", "FastUnionFind", "Blossom", "SparseBlossom"]
+)
 @pytest.mark.parametrize("code", MATCHING_CODES, ids=[c.name for c in MATCHING_CODES])
 def test_codes_are_syndrome_faithful(code, decoder):
     H = code.parity_check_matrix()
@@ -85,7 +87,9 @@ def test_hypergraph_product_is_valid_css():
     # Same number of physical qubits in both sectors.
     assert Hx.shape[1] == Hz.shape[1]
     # CSS commutation condition.
-    assert np.array_equal((Hx @ Hz.T) % 2, np.zeros((Hx.shape[0], Hz.shape[0]), np.uint8))
+    assert np.array_equal(
+        (Hx @ Hz.T) % 2, np.zeros((Hx.shape[0], Hz.shape[0]), np.uint8)
+    )
 
 
 def test_logicals_matrix_and_helpers():

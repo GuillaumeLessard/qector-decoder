@@ -39,7 +39,9 @@ def test_batch_decode_is_faithful_small_and_large():
 def test_single_decode_matches_reference():
     code = codes.repetition_code(15)
     H = code.parity_check_matrix()
-    ad = AutoDecoder(code.check_to_qubits, code.n_qubits, BackendConfig(allow_gpu=False))
+    ad = AutoDecoder(
+        code.check_to_qubits, code.n_qubits, BackendConfig(allow_gpu=False)
+    )
     rng = np.random.default_rng(2)
     for _ in range(50):
         e = (rng.random(code.n_qubits) < 0.1).astype(np.uint8)
@@ -57,7 +59,9 @@ def test_force_backend_override():
 
 def test_diagnostics_structure():
     code = codes.repetition_code(9)
-    ad = AutoDecoder(code.check_to_qubits, code.n_qubits, BackendConfig(allow_gpu=False))
+    ad = AutoDecoder(
+        code.check_to_qubits, code.n_qubits, BackendConfig(allow_gpu=False)
+    )
     syns = (np.random.default_rng(0).random((20, code.n_checks)) < 0.1).astype(np.uint8)
     ad.batch_decode(syns)
     d = ad.diagnostics()
@@ -73,7 +77,9 @@ def test_gpu_path_faithful_if_available():
     H = code.parity_check_matrix()
     cfg = BackendConfig(gpu_threshold=16, allow_gpu=True)
     ad = AutoDecoder(code.check_to_qubits, code.n_qubits, cfg)
-    syns = (np.random.default_rng(1).random((512, code.n_checks)) < 0.08).astype(np.uint8)
+    syns = (np.random.default_rng(1).random((512, code.n_checks)) < 0.08).astype(
+        np.uint8
+    )
     out = np.asarray(ad.batch_decode(syns))
     assert _faithful(out, H, syns)
     assert ad.last_backend in (Backend.CUDA, Backend.OPENCL, Backend.CPU_RAYON)
@@ -87,6 +93,8 @@ def test_calibrate_sets_threshold_and_diagnostics():
     assert ad.diagnostics()["calibrated"] is True
     # after calibration the decoder must still decode faithfully
     H = code.parity_check_matrix()
-    syns = (np.random.default_rng(0).random((300, code.n_checks)) < 0.08).astype(np.uint8)
+    syns = (np.random.default_rng(0).random((300, code.n_checks)) < 0.08).astype(
+        np.uint8
+    )
     out = np.asarray(ad.batch_decode(syns))
     assert _faithful(out, H, syns)

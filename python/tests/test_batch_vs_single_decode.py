@@ -58,7 +58,9 @@ def test_cpu_batch_bit_identical_to_single(code_name, code):
 
     assert np.array_equal(batch, single), f"CPUBatch != single on {code_name}"
     # Faithful: (H @ correction) & 1 == syndrome, for every shot.
-    assert np.array_equal((H @ batch.T).T & 1, syn), f"CPUBatch unfaithful on {code_name}"
+    assert np.array_equal((H @ batch.T).T & 1, syn), (
+        f"CPUBatch unfaithful on {code_name}"
+    )
 
 
 @pytest.mark.parametrize("code_name,code", _codes())
@@ -72,4 +74,6 @@ def test_blossom_batch_bit_identical_to_single(code_name, code):
     single = _per_shot(dec, syn, nq)
 
     assert np.array_equal(batch, single), f"Blossom batch != single on {code_name}"
-    assert np.array_equal((H @ batch.T).T & 1, syn), f"Blossom unfaithful on {code_name}"
+    assert np.array_equal((H @ batch.T).T & 1, syn), (
+        f"Blossom unfaithful on {code_name}"
+    )

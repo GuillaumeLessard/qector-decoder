@@ -68,7 +68,9 @@ def test_sparse_blossom_is_faithful_and_near_optimal(code):
     for s_tuple, min_w in table.items():
         s = np.array(s_tuple, dtype=np.uint8)
         c = np.asarray(sparse.decode(s)).astype(np.uint8)
-        assert np.array_equal((H @ c) & 1, s), f"SparseBlossom {code.name}: not faithful"
+        assert np.array_equal((H @ c) & 1, s), (
+            f"SparseBlossom {code.name}: not faithful"
+        )
         gap = int(c.sum()) - min_w
         max_gap = max(max_gap, gap)
         if gap == 0:

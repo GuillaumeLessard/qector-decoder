@@ -35,7 +35,10 @@ def test_long_run_decode_memory():
     rng = np.random.default_rng(9)
     pool_size = 512
     pool = np.array(
-        [np.asarray(code.syndrome(code.random_error(0.08, rng)), np.uint8) for _ in range(pool_size)],
+        [
+            np.asarray(code.syndrome(code.random_error(0.08, rng)), np.uint8)
+            for _ in range(pool_size)
+        ],
         np.uint8,
     )
 
@@ -51,7 +54,9 @@ def test_long_run_decode_memory():
         if i % sample_every == 0:
             corr = np.asarray(corr, np.uint8)
             # Periodic spot-check: every sampled decode must be faithful.
-            assert np.array_equal((H @ corr) & 1, pool[i % pool_size]), f"unfaithful decode at iteration {i}"
+            assert np.array_equal((H @ corr) & 1, pool[i % pool_size]), (
+                f"unfaithful decode at iteration {i}"
+            )
             faithful_checks += 1
             gc.collect()
             samples.append(_rss_mib(proc))

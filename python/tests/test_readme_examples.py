@@ -39,8 +39,16 @@ def test_readme_mentions_package_and_decoder():
     text = _readme_text()
     assert "qector_decoder_v3" in text, "README does not reference the import name"
     # The README documents at least one real decoder by name.
-    decoder_names = ["UnionFindDecoder", "BlossomDecoder", "SparseBlossomDecoder", "StreamingDecoder", "BatchDecoder"]
-    assert any(name in text for name in decoder_names), "README mentions no known decoder class"
+    decoder_names = [
+        "UnionFindDecoder",
+        "BlossomDecoder",
+        "SparseBlossomDecoder",
+        "StreamingDecoder",
+        "BatchDecoder",
+    ]
+    assert any(name in text for name in decoder_names), (
+        "README mentions no known decoder class"
+    )
 
 
 def test_readme_quickstart_example_runs():

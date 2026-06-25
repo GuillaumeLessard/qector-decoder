@@ -40,7 +40,9 @@ def _logical_errors(d, rounds, shots, seed, basis="x", noise=0.005):
         after_reset_flip_probability=noise,
     )
     sdem = circ.detector_error_model(decompose_errors=True)
-    det, obs = circ.compile_detector_sampler(seed=seed).sample(shots=shots, separate_observables=True)
+    det, obs = circ.compile_detector_sampler(seed=seed).sample(
+        shots=shots, separate_observables=True
+    )
     det = det.astype(np.uint8)
     obs = obs.astype(np.uint8)
     qm = pymatching_compat.Matching.from_detector_error_model(sdem)
@@ -58,7 +60,9 @@ def test_pymatching_parity_rounds_sweep(rounds):
     d = 5
     shots = 3000
     seed = 20260626 + rounds
-    q_err, p_err = _logical_errors(d, rounds, shots=shots, seed=seed, basis="x", noise=0.005)
+    q_err, p_err = _logical_errors(
+        d, rounds, shots=shots, seed=seed, basis="x", noise=0.005
+    )
     ql, qh = wilson(q_err, shots)
     pl, ph = wilson(p_err, shots)
     overlap = not (qh < pl or ph < ql)

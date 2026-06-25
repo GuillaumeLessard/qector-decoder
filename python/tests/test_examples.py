@@ -25,14 +25,22 @@ def test_run_examples():
 
     # Set PYTHONPATH to include the python/ directory in the repo
     env = os.environ.copy()
-    env["PYTHONPATH"] = str(repo_root / "python") + os.pathsep + env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = (
+        str(repo_root / "python") + os.pathsep + env.get("PYTHONPATH", "")
+    )
 
     for example in examples:
         example_path = examples_dir / example
-        assert example_path.exists(), f"Example script {example} does not exist at {example_path}"
+        assert example_path.exists(), (
+            f"Example script {example} does not exist at {example_path}"
+        )
 
         res = subprocess.run(
-            [sys.executable, str(example_path)], capture_output=True, text=True, env=env, cwd=str(repo_root)
+            [sys.executable, str(example_path)],
+            capture_output=True,
+            text=True,
+            env=env,
+            cwd=str(repo_root),
         )
         assert res.returncode == 0, (
             f"Example {example} failed with return code {res.returncode}.\nSTDOUT:\n{res.stdout}\nSTDERR:\n{res.stderr}"

@@ -47,7 +47,9 @@ def test_measurement_error_time_edges_match_pymatching(d):
     sdem = circ.detector_error_model(decompose_errors=True)
     assert sdem.num_observables >= 1
 
-    det, obs = circ.compile_detector_sampler(seed=2025).sample(shots=N, separate_observables=True)
+    det, obs = circ.compile_detector_sampler(seed=2025).sample(
+        shots=N, separate_observables=True
+    )
     det = det.astype(np.uint8)
     obs = obs.astype(np.uint8)
     assert det.shape == (N, sdem.num_detectors)

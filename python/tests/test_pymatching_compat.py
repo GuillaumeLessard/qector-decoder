@@ -71,7 +71,12 @@ def test_decode_batch():
 
 @pytest.mark.parametrize(
     "code",
-    [codes.repetition_code(11), codes.rotated_surface_code(5), codes.rotated_surface_code(7), codes.toric_code(4)],
+    [
+        codes.repetition_code(11),
+        codes.rotated_surface_code(5),
+        codes.rotated_surface_code(7),
+        codes.toric_code(4),
+    ],
     ids=lambda c: c.name,
 )
 def test_weight_optimal_vs_pymatching(code):

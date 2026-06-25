@@ -311,7 +311,9 @@ class TestRestApi:
                 assert resp.status_code == 200
                 assert "correction" in resp.json
         else:
-            pytest.skip(f"REST API framework is '{qd.rest_api._FRAMEWORK}', expected fastapi or flask")
+            pytest.skip(
+                f"REST API framework is '{qd.rest_api._FRAMEWORK}', expected fastapi or flask"
+            )
 
     def test_decode_error_empty_checks(self):
         if qd.rest_api._FRAMEWORK == "fastapi":
@@ -324,7 +326,9 @@ class TestRestApi:
         else:
             app = qd.rest_api.create_app()
             with app.test_client() as client:
-                resp = client.post("/decode", json={"check_to_qubits": [], "syndrome": []})
+                resp = client.post(
+                    "/decode", json={"check_to_qubits": [], "syndrome": []}
+                )
                 assert resp.status_code == 400
 
     def test_app_global_instance(self):

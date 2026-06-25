@@ -30,6 +30,8 @@ def test_environment_snapshot_git_commit_is_string():
 
 def test_environment_snapshot_embedded_in_artifact():
     wb = Workbench()
-    art = wb.run_benchmark({"code": "repetition", "distances": [5], "decoders": ["blossom"], "trials": 100})
+    art = wb.run_benchmark(
+        {"code": "repetition", "distances": [5], "decoders": ["blossom"], "trials": 100}
+    )
     assert "environment" in art
     assert art["environment"]["git_commit"] == wb.environment_snapshot()["git_commit"]

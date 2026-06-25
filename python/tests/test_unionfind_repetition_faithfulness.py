@@ -52,4 +52,6 @@ def test_union_find_repetition_every_single_defect(d, dec_name):
         s = np.zeros(nc, np.uint8)
         s[ci] = 1
         c = np.asarray(dec.decode(s), np.uint8)
-        assert np.array_equal((H @ c) & 1, s), f"{dec_name} on rep({d}): defect {ci} not faithful"
+        assert np.array_equal((H @ c) & 1, s), (
+            f"{dec_name} on rep({d}): defect {ci} not faithful"
+        )

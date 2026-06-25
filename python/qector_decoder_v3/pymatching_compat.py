@@ -92,7 +92,11 @@ class Matching:
         if arr.ndim != 2:
             raise ValueError(f"H must be 2D, got shape {arr.shape}")
         n_det, n_edges = arr.shape
-        w = None if weights is None else np.asarray(weights, dtype=np.float64).reshape(-1)
+        w = (
+            None
+            if weights is None
+            else np.asarray(weights, dtype=np.float64).reshape(-1)
+        )
         fm = None if faults_matrix is None else _to_dense_binary(faults_matrix)
         self._faults_matrix = fm
         self._num_detectors = int(n_det)
@@ -132,7 +136,9 @@ class Matching:
         self._num_detectors = max(self._num_detectors, int(node1) + 1, int(node2) + 1)
         self._decoder = None
 
-    def add_boundary_edge(self, node: int, fault_ids: Any = None, weight: float = 1.0, **_: Any) -> None:
+    def add_boundary_edge(
+        self, node: int, fault_ids: Any = None, weight: float = 1.0, **_: Any
+    ) -> None:
         """Add an edge from a detector node to the boundary."""
         self._edges.append(
             {
@@ -165,7 +171,10 @@ class Matching:
 
     def edges(self) -> List[Tuple[Optional[int], Optional[int], dict]]:
         """PyMatching-style edge list: ``(u, v, {"fault_ids":..., "weight":...})``."""
-        return [(e["u"], e["v"], {"fault_ids": set(e["fault_ids"]), "weight": e["weight"]}) for e in self._edges]
+        return [
+            (e["u"], e["v"], {"fault_ids": set(e["fault_ids"]), "weight": e["weight"]})
+            for e in self._edges
+        ]
 
     def check_matrix(self) -> np.ndarray:
         """The parity-check matrix (rows=detectors, cols=edges)."""
@@ -193,12 +202,16 @@ class Matching:
             # weights are equal, pass None so the uniform-weight fast path runs.
             weights = [e["weight"] for e in self._edges]
             uniform = len(set(round(w, 12) for w in weights)) <= 1
-            self._decoder = BlossomDecoder(c2q, len(self._edges), None if uniform else weights)
+            self._decoder = BlossomDecoder(
+                c2q, len(self._edges), None if uniform else weights
+            )
         return self._decoder
 
     def _edge_correction(self, syndrome: np.ndarray) -> np.ndarray:
         dec = self._ensure_decoder()
-        return np.asarray(dec.decode(syndrome.astype(np.uint8)), dtype=np.uint8).reshape(-1)
+        return np.asarray(
+            dec.decode(syndrome.astype(np.uint8)), dtype=np.uint8
+        ).reshape(-1)
 
     def _to_fault_prediction(self, correction: np.ndarray) -> np.ndarray:
         if self._faults_matrix is not None:
@@ -209,7 +222,9 @@ class Matching:
         """Decode one syndrome; returns predicted fault-id / observable flips."""
         s = np.asarray(syndrome, dtype=np.uint8).reshape(-1)
         if s.shape[0] < self._num_detectors:
-            s = np.concatenate([s, np.zeros(self._num_detectors - s.shape[0], np.uint8)])
+            s = np.concatenate(
+                [s, np.zeros(self._num_detectors - s.shape[0], np.uint8)]
+            )
         corr = self._edge_correction(s)
         return self._to_fault_prediction(corr).astype(np.uint8)
 
@@ -239,7 +254,9 @@ class Matching:
         """Return the raw edge correction (length ``num_edges``)."""
         s = np.asarray(syndrome, dtype=np.uint8).reshape(-1)
         if s.shape[0] < self._num_detectors:
-            s = np.concatenate([s, np.zeros(self._num_detectors - s.shape[0], np.uint8)])
+            s = np.concatenate(
+                [s, np.zeros(self._num_detectors - s.shape[0], np.uint8)]
+            )
         return self._edge_correction(s)
 
     def __repr__(self) -> str:  # pragma: no cover - cosmetic

@@ -110,7 +110,9 @@ class TestFastUnionFindLargeCodes:
             dec.decode(syn)
         elapsed = time.perf_counter() - t0
         us_per = elapsed / 10000 * 1e6
-        print(f"\n  FastUF d=21: {us_per:.1f} µs/decode ({nq} qubits, {len(checks)} checks)")
+        print(
+            f"\n  FastUF d=21: {us_per:.1f} µs/decode ({nq} qubits, {len(checks)} checks)"
+        )
         assert us_per < 1000  # should be well under 1ms
 
 
@@ -394,7 +396,9 @@ class TestGPUCapacity:
     def test_cuda_is_available_bool(self):
         assert isinstance(qd.CUDABatchDecoder.is_available(), bool)
 
-    @pytest.mark.skipif(not qd.OpenCLBatchDecoder.is_available(), reason="OpenCL not available")
+    @pytest.mark.skipif(
+        not qd.OpenCLBatchDecoder.is_available(), reason="OpenCL not available"
+    )
     def test_opencl_large_batch(self):
         checks, nq = surface_code(7)
         dec = qd.OpenCLBatchDecoder(checks, nq)
@@ -402,7 +406,9 @@ class TestGPUCapacity:
         results = dec.batch_decode(batch)
         assert results.shape == (10_000, nq)
 
-    @pytest.mark.skipif(not qd.CUDABatchDecoder.is_available(), reason="CUDA not available")
+    @pytest.mark.skipif(
+        not qd.CUDABatchDecoder.is_available(), reason="CUDA not available"
+    )
     def test_cuda_large_batch(self):
         checks, nq = surface_code(7)
         dec = qd.CUDABatchDecoder(checks, nq)
@@ -410,7 +416,9 @@ class TestGPUCapacity:
         results = dec.batch_decode(batch)
         assert results.shape == (10_000, nq)
 
-    @pytest.mark.skipif(not qd.OpenCLBatchDecoder.is_available(), reason="OpenCL not available")
+    @pytest.mark.skipif(
+        not qd.OpenCLBatchDecoder.is_available(), reason="OpenCL not available"
+    )
     def test_opencl_512_qubit_code(self):
         """Test the extended 512-qubit local-memory path."""
         checks, nq = surface_code(21)  # 441 qubits

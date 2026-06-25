@@ -65,4 +65,6 @@ def test_sparse_blossom_weight_within_bound(code):
             n_equal += 1
 
     frac_equal = n_equal / n_shots
-    assert frac_equal >= 0.9, f"{code.name}: only {frac_equal:.2%} of shots had sparse_w == exact_w (max_gap={max_gap})"
+    assert frac_equal >= 0.9, (
+        f"{code.name}: only {frac_equal:.2%} of shots had sparse_w == exact_w (max_gap={max_gap})"
+    )

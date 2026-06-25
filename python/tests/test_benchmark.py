@@ -62,9 +62,21 @@ class TestBenchmarkSuite:
         # The seed controls generated syndromes, not wall-clock scheduling noise.
         # Verify timing statistics remain internally consistent and broadly sane.
         for results in (r1, r2):
-            assert results["latency_min_us"] <= results["latency_p50_us"] <= results["latency_max_us"]
-            assert results["latency_min_us"] <= results["latency_mean_us"] <= results["latency_max_us"]
-            assert results["latency_p50_us"] <= results["latency_p99_us"] <= results["latency_max_us"]
+            assert (
+                results["latency_min_us"]
+                <= results["latency_p50_us"]
+                <= results["latency_max_us"]
+            )
+            assert (
+                results["latency_min_us"]
+                <= results["latency_mean_us"]
+                <= results["latency_max_us"]
+            )
+            assert (
+                results["latency_p50_us"]
+                <= results["latency_p99_us"]
+                <= results["latency_max_us"]
+            )
         # Throughput can vary significantly on fast decoders due to clock resolution.
         # Just verify both are in the same order of magnitude.
         ratio = r1["throughput"] / r2["throughput"] if r2["throughput"] > 0 else 0

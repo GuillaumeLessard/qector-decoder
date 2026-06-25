@@ -135,7 +135,9 @@ def test_concrete_stabilizer_shift_is_harmless():
 
     # Naive metric flags a failure, but it is harmless: residual is a pure stabiliser.
     assert not np.array_equal(c, e)  # naive c != e  -> would (wrongly) flag
-    assert np.array_equal((H @ r) & 1, np.zeros(H.shape[0], np.uint8))  # residual in ker(H)
+    assert np.array_equal(
+        (H @ r) & 1, np.zeros(H.shape[0], np.uint8)
+    )  # residual in ker(H)
     assert not ((L @ r) & 1).any()  # observable metric -> no logical failure
 
 

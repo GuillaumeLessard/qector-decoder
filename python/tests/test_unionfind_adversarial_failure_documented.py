@@ -93,7 +93,9 @@ def test_union_find_faithful_on_real_qec_codes(code, dec_name):
         e = (rng.random(nq) < 0.12).astype(np.uint8)
         s = ((H @ e) & 1).astype(np.uint8)
         c = np.asarray(dec.decode(s), np.uint8)
-        assert np.array_equal((H @ c) & 1, s), f"{dec_name} unexpectedly failed on real code {code.name}"
+        assert np.array_equal((H @ c) & 1, s), (
+            f"{dec_name} unexpectedly failed on real code {code.name}"
+        )
 
 
 def test_exact_decoders_cover_arbitrary_adversarial_graphs():
@@ -130,8 +132,12 @@ def test_exact_decoders_cover_arbitrary_adversarial_graphs():
                 uf_fail += 1
 
     # The hard assertions: exact decoders cover arbitrary graphs without fault.
-    assert blossom_fail == 0, f"Blossom failed {blossom_fail}/{total_shots} adversarial shots"
-    assert sparse_fail == 0, f"SparseBlossom failed {sparse_fail}/{total_shots} adversarial shots"
+    assert blossom_fail == 0, (
+        f"Blossom failed {blossom_fail}/{total_shots} adversarial shots"
+    )
+    assert sparse_fail == 0, (
+        f"SparseBlossom failed {sparse_fail}/{total_shots} adversarial shots"
+    )
 
     # Documented summary (asserted-true) of the positioning. UF's failure count on
     # adversarial hypergraphs is build-dependent (observed >= 0); the load-bearing

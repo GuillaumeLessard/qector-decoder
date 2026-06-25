@@ -8,7 +8,6 @@ Rules locked here:
   * boundary edges (single detector) and hyperedges retain masks.
 """
 
-
 from qector_decoder_v3 import dem
 
 
@@ -52,7 +51,9 @@ def test_different_pairs_keep_separate_masks():
 
 
 def test_observables_matrix_consistent_after_collapse():
-    m = dem.parse_dem("error(0.1) D0 L0\nerror(0.1) D0 D1\nerror(0.2) D0 D1 L0\nerror(0.1) D1 L0\n")
+    m = dem.parse_dem(
+        "error(0.1) D0 L0\nerror(0.1) D0 D1\nerror(0.2) D0 D1 L0\nerror(0.1) D1 L0\n"
+    )
     c = m.collapse_to_graph()
     L = c.observables_matrix()
     assert L.shape == (1, c.num_errors)

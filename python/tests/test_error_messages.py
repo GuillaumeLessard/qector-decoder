@@ -42,4 +42,6 @@ def test_benchmark_decoder_message_lists_choices():
     msg = str(excinfo.value)
     assert "zzz" in msg
     # message enumerates valid decoder kinds
-    assert "blossom" in msg and "union_find" in msg, f"message should list valid choices: {msg!r}"
+    assert "blossom" in msg and "union_find" in msg, (
+        f"message should list valid choices: {msg!r}"
+    )

@@ -134,7 +134,9 @@ def test_collapse_merges_parallel_edges():
     sigs = {e.detectors: e for e in c.errors}
     merged = sigs[(0, 1)]
     assert merged.probability > 0.2
-    assert merged.observables == (0,)  # keeps the lower-weight (more likely) member's obs
+    assert merged.observables == (
+        0,
+    )  # keeps the lower-weight (more likely) member's obs
 
 
 def test_collapse_preserves_faithfulness_and_observables():

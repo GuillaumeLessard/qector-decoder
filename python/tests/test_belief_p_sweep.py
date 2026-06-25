@@ -41,7 +41,9 @@ def test_belief_p_sweep_not_worse_and_pooled_le():
         pm = pymatching.Matching.from_detector_error_model(sdem)
         no = bm.num_observables
 
-        det, obs = circ.compile_detector_sampler(seed=seed).sample(shots=N, separate_observables=True)
+        det, obs = circ.compile_detector_sampler(seed=seed).sample(
+            shots=N, separate_observables=True
+        )
         det = det.astype(np.uint8)
         obs = obs.astype(np.uint8)
 

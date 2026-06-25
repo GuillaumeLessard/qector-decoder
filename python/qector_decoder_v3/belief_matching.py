@@ -148,7 +148,16 @@ def build_matching_matrices(dem: Any) -> _Matrices:
     for hid, p in priors.items():
         prior_arr[hid] = p
 
-    return _Matrices(hyper_check, hyper_obs_m, prior_arr, hyper_to_edge, edge_check, edge_obs_m, nD, nO)
+    return _Matrices(
+        hyper_check,
+        hyper_obs_m,
+        prior_arr,
+        hyper_to_edge,
+        edge_check,
+        edge_obs_m,
+        nD,
+        nO,
+    )
 
 
 class BeliefMatching:
@@ -163,7 +172,9 @@ class BeliefMatching:
       identity (each qubit is its own logical).
     """
 
-    def __init__(self, matrices, max_iter: int = 30, bp_shortcut: bool = False, p: float = 0.1):
+    def __init__(
+        self, matrices, max_iter: int = 30, bp_shortcut: bool = False, p: float = 0.1
+    ):
         # Accept a raw numpy H matrix as a convenience shortcut.
         if isinstance(matrices, np.ndarray):
             H = np.asarray(matrices, dtype=np.uint8)
@@ -205,12 +216,15 @@ class BeliefMatching:
         # Matching graph = edge check matrix.
         self._n_edges = matrices.edge_check.shape[1]
         self._edge_c2q: List[List[int]] = [
-            sorted(int(e) for e in np.nonzero(matrices.edge_check[c])[0]) for c in range(self.n_checks)
+            sorted(int(e) for e in np.nonzero(matrices.edge_check[c])[0])
+            for c in range(self.n_checks)
         ]
 
     # -- constructors ------------------------------------------------------
     @classmethod
-    def from_detector_error_model(cls, dem: Any, max_iter: int = 20) -> "BeliefMatching":
+    def from_detector_error_model(
+        cls, dem: Any, max_iter: int = 20
+    ) -> "BeliefMatching":
         """Construct from a ``stim.DetectorErrorModel`` (or DEM text string)."""
         return cls(build_matching_matrices(dem), max_iter=max_iter)
 
@@ -260,6 +274,7 @@ class BeliefMatching:
         -------
         BeliefMatching
         """
+
         # Convert sparse scipy matrices to dense uint8 NumPy arrays.
         def _to_dense(m) -> np.ndarray:
             try:
@@ -322,7 +337,9 @@ class BeliefMatching:
         arr = np.asarray(shots, dtype=np.uint8)
         if arr.ndim != 2:
             raise ValueError(f"shots must be 2D, got shape {arr.shape}")
-        return np.stack([self.decode(arr[i]) for i in range(arr.shape[0])]).astype(np.uint8)
+        return np.stack([self.decode(arr[i]) for i in range(arr.shape[0])]).astype(
+            np.uint8
+        )
 
     @property
     def num_detectors(self) -> int:

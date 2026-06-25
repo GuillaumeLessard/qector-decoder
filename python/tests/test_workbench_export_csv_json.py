@@ -33,7 +33,9 @@ def test_export_csv_has_one_row_per_result(tmp_path):
     art = _artifact(wb)
     out = tmp_path / "art.csv"
     wb.export_csv(art, str(out))
-    lines = [line for line in out.read_text(encoding="utf-8").splitlines() if line.strip()]
+    lines = [
+        line for line in out.read_text(encoding="utf-8").splitlines() if line.strip()
+    ]
     assert len(lines) == 1 + len(art["results"])  # header + rows
     header = lines[0].split(",")
     assert "decoder" in header and "syndrome_faithful" in header

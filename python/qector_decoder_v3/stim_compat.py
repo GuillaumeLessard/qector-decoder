@@ -106,7 +106,9 @@ def from_stim_detector_error_model(dem: Any) -> Tuple[List[List[int]], int]:
     elif hasattr(dem, "num_detectors"):
         model = from_stim(dem)
     else:
-        raise TypeError(f"dem doit être un stim.DetectorErrorModel (ou un texte .dem), reçu {type(dem).__name__}")
+        raise TypeError(
+            f"dem doit être un stim.DetectorErrorModel (ou un texte .dem), reçu {type(dem).__name__}"
+        )
 
     check_to_qubits = model.check_to_qubits()
     n_qubits = model.num_errors
@@ -176,7 +178,9 @@ def to_stim_decoder(
             return self._inner.decode(syndrome)
 
         def __repr__(self) -> str:
-            return f"<QECTORStimDecoder n_qubits={self.n_qubits} n_checks={self.n_checks}>"
+            return (
+                f"<QECTORStimDecoder n_qubits={self.n_qubits} n_checks={self.n_checks}>"
+            )
 
     return QECTORStimDecoder(inner, check_to_qubits, n_qubits)
 

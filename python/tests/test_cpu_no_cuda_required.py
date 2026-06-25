@@ -47,14 +47,18 @@ def test_cpu_decode_in_fresh_subprocess():
         text=True,
         timeout=120,
     )
-    assert proc.returncode == 0, f"subprocess failed:\nSTDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}"
+    assert proc.returncode == 0, (
+        f"subprocess failed:\nSTDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}"
+    )
     assert "OK" in proc.stdout, f"missing OK marker; stdout={proc.stdout!r}"
 
 
 def test_autodecoder_never_picks_gpu_when_disabled():
     code = codes.rotated_surface_code(5)
     H = code.parity_check_matrix()
-    auto = AutoDecoder(code.check_to_qubits, code.n_qubits, BackendConfig(allow_gpu=False))
+    auto = AutoDecoder(
+        code.check_to_qubits, code.n_qubits, BackendConfig(allow_gpu=False)
+    )
 
     # No GPU backend should appear in the available set.
     avail = auto.available_backends()
@@ -80,7 +84,9 @@ def test_autodecoder_never_picks_gpu_when_disabled():
     for i in range(batch.shape[0]):
         assert np.array_equal((H @ out[i]) & 1, batch[i]), f"shot {i} not faithful"
     # Confirm the backend that ran was CPU.
-    assert auto.last_backend in (Backend.CPU_SINGLE, Backend.CPU_RAYON), auto.last_backend
+    assert auto.last_backend in (Backend.CPU_SINGLE, Backend.CPU_RAYON), (
+        auto.last_backend
+    )
 
 
 def test_cuda_availability_flag_is_callable_without_gpu_requirement():

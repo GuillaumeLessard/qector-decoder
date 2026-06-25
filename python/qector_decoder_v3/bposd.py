@@ -102,7 +102,9 @@ class BpOsdDecoder:
         arr = np.asarray(syndromes, dtype=np.uint8)
         if arr.ndim != 2:
             raise ValueError(f"syndromes must be 2D, got {arr.shape}")
-        return np.stack([self.decode(arr[i]) for i in range(arr.shape[0])]).astype(np.uint8)
+        return np.stack([self.decode(arr[i]) for i in range(arr.shape[0])]).astype(
+            np.uint8
+        )
 
     @property
     def n_qubits_(self) -> int:
@@ -147,7 +149,9 @@ class BpOsdDecoder:
 # ---------------------------------------------------------------------------
 # GF(2) ordered-statistics solve
 # ---------------------------------------------------------------------------
-def _gf2_osd_solve(H: np.ndarray, s: np.ndarray, order: np.ndarray, hard: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+def _gf2_osd_solve(
+    H: np.ndarray, s: np.ndarray, order: np.ndarray, hard: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
     """OSD-0 solve. ``order`` lists columns least-reliable first; the first
     rank(H) independent of them form the basis, the rest (free) take their BP hard
     decision, and the basis is solved so ``H x == s (mod 2)``.

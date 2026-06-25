@@ -93,4 +93,6 @@ def test_defect_pairs_near_optimal_vs_exact_weight(d):
             n_equal += 1
 
     frac_equal = n_equal / len(pairs)
-    assert frac_equal >= 0.9, f"d={d}: only {frac_equal:.2%} of defect pairs matched exact (max_gap={max_gap})"
+    assert frac_equal >= 0.9, (
+        f"d={d}: only {frac_equal:.2%} of defect pairs matched exact (max_gap={max_gap})"
+    )

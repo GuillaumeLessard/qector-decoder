@@ -47,8 +47,12 @@ def test_version_consistency():
     assert cargo_version and "." in cargo_version, cargo_version
     assert runtime_version and "." in runtime_version, runtime_version
 
-    assert py_version == cargo_version, f"pyproject version {py_version!r} != Cargo version {cargo_version!r}"
-    assert py_version == runtime_version, f"pyproject version {py_version!r} != runtime __version__ {runtime_version!r}"
+    assert py_version == cargo_version, (
+        f"pyproject version {py_version!r} != Cargo version {cargo_version!r}"
+    )
+    assert py_version == runtime_version, (
+        f"pyproject version {py_version!r} != runtime __version__ {runtime_version!r}"
+    )
     assert cargo_version == runtime_version, (
         f"Cargo version {cargo_version!r} != runtime __version__ {runtime_version!r}"
     )

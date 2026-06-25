@@ -61,7 +61,9 @@ def test_collapse_is_idempotent():
     c1 = dem.parse_dem(text).collapse_to_graph()
     c2 = c1.collapse_to_graph()
     assert c1.num_errors == c2.num_errors
-    assert sorted(e.detectors for e in c1.errors) == sorted(e.detectors for e in c2.errors)
+    assert sorted(e.detectors for e in c1.errors) == sorted(
+        e.detectors for e in c2.errors
+    )
 
 
 def test_collapse_preserves_faithfulness():

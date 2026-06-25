@@ -50,7 +50,9 @@ def test_batch_decode_accepts_each_dtype(code_factory, DecCls, dtype):
     batch = np.ascontiguousarray(s.reshape(1, -1).astype(dtype))
     out = np.asarray(dec.batch_decode(batch), np.uint8).reshape(1, -1)
     corr = out[0]
-    assert np.array_equal((H @ corr) & 1, s), f"{DecCls.__name__} dtype={np.dtype(dtype)} not syndrome-faithful"
+    assert np.array_equal((H @ corr) & 1, s), (
+        f"{DecCls.__name__} dtype={np.dtype(dtype)} not syndrome-faithful"
+    )
 
 
 @pytest.mark.parametrize(

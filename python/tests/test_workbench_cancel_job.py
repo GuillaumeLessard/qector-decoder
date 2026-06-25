@@ -10,9 +10,21 @@ def test_cancel_queued_job_is_instant():
     wb = Workbench()
     # Keep the worker busy with a real first job.
     busy = wb.submit_job(
-        {"code": "rotated_surface", "distances": [3, 5, 7], "decoders": ["blossom", "sparse_blossom"], "trials": 400}
+        {
+            "code": "rotated_surface",
+            "distances": [3, 5, 7],
+            "decoders": ["blossom", "sparse_blossom"],
+            "trials": 400,
+        }
     )
-    queued = wb.submit_job({"code": "rotated_surface", "distances": [3], "decoders": ["blossom"], "trials": 100})
+    queued = wb.submit_job(
+        {
+            "code": "rotated_surface",
+            "distances": [3],
+            "decoders": ["blossom"],
+            "trials": 100,
+        }
+    )
     status = wb.cancel_job(queued)
     assert status == "cancelled"
     assert wb.get_job(queued)["status"] == "cancelled"

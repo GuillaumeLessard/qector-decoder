@@ -43,7 +43,9 @@ def test_time_iterations_runs_warmup_and_trials():
     assert counter["n"] == 13
 
 
-@pytest.mark.parametrize("kind", ["union_find", "blossom", "sparse_blossom", "cpu_batch"])
+@pytest.mark.parametrize(
+    "kind", ["union_find", "blossom", "sparse_blossom", "cpu_batch"]
+)
 def test_benchmark_decoder_report(kind):
     code = codes.rotated_surface_code(5)
     r = bm.benchmark_decoder(kind, code, n_trials=200, warmup=20, seed=1)
@@ -80,7 +82,11 @@ def test_report_json_and_csv(tmp_path):
 
 def test_memory_measurement_optional():
     code = codes.repetition_code(9)
-    r = bm.benchmark_decoder("blossom", code, n_trials=50, warmup=5, measure_memory=True)
+    r = bm.benchmark_decoder(
+        "blossom", code, n_trials=50, warmup=5, measure_memory=True
+    )
     assert r["peak_python_alloc_kib"] is not None
-    r2 = bm.benchmark_decoder("blossom", code, n_trials=50, warmup=5, measure_memory=False)
+    r2 = bm.benchmark_decoder(
+        "blossom", code, n_trials=50, warmup=5, measure_memory=False
+    )
     assert r2["peak_python_alloc_kib"] is None

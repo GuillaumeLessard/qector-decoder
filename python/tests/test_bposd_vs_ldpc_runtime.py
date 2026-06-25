@@ -23,7 +23,9 @@ import pytest
 def _bb72():
     from qector_decoder_v3 import codes
 
-    return codes.bivariate_bicycle_code(6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)])
+    return codes.bivariate_bicycle_code(
+        6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)]
+    )
 
 
 def _gf2_rowspace_basis(M):

@@ -12,20 +12,26 @@ from qector_decoder_v3.bposd import BpOsdDecoder
 
 
 def _bb72():
-    return codes.bivariate_bicycle_code(6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)])
+    return codes.bivariate_bicycle_code(
+        6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)]
+    )
 
 
 def test_bb_code_is_valid_css():
     cx, cz = _bb72()
     Hx, Hz = cx.parity_check_matrix(), cz.parity_check_matrix()
     assert Hx.shape[1] == Hz.shape[1] == 72
-    assert np.array_equal((Hx @ Hz.T) % 2, np.zeros((Hx.shape[0], Hz.shape[0]), np.uint8))
+    assert np.array_equal(
+        (Hx @ Hz.T) % 2, np.zeros((Hx.shape[0], Hz.shape[0]), np.uint8)
+    )
 
 
 def test_bicycle_code_is_valid_css():
     bx, bz = codes.bicycle_code(12, weight=6, seed=1)
     Hx, Hz = bx.parity_check_matrix(), bz.parity_check_matrix()
-    assert np.array_equal((Hx @ Hz.T) % 2, np.zeros((Hx.shape[0], Hz.shape[0]), np.uint8))
+    assert np.array_equal(
+        (Hx @ Hz.T) % 2, np.zeros((Hx.shape[0], Hz.shape[0]), np.uint8)
+    )
 
 
 @pytest.mark.parametrize("osd_order", [0, 4])
@@ -111,7 +117,14 @@ def test_bposd_logical_error_rate_competitive_with_ldpc():
     syns = ((errs @ Hx.T) & 1).astype(np.uint8)
 
     q = BpOsdDecoder(Hx, error_rate=p, max_iter=30, osd_order=10)
-    ref = RefBpOsd(Hx, error_rate=p, max_iter=30, osd_order=10, bp_method="product_sum", osd_method="osd_cs")
+    ref = RefBpOsd(
+        Hx,
+        error_rate=p,
+        max_iter=30,
+        osd_order=10,
+        bp_method="product_sum",
+        osd_method="osd_cs",
+    )
 
     q_fail = r_fail = 0
     for i in range(shots):

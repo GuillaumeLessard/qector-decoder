@@ -56,7 +56,9 @@ class _CompiledQectorDecoder(_COMPILED_BASE):  # type: ignore[misc,valid-type]
         self.num_detectors = int(num_detectors)
         self.num_observables = int(num_observables)
 
-    def decode_shots_bit_packed(self, *, bit_packed_detection_event_data: np.ndarray) -> np.ndarray:
+    def decode_shots_bit_packed(
+        self, *, bit_packed_detection_event_data: np.ndarray
+    ) -> np.ndarray:
         # Sinter/Stim use little-endian bit packing.
         dets = np.unpackbits(
             np.ascontiguousarray(bit_packed_detection_event_data),
@@ -123,8 +125,12 @@ class QectorSinterDecoder(_SINTER_BASE):  # type: ignore[misc,valid-type]
             axis=1,
             bitorder="little",
         )
-        result_packed = compiled.decode_shots_bit_packed(bit_packed_detection_event_data=packed)
-        result = np.unpackbits(result_packed, axis=1, count=compiled.num_observables, bitorder="little")
+        result_packed = compiled.decode_shots_bit_packed(
+            bit_packed_detection_event_data=packed
+        )
+        result = np.unpackbits(
+            result_packed, axis=1, count=compiled.num_observables, bitorder="little"
+        )
         return result[0].astype(np.uint8)  # type: ignore[no-any-return]
 
 
@@ -157,7 +163,9 @@ class _UnionFindSinter:
         self._dec = UnionFindDecoder(model.check_to_qubits(), model.num_errors)
 
     def decode_batch(self, shots):
-        corr = np.asarray(self._dec.batch_decode(np.asarray(shots, np.uint8)), dtype=np.uint8)
+        corr = np.asarray(
+            self._dec.batch_decode(np.asarray(shots, np.uint8)), dtype=np.uint8
+        )
         return ((self._L @ corr.T) & 1).T.astype(np.uint8)
 
 

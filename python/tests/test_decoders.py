@@ -117,8 +117,12 @@ class TestUnionFindDecoder:
         syndrome = np.array([1, 0], dtype=np.uint8)
         corr = dec.decode(syndrome)
         # check 0 (qubits 0-3) must have odd parity, check 1 (qubits 4-7) even.
-        assert int(np.bitwise_xor.reduce(corr[:4])) == 1, f"check 0 not reproduced: {corr}"
-        assert int(np.bitwise_xor.reduce(corr[4:])) == 0, f"check 1 not reproduced: {corr}"
+        assert int(np.bitwise_xor.reduce(corr[:4])) == 1, (
+            f"check 0 not reproduced: {corr}"
+        )
+        assert int(np.bitwise_xor.reduce(corr[4:])) == 0, (
+            f"check 1 not reproduced: {corr}"
+        )
 
     def test_generate_surface_code_checks(self):
         checks, n_qubits = qd.generate_surface_code_checks(5)

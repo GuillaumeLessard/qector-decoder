@@ -45,18 +45,39 @@ def test_run_benchmark_real_ler_from_loaded_stim():
 def test_run_benchmark_unknown_decoder_raises():
     wb = Workbench()
     with pytest.raises(WorkbenchError):
-        wb.run_benchmark({"code": "rotated_surface", "distances": [3], "decoders": ["totally_fake"], "trials": 10})
+        wb.run_benchmark(
+            {
+                "code": "rotated_surface",
+                "distances": [3],
+                "decoders": ["totally_fake"],
+                "trials": 10,
+            }
+        )
 
 
 def test_run_benchmark_unknown_code_raises():
     wb = Workbench()
     with pytest.raises(WorkbenchError):
-        wb.run_benchmark({"code": "not_a_code", "distances": [3], "decoders": ["blossom"], "trials": 10})
+        wb.run_benchmark(
+            {
+                "code": "not_a_code",
+                "distances": [3],
+                "decoders": ["blossom"],
+                "trials": 10,
+            }
+        )
 
 
 def test_submit_job_completes():
     wb = Workbench()
-    jid = wb.submit_job({"code": "rotated_surface", "distances": [3], "decoders": ["blossom"], "trials": 200})
+    jid = wb.submit_job(
+        {
+            "code": "rotated_surface",
+            "distances": [3],
+            "decoders": ["blossom"],
+            "trials": 200,
+        }
+    )
     final = wb.wait(jid, timeout=30)
     assert final["status"] == "completed"
     art = wb.job_artifact(jid)

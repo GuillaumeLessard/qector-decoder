@@ -72,7 +72,9 @@ class DecodeResult:
     # -- validation --------------------------------------------------------
     def verify(self, H: np.ndarray) -> bool:
         """Check ``H @ correction == syndrome (mod 2)`` and cache the result."""
-        ok = bool(np.array_equal((H @ self.as_uint8()) & 1, self.syndrome.astype(np.uint8)))
+        ok = bool(
+            np.array_equal((H @ self.as_uint8()) & 1, self.syndrome.astype(np.uint8))
+        )
         self.syndrome_valid = ok
         return ok
 
@@ -84,7 +86,9 @@ class DecodeResult:
             "hamming_weight": self.hamming_weight,
             "sparse_indices": self.sparse_indices.tolist(),
             "weight": self.weight,
-            "logical_flips": None if self.logical_flips is None else self.logical_flips.astype(int).tolist(),
+            "logical_flips": None
+            if self.logical_flips is None
+            else self.logical_flips.astype(int).tolist(),
             "decode_seconds": self.decode_seconds,
             "backend": self.backend,
             "fallback": self.fallback,
@@ -105,12 +109,15 @@ class DecodeResult:
             f"qubits / checks    : {self.n_qubits} / {self.n_checks}",
             f"syndrome weight    : {int(self.syndrome.sum())}",
             f"correction weight  : {self.hamming_weight}",
-            f"flipped qubits     : {self.sparse_indices.tolist()[:32]}" + (" ..." if self.hamming_weight > 32 else ""),
+            f"flipped qubits     : {self.sparse_indices.tolist()[:32]}"
+            + (" ..." if self.hamming_weight > 32 else ""),
         ]
         if self.weight is not None:
             lines.append(f"matching weight    : {self.weight:.4f}")
         if self.logical_flips is not None:
-            lines.append(f"logical flips      : {self.logical_flips.astype(int).tolist()}")
+            lines.append(
+                f"logical flips      : {self.logical_flips.astype(int).tolist()}"
+            )
         if self.decode_seconds is not None:
             lines.append(f"decode time        : {self.decode_seconds * 1e6:.2f} us")
         lines.append(f"syndrome valid     : {self.syndrome_valid}")

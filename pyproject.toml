@@ -1,11 +1,12 @@
 [build-system]
+requires = ["maturin>=1.14,<2.0"]
+build-backend = "maturin"
 
 [tool.ruff]
 exclude = ["scripts/*"]
-ignore = ["E702", "E402"]
 
-requires = ["maturin>=1.14,<2.0"]
-build-backend = "maturin"
+[tool.ruff.lint]
+ignore = ["E702", "E402"]
 
 [project]
 name = "qector-decoder-v3"

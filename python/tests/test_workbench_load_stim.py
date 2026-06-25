@@ -9,7 +9,10 @@ stim = pytest.importorskip("stim")
 
 def _circuit(d=3):
     return stim.Circuit.generated(
-        "surface_code:rotated_memory_x", distance=d, rounds=d, after_clifford_depolarization=0.01
+        "surface_code:rotated_memory_x",
+        distance=d,
+        rounds=d,
+        after_clifford_depolarization=0.01,
     )
 
 

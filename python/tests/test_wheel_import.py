@@ -36,13 +36,17 @@ def test_compiled_artifact_exists_for_current_interpreter():
     # The extension that THIS interpreter actually loaded must be a real file
     # on disk next to the package.
     loaded = getattr(core, "__file__", None)
-    assert loaded is not None and os.path.isfile(loaded), f"core.__file__ is not a real file: {loaded!r}"
+    assert loaded is not None and os.path.isfile(loaded), (
+        f"core.__file__ is not a real file: {loaded!r}"
+    )
     assert os.path.dirname(os.path.abspath(loaded)) == pkg_dir
 
     # And it must match this interpreter's extension suffix (e.g. cp311 .pyd).
     ext_suffix = sysconfig.get_config_var("EXT_SUFFIX")  # e.g. .cp311-win_amd64.pyd
     expected = os.path.join(pkg_dir, "qector_decoder_v3" + ext_suffix)
-    assert os.path.isfile(expected), f"no compiled extension for this interpreter; expected {expected}"
+    assert os.path.isfile(expected), (
+        f"no compiled extension for this interpreter; expected {expected}"
+    )
 
     # Sanity: at least one .pyd or .so for the package exists.
     artifacts = glob.glob(os.path.join(pkg_dir, "qector_decoder_v3.*.pyd"))
@@ -63,7 +67,9 @@ def test_decoder_from_core_module_decodes_faithfully():
     dec = core.BlossomDecoder(code.check_to_qubits, code.n_qubits, None)
     corr = np.asarray(dec.decode(s), np.uint8)
     assert corr.shape == (code.n_qubits,)
-    assert np.array_equal((H @ corr) & 1, s), "core BlossomDecoder not syndrome-faithful"
+    assert np.array_equal((H @ corr) & 1, s), (
+        "core BlossomDecoder not syndrome-faithful"
+    )
 
     sparse = core.SparseBlossomDecoder(code.check_to_qubits, code.n_qubits)
     corr2 = np.asarray(sparse.decode(s), np.uint8)

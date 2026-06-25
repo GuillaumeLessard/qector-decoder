@@ -50,7 +50,9 @@ def test_collapse_shrinks_circuit_dem(d):
     assert col.is_graphlike
     # collapsed problem must still decode faithfully on real shots
     H = col.check_matrix()
-    decoder = qd.BlossomDecoder(col.check_to_qubits(), col.num_errors, col.weights().tolist())
+    decoder = qd.BlossomDecoder(
+        col.check_to_qubits(), col.num_errors, col.weights().tolist()
+    )
     sampler = _circuit(d).compile_detector_sampler(seed=12345)
     dets, _ = sampler.sample(shots=300, separate_observables=True)
     out = np.asarray(decoder.batch_decode(dets.astype(np.uint8)), dtype=np.uint8)
@@ -109,4 +111,6 @@ def test_qector_matching_is_weight_optimal_on_circuit_dem():
             worse += 1
     # weighted MWPM: QECTOR's total weight matches PyMatching's optimum on
     # nearly every shot (a handful of ties/floating-point cases tolerated).
-    assert worse <= max(5, n // 100), f"QECTOR heavier than PyMatching on {worse}/{n} shots"
+    assert worse <= max(5, n // 100), (
+        f"QECTOR heavier than PyMatching on {worse}/{n} shots"
+    )

@@ -26,7 +26,9 @@ def reports():
     out = {}
     for d in (3, 5, 7):
         code = codes.rotated_surface_code(d)
-        out[d] = bm.benchmark_decoder("blossom", code, n_trials=300, warmup=50, seed=1234)
+        out[d] = bm.benchmark_decoder(
+            "blossom", code, n_trials=300, warmup=50, seed=1234
+        )
     return out
 
 

@@ -30,14 +30,18 @@ def test_two_parallel_mechanisms_combine_by_xor():
     m = dem.parse_dem("error(0.1) D0 D1\nerror(0.2) D0 D1\nerror(0.05) D1 D2\n")
     c = m.collapse_to_graph()
     assert c.num_errors == 2  # the two D0-D1 mechanisms merged
-    assert math.isclose(_merged_prob(c, (0, 1)), _xor_combine([0.1, 0.2]), rel_tol=1e-12)
+    assert math.isclose(
+        _merged_prob(c, (0, 1)), _xor_combine([0.1, 0.2]), rel_tol=1e-12
+    )
 
 
 def test_three_parallel_mechanisms_combine_by_xor():
     m = dem.parse_dem("error(0.05) D0 D1\nerror(0.07) D0 D1\nerror(0.09) D0 D1\n")
     c = m.collapse_to_graph()
     assert c.num_errors == 1
-    assert math.isclose(_merged_prob(c, (0, 1)), _xor_combine([0.05, 0.07, 0.09]), rel_tol=1e-12)
+    assert math.isclose(
+        _merged_prob(c, (0, 1)), _xor_combine([0.05, 0.07, 0.09]), rel_tol=1e-12
+    )
 
 
 def test_zero_probability_member_is_identity():
@@ -50,7 +54,9 @@ def test_tiny_probability_combines_additively():
     m = dem.parse_dem("error(1e-9) D0 D1\nerror(1e-9) D0 D1\n")
     c = m.collapse_to_graph()
     # p ~ 2e-9 to first order
-    assert math.isclose(_merged_prob(c, (0, 1)), _xor_combine([1e-9, 1e-9]), rel_tol=1e-6)
+    assert math.isclose(
+        _merged_prob(c, (0, 1)), _xor_combine([1e-9, 1e-9]), rel_tol=1e-6
+    )
 
 
 def test_probability_near_half():
@@ -89,4 +95,6 @@ def test_collapse_with_repeat_and_shift_blocks():
     assert m.num_errors == 3  # all on D0,D1 (shift 0)
     c = m.collapse_to_graph()
     assert c.num_errors == 1
-    assert math.isclose(_merged_prob(c, (0, 1)), _xor_combine([0.1, 0.1, 0.1]), rel_tol=1e-12)
+    assert math.isclose(
+        _merged_prob(c, (0, 1)), _xor_combine([0.1, 0.1, 0.1]), rel_tol=1e-12
+    )

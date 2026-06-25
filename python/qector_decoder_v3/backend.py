@@ -101,7 +101,9 @@ class AutoDecoder:
     lazily on first use so unavailable hardware costs nothing.
     """
 
-    def __init__(self, check_to_qubits, n_qubits=None, config: Optional[BackendConfig] = None):
+    def __init__(
+        self, check_to_qubits, n_qubits=None, config: Optional[BackendConfig] = None
+    ):
         if not check_to_qubits:
             raise ValueError("check_to_qubits must be non-empty")
         self._c2q = [[int(q) for q in check] for check in check_to_qubits]
@@ -168,7 +170,11 @@ class AutoDecoder:
         """Return the backend that *would* run for a given batch size."""
         if self.config.force is not None:
             return self.config.force
-        if self.config.allow_gpu and batch_size >= self.config.gpu_threshold and (self._cuda_ok or self._opencl_ok):
+        if (
+            self.config.allow_gpu
+            and batch_size >= self.config.gpu_threshold
+            and (self._cuda_ok or self._opencl_ok)
+        ):
             if self.config.prefer == Backend.OPENCL and self._opencl_ok:
                 return Backend.OPENCL
             if self._cuda_ok:
@@ -230,7 +236,9 @@ class AutoDecoder:
             return None
 
     # -- calibration -------------------------------------------------------
-    def calibrate(self, sizes=(64, 256, 1024, 4096, 16384), repeats: int = 3, seed: int = 0):
+    def calibrate(
+        self, sizes=(64, 256, 1024, 4096, 16384), repeats: int = 3, seed: int = 0
+    ):
         """Measure the CPU/GPU crossover on this machine and set ``gpu_threshold``.
 
         Times the Rayon CPU path against the fastest available GPU path on random
@@ -267,7 +275,9 @@ class AutoDecoder:
             self._diag.warnings.append("no GPU available for calibration; GPU disabled")
             self.config.gpu_threshold = 1 << 62
         elif crossover is None:
-            self._diag.warnings.append("GPU never beat CPU in calibration; keeping CPU for all sizes")
+            self._diag.warnings.append(
+                "GPU never beat CPU in calibration; keeping CPU for all sizes"
+            )
             self.config.gpu_threshold = 1 << 62
         else:
             self.config.gpu_threshold = int(crossover)
@@ -319,14 +329,22 @@ class AutoDecoder:
 # helpers
 # ---------------------------------------------------------------------------
 def _as_u8_1d(syndrome) -> np.ndarray:
-    s = syndrome if isinstance(syndrome, np.ndarray) else np.asarray(syndrome, dtype=np.uint8)
+    s = (
+        syndrome
+        if isinstance(syndrome, np.ndarray)
+        else np.asarray(syndrome, dtype=np.uint8)
+    )
     if s.dtype != np.uint8:
         s = s.astype(np.uint8)
     return s.reshape(-1)
 
 
 def _as_u8_2d(syndromes) -> np.ndarray:
-    s = syndromes if isinstance(syndromes, np.ndarray) else np.asarray(syndromes, dtype=np.uint8)
+    s = (
+        syndromes
+        if isinstance(syndromes, np.ndarray)
+        else np.asarray(syndromes, dtype=np.uint8)
+    )
     if s.dtype != np.uint8:
         s = s.astype(np.uint8)
     if s.ndim != 2:

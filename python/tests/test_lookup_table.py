@@ -29,7 +29,9 @@ class TestLookupTableDecoder:
 
         # Teste tous les syndromes possibles (2^4 = 16)
         for syndrome_bits in range(1 << 4):
-            syndrome = np.array([(syndrome_bits >> i) & 1 for i in range(4)], dtype=np.uint8)
+            syndrome = np.array(
+                [(syndrome_bits >> i) & 1 for i in range(4)], dtype=np.uint8
+            )
             lt_corr = lt.decode(syndrome)
             uf_corr = uf.decode(syndrome)
             assert np.array_equal(lt_corr, uf_corr), (
@@ -60,7 +62,9 @@ class TestLookupTableDecoder:
 
             lt_corr = lt.decode(syndrome)
             uf_corr = uf.decode(syndrome)
-            assert np.array_equal(lt_corr, uf_corr), f"Low-weight error: LT={lt_corr.tolist()} != UF={uf_corr.tolist()}"
+            assert np.array_equal(lt_corr, uf_corr), (
+                f"Low-weight error: LT={lt_corr.tolist()} != UF={uf_corr.tolist()}"
+            )
 
     def test_surface_code_d5_fallback(self):
         """Code de surface d=5 - table partielle, fallback pour les syndromes non precalcules."""

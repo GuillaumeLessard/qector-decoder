@@ -87,7 +87,9 @@ class PredecodedDecoder:
             residual = UnionFindDecoder(self._c2q, self.n_qubits)
         else:
             residual = SparseBlossomDecoder(self._c2q, self.n_qubits)
-        self._residual: Union[BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder] = residual
+        self._residual: Union[
+            BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder
+        ] = residual
         self.last_predecoded = 0  # number of defects resolved by the predecoder
 
     def _predecode(self, syndrome: np.ndarray):
@@ -121,7 +123,9 @@ class PredecodedDecoder:
         committed, residual = self._predecode(s)
         if not residual.any():
             return committed
-        res_corr = np.asarray(self._residual.decode(residual), dtype=np.uint8).reshape(-1)
+        res_corr = np.asarray(self._residual.decode(residual), dtype=np.uint8).reshape(
+            -1
+        )
         return (committed ^ res_corr).astype(np.uint8)
 
     def is_matching_graph(self) -> bool:
@@ -131,4 +135,3 @@ class PredecodedDecoder:
         This helper validates that invariant for debugging and documentation purposes.
         """
         return all(len(chk) == 2 for chk in self._qubit_checks if chk)
-

@@ -41,7 +41,9 @@ def _in_span(basis, v):
 
 
 def _bb72():
-    return codes.bivariate_bicycle_code(6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)])
+    return codes.bivariate_bicycle_code(
+        6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)]
+    )
 
 
 def test_residual_always_in_ker_hx():

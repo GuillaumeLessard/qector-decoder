@@ -138,7 +138,9 @@ class DemModel:
             for m in members:
                 p = p * (1.0 - m.probability) + m.probability * (1.0 - p)
             best = min(members, key=lambda m: m.weight)  # lowest weight == most likely
-            merged.append(DemError(probability=p, detectors=sig, observables=best.observables))
+            merged.append(
+                DemError(probability=p, detectors=sig, observables=best.observables)
+            )
 
         return DemModel(
             errors=merged,
@@ -232,7 +234,9 @@ class DemModel:
         """Logical observable flips implied by a correction (``L @ c mod 2``)."""
         c = np.asarray(correction, dtype=np.uint8).reshape(-1)
         if c.shape[0] != self.num_errors:
-            raise ValueError(f"correction has length {c.shape[0]}, expected {self.num_errors}")
+            raise ValueError(
+                f"correction has length {c.shape[0]}, expected {self.num_errors}"
+            )
         return (self.observables_matrix() @ c) & 1
 
     def __repr__(self) -> str:  # pragma: no cover - cosmetic
@@ -350,7 +354,9 @@ class DemParseError(ValueError):
     """Raised when DEM text cannot be parsed."""
 
 
-def _exec_instruction(tok: str, state: dict, errors: List[DemError], coords: dict) -> None:
+def _exec_instruction(
+    tok: str, state: dict, errors: List[DemError], coords: dict
+) -> None:
     if tok.startswith("error("):
         m = _ERROR_RE.match(tok)
         if not m:
@@ -393,7 +399,9 @@ def _exec_instruction(tok: str, state: dict, errors: List[DemError], coords: dic
                 state["max_det"] = max(state["max_det"], d)
                 if coord_str:
                     try:
-                        coords[d] = tuple(float(x) for x in coord_str.split(",") if x.strip())
+                        coords[d] = tuple(
+                            float(x) for x in coord_str.split(",") if x.strip()
+                        )
                     except ValueError:
                         pass
         return

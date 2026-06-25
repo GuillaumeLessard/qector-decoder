@@ -74,7 +74,9 @@ def test_force_cuda_matches_cpu_exactly():
 
 def test_allow_gpu_false_reports_no_gpu():
     code, _, _ = _build()
-    ad = AutoDecoder(code.check_to_qubits, code.n_qubits, BackendConfig(allow_gpu=False))
+    ad = AutoDecoder(
+        code.check_to_qubits, code.n_qubits, BackendConfig(allow_gpu=False)
+    )
     avail = ad.available_backends()
     assert Backend.CUDA not in avail
     assert Backend.OPENCL not in avail

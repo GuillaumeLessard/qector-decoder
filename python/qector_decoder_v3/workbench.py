@@ -132,7 +132,9 @@ class Workbench:
         elif isinstance(source, str):
             circuit = stim.Circuit(source)
         else:
-            raise WorkbenchError(f"cannot load Stim circuit from {type(source).__name__}")
+            raise WorkbenchError(
+                f"cannot load Stim circuit from {type(source).__name__}"
+            )
 
         try:
             sdem = circuit.detector_error_model(decompose_errors=True)
@@ -144,7 +146,9 @@ class Workbench:
             "num_detectors": int(circuit.num_detectors),
             "num_observables": int(circuit.num_observables),
             "num_ticks": int(getattr(circuit, "num_ticks", 0)),
-            "dem_num_errors": int(sdem.num_errors) if hasattr(sdem, "num_errors") else None,
+            "dem_num_errors": int(sdem.num_errors)
+            if hasattr(sdem, "num_errors")
+            else None,
         }
         self._loaded = {**desc, "_circuit": circuit, "_sdem": sdem}
         return desc
@@ -236,7 +240,9 @@ class Workbench:
         decoders = list(spec.get("decoders", ["blossom"]))
         for k in decoders:
             if k not in _DECODER_KINDS:
-                raise WorkbenchError(f"unknown decoder {k!r}; choose from {_DECODER_KINDS}")
+                raise WorkbenchError(
+                    f"unknown decoder {k!r}; choose from {_DECODER_KINDS}"
+                )
         trials = int(spec.get("trials", 1000))
         warmup = int(spec.get("warmup", min(100, trials)))
         p = float(spec.get("error_rate", 0.05))
@@ -254,7 +260,13 @@ class Workbench:
                 if job is not None and job._cancel.is_set():
                     raise _Cancelled()
                 rep = _bm.benchmark_decoder(
-                    kind, code, n_trials=trials, warmup=warmup, p=p, seed=int(spec.get("seed", 1)), measure_memory=True
+                    kind,
+                    code,
+                    n_trials=trials,
+                    warmup=warmup,
+                    p=p,
+                    seed=int(spec.get("seed", 1)),
+                    measure_memory=True,
                 )
                 if ler_ctx is not None:
                     rep["logical_error_rate"] = self._ler(kind, code, ler_ctx, trials)
@@ -293,13 +305,17 @@ class Workbench:
                 from . import dem as _dem
 
                 model = _dem.from_stim(self._loaded["_sdem"])
-                code = (model.collapse_to_graph() if model.is_graphlike else model).to_code()
+                code = (
+                    model.collapse_to_graph() if model.is_graphlike else model
+                ).to_code()
                 return [(code, {"circuit": self._loaded["_circuit"]})]
             raise WorkbenchError("loaded problem is not benchmarkable")
         # generated codes
         fam = spec.get("code", "rotated_surface")
         if fam not in _CODE_FAMILIES:
-            raise WorkbenchError(f"unknown code family {fam!r}; choose from {list(_CODE_FAMILIES)}")
+            raise WorkbenchError(
+                f"unknown code family {fam!r}; choose from {list(_CODE_FAMILIES)}"
+            )
         dists = spec.get("distances", [spec.get("distance", 5)])
         return [(_CODE_FAMILIES[fam](int(d)), None) for d in dists]
 
@@ -311,7 +327,9 @@ class Workbench:
 
             circuit = ler_ctx["circuit"]
             sdem = circuit.detector_error_model(decompose_errors=True)
-            det, obs = circuit.compile_detector_sampler(seed=1).sample(shots=shots, separate_observables=True)
+            det, obs = circuit.compile_detector_sampler(seed=1).sample(
+                shots=shots, separate_observables=True
+            )
             det = det.astype(np.uint8)
             obs = obs.astype(np.uint8)
             m = pymatching_compat.Matching.from_detector_error_model(sdem)
@@ -323,7 +341,9 @@ class Workbench:
     # ------------------------------------------------------------- job queue
     def submit_job(self, spec: dict) -> str:
         """Queue a benchmark job; returns a job id. Runs on a FIFO worker."""
-        job = Job(job_id=uuid.uuid4().hex[:12], spec=dict(spec), submitted_unix=time.time())
+        job = Job(
+            job_id=uuid.uuid4().hex[:12], spec=dict(spec), submitted_unix=time.time()
+        )
         with self._cv:
             self._jobs[job.job_id] = job
             self._queue.append(job.job_id)
@@ -510,7 +530,9 @@ class Workbench:
                     f"faithful={r.get('syndrome_faithful')} "
                     f"p50={r.get('latency_us', {}).get('p50', 0):.2f}us"
                 )
-            fig.text(0.07, 0.95, "\n".join(txt), va="top", family="monospace", fontsize=9)
+            fig.text(
+                0.07, 0.95, "\n".join(txt), va="top", family="monospace", fontsize=9
+            )
             pdf.savefig(fig)
             plt.close(fig)
 
@@ -536,7 +558,11 @@ class Workbench:
             ler_rows = [r for r in rows if r.get("logical_error_rate") is not None]
             if len(ler_rows) >= 2:
                 fig, ax = plt.subplots(figsize=(8.27, 5))
-                ax.plot([r.get("distance") for r in ler_rows], [r.get("logical_error_rate") for r in ler_rows], "o-")
+                ax.plot(
+                    [r.get("distance") for r in ler_rows],
+                    [r.get("logical_error_rate") for r in ler_rows],
+                    "o-",
+                )
                 ax.set_xlabel("distance")
                 ax.set_ylabel("logical error rate")
                 ax.set_yscale("log")

@@ -37,7 +37,9 @@ def _gaps(d, shots, seed=20260622, noise=0.005):
     w = np.asarray(model.weights(), float)
     qm = pymatching_compat.Matching.from_detector_error_model(sdem)
     pmc = pymatching.Matching.from_check_matrix(H, weights=w)
-    det, _ = circ.compile_detector_sampler(seed=seed).sample(shots=shots, separate_observables=True)
+    det, _ = circ.compile_detector_sampler(seed=seed).sample(
+        shots=shots, separate_observables=True
+    )
     det = det.astype(np.uint8)
     gaps = np.empty(shots)
     for i in range(shots):

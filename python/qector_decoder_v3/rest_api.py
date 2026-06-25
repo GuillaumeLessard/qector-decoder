@@ -86,7 +86,9 @@ def _create_fastapi_app() -> FastAPI:
     @app.post("/decode", response_model=DecodeResponse)
     async def decode_endpoint(req: DecodeRequest) -> Dict[str, Any]:  # type: ignore[valid-type]
         if not req.check_to_qubits:
-            raise HTTPException(status_code=400, detail="check_to_qubits must be non-empty")
+            raise HTTPException(
+                status_code=400, detail="check_to_qubits must be non-empty"
+            )
 
         try:
             dec_any: Union[BatchDecoder, UnionFindDecoder]

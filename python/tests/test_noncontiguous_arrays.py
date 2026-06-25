@@ -52,7 +52,9 @@ def test_batch_decode_fortran_ordered_2d():
     assert Sf.flags["F_CONTIGUOUS"] and not Sf.flags["C_CONTIGUOUS"]
 
     dec = qd.BlossomDecoder(code.check_to_qubits, nq)
-    out = np.asarray(dec.batch_decode(np.ascontiguousarray(Sf)), np.uint8).reshape(N, -1)
+    out = np.asarray(dec.batch_decode(np.ascontiguousarray(Sf)), np.uint8).reshape(
+        N, -1
+    )
     assert out.shape == (N, nq)
     for i in range(N):
         assert np.array_equal((H @ out[i]) & 1, S[i]), f"row {i} not faithful"

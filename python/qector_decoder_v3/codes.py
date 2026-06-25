@@ -126,7 +126,9 @@ class Code:
                 deg[q] += 1
         return int(deg.max()) if self.n_qubits else 0
 
-    def random_error(self, p: float, rng: Optional[np.random.Generator] = None) -> np.ndarray:
+    def random_error(
+        self, p: float, rng: Optional[np.random.Generator] = None
+    ) -> np.ndarray:
         """Sample an i.i.d. bit-flip error vector of shape ``(n_qubits,)``."""
         rng = rng or np.random.default_rng()
         return (rng.random(self.n_qubits) < p).astype(np.uint8)
@@ -357,7 +359,9 @@ def heavy_hex_code(distance: int) -> Code:
 # ---------------------------------------------------------------------------
 # Arbitrary parity-check matrices (LDPC / hypergraph-product / bicycle / custom)
 # ---------------------------------------------------------------------------
-def from_parity_check_matrix(H: Any, name: str = "custom", distance: Optional[int] = None) -> Code:
+def from_parity_check_matrix(
+    H: Any, name: str = "custom", distance: Optional[int] = None
+) -> Code:
     """Build a :class:`Code` from an arbitrary GF(2) parity-check matrix ``H``.
 
     Accepts a dense ``numpy`` array or any ``scipy.sparse`` matrix.  Rows are
@@ -368,7 +372,9 @@ def from_parity_check_matrix(H: Any, name: str = "custom", distance: Optional[in
     if arr.ndim != 2:
         raise ValueError(f"H must be 2D, got shape {arr.shape}")
     n_checks, n_qubits = arr.shape
-    check_to_qubits = [sorted(int(c) for c in np.nonzero(arr[r])[0]) for r in range(n_checks)]
+    check_to_qubits = [
+        sorted(int(c) for c in np.nonzero(arr[r])[0]) for r in range(n_checks)
+    ]
     return Code(
         name=name,
         check_to_qubits=check_to_qubits,

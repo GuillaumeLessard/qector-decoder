@@ -39,7 +39,10 @@ def test_gpu_memory_bounded():
     rng = np.random.default_rng(9)
     batch_n = 16384
     syns = np.array(
-        [np.asarray(code.syndrome(code.random_error(0.08, rng)), np.uint8) for _ in range(batch_n)],
+        [
+            np.asarray(code.syndrome(code.random_error(0.08, rng)), np.uint8)
+            for _ in range(batch_n)
+        ],
         np.uint8,
     )
 
@@ -49,7 +52,9 @@ def test_gpu_memory_bounded():
     rss_after_call = []
     for call in range(10):
         out = np.asarray(dec.batch_decode(syns), np.uint8).reshape(batch_n, nq)
-        assert np.array_equal((H @ out.T).T & 1, syns), f"GPU batch_decode unfaithful on call {call}"
+        assert np.array_equal((H @ out.T).T & 1, syns), (
+            f"GPU batch_decode unfaithful on call {call}"
+        )
         gc.collect()
         rss_after_call.append(_rss_mib(proc))
 

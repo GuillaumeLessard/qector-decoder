@@ -23,7 +23,9 @@ def test_stored_config_and_round_counting():
     H = code.parity_check_matrix()
     nq = code.n_qubits
     W, f = 6, 0.7
-    dec = qd.SlidingWindowDecoder(code.check_to_qubits, nq, window_size=W, decay_factor=f)
+    dec = qd.SlidingWindowDecoder(
+        code.check_to_qubits, nq, window_size=W, decay_factor=f
+    )
     assert dec.window_size == W
     assert dec.decay_factor == pytest.approx(f)
     assert dec.current_round == 0
@@ -42,7 +44,9 @@ def test_stored_config_and_round_counting():
 def test_flush_resets_current_round():
     code = codes.ring_code(8)
     nq = code.n_qubits
-    dec = qd.SlidingWindowDecoder(code.check_to_qubits, nq, window_size=4, decay_factor=0.5)
+    dec = qd.SlidingWindowDecoder(
+        code.check_to_qubits, nq, window_size=4, decay_factor=0.5
+    )
     H = code.parity_check_matrix()
     rng = np.random.default_rng(3)
     for _ in range(7):
@@ -63,7 +67,9 @@ def test_flush_resets_current_round():
 def test_sliding_decode_is_syndrome_faithful(code):
     H = code.parity_check_matrix()
     nq = code.n_qubits
-    dec = qd.SlidingWindowDecoder(code.check_to_qubits, nq, window_size=5, decay_factor=0.8)
+    dec = qd.SlidingWindowDecoder(
+        code.check_to_qubits, nq, window_size=5, decay_factor=0.8
+    )
     rng = np.random.default_rng(77)
     for _ in range(150):
         s = _reachable(H, nq, rng)

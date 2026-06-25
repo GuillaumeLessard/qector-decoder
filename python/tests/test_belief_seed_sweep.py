@@ -60,7 +60,9 @@ def test_belief_seed_sweep_pooled_le_pymatching():
     shots_total = 0
 
     for seed in seeds:
-        det, obs = circ.compile_detector_sampler(seed=seed).sample(shots=N, separate_observables=True)
+        det, obs = circ.compile_detector_sampler(seed=seed).sample(
+            shots=N, separate_observables=True
+        )
         det = det.astype(np.uint8)
         obs = obs.astype(np.uint8)
 

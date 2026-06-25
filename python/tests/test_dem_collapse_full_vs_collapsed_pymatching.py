@@ -39,7 +39,9 @@ def test_full_vs_collapsed_ler_equivalent(d):
         after_reset_flip_probability=0.005,
     )
     sdem = circ.detector_error_model(decompose_errors=True)
-    det, obs = circ.compile_detector_sampler(seed=7).sample(shots=shots, separate_observables=True)
+    det, obs = circ.compile_detector_sampler(seed=7).sample(
+        shots=shots, separate_observables=True
+    )
     det = det.astype(np.uint8)
     obs = obs.astype(np.uint8)
 
@@ -64,13 +66,18 @@ def test_full_vs_collapsed_ler_equivalent(d):
 
 def test_collapsed_graph_decode_is_faithful():
     circ = stim.Circuit.generated(
-        "surface_code:rotated_memory_x", distance=5, rounds=5, after_clifford_depolarization=0.006
+        "surface_code:rotated_memory_x",
+        distance=5,
+        rounds=5,
+        after_clifford_depolarization=0.006,
     )
     sdem = circ.detector_error_model(decompose_errors=True)
     model = dem.from_stim(sdem).collapse_to_graph()
     H = model.check_matrix()
     dec = model.make_decoder("blossom")
-    det, _ = circ.compile_detector_sampler(seed=3).sample(shots=1000, separate_observables=True)
+    det, _ = circ.compile_detector_sampler(seed=3).sample(
+        shots=1000, separate_observables=True
+    )
     det = det.astype(np.uint8)
     for i in range(len(det)):
         c = np.asarray(dec.decode(det[i]), np.uint8)

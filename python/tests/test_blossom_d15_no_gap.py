@@ -38,14 +38,24 @@ def test_d15_logical_error_parity():
         after_reset_flip_probability=0.005,
     )
     sdem = circ.detector_error_model(decompose_errors=True)
-    det, obs = circ.compile_detector_sampler(seed=20260622).sample(shots=shots, separate_observables=True)
+    det, obs = circ.compile_detector_sampler(seed=20260622).sample(
+        shots=shots, separate_observables=True
+    )
     det = det.astype(np.uint8)
     obs = obs.astype(np.uint8)
 
     qm = pymatching_compat.Matching.from_detector_error_model(sdem)
     pm = pymatching.Matching.from_detector_error_model(sdem)
-    q_err = int(np.any(np.asarray(qm.decode_batch(det), np.uint8).reshape(shots, -1) != obs, axis=1).sum())
-    p_err = int(np.any(np.asarray(pm.decode_batch(det), np.uint8).reshape(shots, -1) != obs, axis=1).sum())
+    q_err = int(
+        np.any(
+            np.asarray(qm.decode_batch(det), np.uint8).reshape(shots, -1) != obs, axis=1
+        ).sum()
+    )
+    p_err = int(
+        np.any(
+            np.asarray(pm.decode_batch(det), np.uint8).reshape(shots, -1) != obs, axis=1
+        ).sum()
+    )
 
     lo_p, hi_p = _wilson(p_err, shots)
     lo_q, hi_q = _wilson(q_err, shots)

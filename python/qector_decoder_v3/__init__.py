@@ -105,22 +105,20 @@ except ImportError:
 try:
     from .qector_decoder_v3 import run_grpc_server, start_metrics_server
 except ImportError:
+
     def start_metrics_server(*_, **__):
         raise NotImplementedError("start_metrics_server is not available in this build")
+
     def run_grpc_server(*_, **__):
         raise NotImplementedError("run_grpc_server is not available in this build")
 
+
 import numpy as np
 
-from .stim_compat import (
-    from_stim_detector_error_model,
-    stim_circuit_to_check_matrix,
-    to_stim_decoder,
-    stim_decoder_from_dem,
-)
 
 try:
     from importlib.metadata import version, PackageNotFoundError
+
     __version__ = version("qector-decoder")
 except PackageNotFoundError:
     __version__ = "0.5.3"
@@ -288,7 +286,9 @@ class SlidingWindowDecoder:
     the standard Union-Find decoder.
     """
 
-    def __init__(self, check_to_qubits, n_qubits=None, window_size=10, decay_factor=0.8):
+    def __init__(
+        self, check_to_qubits, n_qubits=None, window_size=10, decay_factor=0.8
+    ):
         if not check_to_qubits:
             raise ValueError("check_to_qubits must be non-empty")
         c2q = [[int(q) for q in check] for check in check_to_qubits]
@@ -760,9 +760,13 @@ class NeuralPredecoder:
         corrections = np.ascontiguousarray(np.asarray(corrections, dtype=np.uint8))
         # Validate dimensions: expect 2‑D arrays (samples, features)
         if syndromes.ndim != 2:
-            raise ValueError(f"syndromes must be a 2‑D array, got shape {syndromes.shape}")
+            raise ValueError(
+                f"syndromes must be a 2‑D array, got shape {syndromes.shape}"
+            )
         if corrections.ndim != 2:
-            raise ValueError(f"corrections must be a 2‑D array, got shape {corrections.shape}")
+            raise ValueError(
+                f"corrections must be a 2‑D array, got shape {corrections.shape}"
+            )
         self._inner.train(syndromes, corrections, n_epochs, learning_rate)
 
     def predict(self, syndrome):
@@ -808,7 +812,9 @@ class GNNPredecoder:
     NODE_FEAT_DIM = 10
     EDGE_FEAT_DIM = 8
 
-    def __init__(self, node_feat_dim=None, edge_feat_dim=None, hidden_size=16, n_layers=2):
+    def __init__(
+        self, node_feat_dim=None, edge_feat_dim=None, hidden_size=16, n_layers=2
+    ):
         """Create a GNNPredecoder.
 
         If node_feat_dim and edge_feat_dim are not provided, uses the standard
@@ -841,7 +847,9 @@ class GNNPredecoder:
 
     def forward(self, graph):
         """Predict adjusted edge weights for a DetectorGraph."""
-        return self._inner.forward(graph._inner if isinstance(graph, DetectorGraph) else graph)
+        return self._inner.forward(
+            graph._inner if isinstance(graph, DetectorGraph) else graph
+        )
 
     def train(self, graphs, targets, n_epochs):
         """Train the GNN on a list of graphs and target edge weights."""
@@ -850,7 +858,9 @@ class GNNPredecoder:
 
     def predict_with_node_probs(self, graph):
         """Predict edge weights and node error probabilities."""
-        return self._inner.predict_with_node_probs(graph._inner if isinstance(graph, DetectorGraph) else graph)
+        return self._inner.predict_with_node_probs(
+            graph._inner if isinstance(graph, DetectorGraph) else graph
+        )
 
 
 class DetectorGraph:
@@ -949,7 +959,13 @@ class HybridDecoder:
         c2q = [[int(q) for q in check] for check in check_to_qubits]
         nq = None if n_qubits is None else int(n_qubits)
         self._inner = _RustHybridDecoder(
-            c2q, nq, check_positions, check_types, base_weights, gnn_hidden_size, gnn_n_layers
+            c2q,
+            nq,
+            check_positions,
+            check_types,
+            base_weights,
+            gnn_hidden_size,
+            gnn_n_layers,
         )
 
     def decode_hybrid(self, syndrome):

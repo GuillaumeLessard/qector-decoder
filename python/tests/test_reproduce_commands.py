@@ -73,4 +73,6 @@ def test_script_help_parses(script):
     )
     # argparse prints a usage line on --help.
     combined = (proc.stdout + proc.stderr).lower()
-    assert "usage" in combined, f"{script} --help produced no usage text:\n{proc.stdout}"
+    assert "usage" in combined, (
+        f"{script} --help produced no usage text:\n{proc.stdout}"
+    )

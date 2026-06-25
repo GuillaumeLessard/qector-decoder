@@ -39,7 +39,9 @@ def test_flush_clears_stale_state():
         c_ref = np.asarray(ref.decode(s), np.uint8)
 
         assert np.array_equal((H @ c_after_flush) & 1, s)
-        assert np.array_equal(c_after_flush, c_ref), "flush() left stale state: post-flush decode != fresh decode"
+        assert np.array_equal(c_after_flush, c_ref), (
+            "flush() left stale state: post-flush decode != fresh decode"
+        )
 
 
 def test_flush_reproducibility_across_repeated_flush():
@@ -64,4 +66,6 @@ def test_flush_reproducibility_across_repeated_flush():
 
     first = results[0]
     for c in results[1:]:
-        assert np.array_equal(c, first), "flush() not reproducible: same fixed syndrome gave differing corrections"
+        assert np.array_equal(c, first), (
+            "flush() not reproducible: same fixed syndrome gave differing corrections"
+        )

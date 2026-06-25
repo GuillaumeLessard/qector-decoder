@@ -46,7 +46,9 @@ def _decode_failures(d, N, seed, basis="x", p=0.006):
         after_reset_flip_probability=p,
     )
     sdem = circ.detector_error_model(decompose_errors=True)
-    det, obs = circ.compile_detector_sampler(seed=seed).sample(shots=N, separate_observables=True)
+    det, obs = circ.compile_detector_sampler(seed=seed).sample(
+        shots=N, separate_observables=True
+    )
     det = det.astype(np.uint8)
     obs = obs.astype(np.uint8)
 

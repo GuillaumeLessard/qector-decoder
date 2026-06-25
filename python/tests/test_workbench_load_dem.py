@@ -36,7 +36,10 @@ def test_load_dem_from_file_with_spaces(tmp_path):
 def test_load_dem_from_stim_object():
     stim = pytest.importorskip("stim")
     circ = stim.Circuit.generated(
-        "surface_code:rotated_memory_x", distance=3, rounds=3, after_clifford_depolarization=0.01
+        "surface_code:rotated_memory_x",
+        distance=3,
+        rounds=3,
+        after_clifford_depolarization=0.01,
     )
     sdem = circ.detector_error_model(decompose_errors=True)
     wb = Workbench()
