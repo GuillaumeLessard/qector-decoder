@@ -5,8 +5,8 @@
     "platform": "Windows-10-10.0.26100-SP0",
     "machine": "AMD64",
     "processor": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
-    "pip_version_reported": "0.5.1",
-    "module___version__": "0.5.0",
+    "pip_version_reported": "0.5.3",
+    "module___version__": "0.5.3",
     "numpy": "2.2.6",
     "scipy": "1.17.1",
     "stim": "1.16.0",
@@ -25,8 +25,8 @@
     "A_environment": [
       {
         "name": "version_metadata_consistency",
-        "passed": false,
-        "detail": "pip=0.5.1 vs __version__=0.5.0"
+        "passed": true,
+        "detail": "pip=0.5.3 vs __version__=0.5.3"
       }
     ],
     "B_codes": [

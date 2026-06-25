@@ -44,12 +44,12 @@ The v0.5 local validation report records:
 | Rust unit tests | Core Rust modules and backend internals | 87 passed |
 | Total | Python + Rust | 919 passed, 0 deferred |
 
-## 3a. Independent PyPI validation (v0.5.1 package, 2026-06-24)
+## 3a. Independent PyPI validation (v0.5.3 package, 2026-06-25)
 
-86/87 automated checks passed across a primary 20k-shot run and a 5× re-test at
+87/87 automated checks passed across a primary 20k-shot run and a 5× re-test at
 100k shots/pt (seed 777). Platform: Windows 10, AMD Ryzen 16-core, NVIDIA GTX
 1660 Ti CUDA 7.5, Python 3.11.0, NumPy 2.2.6, PyMatching 2.4.0, stim/sinter 1.16.0.
-Full artifact: `benchmark_results/validation_v051.json`.
+Full artifact: `benchmark_results/results_v053_retest.json`.
 
 ### Structural validation (17 code constructions, Suite B)
 
@@ -88,7 +88,7 @@ All 17 code families validate: `repetition_code(d=3–11)`, `ring_code(d=3–7)`
 
 ### Workbench latency (Suite I — repetition d=5, Blossom, 1000 trials)
 
-throughput: 277,778 dec/s · p50 3.60 µs · p90 5.70 µs · p99 11.61 µs · max 46.8 µs · syndrome_faithful: True
+throughput: 285,713 dec/s · p50 3.50 µs · p90 5.20 µs · p99 9.50 µs · max 28.7 µs · syndrome_faithful: True
 
 ### GPU validation (Suite J — GTX 1660 Ti, 100k shots)
 

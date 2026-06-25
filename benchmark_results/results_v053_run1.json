@@ -5,8 +5,8 @@
     "platform": "Windows-10-10.0.26100-SP0",
     "machine": "AMD64",
     "processor": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
-    "pip_version_reported": "0.5.1",
-    "module___version__": "0.5.0",
+    "pip_version_reported": "0.5.3",
+    "module___version__": "0.5.3",
     "numpy": "2.2.6",
     "scipy": "1.17.1",
     "stim": "1.16.0",
@@ -19,101 +19,288 @@
     "opencl_is_available": false,
     "CUDABatchDecoder.is_available": true,
     "OpenCLBatchDecoder.is_available": false,
-    "total_seconds": 29.22
+    "total_seconds": 25.34
   },
   "suites": {
     "A_environment": [
       {
         "name": "version_metadata_consistency",
-        "passed": false,
-        "detail": "pip=0.5.1 vs __version__=0.5.0"
+        "passed": true,
+        "detail": "pip=0.5.3 vs __version__=0.5.3"
       }
     ],
     "B_codes": [
       {
         "name": "repetition_code(d=3)",
-        "passed": false,
-        "error": "TypeError(\"int() argument must be a string, a bytes-like object or a real number, not 'method'\")"
+        "passed": true,
+        "n_qubits": 3,
+        "n_checks": 2,
+        "H_shape": [
+          2,
+          3
+        ],
+        "H_rank": 2,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 3,
+        "max_qubit_degree": 2
       },
       {
         "name": "repetition_code(d=5)",
-        "passed": false,
-        "error": "TypeError(\"int() argument must be a string, a bytes-like object or a real number, not 'method'\")"
+        "passed": true,
+        "n_qubits": 5,
+        "n_checks": 4,
+        "H_shape": [
+          4,
+          5
+        ],
+        "H_rank": 4,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 5,
+        "max_qubit_degree": 2
       },
       {
         "name": "repetition_code(d=7)",
-        "passed": false,
-        "error": "TypeError(\"int() argument must be a string, a bytes-like object or a real number, not 'method'\")"
+        "passed": true,
+        "n_qubits": 7,
+        "n_checks": 6,
+        "H_shape": [
+          6,
+          7
+        ],
+        "H_rank": 6,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 7,
+        "max_qubit_degree": 2
       },
       {
         "name": "repetition_code(d=9)",
-        "passed": false,
-        "error": "TypeError(\"int() argument must be a string, a bytes-like object or a real number, not 'method'\")"
+        "passed": true,
+        "n_qubits": 9,
+        "n_checks": 8,
+        "H_shape": [
+          8,
+          9
+        ],
+        "H_rank": 8,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 9,
+        "max_qubit_degree": 2
       },
       {
         "name": "repetition_code(d=11)",
-        "passed": false,
-        "error": "TypeError(\"int() argument must be a string, a bytes-like object or a real number, not 'method'\")"
+        "passed": true,
+        "n_qubits": 11,
+        "n_checks": 10,
+        "H_shape": [
+          10,
+          11
+        ],
+        "H_rank": 10,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 11,
+        "max_qubit_degree": 2
       },
       {
         "name": "ring_code(d=3)",
-        "passed": false,
-        "error": "TypeError(\"int() argument must be a string, a bytes-like object or a real number, not 'method'\")"
+        "passed": true,
+        "n_qubits": 3,
+        "n_checks": 3,
+        "H_shape": [
+          3,
+          3
+        ],
+        "H_rank": 3,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 3,
+        "max_qubit_degree": 2
       },
       {
         "name": "ring_code(d=5)",
-        "passed": false,
-        "error": "TypeError(\"int() argument must be a string, a bytes-like object or a real number, not 'method'\")"
+        "passed": true,
+        "n_qubits": 5,
+        "n_checks": 5,
+        "H_shape": [
+          5,
+          5
+        ],
+        "H_rank": 5,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 5,
+        "max_qubit_degree": 2
       },
       {
         "name": "ring_code(d=7)",
-        "passed": false,
-        "error": "TypeError(\"int() argument must be a string, a bytes-like object or a real number, not 'method'\")"
+        "passed": true,
+        "n_qubits": 7,
+        "n_checks": 7,
+        "H_shape": [
+          7,
+          7
+        ],
+        "H_rank": 7,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 7,
+        "max_qubit_degree": 2
       },
       {
         "name": "rotated_surface_code(d=3)",
-        "passed": false,
-        "error": "TypeError(\"int() argument must be a string, a bytes-like object or a real number, not 'method'\")"
+        "passed": true,
+        "n_qubits": 9,
+        "n_checks": 4,
+        "H_shape": [
+          4,
+          9
+        ],
+        "H_rank": 4,
+        "n_logicals": 1,
+        "logicals_commute": true,
+        "is_matching_graph": true,
+        "distance_meta": 3,
+        "max_qubit_degree": 2
       },
       {
         "name": "rotated_surface_code(d=5)",
-        "passed": false,
-        "error": "TypeError(\"int() argument must be a string, a bytes-like object or a real number, not 'method'\")"
+        "passed": true,
+        "n_qubits": 25,
+        "n_checks": 12,
+        "H_shape": [
+          12,
+          25
+        ],
+        "H_rank": 12,
+        "n_logicals": 1,
+        "logicals_commute": true,
+        "is_matching_graph": true,
+        "distance_meta": 5,
+        "max_qubit_degree": 2
       },
       {
         "name": "rotated_surface_code(d=7)",
-        "passed": false,
-        "error": "TypeError(\"int() argument must be a string, a bytes-like object or a real number, not 'method'\")"
+        "passed": true,
+        "n_qubits": 49,
+        "n_checks": 24,
+        "H_shape": [
+          24,
+          49
+        ],
+        "H_rank": 24,
+        "n_logicals": 1,
+        "logicals_commute": true,
+        "is_matching_graph": true,
+        "distance_meta": 7,
+        "max_qubit_degree": 2
       },
       {
         "name": "unrotated_surface_code(d=3)",
-        "passed": false,
-        "error": "TypeError(\"int() argument must be a string, a bytes-like object or a real number, not 'method'\")"
+        "passed": true,
+        "n_qubits": 12,
+        "n_checks": 9,
+        "H_shape": [
+          9,
+          12
+        ],
+        "H_rank": 8,
+        "n_logicals": 0,
+        "logicals_commute": null,
+        "is_matching_graph": true,
+        "distance_meta": 3,
+        "max_qubit_degree": 2
       },
       {
         "name": "unrotated_surface_code(d=5)",
-        "passed": false,
-        "error": "TypeError(\"int() argument must be a string, a bytes-like object or a real number, not 'method'\")"
+        "passed": true,
+        "n_qubits": 40,
+        "n_checks": 25,
+        "H_shape": [
+          25,
+          40
+        ],
+        "H_rank": 24,
+        "n_logicals": 0,
+        "logicals_commute": null,
+        "is_matching_graph": true,
+        "distance_meta": 5,
+        "max_qubit_degree": 2
       },
       {
         "name": "toric_code(d=3)",
-        "passed": false,
-        "error": "TypeError(\"int() argument must be a string, a bytes-like object or a real number, not 'method'\")"
+        "passed": true,
+        "n_qubits": 18,
+        "n_checks": 9,
+        "H_shape": [
+          9,
+          18
+        ],
+        "H_rank": 9,
+        "n_logicals": 0,
+        "logicals_commute": null,
+        "is_matching_graph": true,
+        "distance_meta": 3,
+        "max_qubit_degree": 2
       },
       {
         "name": "toric_code(d=5)",
-        "passed": false,
-        "error": "TypeError(\"int() argument must be a string, a bytes-like object or a real number, not 'method'\")"
+        "passed": true,
+        "n_qubits": 50,
+        "n_checks": 25,
+        "H_shape": [
+          25,
+          50
+        ],
+        "H_rank": 25,
+        "n_logicals": 0,
+        "logicals_commute": null,
+        "is_matching_graph": true,
+        "distance_meta": 5,
+        "max_qubit_degree": 2
       },
       {
         "name": "heavy_hex_code(d=3)",
-        "passed": false,
-        "error": "TypeError(\"int() argument must be a string, a bytes-like object or a real number, not 'method'\")"
+        "passed": true,
+        "n_qubits": 9,
+        "n_checks": 6,
+        "H_shape": [
+          6,
+          9
+        ],
+        "H_rank": 6,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 3,
+        "max_qubit_degree": 2
       },
       {
         "name": "heavy_hex_code(d=5)",
-        "passed": false,
-        "error": "TypeError(\"int() argument must be a string, a bytes-like object or a real number, not 'method'\")"
+        "passed": true,
+        "n_qubits": 25,
+        "n_checks": 20,
+        "H_shape": [
+          20,
+          25
+        ],
+        "H_rank": 20,
+        "n_logicals": 1,
+        "logicals_commute": false,
+        "is_matching_graph": true,
+        "distance_meta": 5,
+        "max_qubit_degree": 2
       }
     ],
     "C_validity": [
@@ -122,210 +309,210 @@
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 12.03
+        "us_per_decode": 9.32
       },
       {
         "name": "FastUnionFindDecoder|repetition_code(d=5)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 10.75
+        "us_per_decode": 9.52
       },
       {
         "name": "BlossomDecoder|repetition_code(d=5)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 12.07
+        "us_per_decode": 10.55
       },
       {
         "name": "SparseBlossomDecoder|repetition_code(d=5)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 9.11
+        "us_per_decode": 11.85
       },
       {
         "name": "CPUBatchDecoder|repetition_code(d=5)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 9.8
+        "us_per_decode": 11.18
       },
       {
         "name": "LookupTableDecoder|repetition_code(d=5)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 11.57
+        "us_per_decode": 8.69
       },
       {
         "name": "UnionFindDecoder|repetition_code(d=9)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 10.06
+        "us_per_decode": 10.02
       },
       {
         "name": "FastUnionFindDecoder|repetition_code(d=9)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 9.96
+        "us_per_decode": 10.19
       },
       {
         "name": "BlossomDecoder|repetition_code(d=9)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 12.32
+        "us_per_decode": 10.59
       },
       {
         "name": "SparseBlossomDecoder|repetition_code(d=9)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 17.39
+        "us_per_decode": 10.59
       },
       {
         "name": "CPUBatchDecoder|repetition_code(d=9)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 8.82
+        "us_per_decode": 9.67
       },
       {
         "name": "LookupTableDecoder|repetition_code(d=9)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 9.38
+        "us_per_decode": 10.74
       },
       {
         "name": "UnionFindDecoder|rotated_surface_code(d=3)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 8.65
+        "us_per_decode": 12.21
       },
       {
         "name": "FastUnionFindDecoder|rotated_surface_code(d=3)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 10.13
+        "us_per_decode": 11.44
       },
       {
         "name": "BlossomDecoder|rotated_surface_code(d=3)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 11.41
+        "us_per_decode": 14.82
       },
       {
         "name": "SparseBlossomDecoder|rotated_surface_code(d=3)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 15.53
+        "us_per_decode": 11.47
       },
       {
         "name": "CPUBatchDecoder|rotated_surface_code(d=3)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 14.47
+        "us_per_decode": 9.48
       },
       {
         "name": "LookupTableDecoder|rotated_surface_code(d=3)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 9.84
+        "us_per_decode": 9.5
       },
       {
         "name": "UnionFindDecoder|rotated_surface_code(d=5)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 13.69
+        "us_per_decode": 10.05
       },
       {
         "name": "FastUnionFindDecoder|rotated_surface_code(d=5)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 13.37
+        "us_per_decode": 12.13
       },
       {
         "name": "BlossomDecoder|rotated_surface_code(d=5)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 12.68
+        "us_per_decode": 16.83
       },
       {
         "name": "SparseBlossomDecoder|rotated_surface_code(d=5)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 21.63
+        "us_per_decode": 29.24
       },
       {
         "name": "CPUBatchDecoder|rotated_surface_code(d=5)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 14.16
+        "us_per_decode": 10.66
       },
       {
         "name": "LookupTableDecoder|rotated_surface_code(d=5)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 11.34
+        "us_per_decode": 9.33
       },
       {
         "name": "UnionFindDecoder|ring_code(d=5)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 10.27
+        "us_per_decode": 8.23
       },
       {
         "name": "FastUnionFindDecoder|ring_code(d=5)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 11.24
+        "us_per_decode": 8.17
       },
       {
         "name": "BlossomDecoder|ring_code(d=5)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 10.37
+        "us_per_decode": 9.23
       },
       {
         "name": "SparseBlossomDecoder|ring_code(d=5)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 9.54
+        "us_per_decode": 8.44
       },
       {
         "name": "CPUBatchDecoder|ring_code(d=5)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 9.35
+        "us_per_decode": 12.79
       },
       {
         "name": "LookupTableDecoder|ring_code(d=5)",
         "passed": true,
         "validity_rate": 1.0,
         "n": 2000,
-        "us_per_decode": 10.01
+        "us_per_decode": 14.18
       }
     ],
     "D_montecarlo": [
@@ -1469,7 +1656,7 @@
         "name": "UnionFindDecoder|repetition_code(d=9)",
         "passed": true,
         "valid_fraction": 1.0,
-        "throughput_shots_per_s": 1066485,
+        "throughput_shots_per_s": 1057552,
         "batch_equals_single": true,
         "n": 5000
       },
@@ -1477,7 +1664,7 @@
         "name": "BlossomDecoder|repetition_code(d=9)",
         "passed": true,
         "valid_fraction": 1.0,
-        "throughput_shots_per_s": 1926114,
+        "throughput_shots_per_s": 2697017,
         "batch_equals_single": true,
         "n": 5000
       },
@@ -1485,7 +1672,7 @@
         "name": "SparseBlossomDecoder|repetition_code(d=9)",
         "passed": true,
         "valid_fraction": 1.0,
-        "throughput_shots_per_s": 1611500,
+        "throughput_shots_per_s": 1804142,
         "batch_equals_single": true,
         "n": 5000
       },
@@ -1493,7 +1680,7 @@
         "name": "CPUBatchDecoder|repetition_code(d=9)",
         "passed": true,
         "valid_fraction": 1.0,
-        "throughput_shots_per_s": 354746,
+        "throughput_shots_per_s": 343211,
         "batch_equals_single": true,
         "n": 5000
       },
@@ -1501,7 +1688,7 @@
         "name": "BatchDecoder|repetition_code(d=9)",
         "passed": true,
         "valid_fraction": 1.0,
-        "throughput_shots_per_s": 2213565,
+        "throughput_shots_per_s": 2668090,
         "batch_equals_single": null,
         "n": 5000
       },
@@ -1509,14 +1696,14 @@
         "name": "BatchDecoder.parallel|repetition_code(d=9)",
         "passed": true,
         "valid_fraction": 1.0,
-        "throughput_shots_per_s": 1844950,
+        "throughput_shots_per_s": 1875961,
         "n": 5000
       },
       {
         "name": "UnionFindDecoder|rotated_surface_code(d=5)",
         "passed": true,
         "valid_fraction": 1.0,
-        "throughput_shots_per_s": 2164877,
+        "throughput_shots_per_s": 2347528,
         "batch_equals_single": true,
         "n": 5000
       },
@@ -1524,7 +1711,7 @@
         "name": "BlossomDecoder|rotated_surface_code(d=5)",
         "passed": true,
         "valid_fraction": 1.0,
-        "throughput_shots_per_s": 1696468,
+        "throughput_shots_per_s": 1998881,
         "batch_equals_single": true,
         "n": 5000
       },
@@ -1532,7 +1719,7 @@
         "name": "SparseBlossomDecoder|rotated_surface_code(d=5)",
         "passed": true,
         "valid_fraction": 1.0,
-        "throughput_shots_per_s": 735586,
+        "throughput_shots_per_s": 841652,
         "batch_equals_single": false,
         "n": 5000
       },
@@ -1540,7 +1727,7 @@
         "name": "CPUBatchDecoder|rotated_surface_code(d=5)",
         "passed": true,
         "valid_fraction": 1.0,
-        "throughput_shots_per_s": 231765,
+        "throughput_shots_per_s": 246104,
         "batch_equals_single": true,
         "n": 5000
       },
@@ -1548,7 +1735,7 @@
         "name": "BatchDecoder|rotated_surface_code(d=5)",
         "passed": true,
         "valid_fraction": 1.0,
-        "throughput_shots_per_s": 1061774,
+        "throughput_shots_per_s": 1599539,
         "batch_equals_single": null,
         "n": 5000
       },
@@ -1556,7 +1743,7 @@
         "name": "BatchDecoder.parallel|rotated_surface_code(d=5)",
         "passed": true,
         "valid_fraction": 1.0,
-        "throughput_shots_per_s": 1291389,
+        "throughput_shots_per_s": 1724792,
         "n": 5000
       }
     ],
@@ -1576,9 +1763,14 @@
         "raised": "ValueError"
       },
       {
-        "name": "dtype_robustness",
-        "passed": false,
-        "error": "TypeError('Syndrome must be dtype uint8, got int64')"
+        "name": "strict_uint8_rejects_int64",
+        "passed": true,
+        "raised": "TypeError",
+        "message": "Syndrome must be dtype uint8, got int64"
+      },
+      {
+        "name": "uint8_input_accepted",
+        "passed": true
       },
       {
         "name": "large_code_d101",
@@ -1676,19 +1868,21 @@
         "explain_ok": true
       },
       {
-        "name": "pymatching_compat.Matching",
-        "passed": false,
-        "error": "ValueError('matmul: Input operand 1 has a mismatch in its core dimension 0, with gufunc signature (n?,k),(k,m?)->(n?,m?) (size 2 is different from 7)')"
+        "name": "pymatching_compat_matches_pymatching",
+        "passed": true,
+        "identical_predictions": true,
+        "qector_obs_accuracy": 0.9983333333333333,
+        "pymatching_obs_accuracy": 0.9983333333333333,
+        "n": 3000
       },
       {
-        "name": "qector_vs_pymatching_LER",
-        "passed": false,
-        "error": "ValueError('operands could not be broadcast together with shapes (2000,7) (2000,2) ')"
-      },
-      {
-        "name": "stim_circuit_to_check_matrix",
-        "passed": false,
-        "detail": "fn not found"
+        "name": "stim_compat.from_dem",
+        "passed": true,
+        "num_detectors": 16,
+        "decoder_type": "QECTORStimDecoder",
+        "out_len": 15,
+        "dem_checks": 16,
+        "dem_n_qubits": 15
       }
     ],
     "I_workbench": [
@@ -1731,8 +1925,112 @@
       },
       {
         "name": "run_benchmark",
-        "passed": false,
-        "error": "WorkbenchError(\"unknown code family 'repetition_code'; choose from ['repetition', 'ring', 'rotated_surface', 'unrotated_surface', 'toric', 'heavy_hex']\")"
+        "passed": true,
+        "result_keys": [
+          "environment",
+          "results",
+          "spec"
+        ],
+        "syndrome_faithful": true,
+        "throughput_decodes_per_s": 277777.9083067222,
+        "latency_us": {
+          "n": 1000,
+          "mean": 4.1884000529535115,
+          "median": 3.5999983083456755,
+          "std": 2.483455696454345,
+          "min": 2.5999906938523054,
+          "max": 46.79999256040901,
+          "ci95_low": 4.0344767025563035,
+          "ci95_high": 4.342323403350719,
+          "p50": 3.5999983083456755,
+          "p90": 5.699999746866524,
+          "p95": 6.799993570894003,
+          "p99": 11.605000909185032
+        },
+        "env": {
+          "timestamp_unix": 1782313152,
+          "python_version": "3.11.0",
+          "python_implementation": "CPython",
+          "platform": "Windows-10-10.0.26100-SP0",
+          "system": "Windows",
+          "machine": "AMD64",
+          "processor": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+          "cpu_count_logical": 16,
+          "numpy_version": "2.2.6",
+          "rust_version": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+          "cargo_version": "cargo 1.96.0 (30a34c682 2026-05-25)",
+          "git_commit": "unknown",
+          "qector_decoder_v3_version": "0.5.1",
+          "pymatching_version": "2.4.0",
+          "stim_version": "1.16.0",
+          "scipy_version": "1.17.1",
+          "ram_total_gb": 16.51,
+          "ram_available_gb": 1.01,
+          "cuda_available": true,
+          "opencl_available": false,
+          "backends": {
+            "cpu": true,
+            "cuda": true,
+            "opencl": false,
+            "cuda_device": "NVIDIA GeForce GTX 1660 Ti",
+            "opencl_device": null
+          }
+        }
+      },
+      {
+        "name": "export_json",
+        "passed": true,
+        "size": 2407
+      },
+      {
+        "name": "export_csv",
+        "passed": true,
+        "size": 261
+      },
+      {
+        "name": "export_pdf",
+        "passed": true,
+        "size": 29868
+      }
+    ],
+    "J_gpu": [
+      {
+        "name": "CUDA|repetition_code(d=9)",
+        "passed": true,
+        "device": "NVIDIA GeForce GTX 1660 Ti",
+        "compute_capability": [
+          7,
+          5
+        ],
+        "gpu_valid_fraction": 1.0,
+        "cpu_valid_fraction": 1.0,
+        "gpu_throughput_shots_per_s": 5611830,
+        "cpu_throughput_shots_per_s": 410667,
+        "speedup_vs_cpu": 13.67,
+        "syndrome_agreement_fraction": 1.0,
+        "is_degraded": false,
+        "total_failures": 0,
+        "gpu_recoveries": 0,
+        "n": 20000
+      },
+      {
+        "name": "CUDA|rotated_surface_code(d=5)",
+        "passed": true,
+        "device": "NVIDIA GeForce GTX 1660 Ti",
+        "compute_capability": [
+          7,
+          5
+        ],
+        "gpu_valid_fraction": 1.0,
+        "cpu_valid_fraction": 1.0,
+        "gpu_throughput_shots_per_s": 3173143,
+        "cpu_throughput_shots_per_s": 390918,
+        "speedup_vs_cpu": 8.12,
+        "syndrome_agreement_fraction": 1.0,
+        "is_degraded": false,
+        "total_failures": 0,
+        "gpu_recoveries": 0,
+        "n": 20000
       }
     ]
   }

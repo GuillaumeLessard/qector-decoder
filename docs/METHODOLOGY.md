@@ -190,21 +190,21 @@ as if they were the same metric.
 | GPU | “CPU/GPU bit-identical on tested configs” | “Universal GPU speedup” |
 | Workbench/API | “Local/demo or roadmap unless separately contracted” | “Enterprise SaaS / OEM ready” |
 | Hardware | “Simulation/offline R&D platform” | “Real-time hardware QEC control stack” |
-| GPU throughput | "7.67x speedup rep d=9 vs CPU batch, 100k shots, GTX 1660 Ti (artifact: validation_v051.json)" | "Universal GPU speedup on all hardware" |
-| Workbench latency | "277,778 dec/s, p50 3.60 us, p99 11.61 us, rep d=5 Blossom, 1000 trials" | "Sub-microsecond real-time system decoder" |
+| GPU throughput | "7.67x speedup rep d=9 vs CPU batch, 100k shots, GTX 1660 Ti (artifact: results_v053_retest.json)" | "Universal GPU speedup on all hardware" |
+| Workbench latency | "285,713 dec/s, p50 3.50 us, p99 9.50 us, rep d=5 Blossom, 1000 trials" | "Sub-microsecond real-time system decoder" |
 
 ## 11. Independent PyPI validation artifact
 
-`benchmark_results/validation_v051.json` is the authoritative external evidence record
-for v0.5.1/v0.5.2 (generated 2026-06-24, isolated PyPI venv, Windows 10, AMD Ryzen 16-core,
+`benchmark_results/results_v053_retest.json` is the authoritative external evidence record
+for v0.5.3 (generated 2026-06-25, isolated PyPI venv, Windows 10, AMD Ryzen 16-core,
 GTX 1660 Ti CUDA 7.5, Python 3.11, NumPy 2.2.6, PyMatching 2.4.0, stim/sinter 1.16.0).
 
 Reference this file whenever making any of these public claims:
-- "86/87 automated checks pass"
+- "87/87 automated checks pass"
 - "30 decoder x code combinations produce 100% syndrome-valid corrections"
 - "Blossom LER within 1.78% of PyMatching"
 - "CUDA 7.67x faster than CPU batch at 100k shots"
-- "Workbench 277,778 dec/s, p50 3.60 us, p99 11.61 us"
+- "Workbench 285,713 dec/s, p50 3.50 us, p99 9.50 us"
 - "LookupTableDecoder table_size = 64 for rep d=5"
 
 Cite the artifact path, date, platform, and 86/87 pass/fail count alongside the numbers.
@@ -231,7 +231,7 @@ For external review, start here:
 1. `docs/REPRODUCE.md`
 2. `docs/REPRODUCIBILITY_CHECKLIST.md`
 3. `docs/CORRECTNESS_AUDIT.md`
-4. `benchmark_results/validation_v051.json` (independent PyPI validation artifact)
+4. `benchmark_results/results_v053_retest.json` (independent PyPI validation artifact)
 5. Checked-in JSON artifacts under `benchmark_results/`
 
 A result is only strong when a reviewer can rerun it, inspect the artifact,

@@ -2,9 +2,9 @@
 
 This file consolidates logical-error-rate results from two sources:
 1. Internal benchmarks (toric surface codes, earlier runs)
-2. **Independent PyPI validation** (2026-06-24, 86/87 checks PASS — the authoritative external record)
+2. **Independent PyPI validation** (2026-06-25, 87/87 checks PASS — the authoritative external record)
 
-Full machine-readable validation artifact: `benchmark_results/validation_v051.json`
+Full machine-readable validation artifact: `benchmark_results/results_v053_retest.json`
 
 ---
 
@@ -107,12 +107,12 @@ model property shared with PyMatching (Finding F-2). Use circuit-level Stim DEM 
 
 | Decoder | Throughput |
 |---------|-----------|
-| UnionFindDecoder | ~1.06M shots/s |
-| BlossomDecoder | ~2.70M shots/s |
-| SparseBlossomDecoder | ~1.80M shots/s |
-| CPUBatchDecoder | ~0.34M shots/s |
-| BatchDecoder (parallel_batch_decode) | ~2.67M shots/s |
-| BatchDecoder (alias) | ~1.88M shots/s |
+| UnionFindDecoder | ~1.07M shots/s |
+| BlossomDecoder | ~1.93M shots/s |
+| SparseBlossomDecoder | ~1.61M shots/s |
+| CPUBatchDecoder | ~0.35M shots/s |
+| BatchDecoder (parallel_batch_decode) | ~2.21M shots/s |
+| BatchDecoder (alias) | ~1.84M shots/s |
 
 ---
 
@@ -123,7 +123,7 @@ model property shared with PyMatching (Finding F-2). Use circuit-level Stim DEM 
 3. **CUDA delivers 7× throughput** vs CPU batch at 100k shots on GTX 1660 Ti.
 4. **LookupTableDecoder is the fastest single-shot decoder tested** (~8.7 µs on rep d=5, exact on precomputed syndromes).
 5. **UnionFind ~3.1× less accurate than Blossom/MWPM** — expected speed/accuracy trade-off, both 100% valid.
-6. **Workbench latency**: Blossom rep d=5 → 277,778 dec/s, p50 3.60 µs, p99 11.61 µs, max 46.8 µs.
+6. **Workbench latency**: Blossom rep d=5 → 285,713 dec/s, p50 3.50 µs, p99 9.50 µs, max 28.7 µs.
 
 ### Recommendations
 

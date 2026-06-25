@@ -60,7 +60,7 @@ Use the real source-build path. The repository currently does not ship `install.
 PowerShell:
 
 ```powershell
-git clone https://github.com/qectorlab/qector-decoder.git
+git clone https://github.com/GuillaumeLessard/qector-decoder.git
 cd qector-decoder
 
 py -3.11 -m venv .venv

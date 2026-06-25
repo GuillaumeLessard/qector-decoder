@@ -187,7 +187,7 @@ else:
 
 Validated by independent automated test suite (87/87 checks PASS on v0.5.3).
 Platform: Windows 10, AMD Ryzen 16-core, NVIDIA GTX 1660 Ti (CUDA 7.5), Python 3.11, PyMatching 2.4.0.
-Full artifact: `benchmark_results/validation_v052.json`.
+Full artifact: `benchmark_results/results_v053_retest.json`.
 
 **v0.5.3 API fixes (all 3 verified):**
 
@@ -205,7 +205,7 @@ Full artifact: `benchmark_results/validation_v052.json`.
 | Blossom LER within 1.78% of PyMatching on rotated surface code d=3-7 | Confirmed |
 | CUDA batch 100% CPU-agreeing at all tested batch sizes (GTX 1660 Ti) | Confirmed |
 | CUDA batch 6.9-7.7x faster than CPU batch at 100k shots | Confirmed |
-| Workbench single-decode rep d=5 Blossom: 277,778 dec/s, p50 3.60 us, p99 11.61 us | Confirmed |
+| Workbench single-decode rep d=5 Blossom: 285,713 dec/s, p50 3.50 us, p99 9.50 us | Confirmed |
 | AutoDecoder backends: cpu, cuda GTX 1660 Ti, opencl=False | Confirmed |
 | Workbench JSON/CSV/PDF export pipeline end-to-end | Confirmed |
 | LookupTableDecoder table_size for rep d=5: 64 entries | Confirmed |

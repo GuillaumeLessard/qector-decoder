@@ -159,5 +159,5 @@ Before publishing, confirm:
 - `docs/REPRODUCE.md` — detailed commands
 - `docs/METHODOLOGY.md` — measurement rules
 - `docs/CORRECTNESS_AUDIT.md` — decoder contracts and known limits
-- `benchmark_results/validation_v051.json` — independent PyPI validation artifact (86/87 checks, 100k shots)
+- `benchmark_results/results_v053_retest.json` — independent PyPI validation artifact (87/87 checks, 100k shots)
 - `docs/API_STABILITY.md` — what is stable, what is experimental
