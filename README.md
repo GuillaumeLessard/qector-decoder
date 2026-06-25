@@ -1,6 +1,12 @@
 # QECTOR Decoder v3
 
-Source-available Rust/Python quantum error correction decoding platform.
+[![PyPI version](https://img.shields.io/pypi/v/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
+[![License](https://img.shields.io/badge/License-Custom-yellow.svg)](https://github.com/GuillaumeLessard/qector-decoder/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/GuillaumeLessard/qector-decoder.svg)](https://github.com/GuillaumeLessard/qector-decoder/stargazers)
+[![GitHub last commit](https://img.shields.io/github/last-commit/GuillaumeLessard/qector-decoder)](https://github.com/GuillaumeLessard/qector-decoder/commits/main)
+
+Source-available Rust/Python QEC decoder...
 
 PyMatching-compatible MWPM validation, belief-matching accuracy mode, BP-OSD for LDPC/qLDPC, CPU/GPU batch decoding, and artifact-backed benchmark evidence.
 
