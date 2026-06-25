@@ -215,7 +215,7 @@ def main():
     bl_dec = qd.BlossomDecoder(c2q_ring)
     ring_results["Blossom"] = benchmark_latency(bl_dec, len(c2q_ring), n_runs=2000)
     r = ring_results["Blossom"]
-    print(f"### Blossom")
+    print("### Blossom")
     print(f"  mean={r['latency_mean_us']} µs  std={r['latency_std_us']} µs")
     print(f"  p50={r['latency_p50_us']} µs  p90={r['latency_p90_us']} µs  p99={r['latency_p99_us']} µs")
     print(f"  throughput={r['throughput']} dec/s")
@@ -223,7 +223,7 @@ def main():
 
     # LER sur le petit code
     ler_ring = benchmark_ler(c2q_ring, 4, error_rate=0.05, n_shots=5000)
-    print(f"### LER (error_rate=0.05, n_shots=5000)")
+    print("### LER (error_rate=0.05, n_shots=5000)")
     print(f"  UnionFind LER = {ler_ring['uf_ler']}")
     print(f"  Blossom   LER = {ler_ring['bl_ler']}")
     print(f"  Mismatch rate = {ler_ring['mismatch_rate']}")

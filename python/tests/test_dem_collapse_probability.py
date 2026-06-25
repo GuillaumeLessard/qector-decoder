@@ -8,7 +8,6 @@ near 0.5, many parallel mechanisms, and nested ``repeat`` / ``shift_detectors``.
 
 import math
 
-import numpy as np
 
 from qector_decoder_v3 import dem
 

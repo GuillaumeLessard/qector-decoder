@@ -1,5 +1,18 @@
 # QECTOR Decoder v3
 
+[Skip to content](#qector-decoder-v3)
+
+## Repository navigation
+
+- [Code](https://github.com/GuillaumeLessard/qector-decoder)
+- [Issues](https://github.com/GuillaumeLessard/qector-decoder/issues)
+- [Pull requests](https://github.com/GuillaumeLessard/qector-decoder/pulls)
+- [Actions](https://github.com/GuillaumeLessard/qector-decoder/actions)
+- [Security](https://github.com/GuillaumeLessard/qector-decoder/security)
+- [Insights](https://github.com/GuillaumeLessard/qector-decoder/insights)
+- [Settings](https://github.com/GuillaumeLessard/qector-decoder/settings)
+- [Tests](https://github.com/GuillaumeLessard/qector-decoder/tree/main/tests)
+
 [![PyPI version](https://img.shields.io/pypi/v/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
 [![License](https://img.shields.io/badge/License-Custom-yellow.svg)](https://github.com/GuillaumeLessard/qector-decoder/blob/main/LICENSE)

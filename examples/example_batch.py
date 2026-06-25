@@ -41,7 +41,7 @@ def main():
     print(f"Batch size: {batch_size}")
     
     # 1. CPU Batch decoder
-    print(f"\n1. CPUBatchDecoder (CPU parallel execution):")
+    print("\n1. CPUBatchDecoder (CPU parallel execution):")
     cpu_batch = CPUBatchDecoder(checks, n_qubits)
     # Warm up
     _ = cpu_batch.batch_decode(syndromes[:10])
@@ -55,7 +55,7 @@ def main():
     
     # 2. GPU OpenCL Batch decoder (if available)
     cl_avail = opencl_is_available()
-    print(f"\n2. OpenCLBatchDecoder (GPU OpenCL):")
+    print("\n2. OpenCLBatchDecoder (GPU OpenCL):")
     print(f"   OpenCL available: {cl_avail}")
     
     if cl_avail:
@@ -79,7 +79,7 @@ def main():
         
     # 3. GPU CUDA Batch decoder (if available)
     cuda_avail = cuda_is_available()
-    print(f"\n3. CUDABatchDecoder (GPU Native CUDA):")
+    print("\n3. CUDABatchDecoder (GPU Native CUDA):")
     print(f"   CUDA available: {cuda_avail}")
     
     if cuda_avail and CUDABatchDecoder is not None:

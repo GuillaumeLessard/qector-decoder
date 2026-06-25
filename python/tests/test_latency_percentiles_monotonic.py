@@ -11,7 +11,6 @@ so the spec's "(5,7)" is realized as two distances, d=5 and d=7.
 
 import pytest
 
-import qector_decoder_v3 as qd
 from qector_decoder_v3 import benchmarking as bm, codes
 
 KINDS = ["blossom", "sparse_blossom", "union_find"]

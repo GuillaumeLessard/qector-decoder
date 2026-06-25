@@ -31,7 +31,7 @@ def _wilson(k, n, z=1.959963985):
 def test_full_vs_collapsed_ler_equivalent(d):
     shots = 4000
     circ = stim.Circuit.generated(
-        f"surface_code:rotated_memory_x",
+        "surface_code:rotated_memory_x",
         distance=d,
         rounds=d,
         after_clifford_depolarization=0.005,

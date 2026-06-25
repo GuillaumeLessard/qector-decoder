@@ -5,7 +5,6 @@ for reproducibility).  Checks CSS commutation and BP-OSD syndrome-faithfulness.
 """
 
 import numpy as np
-import pytest
 
 from qector_decoder_v3 import codes
 from qector_decoder_v3.bposd import BpOsdDecoder

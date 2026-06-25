@@ -118,7 +118,7 @@ class BpOsdDecoder:
         order = np.argsort(rel)
         x0, pivots = _gf2_osd_solve(self.H, s, order, hard)
         if self.osd_order <= 0:
-            return x0
+            return x0  # type: ignore[no-any-return]
         # OSD-w (greedy combination sweep over the least-reliable bits): force
         # small combinations on and re-solve, keeping the lowest-weight result.
         best, best_w = x0, int(x0.sum())
@@ -147,7 +147,7 @@ class BpOsdDecoder:
 # ---------------------------------------------------------------------------
 # GF(2) ordered-statistics solve
 # ---------------------------------------------------------------------------
-def _gf2_osd_solve(H: np.ndarray, s: np.ndarray, order: np.ndarray, hard: np.ndarray):
+def _gf2_osd_solve(H: np.ndarray, s: np.ndarray, order: np.ndarray, hard: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """OSD-0 solve. ``order`` lists columns least-reliable first; the first
     rank(H) independent of them form the basis, the rest (free) take their BP hard
     decision, and the basis is solved so ``H x == s (mod 2)``.

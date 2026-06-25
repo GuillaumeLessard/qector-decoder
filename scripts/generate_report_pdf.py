@@ -195,9 +195,11 @@ def plot_belief(rows):
         red = 100 * (1 - bm / pm) if pm else 0
         ax.annotate(f"-{red:.0f}%" if red > 1 else "~parity",
                     (x, bm), textcoords="offset points", xytext=(0, -14), ha="center", fontsize=9)
-    ax.set_xlabel("distance d"); ax.set_ylabel("logical error rate")
+    ax.set_xlabel("distance d")
+    ax.set_ylabel("logical error rate")
     ax.set_title("Belief-matching BEATS PyMatching on LER (rotated surface, p=0.005)")
-    ax.grid(True, alpha=0.3); ax.legend()
+    ax.grid(True, alpha=0.3)
+    ax.legend()
     fig.tight_layout()
     return fig
 
@@ -211,7 +213,8 @@ def plot_bposd():
         ax.text(i, v + 0.0008, f"{v:.4f}", ha="center", fontsize=11)
     ax.set_ylabel("logical error rate")
     ax.set_title("BP-OSD on [[72,12]] bivariate-bicycle LDPC code (p=0.03)")
-    ax.set_ylim(0, 0.05); ax.grid(True, axis="y", alpha=0.3)
+    ax.set_ylim(0, 0.05)
+    ax.grid(True, axis="y", alpha=0.3)
     fig.tight_layout()
     return fig
 
@@ -481,7 +484,8 @@ def plot_psweep(ext):
     fig, ax = plt.subplots(figsize=(8.5, 5.5))
     ax.semilogy(p, [r["pm_ler"] for r in rows], "s--", label="PyMatching")
     ax.semilogy(p, [r["belief_ler"] for r in rows], "o-", label="QECTOR belief-matching")
-    ax.set_xlabel("physical error rate p"); ax.set_ylabel("logical error rate")
+    ax.set_xlabel("physical error rate p")
+    ax.set_ylabel("logical error rate")
     ax.set_title(f"Belief-matching vs PyMatching across p (d={ext['psweep']['distance']})")
     ax.grid(True, which="both", alpha=0.3); ax.legend()
     fig.tight_layout()
@@ -501,9 +505,11 @@ def plot_multiseed(ext):
         xs = _np.arange(len(reds)) + i * width
         ax.bar(xs, reds, width=width, label=f"d={d}")
     ax.axhline(0, color="k", lw=0.8)
-    ax.set_xlabel("seed index"); ax.set_ylabel("LER reduction vs PyMatching (%)")
+    ax.set_xlabel("seed index")
+    ax.set_ylabel("LER reduction vs PyMatching (%)")
     ax.set_title("Belief-matching LER reduction per seed (positive = belief better)")
-    ax.grid(True, axis="y", alpha=0.3); ax.legend()
+    ax.grid(True, axis="y", alpha=0.3)
+    ax.legend()
     fig.tight_layout()
     return fig
 
@@ -595,7 +601,6 @@ def _weight_gap_lines(wg):
 def plot_weight_gap_hist(wg):
     if not wg:
         return None
-    import numpy as _np
     pd = wg["per_distance"]
     fig, axes = plt.subplots(1, len(pd), figsize=(4.0 * len(pd), 4.2), squeeze=False)
     labels = ["0", "<1", "1-2", "2-4", "4-8", "8-16", "16-32", "32-64",
@@ -764,7 +769,8 @@ def plot_gpu(g):
         sp = [r["cpu_us_per_shot"] / r["cuda_us_per_shot"] for r in rows]
         ax.semilogx(B, sp, "o-", label=f"d={d}")
     ax.axhline(1, color="k", lw=0.8, ls=":")
-    ax.set_xlabel("batch size"); ax.set_ylabel("CUDA speedup vs CPU (x)")
+    ax.set_xlabel("batch size")
+    ax.set_ylabel("CUDA speedup vs CPU (x)")
     ax.set_title("CUDA batch-decode speedup vs CPU (bit-identical, GTX 1660 Ti)")
     ax.grid(True, which="both", alpha=0.3); ax.legend()
     fig.tight_layout()

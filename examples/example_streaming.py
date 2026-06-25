@@ -46,7 +46,7 @@ def main():
     for round_idx in range(n_rounds):
         syndrome = rng.integers(0, 2, size=n_checks, dtype=np.uint8)
         # update() inserts the new round's syndrome and returns the corrected state
-        result = stream.update(syndrome)
+        stream.update(syndrome)
         if round_idx % 100 == 0:
             stream.flush()  # periodically flush history in a real environment
     t1 = time.perf_counter()
@@ -57,13 +57,13 @@ def main():
     print(f"   Throughput: {n_rounds / (total_time / 1000):.0f} rounds/s")
     
     # 2. Sliding window decoder
-    print(f"\n2. SlidingWindowDecoder (sliding window with decay factor 0.85):")
+    print("\n2. SlidingWindowDecoder (sliding window with decay factor 0.85):")
     window = SlidingWindowDecoder(checks, n_qubits, window_size=window_size, decay_factor=0.85)
     
     t0 = time.perf_counter()
     for round_idx in range(n_rounds):
         syndrome = rng.integers(0, 2, size=n_checks, dtype=np.uint8)
-        result = window.update(syndrome)
+        window.update(syndrome)
         if round_idx % 100 == 0:
             window.flush()
     t1 = time.perf_counter()

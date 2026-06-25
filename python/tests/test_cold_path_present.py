@@ -11,7 +11,6 @@ import numbers
 
 import pytest
 
-import qector_decoder_v3 as qd
 from qector_decoder_v3 import benchmarking as bm, codes
 
 SUMMARY_KEYS = ("mean", "median", "p50", "p99")

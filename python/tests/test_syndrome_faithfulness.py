@@ -37,8 +37,11 @@ def unrotated_surface_code(d):
     """Planar surface code: data qubits on edges of a d x d vertex lattice,
     Z-stabilizers on vertex stars (weight 2/3/4, boundary qubits degree 1)."""
     nh = d * (d - 1)
-    h = lambda r, c: r * (d - 1) + c
-    v = lambda r, c: nh + r * d + c
+    def h(r, c):
+        return r * (d - 1) + c
+
+    def v(r, c):
+        return nh + r * d + c
     n_qubits = nh + (d - 1) * d
     checks = []
     for r in range(d):

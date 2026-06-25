@@ -23,7 +23,7 @@ Usage (sans Qiskit — mode dict brut) ::
 from __future__ import annotations
 
 import warnings
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
 import numpy as np
 

@@ -13,7 +13,7 @@ if hasattr(sys.stdout, "reconfigure"):
 import numpy as np
 from qector_decoder_v3 import codes
 from qector_decoder_v3.pymatching_compat import Matching
-from qector_decoder_v3.backend import AutoDecoder, BackendConfig
+from qector_decoder_v3.backend import AutoDecoder
 
 
 def main():

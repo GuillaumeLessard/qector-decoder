@@ -7,9 +7,7 @@ percentiles, positive throughput, and a recorded peak Python allocation.
 NO wall-clock thresholds -- only invariants that hold by construction.
 """
 
-import pytest
 
-import qector_decoder_v3 as qd
 from qector_decoder_v3 import benchmarking as bm, codes
 
 KINDS = ["blossom", "union_find", "sparse_blossom"]

@@ -132,7 +132,7 @@ class TestSlidingWindowDecoder:
         dec = qd.SlidingWindowDecoder(checks, n_qubits, window_size=3, decay_factor=0.5)
         r1 = np.array([1, 0, 0, 0], dtype=np.uint8)
         r2 = np.array([0, 1, 0, 0], dtype=np.uint8)
-        c1 = dec.update(r1)
+        dec.update(r1)
         c2 = dec.update(r2)
         assert c2.shape == (n_qubits,)
 

@@ -1,4 +1,9 @@
 [build-system]
+
+[tool.ruff]
+exclude = ["scripts/*"]
+ignore = ["E702", "E402"]
+
 requires = ["maturin>=1.14,<2.0"]
 build-backend = "maturin"
 
@@ -70,7 +75,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "numpy>=1.24.0",
+    "numpy>=2.0.0",
 ]
 
 [project.optional-dependencies]

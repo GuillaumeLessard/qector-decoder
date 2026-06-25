@@ -15,7 +15,6 @@ Code: bivariate-bicycle ``[[72, 12]]``.
 """
 
 import numpy as np
-import pytest
 
 from qector_decoder_v3 import codes
 from qector_decoder_v3.bposd import BpOsdDecoder

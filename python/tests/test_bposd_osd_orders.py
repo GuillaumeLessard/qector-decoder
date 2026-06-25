@@ -7,7 +7,6 @@ weight is monotonically non-increasing in the order.
 """
 
 import numpy as np
-import pytest
 
 from qector_decoder_v3 import codes
 from qector_decoder_v3.bposd import BpOsdDecoder

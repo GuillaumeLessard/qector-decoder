@@ -1,6 +1,5 @@
 """Workbench: loading a Stim circuit (file path, text, and Circuit object)."""
 
-import numpy as np
 import pytest
 
 from qector_decoder_v3.workbench import Workbench, WorkbenchError

@@ -45,7 +45,7 @@ def main() -> int:
             before_measure_flip_probability=args.noise,
             after_reset_flip_probability=args.noise)
         sdem = circ.detector_error_model(decompose_errors=True)
-        model = dem.from_stim(sdem).collapse_to_graph()
+        dem.from_stim(sdem).collapse_to_graph()
         det, obs = circ.compile_detector_sampler(seed=args.seed).sample(
             shots=args.shots, separate_observables=True)
         pmf = pymatching.Matching.from_detector_error_model(sdem)

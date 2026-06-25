@@ -8,7 +8,6 @@ Rules locked here:
   * boundary edges (single detector) and hyperedges retain masks.
 """
 
-import numpy as np
 
 from qector_decoder_v3 import dem
 

@@ -22,14 +22,12 @@ import argparse
 import csv
 import json
 import math
-import os
 import platform
-import sys
 import time
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Tuple
 
 import numpy as np
 
@@ -470,7 +468,7 @@ def main():
         cpu=cpu,
     )
 
-    print(f"# QECTOR v3 - Benchmark LER Serieux")
+    print("# QECTOR v3 - Benchmark LER Serieux")
     print(f"CPU: {cpu}")
     print(f"Python: {platform.python_version()}")
     print(f"QECTOR: {qd.__version__}")
@@ -574,7 +572,7 @@ def main():
     save_json(report, json_path)
     save_csv(report.results, csv_path)
 
-    print(f"\n[RESULTS] Resultats sauvegardes :")
+    print("\n[RESULTS] Resultats sauvegardes :")
     print(f"   JSON -> {json_path.resolve()}")
     print(f"   CSV  -> {csv_path.resolve()}")
 

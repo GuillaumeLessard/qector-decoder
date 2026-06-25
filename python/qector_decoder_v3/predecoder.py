@@ -124,8 +124,11 @@ class PredecodedDecoder:
         res_corr = np.asarray(self._residual.decode(residual), dtype=np.uint8).reshape(-1)
         return (committed ^ res_corr).astype(np.uint8)
 
-    def batch_decode(self, syndromes) -> np.ndarray:
-        arr = np.asarray(syndromes, dtype=np.uint8)
-        if arr.ndim != 2:
-            raise ValueError(f"syndromes must be 2D, got {arr.shape}")
-        return np.stack([self.decode(arr[i]) for i in range(arr.shape[0])]).astype(np.uint8)
+    def is_matching_graph(self) -> bool:
+        """Return True if the underlying qubit-check graph is a proper matching graph.
+
+        A matching graph for a decoder requires each qubit (edge) to connect exactly two checks.
+        This helper validates that invariant for debugging and documentation purposes.
+        """
+        return all(len(chk) == 2 for chk in self._qubit_checks if chk)
+

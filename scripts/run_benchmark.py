@@ -55,9 +55,9 @@ def run_full_benchmark():
     batch_dec.parallel_batch_decode(batch_syndromes)
     t1 = time.perf_counter()
     batch_tp = n_batch / (t1 - t0)
-    print(f"--- BatchDecoder parallel (ring d=10) ---")
+    print("--- BatchDecoder parallel (ring d=10) ---")
     print(f"Throughput    : {batch_tp:,.0f} decodes/second")
-    print(f"Status        : EXCELLENT")
+    print("Status        : EXCELLENT")
     print()
 
     # Save ring results as primary

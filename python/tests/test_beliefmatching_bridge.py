@@ -23,7 +23,7 @@ beliefmatching = pytest.importorskip("beliefmatching")
 
 from beliefmatching import detector_error_model_to_check_matrices  # noqa: E402
 
-from qector_decoder_v3.belief_matching import BeliefMatching, build_matching_matrices  # noqa: E402
+from qector_decoder_v3.belief_matching import BeliefMatching  # noqa: E402
 
 
 def _circuit(d=3, p=0.005):

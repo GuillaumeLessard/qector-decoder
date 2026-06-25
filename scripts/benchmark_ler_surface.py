@@ -14,7 +14,6 @@ Decodeurs compares:
 
 import json
 import math
-import sys
 import time
 
 import numpy as np

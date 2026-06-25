@@ -73,7 +73,7 @@ class _CompiledQectorDecoder(_COMPILED_BASE):  # type: ignore[misc,valid-type]
             k = min(self.num_observables, preds.shape[1])
             fixed[:, :k] = preds[:, :k]
             preds = fixed
-        return np.packbits(preds, axis=1, bitorder="little")
+        return np.packbits(preds, axis=1, bitorder="little")  # type: ignore[no-any-return]
 
 
 class QectorSinterDecoder(_SINTER_BASE):  # type: ignore[misc,valid-type]
@@ -125,7 +125,7 @@ class QectorSinterDecoder(_SINTER_BASE):  # type: ignore[misc,valid-type]
         )
         result_packed = compiled.decode_shots_bit_packed(bit_packed_detection_event_data=packed)
         result = np.unpackbits(result_packed, axis=1, count=compiled.num_observables, bitorder="little")
-        return result[0].astype(np.uint8)
+        return result[0].astype(np.uint8)  # type: ignore[no-any-return]
 
 
 def _build_matcher(kind: str, dem):

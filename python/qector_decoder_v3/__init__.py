@@ -26,31 +26,61 @@ Independently validated (v0.5.3, 2026-06-25, PyPI install, isolated venv):
         GPU output: 100% valid, 100% CPU-agreeing
 """
 
-from .qector_decoder_v3 import (
-    UnionFindDecoder as _RustUnionFindDecoder,
-    FastUnionFindDecoder as _RustFastUnionFindDecoder,
-    BlossomDecoder as _RustBlossomDecoder,
-    SlidingWindowDecoder as _RustSlidingWindowDecoder,
-    StreamingDecoder as _RustStreamingDecoder,
-    BatchDecoder as _RustBatchDecoder,
-    CPUBatchDecoder as _RustCPUBatchDecoder,
-    OpenCLBatchDecoder as _RustOpenCLBatchDecoder,
-    BenchmarkSuite as _RustBenchmarkSuite,
-    LookupTableDecoder as _RustLookupTableDecoder,
-    BPOSDDecoder as _RustBPOSDDecoder,
-    NeuralPredecoder as _RustNeuralPredecoder,
-    DetectorGraph as _RustDetectorGraph,
-    GNNPredecoder as _RustGNNPredecoder,
-    GNNTrainer as _RustGNNTrainer,
-    SparseBlossomDecoder as _RustSparseBlossomDecoder,
-    HybridDecoder as _RustHybridDecoder,
-    py_check_to_edges,
-    py_generate_surface_code_checks,
-    py_generate_toy_code_checks,
-    py_generate_ring_code_checks,
-    py_generate_repetition_code_checks,
-    run_mcp_server,
-)
+try:
+    # Attempt to import compiled Rust bindings from the installed wheel package
+    from qector_decoder_v3.qector_decoder_v3 import (
+        UnionFindDecoder as _RustUnionFindDecoder,
+        FastUnionFindDecoder as _RustFastUnionFindDecoder,
+        BlossomDecoder as _RustBlossomDecoder,
+        SlidingWindowDecoder as _RustSlidingWindowDecoder,
+        StreamingDecoder as _RustStreamingDecoder,
+        BatchDecoder as _RustBatchDecoder,
+        CPUBatchDecoder as _RustCPUBatchDecoder,
+        OpenCLBatchDecoder as _RustOpenCLBatchDecoder,
+        BenchmarkSuite as _RustBenchmarkSuite,
+        LookupTableDecoder as _RustLookupTableDecoder,
+        BPOSDDecoder as _RustBPOSDDecoder,
+        NeuralPredecoder as _RustNeuralPredecoder,
+        DetectorGraph as _RustDetectorGraph,
+        GNNPredecoder as _RustGNNPredecoder,
+        GNNTrainer as _RustGNNTrainer,
+        SparseBlossomDecoder as _RustSparseBlossomDecoder,
+        HybridDecoder as _RustHybridDecoder,
+        py_check_to_edges,
+        py_generate_surface_code_checks,
+        py_generate_toy_code_checks,
+        py_generate_ring_code_checks,
+        py_generate_repetition_code_checks,
+        run_mcp_server,
+    )
+except Exception:
+    # Fallback to the source version (editable install) if wheel is not available
+    from .qector_decoder_v3 import (
+        UnionFindDecoder as _RustUnionFindDecoder,
+        FastUnionFindDecoder as _RustFastUnionFindDecoder,
+        BlossomDecoder as _RustBlossomDecoder,
+        SlidingWindowDecoder as _RustSlidingWindowDecoder,
+        StreamingDecoder as _RustStreamingDecoder,
+        BatchDecoder as _RustBatchDecoder,
+        CPUBatchDecoder as _RustCPUBatchDecoder,
+        OpenCLBatchDecoder as _RustOpenCLBatchDecoder,
+        BenchmarkSuite as _RustBenchmarkSuite,
+        LookupTableDecoder as _RustLookupTableDecoder,
+        BPOSDDecoder as _RustBPOSDDecoder,
+        NeuralPredecoder as _RustNeuralPredecoder,
+        DetectorGraph as _RustDetectorGraph,
+        GNNPredecoder as _RustGNNPredecoder,
+        GNNTrainer as _RustGNNTrainer,
+        SparseBlossomDecoder as _RustSparseBlossomDecoder,
+        HybridDecoder as _RustHybridDecoder,
+        py_check_to_edges,
+        py_generate_surface_code_checks,
+        py_generate_toy_code_checks,
+        py_generate_ring_code_checks,
+        py_generate_repetition_code_checks,
+        run_mcp_server,
+    )
+
 
 try:
     from .qector_decoder_v3 import (
@@ -73,20 +103,26 @@ except ImportError:
 
 
 try:
-    from .qector_decoder_v3 import run_grpc_server
+    from .qector_decoder_v3 import run_grpc_server, start_metrics_server
 except ImportError:
-    run_grpc_server = None
-
-try:
-    from .qector_decoder_v3 import start_metrics_server
-except ImportError:
-    start_metrics_server = None  # type: ignore[assignment]
+    def start_metrics_server(*_, **__):
+        raise NotImplementedError("start_metrics_server is not available in this build")
+    def run_grpc_server(*_, **__):
+        raise NotImplementedError("run_grpc_server is not available in this build")
 
 import numpy as np
 
+from .stim_compat import (
+    from_stim_detector_error_model,
+    stim_circuit_to_check_matrix,
+    to_stim_decoder,
+    stim_decoder_from_dem,
+)
+
 try:
-    from .qector_decoder_v3 import __version__
-except (ImportError, AttributeError):
+    from importlib.metadata import version, PackageNotFoundError
+    __version__ = version("qector-decoder")
+except PackageNotFoundError:
     __version__ = "0.5.3"
 
 
@@ -719,10 +755,14 @@ class NeuralPredecoder:
         self._inner = _RustNeuralPredecoder(n_input, n_output, n_hidden1, n_hidden2)
 
     def train(self, syndromes, corrections, n_epochs, learning_rate=0.01):
-        if not isinstance(syndromes, np.ndarray):
-            syndromes = np.array(syndromes, dtype=np.uint8)
-        if not isinstance(corrections, np.ndarray):
-            corrections = np.array(corrections, dtype=np.uint8)
+        # Ensure inputs are NumPy arrays of dtype uint8 and contiguous in memory
+        syndromes = np.ascontiguousarray(np.asarray(syndromes, dtype=np.uint8))
+        corrections = np.ascontiguousarray(np.asarray(corrections, dtype=np.uint8))
+        # Validate dimensions: expect 2‑D arrays (samples, features)
+        if syndromes.ndim != 2:
+            raise ValueError(f"syndromes must be a 2‑D array, got shape {syndromes.shape}")
+        if corrections.ndim != 2:
+            raise ValueError(f"corrections must be a 2‑D array, got shape {corrections.shape}")
         self._inner.train(syndromes, corrections, n_epochs, learning_rate)
 
     def predict(self, syndrome):
