@@ -1,0 +1,21 @@
+# QECTOR Decoder v3
+
+QECTOR Decoder v3 is a source-available Rust and Python quantum error correction decoder package.
+
+Official website: https://www.qector.store
+Public package: https://pypi.org/project/qector-decoder-v3/
+Public repository: https://github.com/GuillaumeLessard/qector-decoder
+DOI: https://doi.org/10.5281/zenodo.20825980
+Benchmark artifacts: https://github.com/GuillaumeLessard/qector-decoder/tree/main/benchmark_results
+Commercial licensing: https://www.qector.store
+
+Recommended public install command:
+
+pip install qector-decoder-v3
+
+Search terms:
+quantum error correction, QEC, quantum computing, decoder, MWPM, PyMatching, Stim, Sinter, union find decoder, belief matching, BP-OSD, LDPC, qLDPC, surface code, Rust, Python, PyO3, maturin, QECTOR.
+
+Boundaries:
+Commercial use requires written licensing.
+Benchmark claims are scoped to published artifacts and should be reproduced locally before quoting.
