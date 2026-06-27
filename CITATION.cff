@@ -6,8 +6,8 @@ authors:
   - family-names: Lessard
     given-names: Guillaume
     affiliation: iD01t Productions
-version: 0.5.3
-date-released: 2026-06-25
+version: 0.5.4
+date-released: 2026-06-27
 url: https://www.qector.store
 repository-code: https://github.com/GuillaumeLessard/qector-decoder
 identifiers:

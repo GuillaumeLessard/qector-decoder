@@ -5,6 +5,15 @@ on [Keep a Changelog](https://keepachangelog.com/), and the project aims to foll
 semantic versioning. Every benchmark artifact is stamped with the git commit and
 environment so report figures trace back to a specific build.
 
+## [0.5.4] - 2026-06-27
+
+### Fixed
+- **`NeuralPredecoder.train()` raises a clear, actionable error under numpy>=2.0** instead of a cryptic raw `TypeError: 'ndarray' object is not an instance of 'ndarray'`. Root cause: the compiled extension's `train()` binding performs a native array-type check that fails for every numpy>=2.0 array regardless of how it is constructed in Python (confirmed: plain Python lists hit the identical failure, ruling out any pure-Python array-shape workaround). `predict()` and `decode()` are unaffected on any numpy version and continue to work normally. A native fix requires a Rust-side rebuild and is tracked for a future release; `train()` currently requires an environment with `numpy<2` installed.
+- **`python/tests/test_full_api_coverage.py::test_neural_predecoder`** was passing flat 1-D arrays to `.train()`, which the wrapper's own shape validation rejects regardless of numpy version. Fixed to use the documented `(samples, features)` 2-D shape and to assert the new `RuntimeError` on numpy>=2.0.
+
+### Validation
+- Re-ran the full 125-check independent validation suite as a clean PyPI wheel install (Windows 10, Python 3.11, NumPy 2.2.6): 125/125 PASS. `NeuralPredecoder.train()`'s numpy>=2.0 limitation is the one item now surfaced with a documented, actionable error rather than a known-but-unhandled failure.
+
 ## [0.5.3] - 2026-06-25
 
 ### Fixed

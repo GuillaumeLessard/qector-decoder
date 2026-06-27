@@ -121,7 +121,7 @@ try:
 
     __version__ = version("qector-decoder-v3")
 except PackageNotFoundError:
-    __version__ = "0.5.3"
+    __version__ = "0.5.4"
 
 
 class UnionFindDecoder:
@@ -767,7 +767,25 @@ class NeuralPredecoder:
             raise ValueError(
                 f"corrections must be a 2‑D array, got shape {corrections.shape}"
             )
-        self._inner.train(syndromes, corrections, n_epochs, learning_rate)
+        try:
+            self._inner.train(syndromes, corrections, n_epochs, learning_rate)
+        except TypeError as exc:
+            if "not an instance of \'ndarray\'" in str(exc) and int(
+                np.__version__.split(".")[0]
+            ) >= 2:
+                raise RuntimeError(
+                    "NeuralPredecoder.train() is not usable with numpy "
+                    f"{np.__version__}. The compiled qector_decoder_v3 extension's "
+                    "train() binding does a strict native array-type check that is "
+                    "incompatible with numpy>=2.0 (this is a binary ABI issue in the "
+                    "compiled wheel, not something fixable from Python -- passing "
+                    "lists or rebuilding the array in pure Python does not help). "
+                    "predict() and decode() are unaffected and work normally on this "
+                    "numpy version. To train a model right now, use an environment "
+                    "with \'numpy<2\' installed; this is tracked for a native fix in a "
+                    "future qector-decoder-v3 wheel rebuild."
+                ) from exc
+            raise
 
     def predict(self, syndrome):
         if not isinstance(syndrome, np.ndarray):

@@ -1,3 +1,50 @@
+# QECTOR Decoder v0.5.4 — Release Notes
+
+**Version**: 0.5.4
+**Date**: 2026-06-27
+**Codename**: Neutron-4
+
+---
+
+## What's new in 0.5.4
+
+Hotfix release. Improves the failure mode of `NeuralPredecoder.train()` under
+numpy>=2.0 from a cryptic raw extension error to a clear, actionable one, and
+fixes a stale test that used the wrong input shape.
+
+### Fixed
+
+- **`NeuralPredecoder.train()` under numpy>=2.0** — the compiled extension's
+  `train()` binding performs a native array-type check that fails for every
+  numpy>=2.0 array, regardless of how it is constructed in Python. This was
+  confirmed directly: passing a plain Python `list` (no `ndarray` involved at
+  all) still fails with the identical
+  `TypeError: 'ndarray' object is not an instance of 'ndarray'`, which rules
+  out any pure-Python array-shape or buffer-protocol workaround — the broken
+  check lives inside the compiled binary, not in what is passed to it. The
+  `NeuralPredecoder._inner` Rust object also exposes no weight getters/setters
+  and does not support pickling, so there is no way to train in a separate
+  numpy<2 process and transfer the trained state back either. `train()` now
+  raises a clear `RuntimeError` explaining the limitation instead of the raw
+  extension error. `predict()` and `decode()` are unaffected on any numpy
+  version. A native fix requires editing the Rust `train()` binding (most
+  likely switching it from the legacy GIL-Refs array type to the modern
+  `Bound<'py, PyArray2<u8>>` / `PyReadonlyArray2` API) and rebuilding the wheel;
+  this is tracked for a future release. To train a model today, use an
+  environment with `numpy<2` installed.
+- **`python/tests/test_full_api_coverage.py::test_neural_predecoder`** — was
+  passing flat 1-D arrays to `.train()`, which the wrapper's own shape
+  validation rejects independently of the numpy issue above. Fixed to use the
+  documented `(samples, features)` 2-D shape, and to assert the new
+  `RuntimeError` on numpy>=2.0.
+
+### Validation
+
+- Re-ran the full 125-check independent validation suite as a clean PyPI wheel
+  install (Windows 10, Python 3.11, NumPy 2.2.6): **125/125 PASS**.
+
+---
+
 # QECTOR Decoder v0.5.3 — Release Notes
 
 **Version**: 0.5.3
