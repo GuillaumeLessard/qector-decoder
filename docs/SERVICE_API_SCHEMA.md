@@ -49,7 +49,7 @@ Response example:
 {
   "status": "ok",
   "decoder": "QECTOR UnionFind",
-  "version": "0.5.0"
+  "version": "0.5.3"
 }
 ```
 
@@ -61,7 +61,7 @@ FastAPI response example:
 
 ```json
 {
-  "version": "0.5.0",
+  "version": "0.5.3",
   "framework": "fastapi",
   "decoder_backend": "rust-pyo3"
 }
@@ -100,7 +100,7 @@ Response example:
   "correction": [0, 1, 0, 0],
   "n_qubits": 4,
   "n_checks": 3,
-  "version": "0.5.0"
+  "version": "0.5.3"
 }
 ```
 

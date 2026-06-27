@@ -373,6 +373,6 @@ From v0.3.0:
 
 ## Links
 
-- Repository: https://github.com/qector/qector-decoder
-- Issues: https://github.com/qector/qector-decoder/issues
-- Documentation: See `README.md` and `DECODER_COMPARISON.md`
+- Repository: https://github.com/GuillaumeLessard/qector-decoder
+- Issues: https://github.com/GuillaumeLessard/qector-decoder/issues
+- Documentation: See `README.md` and `CHANGELOG.md`

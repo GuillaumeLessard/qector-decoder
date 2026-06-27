@@ -207,7 +207,7 @@ Reference this file whenever making any of these public claims:
 - "Workbench 285,713 dec/s, p50 3.50 us, p99 9.50 us"
 - "LookupTableDecoder table_size = 64 for rep d=5"
 
-Cite the artifact path, date, platform, and 86/87 pass/fail count alongside the numbers.
+Cite the artifact path, date, platform, and 87/87 pass/fail count alongside the numbers.
 
 ## 12. What to report in papers, README, website, and sales material
 
