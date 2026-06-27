@@ -46,13 +46,12 @@ environment so report figures trace back to a specific build.
   explaining why single-round code-capacity noise does not produce surface-code
   threshold distance scaling (by-design; PyMatching shows the same behaviour).
 
-
 ### Fixed
 - **Blossom exactness at large distance (adaptive-k).** `BlossomDecoder` previously
   used a fixed `k=12` candidate cap, which undershot the optimum on large dense
-  circuit-level graphs (d ≥ 13–15), producing heavier matchings and a markedly
+  circuit-level graphs (d >= 13-15), producing heavier matchings and a markedly
   worse logical error rate than PyMatching at d=15. The candidate set is now
-  **adaptive**, `k = max(12, 4·√n_defects)`, restoring exact-MWPM LER parity with
+  **adaptive**, `k = max(12, 4*sqrt(n_defects))`, restoring exact-MWPM LER parity with
   PyMatching through **d=15** (`memory_x` and `memory_z`). Locked permanently by
   `test_blossom_adaptive_k_regression.py`, `test_blossom_d15_no_gap.py`,
   `test_blossom_candidate_set_contains_optimal.py`, `test_weight_gap_histogram.py`,
@@ -71,8 +70,8 @@ environment so report figures trace back to a specific build.
   (replaces "Git commit: unknown").
 - **Expanded validation suite** covering: exact-MWPM parity (memory_x/z, p-sweep,
   rounds-sweep), DEM-collapse mathematical equivalence + d=11/d=15 regression
-  fixtures (50,484→6,718 and 132,426→17,862), logical-observable / stabilizer-coset
-  correctness, belief-matching seed×p grid + reference cross-check, BP-OSD on
+  fixtures (50,484->6,718 and 132,426->17,862), logical-observable / stabilizer-coset
+  correctness, belief-matching seed x p grid + reference cross-check, BP-OSD on
   BB[[72,12]]/BB[[144,12,12]]/HGP/bicycle, GPU CPU-bit-identity + fallback +
   calibration, latency percentiles + tail, and memory/leak profiling.
 - **Documentation**: README "Validated scope", "When to use which decoder" decision
@@ -87,7 +86,7 @@ environment so report figures trace back to a specific build.
 ## [0.4.0]
 
 ### Added
-- `SparseBlossomDecoder` (region-growing, RadixHeap, exact DP for n ≤ 20 with
+- `SparseBlossomDecoder` (region-growing, RadixHeap, exact DP for n <= 20 with
   Edmonds primal-dual fallback), bit-validated against `BlossomDecoder`.
 - Ecosystem layer: `codes`, `dem`, `result`, `backend`, `pymatching_compat`,
   `benchmarking`; belief-matching and BP-OSD decoders; Stim/Sinter compatibility.

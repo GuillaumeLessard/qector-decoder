@@ -119,7 +119,7 @@ import numpy as np
 try:
     from importlib.metadata import version, PackageNotFoundError
 
-    __version__ = version("qector-decoder")
+    __version__ = version("qector-decoder-v3")
 except PackageNotFoundError:
     __version__ = "0.5.3"
 
