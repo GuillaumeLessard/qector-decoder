@@ -17,7 +17,9 @@ import sys
 import time
 
 _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(_REPO, "python"))
+import importlib.util
+if importlib.util.find_spec("qector_decoder_v3.qector_decoder_v3") is None:
+    sys.path.insert(0, os.path.join(_REPO, "python"))
 
 import numpy as np  # noqa: E402
 

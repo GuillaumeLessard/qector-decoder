@@ -1,0 +1,88 @@
+{
+  "environment": {
+    "timestamp_unix": null,
+    "python_version": "3.11.0",
+    "python_implementation": "CPython",
+    "platform": "Windows-10-10.0.22621-SP0",
+    "system": "Windows",
+    "machine": "AMD64",
+    "processor": "AMD64 Family 22 Model 48 Stepping 1, AuthenticAMD",
+    "cpu_count_logical": 4,
+    "numpy_version": "2.2.6",
+    "rust_version": null,
+    "cargo_version": null,
+    "git_commit": "bcb743628b2e5170d241e7a310f840c3e19bc07f",
+    "qector_decoder_v3_version": "0.5.4",
+    "pymatching_version": "2.4.0",
+    "stim_version": "1.16.0",
+    "scipy_version": "1.17.1",
+    "ram_total_gb": 7.47,
+    "ram_available_gb": 2.14,
+    "cuda_available": false,
+    "opencl_available": false,
+    "command": "C:\\Users\\Admin\\Desktop\\qector-push-clean\\scripts\\native_memory_profile.py --distances 5 9 --batch 4096 --out C:\\Users\\Admin\\Desktop\\qector-push-clean\\qector_evidence_bundle\\native_memory"
+  },
+  "batch": 4096,
+  "results": [
+    {
+      "decoder": "cpu_batch",
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "batch": 4096,
+      "rss_base_mib": 57.86,
+      "rss_peak_mib": 58.57,
+      "native_delta_mib": 0.71
+    },
+    {
+      "decoder": "blossom",
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "batch": 4096,
+      "rss_base_mib": 58.64,
+      "rss_peak_mib": 58.7,
+      "native_delta_mib": 0.06
+    },
+    {
+      "decoder": "fast_union_find",
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "batch": 4096,
+      "rss_base_mib": 58.82,
+      "rss_peak_mib": 58.85,
+      "native_delta_mib": 0.02
+    },
+    {
+      "decoder": "cpu_batch",
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "batch": 4096,
+      "rss_base_mib": 59.87,
+      "rss_peak_mib": 60.84,
+      "native_delta_mib": 0.97
+    },
+    {
+      "decoder": "blossom",
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "batch": 4096,
+      "rss_base_mib": 59.82,
+      "rss_peak_mib": 60.41,
+      "native_delta_mib": 0.59
+    },
+    {
+      "decoder": "fast_union_find",
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "batch": 4096,
+      "rss_base_mib": 60.39,
+      "rss_peak_mib": 60.41,
+      "native_delta_mib": 0.02
+    }
+  ]
+}

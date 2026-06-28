@@ -1,0 +1,16 @@
+p=0.004 seed=0 pm=0.0040 belief=0.0000 red=+100.0%
+p=0.004 seed=1 pm=0.0000 belief=0.0000 red=+0.0%
+p=0.004 seed=2 pm=0.0040 belief=0.0040 red=+0.0%
+p=0.004 seed=3 pm=0.0040 belief=0.0020 red=+50.0%
+p=0.004 seed=4 pm=0.0060 belief=0.0080 red=-33.3%
+p=0.005 seed=0 pm=0.0140 belief=0.0120 red=+14.3%
+p=0.005 seed=1 pm=0.0120 belief=0.0100 red=+16.7%
+p=0.005 seed=2 pm=0.0060 belief=0.0100 red=-66.7%
+p=0.005 seed=3 pm=0.0000 belief=0.0020 red=+0.0%
+p=0.005 seed=4 pm=0.0060 belief=0.0080 red=-33.3%
+p=0.006 seed=0 pm=0.0240 belief=0.0120 red=+50.0%
+p=0.006 seed=1 pm=0.0160 belief=0.0160 red=+0.0%
+p=0.006 seed=2 pm=0.0120 belief=0.0060 red=+50.0%
+p=0.006 seed=3 pm=0.0140 belief=0.0120 red=+14.3%
+p=0.006 seed=4 pm=0.0160 belief=0.0100 red=+37.5%
+wrote C:\Users\Admin\Desktop\qector-push-clean\qector_evidence_bundle\belief_grid.json

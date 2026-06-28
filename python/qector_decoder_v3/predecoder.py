@@ -118,6 +118,24 @@ class PredecodedDecoder:
         self.last_predecoded = resolved
         return committed, s
 
+    def batch_decode(self, syndromes) -> np.ndarray:
+        """Decode a batch of syndromes.
+
+        Parameters
+        ----------
+        syndromes : array-like, shape (n_shots, n_checks)
+            Each row is a single syndrome bit-vector.
+
+        Returns
+        -------
+        np.ndarray, shape (n_shots, n_qubits)
+            Correction vectors, one per shot.
+        """
+        S = np.asarray(syndromes, dtype=np.uint8)
+        if S.ndim == 1:
+            S = S.reshape(1, -1)
+        return np.stack([self.decode(S[i]) for i in range(len(S))], axis=0)
+
     def decode(self, syndrome) -> np.ndarray:
         s = np.asarray(syndrome, dtype=np.uint8).reshape(-1)
         committed, residual = self._predecode(s)

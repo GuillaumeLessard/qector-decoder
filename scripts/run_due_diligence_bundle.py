@@ -25,7 +25,9 @@ import time
 
 _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _SCRIPTS = os.path.join(_REPO, "scripts")
-sys.path.insert(0, os.path.join(_REPO, "python"))
+import importlib.util
+if importlib.util.find_spec("qector_decoder_v3.qector_decoder_v3") is None:
+    sys.path.insert(0, os.path.join(_REPO, "python"))
 
 import numpy as np  # noqa: E402
 
@@ -204,13 +206,16 @@ def main() -> int:
     with open(os.path.join(out, "pip_freeze.txt"), "w", encoding="utf-8") as fh:
         fh.write(freeze.stdout)
 
-    cargo = subprocess.run(["cargo", "metadata", "--format-version", "1", "--no-deps"],
-                           capture_output=True, text=True, check=False, cwd=_REPO)
-    if cargo.returncode == 0 and cargo.stdout.strip():
-        with open(os.path.join(out, "cargo_metadata.json"), "w", encoding="utf-8") as fh:
-            fh.write(cargo.stdout)
-        manifest["cargo_metadata"] = True
-    else:
+    try:
+        cargo = subprocess.run(["cargo", "metadata", "--format-version", "1", "--no-deps"],
+                               capture_output=True, text=True, check=False, cwd=_REPO)
+        if cargo.returncode == 0 and cargo.stdout.strip():
+            with open(os.path.join(out, "cargo_metadata.json"), "w", encoding="utf-8") as fh:
+                fh.write(cargo.stdout)
+            manifest["cargo_metadata"] = True
+        else:
+            manifest["cargo_metadata"] = False
+    except (FileNotFoundError, Exception):
         manifest["cargo_metadata"] = False
 
     # Optional PDF report (reportlab/matplotlib).

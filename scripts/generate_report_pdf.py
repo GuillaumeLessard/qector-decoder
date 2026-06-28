@@ -104,7 +104,9 @@ ENVIRONMENT = {
 def _environment():
     """Live environment for the title page (falls back to the static dict)."""
     try:
-        sys.path.insert(0, os.path.join(_REPO, "python"))
+        import importlib.util
+        if importlib.util.find_spec("qector_decoder_v3.qector_decoder_v3") is None:
+            sys.path.insert(0, os.path.join(_REPO, "python"))
         from qector_decoder_v3 import benchmarking as _bm
         e = _bm.capture_environment()
         out = {

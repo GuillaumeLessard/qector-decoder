@@ -1,0 +1,7 @@
+d= 5 cpu_batch        base=    57.9MiB peak=    58.6MiB native_delta=   0.71MiB
+d= 5 blossom          base=    58.6MiB peak=    58.7MiB native_delta=   0.06MiB
+d= 5 fast_union_find  base=    58.8MiB peak=    58.8MiB native_delta=   0.02MiB
+d= 9 cpu_batch        base=    59.9MiB peak=    60.8MiB native_delta=   0.97MiB
+d= 9 blossom          base=    59.8MiB peak=    60.4MiB native_delta=   0.59MiB
+d= 9 fast_union_find  base=    60.4MiB peak=    60.4MiB native_delta=   0.02MiB
+wrote C:\Users\Admin\Desktop\qector-push-clean\qector_evidence_bundle\native_memory.json

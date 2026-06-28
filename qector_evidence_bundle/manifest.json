@@ -1,0 +1,63 @@
+{
+  "started_unix": 1782548245,
+  "quick": true,
+  "steps": [
+    {
+      "name": "correctness_audit",
+      "ok": true,
+      "rc": 0
+    },
+    {
+      "name": "competitive_stim_ler",
+      "ok": true,
+      "rc": 0,
+      "seconds": 10.7
+    },
+    {
+      "name": "stim_ler_d13_d15",
+      "ok": true,
+      "rc": 0,
+      "seconds": 29.4
+    },
+    {
+      "name": "stim_ler_memz",
+      "ok": true,
+      "rc": 0,
+      "seconds": 10.2
+    },
+    {
+      "name": "belief_extended",
+      "ok": true,
+      "rc": 0,
+      "seconds": 1086.3
+    },
+    {
+      "name": "belief_grid",
+      "ok": true,
+      "rc": 0,
+      "seconds": 864.8
+    },
+    {
+      "name": "weight_gap_analysis",
+      "ok": true,
+      "rc": 0,
+      "seconds": 77.6
+    },
+    {
+      "name": "d15_mismatch_audit",
+      "ok": true,
+      "rc": 0,
+      "seconds": 44.2
+    },
+    {
+      "name": "native_memory",
+      "ok": true,
+      "rc": 0,
+      "seconds": 5.0
+    }
+  ],
+  "cargo_metadata": false,
+  "full_report_pdf": true,
+  "finished_unix": 1782550502,
+  "n_artifacts": 26
+}

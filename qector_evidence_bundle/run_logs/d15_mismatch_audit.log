@@ -1,0 +1,8 @@
+=== d=11 memory_x  shots=2000  seed=20260622 edges=6718 ===
+LER  QECTOR(collapsed) = 0.00150 (3 errs)
+LER  PyMatching(collapsed) = 0.00150 (3 errs)
+LER  PyMatching(full sdem) = 0.00150 (3 errs)
+shots QECTOR heavier than PM(collapsed): 150  (QECTOR lighter: 89)
+GAP shots (QECTOR wrong, PM-full right): 0
+recorded mismatch rows: 0  cause breakdown: {'QECTOR_suboptimal_weight': 0, 'same_weight_diff_coset': 0, 'collapse_effect': 0, 'other': 0}
+wrote C:\Users\Admin\Desktop\qector-push-clean\qector_evidence_bundle\d15_mismatch_audit.csv

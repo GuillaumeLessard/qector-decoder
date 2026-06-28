@@ -26,7 +26,7 @@ class TestBenchmarkSuite:
         assert "latency_max_us" in results
         assert "throughput" in results
         assert "timestamp" in results
-        assert results["version"] == "0.5.0"
+        assert results["version"] == qd.__version__
         assert results["n_samples"] == 100
 
     def test_benchmark_save(self, small_decoder, tmp_path):
@@ -37,7 +37,7 @@ class TestBenchmarkSuite:
         suite.save(str(path), results)
         assert path.exists()
         data = json.loads(path.read_text())
-        assert data["version"] == "0.5.0"
+        assert data["version"] == qd.__version__
         assert "throughput" in data
 
     def test_benchmark_positive_latency(self, small_decoder):

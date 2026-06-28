@@ -1,0 +1,4 @@
+d= 9 rounds= 9 raw=26823->edges=3534 | QECTOR-Blossom LER=0.0040 (1371.9us) | PyMatching LER=0.0040 (110.0us) | QECTOR-UF LER=0.0230 (117.1us)
+d=11 rounds=11 raw=50484->edges=6718 | QECTOR-Blossom LER=0.0005 (3964.0us) | PyMatching LER=0.0005 (246.0us) | QECTOR-UF LER=0.0145 (256.2us)
+
+wrote C:\Users\Admin\Desktop\qector-push-clean\qector_evidence_bundle\stim_ler_d13_d15.json and C:\Users\Admin\Desktop\qector-push-clean\qector_evidence_bundle\stim_ler_d13_d15.md

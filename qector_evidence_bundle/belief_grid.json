@@ -1,0 +1,193 @@
+{
+  "environment": {
+    "timestamp_unix": null,
+    "python_version": "3.11.0",
+    "python_implementation": "CPython",
+    "platform": "Windows-10-10.0.22621-SP0",
+    "system": "Windows",
+    "machine": "AMD64",
+    "processor": "AMD64 Family 22 Model 48 Stepping 1, AuthenticAMD",
+    "cpu_count_logical": 4,
+    "numpy_version": "2.2.6",
+    "rust_version": null,
+    "cargo_version": null,
+    "git_commit": "bcb743628b2e5170d241e7a310f840c3e19bc07f",
+    "qector_decoder_v3_version": "0.5.4",
+    "pymatching_version": "2.4.0",
+    "stim_version": "1.16.0",
+    "scipy_version": "1.17.1",
+    "ram_total_gb": 7.47,
+    "ram_available_gb": 2.71,
+    "cuda_available": false,
+    "opencl_available": false,
+    "command": "C:\\Users\\Admin\\Desktop\\qector-push-clean\\scripts\\belief_grid.py --shots 500 --out C:\\Users\\Admin\\Desktop\\qector-push-clean\\qector_evidence_bundle\\belief_grid"
+  },
+  "distance": 5,
+  "shots": 500,
+  "cells": [
+    {
+      "p": 0.004,
+      "seed": 0,
+      "pm_errors": 2,
+      "belief_errors": 0,
+      "pm_ler": 0.004,
+      "belief_ler": 0.0,
+      "reduction_pct": 100.0
+    },
+    {
+      "p": 0.004,
+      "seed": 1,
+      "pm_errors": 0,
+      "belief_errors": 0,
+      "pm_ler": 0.0,
+      "belief_ler": 0.0,
+      "reduction_pct": 0.0
+    },
+    {
+      "p": 0.004,
+      "seed": 2,
+      "pm_errors": 2,
+      "belief_errors": 2,
+      "pm_ler": 0.004,
+      "belief_ler": 0.004,
+      "reduction_pct": 0.0
+    },
+    {
+      "p": 0.004,
+      "seed": 3,
+      "pm_errors": 2,
+      "belief_errors": 1,
+      "pm_ler": 0.004,
+      "belief_ler": 0.002,
+      "reduction_pct": 50.0
+    },
+    {
+      "p": 0.004,
+      "seed": 4,
+      "pm_errors": 3,
+      "belief_errors": 4,
+      "pm_ler": 0.006,
+      "belief_ler": 0.008,
+      "reduction_pct": -33.33333333333333
+    },
+    {
+      "p": 0.005,
+      "seed": 0,
+      "pm_errors": 7,
+      "belief_errors": 6,
+      "pm_ler": 0.014,
+      "belief_ler": 0.012,
+      "reduction_pct": 14.28571428571429
+    },
+    {
+      "p": 0.005,
+      "seed": 1,
+      "pm_errors": 6,
+      "belief_errors": 5,
+      "pm_ler": 0.012,
+      "belief_ler": 0.01,
+      "reduction_pct": 16.666666666666664
+    },
+    {
+      "p": 0.005,
+      "seed": 2,
+      "pm_errors": 3,
+      "belief_errors": 5,
+      "pm_ler": 0.006,
+      "belief_ler": 0.01,
+      "reduction_pct": -66.66666666666667
+    },
+    {
+      "p": 0.005,
+      "seed": 3,
+      "pm_errors": 0,
+      "belief_errors": 1,
+      "pm_ler": 0.0,
+      "belief_ler": 0.002,
+      "reduction_pct": 0.0
+    },
+    {
+      "p": 0.005,
+      "seed": 4,
+      "pm_errors": 3,
+      "belief_errors": 4,
+      "pm_ler": 0.006,
+      "belief_ler": 0.008,
+      "reduction_pct": -33.33333333333333
+    },
+    {
+      "p": 0.006,
+      "seed": 0,
+      "pm_errors": 12,
+      "belief_errors": 6,
+      "pm_ler": 0.024,
+      "belief_ler": 0.012,
+      "reduction_pct": 50.0
+    },
+    {
+      "p": 0.006,
+      "seed": 1,
+      "pm_errors": 8,
+      "belief_errors": 8,
+      "pm_ler": 0.016,
+      "belief_ler": 0.016,
+      "reduction_pct": 0.0
+    },
+    {
+      "p": 0.006,
+      "seed": 2,
+      "pm_errors": 6,
+      "belief_errors": 3,
+      "pm_ler": 0.012,
+      "belief_ler": 0.006,
+      "reduction_pct": 50.0
+    },
+    {
+      "p": 0.006,
+      "seed": 3,
+      "pm_errors": 7,
+      "belief_errors": 6,
+      "pm_ler": 0.014,
+      "belief_ler": 0.012,
+      "reduction_pct": 14.28571428571429
+    },
+    {
+      "p": 0.006,
+      "seed": 4,
+      "pm_errors": 8,
+      "belief_errors": 5,
+      "pm_ler": 0.016,
+      "belief_ler": 0.01,
+      "reduction_pct": 37.5
+    }
+  ],
+  "summary": [
+    {
+      "p": 0.004,
+      "n_seeds": 5,
+      "belief_le_pm": 4,
+      "mean_reduction_pct": 23.333333333333336,
+      "pooled_pm_ler": 0.0036,
+      "pooled_belief_ler": 0.0028,
+      "pooled_reduction_pct": 22.22222222222222
+    },
+    {
+      "p": 0.005,
+      "n_seeds": 5,
+      "belief_le_pm": 2,
+      "mean_reduction_pct": -13.809523809523807,
+      "pooled_pm_ler": 0.0076,
+      "pooled_belief_ler": 0.0084,
+      "pooled_reduction_pct": -10.526315789473696
+    },
+    {
+      "p": 0.006,
+      "n_seeds": 5,
+      "belief_le_pm": 5,
+      "mean_reduction_pct": 30.357142857142854,
+      "pooled_pm_ler": 0.0164,
+      "pooled_belief_ler": 0.0112,
+      "pooled_reduction_pct": 31.707317073170728
+    }
+  ]
+}

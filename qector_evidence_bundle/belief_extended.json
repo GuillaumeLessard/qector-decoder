@@ -1,0 +1,312 @@
+{
+  "environment": {
+    "timestamp_unix": 1782548286,
+    "python_version": "3.11.0",
+    "python_implementation": "CPython",
+    "platform": "Windows-10-10.0.22621-SP0",
+    "system": "Windows",
+    "machine": "AMD64",
+    "processor": "AMD64 Family 22 Model 48 Stepping 1, AuthenticAMD",
+    "cpu_count_logical": 4,
+    "numpy_version": "2.2.6",
+    "rust_version": null,
+    "cargo_version": null,
+    "git_commit": "bcb743628b2e5170d241e7a310f840c3e19bc07f",
+    "qector_decoder_v3_version": "0.5.4",
+    "pymatching_version": "2.4.0",
+    "stim_version": "1.16.0",
+    "scipy_version": "1.17.1",
+    "ram_total_gb": 7.47,
+    "ram_available_gb": 0.36,
+    "cuda_available": false,
+    "opencl_available": false,
+    "command": "C:\\Users\\Admin\\Desktop\\qector-push-clean\\scripts\\belief_extended.py --ms-distances 3 5 --ms-shots 750 --ps-shots 750 --mz-shots 750 --out C:\\Users\\Admin\\Desktop\\qector-push-clean\\qector_evidence_bundle\\belief_extended"
+  },
+  "multiseed": {
+    "basis": "x",
+    "noise": 0.005,
+    "shots": 750,
+    "n_seeds": 8,
+    "rows": [
+      {
+        "d": 3,
+        "seed": 0,
+        "pm_ler": 0.010666666666666666,
+        "belief_ler": 0.010666666666666666,
+        "reduction_pct": 0.0
+      },
+      {
+        "d": 3,
+        "seed": 1,
+        "pm_ler": 0.014666666666666666,
+        "belief_ler": 0.012,
+        "reduction_pct": 18.181818181818176
+      },
+      {
+        "d": 3,
+        "seed": 2,
+        "pm_ler": 0.009333333333333334,
+        "belief_ler": 0.014666666666666666,
+        "reduction_pct": -57.14285714285712
+      },
+      {
+        "d": 3,
+        "seed": 3,
+        "pm_ler": 0.013333333333333334,
+        "belief_ler": 0.017333333333333333,
+        "reduction_pct": -29.999999999999982
+      },
+      {
+        "d": 3,
+        "seed": 4,
+        "pm_ler": 0.014666666666666666,
+        "belief_ler": 0.017333333333333333,
+        "reduction_pct": -18.181818181818187
+      },
+      {
+        "d": 3,
+        "seed": 5,
+        "pm_ler": 0.016,
+        "belief_ler": 0.016,
+        "reduction_pct": 0.0
+      },
+      {
+        "d": 3,
+        "seed": 6,
+        "pm_ler": 0.010666666666666666,
+        "belief_ler": 0.009333333333333334,
+        "reduction_pct": 12.49999999999999
+      },
+      {
+        "d": 3,
+        "seed": 7,
+        "pm_ler": 0.014666666666666666,
+        "belief_ler": 0.014666666666666666,
+        "reduction_pct": 0.0
+      },
+      {
+        "d": 5,
+        "seed": 0,
+        "pm_ler": 0.012,
+        "belief_ler": 0.009333333333333334,
+        "reduction_pct": 22.22222222222222
+      },
+      {
+        "d": 5,
+        "seed": 1,
+        "pm_ler": 0.013333333333333334,
+        "belief_ler": 0.008,
+        "reduction_pct": 40.0
+      },
+      {
+        "d": 5,
+        "seed": 2,
+        "pm_ler": 0.010666666666666666,
+        "belief_ler": 0.009333333333333334,
+        "reduction_pct": 12.49999999999999
+      },
+      {
+        "d": 5,
+        "seed": 3,
+        "pm_ler": 0.004,
+        "belief_ler": 0.004,
+        "reduction_pct": 0.0
+      },
+      {
+        "d": 5,
+        "seed": 4,
+        "pm_ler": 0.010666666666666666,
+        "belief_ler": 0.008,
+        "reduction_pct": 25.0
+      },
+      {
+        "d": 5,
+        "seed": 5,
+        "pm_ler": 0.013333333333333334,
+        "belief_ler": 0.008,
+        "reduction_pct": 40.0
+      },
+      {
+        "d": 5,
+        "seed": 6,
+        "pm_ler": 0.008,
+        "belief_ler": 0.005333333333333333,
+        "reduction_pct": 33.333333333333336
+      },
+      {
+        "d": 5,
+        "seed": 7,
+        "pm_ler": 0.006666666666666667,
+        "belief_ler": 0.004,
+        "reduction_pct": 40.0
+      }
+    ],
+    "summary": [
+      {
+        "d": 3,
+        "n_seeds": 8,
+        "belief_strictly_better": 2,
+        "belief_le_pm": 5,
+        "mean_reduction_pct": -9.33035714285714,
+        "pooled_pm_ler": 0.013,
+        "pooled_belief_ler": 0.014,
+        "pooled_reduction_pct": -7.692307692307687
+      },
+      {
+        "d": 5,
+        "n_seeds": 8,
+        "belief_strictly_better": 7,
+        "belief_le_pm": 8,
+        "mean_reduction_pct": 26.631944444444446,
+        "pooled_pm_ler": 0.009833333333333333,
+        "pooled_belief_ler": 0.007,
+        "pooled_reduction_pct": 28.8135593220339
+      }
+    ]
+  },
+  "psweep": {
+    "basis": "x",
+    "distance": 5,
+    "shots": 750,
+    "seed": 12345,
+    "rows": [
+      {
+        "p": 0.002,
+        "pm_ler": 0.0,
+        "pm_ci95": [
+          0.0,
+          0.005095844461111825
+        ],
+        "belief_ler": 0.0,
+        "belief_ci95": [
+          0.0,
+          0.005095844461111825
+        ],
+        "reduction_pct": 0.0
+      },
+      {
+        "p": 0.004,
+        "pm_ler": 0.0026666666666666666,
+        "pm_ci95": [
+          0.0007316010500480604,
+          0.009670398907271168
+        ],
+        "belief_ler": 0.0013333333333333333,
+        "belief_ci95": [
+          0.0002354048598675689,
+          0.007513517349347958
+        ],
+        "reduction_pct": 50.0
+      },
+      {
+        "p": 0.005,
+        "pm_ler": 0.012,
+        "pm_ci95": [
+          0.006325867282391302,
+          0.02264767691165384
+        ],
+        "belief_ler": 0.006666666666666667,
+        "belief_ci95": [
+          0.002850864733421943,
+          0.015510368468208389
+        ],
+        "reduction_pct": 44.44444444444444
+      },
+      {
+        "p": 0.006,
+        "pm_ler": 0.013333333333333334,
+        "pm_ci95": [
+          0.0072582566758450495,
+          0.024368365266303794
+        ],
+        "belief_ler": 0.010666666666666666,
+        "belief_ci95": [
+          0.005414669682214564,
+          0.020905796763726874
+        ],
+        "reduction_pct": 20.000000000000007
+      },
+      {
+        "p": 0.008,
+        "pm_ler": 0.032,
+        "pm_ci95": [
+          0.021596719597416297,
+          0.047172990818184365
+        ],
+        "belief_ler": 0.024,
+        "belief_ci95": [
+          0.015234165285878187,
+          0.03761707864110027
+        ],
+        "reduction_pct": 25.0
+      },
+      {
+        "p": 0.01,
+        "pm_ler": 0.050666666666666665,
+        "pm_ci95": [
+          0.03713392397594918,
+          0.0687788749131033
+        ],
+        "belief_ler": 0.04533333333333334,
+        "belief_ci95": [
+          0.03262003557332582,
+          0.06268045232331186
+        ],
+        "reduction_pct": 10.526315789473673
+      }
+    ]
+  },
+  "memz": {
+    "basis": "z",
+    "noise": 0.005,
+    "shots": 750,
+    "seed": 2026,
+    "rows": [
+      {
+        "d": 3,
+        "pm_ler": 0.016,
+        "pm_ci95": [
+          0.009175960929790073,
+          0.027756816508566165
+        ],
+        "qmwpm_ler": 0.016,
+        "belief_ler": 0.013333333333333334,
+        "belief_ci95": [
+          0.0072582566758450495,
+          0.024368365266303794
+        ],
+        "reduction_pct": 16.666666666666664
+      },
+      {
+        "d": 5,
+        "pm_ler": 0.006666666666666667,
+        "pm_ci95": [
+          0.002850864733421943,
+          0.015510368468208389
+        ],
+        "qmwpm_ler": 0.006666666666666667,
+        "belief_ler": 0.005333333333333333,
+        "belief_ci95": [
+          0.0020759256901458304,
+          0.0136322297633808
+        ],
+        "reduction_pct": 20.000000000000007
+      },
+      {
+        "d": 7,
+        "pm_ler": 0.0026666666666666666,
+        "pm_ci95": [
+          0.0007316010500480604,
+          0.009670398907271168
+        ],
+        "qmwpm_ler": 0.004,
+        "belief_ler": 0.005333333333333333,
+        "belief_ci95": [
+          0.0020759256901458304,
+          0.0136322297633808
+        ],
+        "reduction_pct": -100.0
+      }
+    ]
+  }
+}

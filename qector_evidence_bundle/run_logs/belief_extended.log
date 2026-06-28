@@ -1,0 +1,26 @@
+[multiseed] d=3 seed=0 pm=0.0107 belief=0.0107 red=+0.0%
+[multiseed] d=3 seed=1 pm=0.0147 belief=0.0120 red=+18.2%
+[multiseed] d=3 seed=2 pm=0.0093 belief=0.0147 red=-57.1%
+[multiseed] d=3 seed=3 pm=0.0133 belief=0.0173 red=-30.0%
+[multiseed] d=3 seed=4 pm=0.0147 belief=0.0173 red=-18.2%
+[multiseed] d=3 seed=5 pm=0.0160 belief=0.0160 red=+0.0%
+[multiseed] d=3 seed=6 pm=0.0107 belief=0.0093 red=+12.5%
+[multiseed] d=3 seed=7 pm=0.0147 belief=0.0147 red=+0.0%
+[multiseed] d=5 seed=0 pm=0.0120 belief=0.0093 red=+22.2%
+[multiseed] d=5 seed=1 pm=0.0133 belief=0.0080 red=+40.0%
+[multiseed] d=5 seed=2 pm=0.0107 belief=0.0093 red=+12.5%
+[multiseed] d=5 seed=3 pm=0.0040 belief=0.0040 red=+0.0%
+[multiseed] d=5 seed=4 pm=0.0107 belief=0.0080 red=+25.0%
+[multiseed] d=5 seed=5 pm=0.0133 belief=0.0080 red=+40.0%
+[multiseed] d=5 seed=6 pm=0.0080 belief=0.0053 red=+33.3%
+[multiseed] d=5 seed=7 pm=0.0067 belief=0.0040 red=+40.0%
+[psweep] d=5 p=0.002 pm=0.0000 belief=0.0000 red=+0.0%
+[psweep] d=5 p=0.004 pm=0.0027 belief=0.0013 red=+50.0%
+[psweep] d=5 p=0.005 pm=0.0120 belief=0.0067 red=+44.4%
+[psweep] d=5 p=0.006 pm=0.0133 belief=0.0107 red=+20.0%
+[psweep] d=5 p=0.008 pm=0.0320 belief=0.0240 red=+25.0%
+[psweep] d=5 p=0.01 pm=0.0507 belief=0.0453 red=+10.5%
+[memz] d=3 pm=0.0160 qmwpm=0.0160 belief=0.0133 red=+16.7%
+[memz] d=5 pm=0.0067 qmwpm=0.0067 belief=0.0053 red=+20.0%
+[memz] d=7 pm=0.0027 qmwpm=0.0040 belief=0.0053 red=-100.0%
+wrote C:\Users\Admin\Desktop\qector-push-clean\qector_evidence_bundle\belief_extended.json

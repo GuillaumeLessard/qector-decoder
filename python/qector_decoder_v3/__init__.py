@@ -1,4 +1,4 @@
-"""
+﻿"""
 QECTOR Decoder v3 — Source-available Rust/Python QEC decoders with reproducible, artifact-hashed benchmark evidence.
 Rust core + PyO3 bindings. Zero-copy NumPy. GIL-free decode.
 
@@ -121,7 +121,7 @@ try:
 
     __version__ = version("qector-decoder-v3")
 except PackageNotFoundError:
-    __version__ = "0.5.4"
+    __version__ = "0.5.5"
 
 
 class UnionFindDecoder:
@@ -770,10 +770,9 @@ class NeuralPredecoder:
         try:
             self._inner.train(syndromes, corrections, n_epochs, learning_rate)
         except TypeError as exc:
-            if (
-                "not an instance of 'ndarray'" in str(exc)
-                and int(np.__version__.split(".")[0]) >= 2
-            ):
+            if "not an instance of \'ndarray\'" in str(exc) and int(
+                np.__version__.split(".")[0]
+            ) >= 2:
                 raise RuntimeError(
                     "NeuralPredecoder.train() is not usable with numpy "
                     f"{np.__version__}. The compiled qector_decoder_v3 extension's "
@@ -783,7 +782,7 @@ class NeuralPredecoder:
                     "lists or rebuilding the array in pure Python does not help). "
                     "predict() and decode() are unaffected and work normally on this "
                     "numpy version. To train a model right now, use an environment "
-                    "with 'numpy<2' installed; this is tracked for a native fix in a "
+                    "with \'numpy<2\' installed; this is tracked for a native fix in a "
                     "future qector-decoder-v3 wheel rebuild."
                 ) from exc
             raise

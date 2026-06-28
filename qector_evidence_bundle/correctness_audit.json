@@ -1,0 +1,92 @@
+{
+  "environment": {
+    "timestamp_unix": 1782548230,
+    "python_version": "3.11.0",
+    "python_implementation": "CPython",
+    "platform": "Windows-10-10.0.22621-SP0",
+    "system": "Windows",
+    "machine": "AMD64",
+    "processor": "AMD64 Family 22 Model 48 Stepping 1, AuthenticAMD",
+    "cpu_count_logical": 4,
+    "numpy_version": "2.2.6",
+    "rust_version": null,
+    "cargo_version": null,
+    "git_commit": "bcb743628b2e5170d241e7a310f840c3e19bc07f",
+    "qector_decoder_v3_version": "0.5.4",
+    "pymatching_version": "2.4.0",
+    "stim_version": "1.16.0",
+    "scipy_version": "1.17.1",
+    "ram_total_gb": 7.47,
+    "ram_available_gb": 0.37,
+    "cuda_available": false,
+    "opencl_available": false
+  },
+  "seed": 20260622,
+  "all_faithful": true,
+  "results": [
+    {
+      "code": "rotated_surface_d3",
+      "distance": 3,
+      "n_qubits": 9,
+      "shots": 2000,
+      "syndrome_faithful": {
+        "cpu_batch": true,
+        "blossom": true,
+        "sparse_blossom": true,
+        "union_find": true
+      },
+      "gpu_bit_identical_to_cpu": {
+        "cuda": null,
+        "opencl": null
+      }
+    },
+    {
+      "code": "rotated_surface_d5",
+      "distance": 5,
+      "n_qubits": 25,
+      "shots": 2000,
+      "syndrome_faithful": {
+        "cpu_batch": true,
+        "blossom": true,
+        "sparse_blossom": true,
+        "union_find": true
+      },
+      "gpu_bit_identical_to_cpu": {
+        "cuda": null,
+        "opencl": null
+      }
+    },
+    {
+      "code": "rotated_surface_d7",
+      "distance": 7,
+      "n_qubits": 49,
+      "shots": 2000,
+      "syndrome_faithful": {
+        "cpu_batch": true,
+        "blossom": true,
+        "sparse_blossom": true,
+        "union_find": true
+      },
+      "gpu_bit_identical_to_cpu": {
+        "cuda": null,
+        "opencl": null
+      }
+    },
+    {
+      "code": "rotated_surface_d9",
+      "distance": 9,
+      "n_qubits": 81,
+      "shots": 2000,
+      "syndrome_faithful": {
+        "cpu_batch": true,
+        "blossom": true,
+        "sparse_blossom": true,
+        "union_find": true
+      },
+      "gpu_bit_identical_to_cpu": {
+        "cuda": null,
+        "opencl": null
+      }
+    }
+  ]
+}

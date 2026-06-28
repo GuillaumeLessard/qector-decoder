@@ -1,0 +1,5 @@
+d= 3 rounds= 3 raw=  556->edges=  78 | QECTOR-Blossom LER=0.0130 (7.6us) | PyMatching LER=0.0130 (2.0us) | QECTOR-UF LER=0.0145 (3.0us)
+d= 5 rounds= 5 raw= 3706->edges= 502 | QECTOR-Blossom LER=0.0080 (71.4us) | PyMatching LER=0.0080 (12.4us) | QECTOR-UF LER=0.0380 (13.2us)
+d= 7 rounds= 7 raw=11974->edges=1558 | QECTOR-Blossom LER=0.0045 (456.5us) | PyMatching LER=0.0045 (40.2us) | QECTOR-UF LER=0.0170 (47.2us)
+
+wrote C:\Users\Admin\Desktop\qector-push-clean\qector_evidence_bundle\stim_ler_memz.json and C:\Users\Admin\Desktop\qector-push-clean\qector_evidence_bundle\stim_ler_memz.md

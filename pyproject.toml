@@ -10,7 +10,7 @@ ignore = ["E702", "E402"]
 
 [project]
 name = "qector-decoder-v3"
-version = "0.5.4"
+version = "0.5.5"
 description = "Source-available Rust/Python quantum error correction decoder package for QEC research, PyMatching-compatible validation, belief-matching, BP-OSD/qLDPC workflows, CPU/GPU batch decoding, and reproducible benchmark evidence"
 readme = {file = "PYPI_README.md", content-type = "text/markdown"}
 requires-python = ">=3.9,<3.14"
