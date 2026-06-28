@@ -91,3 +91,7 @@ _pytest_*.log
 _pytest_v*.log
 test_full_v*.py
 test_v0*.py
+
+# kimi probe/fix helpers
+_kimi_fix_probe.py
+_fix_fixtures.py
