@@ -78,3 +78,16 @@ htmlcov/
 *.tmp
 *.bak
 *.orig
+
+# --- Session scratch / probe files (never committed) ---
+_kimi_probe*.py
+_kimi_probe*.txt
+_probe*.py
+_opencl_probe.py
+_check_gitignore.ps1
+_search_*.ps1
+_search_*.txt
+_pytest_*.log
+_pytest_v*.log
+test_full_v*.py
+test_v0*.py
