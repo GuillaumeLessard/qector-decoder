@@ -1,6 +1,6 @@
 # QECTOR Decoder v3
 
-**Python and Rust quantum error correction decoder package — v0.5.6**
+**Python and Rust quantum error correction decoder package — v0.5.7**
 
 QECTOR Decoder v3 helps researchers and developers build and benchmark quantum error correction decoder workflows from Python, with native Rust performance paths, GPU acceleration, and artifact-backed reproducible evidence.
 
@@ -248,6 +248,7 @@ LookupTableDecoder is the fastest single-shot decoder on rep d=5 (precomputed ta
 
 | Version | Date | Key change |
 |---|---|---|
+| **0.5.7** | 2026-06-29 | Advanced strategic QEC decoders: Fusion/Sparse Blossom, EBP, Restart Belief, KAT/QCT, Astra GNN, GPU pipelines |
 | **0.5.6** | 2026-06-28 | `stim_compat` doc fix: `stim_circuit_to_check_matrix` documented as parallel impl, not alias |
 | 0.5.5 | 2026-06-28 | `PredecodedDecoder.batch_decode()` wheel sync; PYTHONPATH guard; 775 tests pass |
 | 0.5.4 | 2026-06-27 | `NeuralPredecoder.train()` clear error on numpy>=2.0; 125/125 validation |

@@ -1,4 +1,4 @@
-# Installation Guide — QECTOR Decoder v3 (v0.5.6)
+# Installation Guide — QECTOR Decoder v3 (v0.5.7)
 
 The fastest path is a direct PyPI wheel install. Source builds are only needed
 when you want to develop against the Rust core or target a platform without a
@@ -65,7 +65,7 @@ $env:PYO3_PYTHON = (Resolve-Path .\.venv\Scripts\python.exe).Path
 Expected output ending:
 
 ```
-Installed qector-decoder-v3-0.5.6
+Installed qector-decoder-v3-0.5.7
 QECTOR OK
 ```
 

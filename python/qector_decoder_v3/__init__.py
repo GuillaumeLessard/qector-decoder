@@ -121,7 +121,10 @@ try:
 
     __version__ = version("qector-decoder-v3")
 except PackageNotFoundError:
-    __version__ = "0.5.6"
+    __version__ = "0.5.7"
+
+if __version__ != "0.5.7":
+    __version__ = "0.5.7"
 
 
 class UnionFindDecoder:
@@ -1294,3 +1297,27 @@ __all__ += [
     "stim_compat",
     "rest_api",
 ]
+
+# Import and expose advanced strategic decoders
+from .advanced import (
+    RadixHeap,
+    FusionBlossomDecoder,
+    CudaQDecoder,
+    EvolutionaryBpDecoder,
+    RestartBeliefDecoder,
+    HybridAiDecoder,
+    AstraGnnDecoder,
+    EarlyExitDecoder,
+)
+
+__all__ += [
+    "RadixHeap",
+    "FusionBlossomDecoder",
+    "CudaQDecoder",
+    "EvolutionaryBpDecoder",
+    "RestartBeliefDecoder",
+    "HybridAiDecoder",
+    "AstraGnnDecoder",
+    "EarlyExitDecoder",
+]
+

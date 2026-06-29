@@ -6,7 +6,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/GuillaumeLessard/qector-decoder.svg)](https://github.com/GuillaumeLessard/qector-decoder/stargazers)
 [![GitHub last commit](https://img.shields.io/github/last-commit/GuillaumeLessard/qector-decoder)](https://github.com/GuillaumeLessard/qector-decoder/commits/main)
 
-Source-available Rust/Python QEC decoder package — v0.5.6
+Source-available Rust/Python QEC decoder package — v0.5.7
 
 PyMatching-compatible MWPM validation, belief-matching accuracy mode, BP-OSD for LDPC/qLDPC, CPU/GPU batch decoding, Stim/Sinter integration, and artifact-backed benchmark evidence.
 
@@ -216,6 +216,7 @@ Full artifact: `benchmark_results/results_v053_retest.json`
 
 | Version | Date | Key change |
 |---|---|---|
+| 0.5.7 | 2026-06-29 | Advanced strategic QEC decoders: Fusion/Sparse Blossom, EBP, Restart Belief, KAT/QCT, Astra GNN, GPU pipelines |
 | 0.5.6 | 2026-06-28 | `stim_compat` doc fix: `stim_circuit_to_check_matrix` is parallel impl, not alias |
 | 0.5.5 | 2026-06-28 | `PredecodedDecoder.batch_decode()` wheel fix; PYTHONPATH guard; 775 tests pass |
 | 0.5.4 | 2026-06-27 | `NeuralPredecoder.train()` clear error on numpy>=2.0; 125/125 validation |

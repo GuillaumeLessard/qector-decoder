@@ -1,6 +1,6 @@
 [package]
 name = "qector_decoder_v3"
-version = "0.5.6"
+version = "0.5.7"
 edition = "2021"
 authors = ["Guillaume Lessard / iD01t Productions <guiliguili2705@gmail.com>"]
 description = "Source-available Rust QEC decoder core (Union-Find, exact polynomial MWPM/Blossom, Sparse Blossom, BP-OSD) with CPU/CUDA/OpenCL batch decoding and PyO3 bindings"
