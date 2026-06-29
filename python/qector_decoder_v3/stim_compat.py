@@ -10,7 +10,7 @@ Usage — code-capacity (matching graph) ::
     import stim
     from qector_decoder_v3.stim_compat import (
         from_stim_detector_error_model,
-        stim_circuit_to_check_matrix,   # alias for from_stim_detector_error_model
+        stim_circuit_to_check_matrix,   # superset: also accepts stim.Circuit objects
         to_stim_decoder,
         stim_decoder_from_dem,
     )
@@ -19,7 +19,7 @@ Usage — code-capacity (matching graph) ::
     circuit = stim.Circuit.generated("surface_code:rotated_memory_x", distance=5)
     dem = circuit.detector_error_model(decompose_errors=True)
     c2q, nq = from_stim_detector_error_model(dem)
-    # stim_circuit_to_check_matrix(dem) is an identical alias
+    # stim_circuit_to_check_matrix(dem) also works; it additionally accepts stim.Circuit
 
     # 2. Créer un wrapper QECTOR compatible stim.Decoder
     decoder = stim_decoder_from_dem(dem)
