@@ -24,6 +24,7 @@ Example
 
 from __future__ import annotations
 
+import os
 import time
 from dataclasses import dataclass, field
 from typing import List, Optional
@@ -119,7 +120,13 @@ class AutoDecoder:
         self._opencl: Optional[OpenCLBatchDecoder] = None
 
         self._cuda_ok = bool(self.config.allow_gpu and cuda_is_available())
-        self._opencl_ok = bool(self.config.allow_gpu and opencl_is_available())
+        # OpenCL availability probes can succeed even when constructing the native
+        # decoder crashes in a vendor driver. Keep direct OpenCL use available via
+        # OpenCLBatchDecoder, but require an explicit opt-in for automatic routing.
+        opencl_auto = os.environ.get("QECTOR_ENABLE_OPENCL_AUTO", "").lower() in {"1", "true", "yes", "on"}
+        self._opencl_ok = bool(self.config.allow_gpu and opencl_auto and opencl_is_available())
+        if self.config.allow_gpu and not opencl_auto and opencl_is_available():
+            self._diag.warnings.append("OpenCL auto-routing disabled; set QECTOR_ENABLE_OPENCL_AUTO=1 to enable it")
 
     # -- availability ------------------------------------------------------
     def available_backends(self) -> List[str]:
