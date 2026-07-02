@@ -40,6 +40,4 @@ def test_sparse_blossom_dense_faithful(code, p):
         if s.sum() >= code.n_checks // 4:
             dense_seen += 1
     # confirm we genuinely exercised dense syndromes, not sparse ones
-    assert dense_seen > n_shots // 2, (
-        f"{code.name} p={p}: expected many dense syndromes, saw {dense_seen}"
-    )
+    assert dense_seen > n_shots // 2, f"{code.name} p={p}: expected many dense syndromes, saw {dense_seen}"

@@ -1,86 +1,33 @@
 """
 QECTOR Decoder v3 — Source-available Rust/Python QEC decoders with reproducible, artifact-hashed benchmark evidence.
 Rust core + PyO3 bindings. Zero-copy NumPy. GIL-free decode.
-
-Independently validated (v0.5.3, 2026-06-25, PyPI install, isolated venv):
-    Platform:  Windows 10, AMD Ryzen (16 cores), Python 3.11, NumPy 2.2.6
-    GPU:       NVIDIA GeForce GTX 1660 Ti (CUDA 7.5)
-    Reference: PyMatching 2.4.0, stim 1.16.0, sinter 1.16.0
-    Result:    87/87 automated checks PASS (primary 20k + re-test 100k shots/pt)
-
-    Workbench single-decode (repetition d=5, Blossom, 1000 trials):
-        throughput: 208,334 decodes/s
-        p50: 4.80 µs  |  p90: 8.30 µs  |  p99: 20.30 µs  |  max: 69.8 µs
-        syndrome_faithful: True
-
-    CPU batch throughput (repetition d=9):
-        UnionFindDecoder:   ~1.06M shots/s
-        BlossomDecoder:     ~2.70M shots/s
-        SparseBlossomDecoder: ~1.80M shots/s
-        CPUBatchDecoder:    ~0.34M shots/s
-        BatchDecoder:       ~2.67M shots/s (parallel_batch_decode)
-
-    CUDA GPU vs CPU (100k shots, GTX 1660 Ti):
-        repetition_code(d=9):       7.67× faster than CPU batch
-        rotated_surface_code(d=5):  6.93× faster than CPU batch
-        GPU output: 100% valid, 100% CPU-agreeing
 """
 
-try:
-    # Attempt to import compiled Rust bindings from the installed wheel package
-    from qector_decoder_v3.qector_decoder_v3 import (
-        UnionFindDecoder as _RustUnionFindDecoder,
-        FastUnionFindDecoder as _RustFastUnionFindDecoder,
-        BlossomDecoder as _RustBlossomDecoder,
-        SlidingWindowDecoder as _RustSlidingWindowDecoder,
-        StreamingDecoder as _RustStreamingDecoder,
-        BatchDecoder as _RustBatchDecoder,
-        CPUBatchDecoder as _RustCPUBatchDecoder,
-        OpenCLBatchDecoder as _RustOpenCLBatchDecoder,
-        BenchmarkSuite as _RustBenchmarkSuite,
-        LookupTableDecoder as _RustLookupTableDecoder,
-        BPOSDDecoder as _RustBPOSDDecoder,
-        NeuralPredecoder as _RustNeuralPredecoder,
-        DetectorGraph as _RustDetectorGraph,
-        GNNPredecoder as _RustGNNPredecoder,
-        GNNTrainer as _RustGNNTrainer,
-        SparseBlossomDecoder as _RustSparseBlossomDecoder,
-        HybridDecoder as _RustHybridDecoder,
-        py_check_to_edges,
-        py_generate_surface_code_checks,
-        py_generate_toy_code_checks,
-        py_generate_ring_code_checks,
-        py_generate_repetition_code_checks,
-        run_mcp_server,
-    )
-except Exception:
-    # Fallback to the source version (editable install) if wheel is not available
-    from .qector_decoder_v3 import (
-        UnionFindDecoder as _RustUnionFindDecoder,
-        FastUnionFindDecoder as _RustFastUnionFindDecoder,
-        BlossomDecoder as _RustBlossomDecoder,
-        SlidingWindowDecoder as _RustSlidingWindowDecoder,
-        StreamingDecoder as _RustStreamingDecoder,
-        BatchDecoder as _RustBatchDecoder,
-        CPUBatchDecoder as _RustCPUBatchDecoder,
-        OpenCLBatchDecoder as _RustOpenCLBatchDecoder,
-        BenchmarkSuite as _RustBenchmarkSuite,
-        LookupTableDecoder as _RustLookupTableDecoder,
-        BPOSDDecoder as _RustBPOSDDecoder,
-        NeuralPredecoder as _RustNeuralPredecoder,
-        DetectorGraph as _RustDetectorGraph,
-        GNNPredecoder as _RustGNNPredecoder,
-        GNNTrainer as _RustGNNTrainer,
-        SparseBlossomDecoder as _RustSparseBlossomDecoder,
-        HybridDecoder as _RustHybridDecoder,
-        py_check_to_edges,
-        py_generate_surface_code_checks,
-        py_generate_toy_code_checks,
-        py_generate_ring_code_checks,
-        py_generate_repetition_code_checks,
-        run_mcp_server,
-    )
-
+from .qector_decoder_v3 import (
+    UnionFindDecoder as _RustUnionFindDecoder,
+    FastUnionFindDecoder as _RustFastUnionFindDecoder,
+    BlossomDecoder as _RustBlossomDecoder,
+    SlidingWindowDecoder as _RustSlidingWindowDecoder,
+    StreamingDecoder as _RustStreamingDecoder,
+    BatchDecoder as _RustBatchDecoder,
+    CPUBatchDecoder as _RustCPUBatchDecoder,
+    OpenCLBatchDecoder as _RustOpenCLBatchDecoder,
+    BenchmarkSuite as _RustBenchmarkSuite,
+    LookupTableDecoder as _RustLookupTableDecoder,
+    BPOSDDecoder as _RustBPOSDDecoder,
+    NeuralPredecoder as _RustNeuralPredecoder,
+    DetectorGraph as _RustDetectorGraph,
+    GNNPredecoder as _RustGNNPredecoder,
+    GNNTrainer as _RustGNNTrainer,
+    SparseBlossomDecoder as _RustSparseBlossomDecoder,
+    HybridDecoder as _RustHybridDecoder,
+    py_check_to_edges,
+    py_generate_surface_code_checks,
+    py_generate_toy_code_checks,
+    py_generate_ring_code_checks,
+    py_generate_repetition_code_checks,
+    run_mcp_server,
+)
 
 try:
     from .qector_decoder_v3 import (
@@ -95,36 +42,94 @@ except ImportError:
 
 
 try:
-    from .qector_decoder_v3 import opencl_is_available
+    from .qector_decoder_v3 import opencl_is_available as _rust_opencl_is_available
 except ImportError:
 
-    def opencl_is_available():
+    def _rust_opencl_is_available():
         return False
 
 
 try:
-    from .qector_decoder_v3 import run_grpc_server, start_metrics_server
+    from .qector_decoder_v3 import run_grpc_server
 except ImportError:
+    run_grpc_server = None
 
-    def start_metrics_server(*_, **__):
-        raise NotImplementedError("start_metrics_server is not available in this build")
+try:
+    from .qector_decoder_v3 import start_metrics_server
+except ImportError:
+    start_metrics_server = None  # type: ignore[assignment]
 
-    def run_grpc_server(*_, **__):
-        raise NotImplementedError("run_grpc_server is not available in this build")
-
+import os
+import subprocess
+import sys
 
 import numpy as np
 
+# The authoritative runtime version is whatever the compiled Rust core reports.
+# ``__fallback_version__`` is the Python-packaging version (pyproject/Cargo) and is
+# used ONLY when the compiled module does not expose ``__version__`` (e.g. an old
+# wheel). We never overwrite a real compiled ``__version__`` with it — doing so
+# would falsely claim a version the loaded binary is not — so after a version bump
+# ``__version__`` keeps reporting the *built* value until the Rust wheel is rebuilt.
+__fallback_version__ = "0.5.7"
 
 try:
-    from importlib.metadata import version, PackageNotFoundError
+    from .qector_decoder_v3 import __version__
+except (ImportError, AttributeError):
+    __version__ = __fallback_version__
 
-    __version__ = version("qector-decoder-v3")
-except PackageNotFoundError:
-    __version__ = "0.5.7"
+_OPENCL_HEALTH_CACHE: bool | None = None
 
-if __version__ != "0.5.7":
-    __version__ = "0.5.7"
+
+def _opencl_raw_available() -> bool:
+    try:
+        return bool(_rust_opencl_is_available())
+    except Exception:
+        return False
+
+
+def _opencl_health_check() -> bool:
+    """Return True only when OpenCL can construct and decode a tiny batch.
+
+    Some OpenCL driver stacks report a device but crash the process during
+    context/kernel setup. Probe that risky path in a child process so production
+    code can fall back to CPU instead of taking down the caller.
+    """
+    global _OPENCL_HEALTH_CACHE
+    if os.environ.get("QECTOR_DISABLE_OPENCL", "").lower() in {"1", "true", "yes", "on"}:
+        return False
+    if os.environ.get("QECTOR_OPENCL_PROBE_CHILD") == "1":
+        return _opencl_raw_available()
+    if _OPENCL_HEALTH_CACHE is not None:
+        return _OPENCL_HEALTH_CACHE
+    if not _opencl_raw_available():
+        _OPENCL_HEALTH_CACHE = False
+        return False
+
+    code = (
+        "import os\n"
+        "os.environ['QECTOR_OPENCL_PROBE_CHILD']='1'\n"
+        "import numpy as np\n"
+        "import qector_decoder_v3 as qd\n"
+        "dec = qd.OpenCLBatchDecoder([[0, 1]], 2)\n"
+        "out = np.asarray(dec.batch_decode(np.array([[1]], dtype=np.uint8)), dtype=np.uint8)\n"
+        "assert out.shape == (1, 2)\n"
+    )
+    try:
+        proc = subprocess.run(
+            [sys.executable, "-c", code],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=float(os.environ.get("QECTOR_OPENCL_PROBE_TIMEOUT", "10")),
+        )
+        _OPENCL_HEALTH_CACHE = proc.returncode == 0
+    except Exception:
+        _OPENCL_HEALTH_CACHE = False
+    return _OPENCL_HEALTH_CACHE
+
+
+def opencl_is_available():
+    return _opencl_health_check()
 
 
 class UnionFindDecoder:
@@ -132,17 +137,6 @@ class UnionFindDecoder:
 
     Rust core with PyO3 bindings. Zero-copy NumPy interop.
     GIL is released during decode for true parallelism.
-
-    Performance (independently validated, Windows 10, AMD Ryzen, Python 3.11):
-        - repetition_code(d=5):  ~9.3 µs/decode,  ~1.06M shots/s (batch)
-        - repetition_code(d=9):  ~10.0 µs/decode
-        - rotated_surface_code(d=3): ~12.2 µs/decode
-        - rotated_surface_code(d=5): ~10.1 µs/decode
-
-    Accuracy note:
-        UnionFind LER averages ~3.1× that of Blossom/MWPM across d=3–9.
-        All corrections are 100% syndrome-valid. Use when throughput dominates
-        over accuracy; use BlossomDecoder when LER matters.
     """
 
     def __init__(self, check_to_qubits, n_qubits=None):
@@ -183,12 +177,6 @@ class FastUnionFindDecoder:
 
     Uses pre-allocated reusable buffers, AVX2 runtime dispatch, and FFI.
     Same API as UnionFindDecoder but with lower overhead.
-
-    Performance (independently validated, Windows 10, AMD Ryzen, Python 3.11):
-        - repetition_code(d=5):  ~9.5 µs/decode
-        - repetition_code(d=9):  ~10.2 µs/decode
-        - rotated_surface_code(d=3): ~11.4 µs/decode
-        - rotated_surface_code(d=5): ~12.1 µs/decode
     """
 
     def __init__(self, check_to_qubits, n_qubits=None):
@@ -227,21 +215,6 @@ class BlossomDecoder:
     """Minimum-Weight Perfect Matching (MWPM) decoder via Edmonds' Blossom algorithm.
 
     Supports weighted edges for higher decoding accuracy on realistic codes.
-
-    Performance (independently validated, Windows 10, AMD Ryzen, Python 3.11):
-        - repetition_code(d=5):  ~10.6 µs/decode,  ~2.70M shots/s (batch)
-        - repetition_code(d=9):  ~10.6 µs/decode
-        - rotated_surface_code(d=3): ~14.8 µs/decode
-        - rotated_surface_code(d=5): ~16.8 µs/decode
-
-    Accuracy (100k shots/pt, independent validation vs PyMatching 2.4.0):
-        Repetition code (d=3–9):  LER within 0.00% of PyMatching
-        Surface code (d=3–7):     LER within 1.78% of PyMatching
-        pymatching_compat layer:  bit-identical to PyMatching 2.4.0
-
-    Sample LER data (repetition code, Blossom = PyMatching at all distances):
-        d=3, p=0.05: LER=0.0069  d=5, p=0.05: LER=0.0011
-        d=7, p=0.05: LER=0.0002  d=9, p=0.05: LER<0.0001
     """
 
     def __init__(self, check_to_qubits, n_qubits=None, edge_weights=None):
@@ -289,9 +262,7 @@ class SlidingWindowDecoder:
     the standard Union-Find decoder.
     """
 
-    def __init__(
-        self, check_to_qubits, n_qubits=None, window_size=10, decay_factor=0.8
-    ):
+    def __init__(self, check_to_qubits, n_qubits=None, window_size=10, decay_factor=0.8):
         if not check_to_qubits:
             raise ValueError("check_to_qubits must be non-empty")
         c2q = [[int(q) for q in check] for check in check_to_qubits]
@@ -379,11 +350,6 @@ class BatchDecoder:
     """Parallel batch decoder using Rayon (Rust data parallelism).
 
     Distributes batch decoding across all CPU cores.
-
-    Performance (independently validated, Windows 10, AMD Ryzen, Python 3.11):
-        - repetition_code(d=9):  ~2.67M shots/s  (parallel_batch_decode)
-                                  ~1.88M shots/s  (batch_decode alias)
-        Use parallel_batch_decode for maximum throughput.
     """
 
     def __init__(self, check_to_qubits, n_qubits=None):
@@ -402,16 +368,6 @@ class BatchDecoder:
             raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
         return self._inner.parallel_batch_decode(syndromes)
 
-    def decode(self, syndrome):
-        """Single-syndrome decode. Wraps a 1-row batch for API consistency."""
-        if not isinstance(syndrome, np.ndarray):
-            syndrome = np.array(syndrome, dtype=np.uint8)
-        if syndrome.dtype != np.uint8:
-            syndrome = syndrome.astype(np.uint8)
-        if syndrome.ndim != 1:
-            raise ValueError(f"syndrome must be 1D, got shape {syndrome.shape}")
-        return self.parallel_batch_decode(syndrome.reshape(1, -1))[0]
-
     def batch_decode(self, syndromes):
         """Alias for ``parallel_batch_decode`` for API consistency with the
         other batch decoders."""
@@ -427,14 +383,7 @@ class BatchDecoder:
 
 
 class CPUBatchDecoder:
-    """SIMD-friendly CPU batch decoder with pooled buffers and SoA transposition.
-
-    Performance (independently validated, Windows 10, AMD Ryzen, Python 3.11):
-        - repetition_code(d=5):  ~11.2 µs/decode
-        - repetition_code(d=9):  ~9.7 µs/decode,  ~0.34M shots/s
-        - rotated_surface_code(d=3): ~9.5 µs/decode
-        - rotated_surface_code(d=5): ~10.7 µs/decode
-    """
+    """SIMD-friendly CPU batch decoder with pooled buffers and SoA transposition."""
 
     def __init__(self, check_to_qubits, n_qubits=None):
         if not check_to_qubits:
@@ -477,6 +426,11 @@ class OpenCLBatchDecoder:
     """
 
     def __init__(self, check_to_qubits, n_qubits=None):
+        if os.environ.get("QECTOR_OPENCL_PROBE_CHILD") != "1" and not _opencl_health_check():
+            raise RuntimeError(
+                "OpenCL backend is unavailable or failed its health check; "
+                "use CPUBatchDecoder/AutoDecoder fallback or set QECTOR_DISABLE_OPENCL=1"
+            )
         if not check_to_qubits:
             raise ValueError("check_to_qubits must be non-empty")
         c2q = [[int(q) for q in check] for check in check_to_qubits]
@@ -509,10 +463,6 @@ class OpenCLBatchDecoder:
         return self._inner.n_checks
 
     @property
-    def device_name(self) -> str:
-        return str(self._inner.device_name)
-
-    @property
     def consecutive_failures(self):
         """Number of consecutive GPU failures since last success."""
         return self._inner.consecutive_failures
@@ -534,8 +484,8 @@ class OpenCLBatchDecoder:
 
     @staticmethod
     def is_available():
-        """Return True if an OpenCL GPU is available on this system."""
-        return _RustOpenCLBatchDecoder.is_available()
+        """Return True if OpenCL is available and passes a safe decode probe."""
+        return _opencl_health_check()
 
 
 class CUDABatchDecoder:
@@ -543,43 +493,11 @@ class CUDABatchDecoder:
 
     Uses a compiled CUDA kernel loaded through the CUDA Driver API. Falls back
     to CPU UnionFind for tiny batches or after repeated CUDA failures.
-
-    Always call ``CUDABatchDecoder.is_available()`` before constructing.
-    A descriptive ``RuntimeError`` is raised immediately if no CUDA GPU or
-    driver is present -- no opaque Rust-level crash.
-
-    Performance (independently validated, NVIDIA GTX 1660 Ti, CUDA 7.5, 100k shots):
-        - repetition_code(d=9):  ~3.85M shots/s  (7.67× faster than CPU batch)
-        - rotated_surface_code(d=5): ~3.40M shots/s (6.93× faster than CPU batch)
-        - GPU output is 100% CPU-agreeing and 100% syndrome-valid at all
-          tested batch sizes.
-
-    Example::
-
-        from qector_decoder_v3 import CUDABatchDecoder
-        if CUDABatchDecoder.is_available():
-            dec = CUDABatchDecoder(check_to_qubits, n_qubits)
-            corrections = dec.batch_decode(syndromes)
-        else:
-            # Fall back to CPU batch decoding
-            from qector_decoder_v3 import BatchDecoder
-            dec = BatchDecoder(check_to_qubits, n_qubits)
-            corrections = dec.parallel_batch_decode(syndromes)
     """
 
     def __init__(self, check_to_qubits, n_qubits=None):
         if _RustCUDABatchDecoder is None:
-            raise RuntimeError(
-                "CUDA is not available: this build of qector-decoder-v3 was compiled "
-                "without the 'cuda' feature. Install a CUDA-enabled wheel or use "
-                "CUDABatchDecoder.is_available() to check before constructing."
-            )
-        if not CUDABatchDecoder.is_available():
-            raise RuntimeError(
-                "CUDA is not available on this system: no CUDA-capable GPU or driver "
-                "was detected. Use CUDABatchDecoder.is_available() to check before "
-                "constructing, or use BatchDecoder for CPU-based batch decoding."
-            )
+            raise RuntimeError("qector-decoder-v3 was built without the 'cuda' feature")
         if not check_to_qubits:
             raise ValueError("check_to_qubits must be non-empty")
         c2q = [[int(q) for q in check] for check in check_to_qubits]
@@ -607,8 +525,8 @@ class CUDABatchDecoder:
         return self._inner.n_checks
 
     @property
-    def device_name(self) -> str:
-        return str(self._inner.device_name)
+    def device_name(self):
+        return self._inner.device_name
 
     @property
     def compute_capability(self):
@@ -642,17 +560,6 @@ class SparseBlossomDecoder:
     """Region-growing Sparse Blossom decoder with RadixHeap.
 
     Supports dynamic weight overrides from GNN Pre-Decoder for enriched decoding.
-
-    Performance (independently validated, Windows 10, AMD Ryzen, Python 3.11):
-        - repetition_code(d=5):  ~11.8 µs/decode,  ~1.80M shots/s (batch)
-        - repetition_code(d=9):  ~10.6 µs/decode
-        - rotated_surface_code(d=3): ~11.5 µs/decode
-        - rotated_surface_code(d=5): ~29.2 µs/decode
-
-    Note on degeneracy:
-        batch_decode may return different (but equally valid) corrections than
-        single-shot decode on degenerate syndromes. Both are 100% syndrome-valid.
-        This is benign matching degeneracy, not an error.
     """
 
     def __init__(self, check_to_qubits, n_qubits=None):
@@ -671,6 +578,15 @@ class SparseBlossomDecoder:
 
     def decode_with_weights(self, syndrome, weights):
         """Decode with per-qubit dynamic weight overrides.
+
+        Honesty note: ``SparseBlossomDecoder`` is a region-growing
+        **minimum-cardinality** matcher. The ``weights`` are applied only as an
+        approximate rescale of the BFS region-growth distances; this does **not**
+        perform an exact weighted MWPM (the correction is syndrome-valid but not
+        weight-optimal), and empirically the override has little to no effect on
+        the logical error rate. For true weighted minimum-weight perfect matching
+        use :class:`BlossomDecoder` (exact Edmonds) or the ``pymatching_compat``
+        layer. A one-time warning is emitted on first weighted use.
 
         Args:
             syndrome: np.ndarray of shape (n_checks,) with dtype uint8.
@@ -758,38 +674,11 @@ class NeuralPredecoder:
         self._inner = _RustNeuralPredecoder(n_input, n_output, n_hidden1, n_hidden2)
 
     def train(self, syndromes, corrections, n_epochs, learning_rate=0.01):
-        # Ensure inputs are NumPy arrays of dtype uint8 and contiguous in memory
-        syndromes = np.ascontiguousarray(np.asarray(syndromes, dtype=np.uint8))
-        corrections = np.ascontiguousarray(np.asarray(corrections, dtype=np.uint8))
-        # Validate dimensions: expect 2‑D arrays (samples, features)
-        if syndromes.ndim != 2:
-            raise ValueError(
-                f"syndromes must be a 2‑D array, got shape {syndromes.shape}"
-            )
-        if corrections.ndim != 2:
-            raise ValueError(
-                f"corrections must be a 2‑D array, got shape {corrections.shape}"
-            )
-        try:
-            self._inner.train(syndromes, corrections, n_epochs, learning_rate)
-        except TypeError as exc:
-            if (
-                "not an instance of 'ndarray'" in str(exc)
-                and int(np.__version__.split(".")[0]) >= 2
-            ):
-                raise RuntimeError(
-                    "NeuralPredecoder.train() is not usable with numpy "
-                    f"{np.__version__}. The compiled qector_decoder_v3 extension's "
-                    "train() binding does a strict native array-type check that is "
-                    "incompatible with numpy>=2.0 (this is a binary ABI issue in the "
-                    "compiled wheel, not something fixable from Python -- passing "
-                    "lists or rebuilding the array in pure Python does not help). "
-                    "predict() and decode() are unaffected and work normally on this "
-                    "numpy version. To train a model right now, use an environment "
-                    "with 'numpy<2' installed; this is tracked for a native fix in a "
-                    "future qector-decoder-v3 wheel rebuild."
-                ) from exc
-            raise
+        if not isinstance(syndromes, np.ndarray):
+            syndromes = np.array(syndromes, dtype=np.uint8)
+        if not isinstance(corrections, np.ndarray):
+            corrections = np.array(corrections, dtype=np.uint8)
+        self._inner.train(syndromes, corrections, n_epochs, learning_rate)
 
     def predict(self, syndrome):
         if not isinstance(syndrome, np.ndarray):
@@ -834,9 +723,7 @@ class GNNPredecoder:
     NODE_FEAT_DIM = 10
     EDGE_FEAT_DIM = 8
 
-    def __init__(
-        self, node_feat_dim=None, edge_feat_dim=None, hidden_size=16, n_layers=2
-    ):
+    def __init__(self, node_feat_dim=None, edge_feat_dim=None, hidden_size=16, n_layers=2):
         """Create a GNNPredecoder.
 
         If node_feat_dim and edge_feat_dim are not provided, uses the standard
@@ -869,9 +756,7 @@ class GNNPredecoder:
 
     def forward(self, graph):
         """Predict adjusted edge weights for a DetectorGraph."""
-        return self._inner.forward(
-            graph._inner if isinstance(graph, DetectorGraph) else graph
-        )
+        return self._inner.forward(graph._inner if isinstance(graph, DetectorGraph) else graph)
 
     def train(self, graphs, targets, n_epochs):
         """Train the GNN on a list of graphs and target edge weights."""
@@ -880,9 +765,7 @@ class GNNPredecoder:
 
     def predict_with_node_probs(self, graph):
         """Predict edge weights and node error probabilities."""
-        return self._inner.predict_with_node_probs(
-            graph._inner if isinstance(graph, DetectorGraph) else graph
-        )
+        return self._inner.predict_with_node_probs(graph._inner if isinstance(graph, DetectorGraph) else graph)
 
 
 class DetectorGraph:
@@ -981,13 +864,7 @@ class HybridDecoder:
         c2q = [[int(q) for q in check] for check in check_to_qubits]
         nq = None if n_qubits is None else int(n_qubits)
         self._inner = _RustHybridDecoder(
-            c2q,
-            nq,
-            check_positions,
-            check_types,
-            base_weights,
-            gnn_hidden_size,
-            gnn_n_layers,
+            c2q, nq, check_positions, check_types, base_weights, gnn_hidden_size, gnn_n_layers
         )
 
     def decode_hybrid(self, syndrome):
@@ -1094,12 +971,6 @@ class LookupTableDecoder:
     Pre-computes all syndrome → correction mappings for small codes
     (n_qubits ≤ 20, exhaustive; otherwise low-weight enumeration).
     Decoding is O(1) for precomputed syndromes, fallback to UnionFind otherwise.
-
-    Performance (independently validated, Windows 10, AMD Ryzen, Python 3.11):
-        - repetition_code(d=5):  ~8.7 µs/decode  (fastest single-shot decoder tested)
-        - repetition_code(d=9):  ~10.7 µs/decode
-        - rotated_surface_code(d=3): ~9.5 µs/decode
-        - table_size for repetition_code(d=5): 64 entries
     """
 
     def __init__(self, check_to_qubits, n_qubits=None):
@@ -1298,26 +1169,114 @@ __all__ += [
     "rest_api",
 ]
 
-# Import and expose advanced strategic decoders
-from .advanced import (
-    RadixHeap,
-    FusionBlossomDecoder,
-    CudaQDecoder,
-    EvolutionaryBpDecoder,
-    RestartBeliefDecoder,
-    HybridAiDecoder,
-    AstraGnnDecoder,
-    EarlyExitDecoder,
-)
+# ---------------------------------------------------------------------------
+# GPU backend abstraction + batched belief propagation (additive, CuPy-optional).
+#
+# ``gpu_backend`` only needs NumPy + stdlib to import (CuPy is probed lazily and
+# guarded internally), and ``bp_cupy`` builds purely on in-tree pure-Python
+# modules, so neither requires CuPy to be installed. They are still wrapped in a
+# tolerant guard so that — per the package contract — a missing optional path can
+# never break ``import qector_decoder_v3``. The selected detection helpers
+# (``has_cupy`` / ``has_cuda_rust`` / ``gpu_available`` / ``get_backend``) and the
+# batched-BP entry points are re-exported at top level for convenience; the full
+# foundation API remains available as ``qector_decoder_v3.gpu_backend``.
+# ---------------------------------------------------------------------------
+try:
+    from . import gpu_backend
+    from .gpu_backend import (
+        has_cupy,
+        has_cuda_rust,
+        gpu_available,
+        get_backend,
+    )
 
-__all__ += [
-    "RadixHeap",
-    "FusionBlossomDecoder",
-    "CudaQDecoder",
-    "EvolutionaryBpDecoder",
-    "RestartBeliefDecoder",
-    "HybridAiDecoder",
-    "AstraGnnDecoder",
-    "EarlyExitDecoder",
-]
+    __all__ += [
+        "gpu_backend",
+        "has_cupy",
+        "has_cuda_rust",
+        "gpu_available",
+        "get_backend",
+    ]
+except Exception:  # pragma: no cover - defensive; gpu_backend has no hard deps
+    gpu_backend = None  # type: ignore[assignment]
 
+try:
+    from . import bp_cupy
+    from .bp_cupy import BatchedBpDecoder, batched_bp_decode
+
+    __all__ += [
+        "bp_cupy",
+        "BatchedBpDecoder",
+        "batched_bp_decode",
+    ]
+except Exception:  # pragma: no cover - defensive; bp_cupy has no hard deps
+    bp_cupy = None  # type: ignore[assignment]
+    BatchedBpDecoder = None  # type: ignore[assignment]
+    batched_bp_decode = None  # type: ignore[assignment]
+
+# ---------------------------------------------------------------------------
+# Intelligent decoder routing + high-level streaming orchestration (additive).
+#
+# Both are pure-Python layers built only on already-imported in-tree modules
+# (``gpu_backend`` / ``backend`` and the exported decoder classes); they degrade
+# to NumPy/CPU when no CuPy/device is present. ``routing`` answers "which decoder
+# *family* is even correct here?" (and forces BP-OSD for hyperedge codes so every
+# correction satisfies ``H·c == s``); ``streaming`` orchestrates multi-round
+# sliding-window decoding on top of the single-shot decoders without shadowing the
+# compiled ``StreamingDecoder`` / ``SlidingWindowDecoder``. Wrapped in tolerant
+# guards so a missing optional path can never break ``import qector_decoder_v3``.
+# ---------------------------------------------------------------------------
+try:
+    from . import routing
+    from .routing import (
+        recommend_decoder,
+        recommend,
+        AutoRouter,
+        Recommendation,
+        DecoderName,
+        HardwareProfile,
+        detect_hardware,
+    )
+
+    __all__ += [
+        "routing",
+        "recommend_decoder",
+        "recommend",
+        "AutoRouter",
+        "Recommendation",
+        "DecoderName",
+        "HardwareProfile",
+        "detect_hardware",
+    ]
+except Exception:  # pragma: no cover - defensive; routing has no hard deps
+    routing = None  # type: ignore[assignment]
+    recommend_decoder = None  # type: ignore[assignment]
+    recommend = None  # type: ignore[assignment]
+    AutoRouter = None  # type: ignore[assignment]
+    Recommendation = None  # type: ignore[assignment]
+    DecoderName = None  # type: ignore[assignment]
+    HardwareProfile = None  # type: ignore[assignment]
+    detect_hardware = None  # type: ignore[assignment]
+
+try:
+    from . import streaming
+    from .streaming import (
+        StreamingSession,
+        sliding_window_decode,
+        StreamingResult,
+        StreamingTelemetry,
+    )
+
+    __all__ += [
+        "streaming",
+        "StreamingSession",
+        "sliding_window_decode",
+        "StreamingResult",
+        "StreamingTelemetry",
+    ]
+except Exception:  # pragma: no cover - defensive; streaming has no hard deps
+    streaming = None  # type: ignore[assignment]
+    StreamingSession = None  # type: ignore[assignment]
+    sliding_window_decode = None  # type: ignore[assignment]
+    StreamingResult = None  # type: ignore[assignment]
+    StreamingTelemetry = None  # type: ignore[assignment]

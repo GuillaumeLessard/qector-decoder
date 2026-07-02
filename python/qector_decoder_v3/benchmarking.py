@@ -110,9 +110,7 @@ def git_commit() -> str:
 
 def _safe_cmd(cmd: Sequence[str]) -> Optional[str]:
     try:
-        out = subprocess.run(
-            list(cmd), capture_output=True, text=True, timeout=10, check=False
-        )
+        out = subprocess.run(list(cmd), capture_output=True, text=True, timeout=10, check=False)
         return out.stdout.strip() or None
     except Exception:  # pragma: no cover
         return None
@@ -177,16 +175,14 @@ def summarize(samples_seconds: Sequence[float]) -> Dict[str, float]:
         "ci95_low": mean - half,
         "ci95_high": mean + half,
     }
-    summary.update(percentiles(us.tolist()))
+    summary.update(percentiles(us))
     return summary
 
 
 # ---------------------------------------------------------------------------
 # Timing primitives
 # ---------------------------------------------------------------------------
-def time_iterations(
-    fn: Callable[[], Any], n_trials: int, warmup: int = 0
-) -> List[float]:
+def time_iterations(fn: Callable[[], Any], n_trials: int, warmup: int = 0) -> List[float]:
     """Time ``fn`` per-call ``n_trials`` times after ``warmup`` untimed calls."""
     for _ in range(max(0, warmup)):
         fn()
@@ -254,9 +250,7 @@ def benchmark_decoder(
     builder = _build_decoder(kind, code)
 
     # Cold path: construction time (median of a few builds).
-    cold_samples = time_iterations(
-        lambda: builder(), n_trials=min(20, max(3, n_trials // 50)), warmup=1
-    )
+    cold_samples = time_iterations(lambda: builder(), n_trials=min(20, max(3, n_trials // 50)), warmup=1)
     decoder = builder()
 
     # Optional correctness gate (cheap, on a handful of syndromes).
@@ -298,9 +292,7 @@ def benchmark_decoder(
         "syndrome_faithful": valid,
         "cold_path_us": summarize(cold_samples),
         "latency_us": summarize(hot_samples),
-        "throughput_decodes_per_s": (1.0 / statistics.median(hot_samples))
-        if hot_samples
-        else None,
+        "throughput_decodes_per_s": (1.0 / statistics.median(hot_samples)) if hot_samples else None,
         "peak_python_alloc_kib": peak_kib,
     }
     return report
@@ -312,9 +304,7 @@ def benchmark_decoder(
 class BenchmarkReport:
     """A set of decoder benchmarks plus the environment they ran in."""
 
-    def __init__(
-        self, results: List[Dict[str, Any]], environment: Optional[dict] = None
-    ):
+    def __init__(self, results: List[Dict[str, Any]], environment: Optional[dict] = None):
         self.results = results
         self.environment = environment or capture_environment()
 

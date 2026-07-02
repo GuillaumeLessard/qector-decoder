@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-example_basic.py — QECTOR Decoder v3.4 Basic Usage
+example_basic.py - QECTOR Decoder v3 Basic Usage
 
 Demonstrates UnionFind, Blossom, SparseBlossom, BP-OSD, and Hybrid decoders.
 """
@@ -34,7 +34,7 @@ def main():
     syndrome[7] = 1
     
     print("=" * 60)
-    print("QECTOR v3.4 — Basic Decoder Demo")
+    print("QECTOR v3 - Basic Decoder Demo")
     print("=" * 60)
     print(f"Code: Ring Code d=5 ({n_qubits} qubits, {n_checks} checks)")
     print(f"Syndrome: {syndrome}")

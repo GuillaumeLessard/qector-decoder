@@ -5,6 +5,7 @@ for reproducibility).  Checks CSS commutation and BP-OSD syndrome-faithfulness.
 """
 
 import numpy as np
+import pytest
 
 from qector_decoder_v3 import codes
 from qector_decoder_v3.bposd import BpOsdDecoder
@@ -20,9 +21,7 @@ def test_bicycle_is_valid_css():
     Hz = bz.parity_check_matrix().astype(np.uint8)
     assert Hx.shape[1] == Hz.shape[1]
     assert Hx.shape[1] > 0
-    assert np.array_equal(
-        (Hx @ Hz.T) % 2, np.zeros((Hx.shape[0], Hz.shape[0]), np.uint8)
-    )
+    assert np.array_equal((Hx @ Hz.T) % 2, np.zeros((Hx.shape[0], Hz.shape[0]), np.uint8))
 
 
 def test_bposd_bicycle_faithful_per_shot():

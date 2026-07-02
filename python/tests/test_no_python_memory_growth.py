@@ -28,10 +28,7 @@ def test_no_python_memory_growth():
     rng = np.random.default_rng(7)
     pool_size = 256
     pool = np.array(
-        [
-            np.asarray(code.syndrome(code.random_error(0.08, rng)), np.uint8)
-            for _ in range(pool_size)
-        ],
+        [np.asarray(code.syndrome(code.random_error(0.08, rng)), np.uint8) for _ in range(pool_size)],
         np.uint8,
     )
 

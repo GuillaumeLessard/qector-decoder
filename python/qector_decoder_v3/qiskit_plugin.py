@@ -23,7 +23,7 @@ Usage (sans Qiskit — mode dict brut) ::
 from __future__ import annotations
 
 import warnings
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 
@@ -52,9 +52,7 @@ def _normalize_counts(result: Any) -> Dict[str, int]:
         # get_counts() retourne un dict {bitstring: count}
         return {str(k): int(v) for k, v in result.get_counts().items()}
 
-    raise TypeError(
-        f"result must be a dict or qiskit.result.Result, got {type(result).__name__}"
-    )
+    raise TypeError(f"result must be a dict or qiskit.result.Result, got {type(result).__name__}")
 
 
 def _bitstring_to_syndrome(bitstring: str, n_checks: int) -> List[int]:

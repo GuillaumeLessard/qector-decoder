@@ -148,54 +148,13 @@ def build_matching_matrices(dem: Any) -> _Matrices:
     for hid, p in priors.items():
         prior_arr[hid] = p
 
-    return _Matrices(
-        hyper_check,
-        hyper_obs_m,
-        prior_arr,
-        hyper_to_edge,
-        edge_check,
-        edge_obs_m,
-        nD,
-        nO,
-    )
+    return _Matrices(hyper_check, hyper_obs_m, prior_arr, hyper_to_edge, edge_check, edge_obs_m, nD, nO)
 
 
 class BeliefMatching:
-    """Belief-propagation + minimum-weight perfect matching decoder.
+    """Belief-propagation + minimum-weight perfect matching decoder."""
 
-    Can be constructed from:
-    - A :class:`_Matrices` object (returned by :func:`build_matching_matrices`).
-    - A raw numpy check matrix ``H`` of shape ``(num_detectors, num_qubits)``
-      with uniform priors (each column weight ``-log(p/(1-p))`` at ``p=0.1``).
-      This is the convenience constructor: ``BeliefMatching(H)`` or
-      ``BeliefMatching(H, p=0.05)``.  Observable matrix is assumed to be
-      identity (each qubit is its own logical).
-    """
-
-    def __init__(
-        self, matrices, max_iter: int = 30, bp_shortcut: bool = False, p: float = 0.1
-    ):
-        # Accept a raw numpy H matrix as a convenience shortcut.
-        if isinstance(matrices, np.ndarray):
-            H = np.asarray(matrices, dtype=np.uint8)
-            if H.ndim != 2:
-                raise ValueError(f"H must be 2D, got shape {H.shape}")
-            num_detectors, num_qubits = H.shape
-            # Uniform prior p for all mechanisms
-            prior_arr = np.full(num_qubits, float(p), dtype=np.float64)
-            # Observable matrix: identity (each qubit is its own logical)
-            obs_m = np.eye(num_qubits, dtype=np.uint8)
-            # No hyperedge structure: hyper == edge
-            matrices = _Matrices(
-                hyper_check=H.copy(),
-                hyper_obs=obs_m,
-                hyper_priors=prior_arr,
-                hyper_to_edge=np.eye(num_qubits, dtype=np.uint8),
-                edge_check=H.copy(),
-                edge_obs=obs_m,
-                num_detectors=num_detectors,
-                num_observables=num_qubits,
-            )
+    def __init__(self, matrices: _Matrices, max_iter: int = 30, bp_shortcut: bool = False):
         self._m = matrices
         self.max_iter = int(max_iter)
         # Trusting BP's hard decision when it merely satisfies the syndrome can
@@ -216,93 +175,17 @@ class BeliefMatching:
         # Matching graph = edge check matrix.
         self._n_edges = matrices.edge_check.shape[1]
         self._edge_c2q: List[List[int]] = [
-            sorted(int(e) for e in np.nonzero(matrices.edge_check[c])[0])
-            for c in range(self.n_checks)
+            sorted(int(e) for e in np.nonzero(matrices.edge_check[c])[0]) for c in range(self.n_checks)
         ]
 
     # -- constructors ------------------------------------------------------
     @classmethod
-    def from_detector_error_model(
-        cls, dem: Any, max_iter: int = 20
-    ) -> "BeliefMatching":
-        """Construct from a ``stim.DetectorErrorModel`` (or DEM text string)."""
+    def from_detector_error_model(cls, dem: Any, max_iter: int = 20) -> "BeliefMatching":
         return cls(build_matching_matrices(dem), max_iter=max_iter)
 
     @classmethod
     def from_stim_circuit(cls, circuit, max_iter: int = 20) -> "BeliefMatching":
-        """Construct directly from a ``stim.Circuit`` object."""
-        return cls.from_detector_error_model(
-            circuit.detector_error_model(decompose_errors=True), max_iter=max_iter
-        )
-
-    @classmethod
-    def from_beliefmatching_matrices(
-        cls, bm_matrices: Any, max_iter: int = 20
-    ) -> "BeliefMatching":
-        """Construct from a ``beliefmatching.DemMatrices`` object.
-
-        ``beliefmatching.DemMatrices`` is the struct returned by
-        ``beliefmatching.detector_error_model_to_check_matrices(dem)``.  Its
-        attributes are sparse scipy CSC matrices; this constructor converts them
-        to the dense NumPy arrays QECTOR's belief engine requires.
-
-        .. code-block:: python
-
-            import stim, beliefmatching
-            from qector_decoder_v3.belief_matching import BeliefMatching
-
-            dem = stim.Circuit.generated(
-                "surface_code:rotated_memory_x", distance=5,
-                rounds=5, after_clifford_depolarization=0.005,
-            ).detector_error_model(decompose_errors=True)
-
-            # Correct way to build a beliefmatching.DemMatrices:
-            bm_mats = beliefmatching.detector_error_model_to_check_matrices(dem)
-            qbm = BeliefMatching.from_beliefmatching_matrices(bm_mats)
-
-        Parameters
-        ----------
-        bm_matrices : beliefmatching.DemMatrices
-            A ``DemMatrices`` produced by
-            ``beliefmatching.detector_error_model_to_check_matrices(dem)``.
-            **Not** constructed via ``beliefmatching.DemMatrices(dem)`` directly —
-            that constructor requires five explicit sparse matrix arguments.
-        max_iter : int
-            Maximum BP iterations.
-
-        Returns
-        -------
-        BeliefMatching
-        """
-
-        # Convert sparse scipy matrices to dense uint8 NumPy arrays.
-        def _to_dense(m) -> np.ndarray:
-            try:
-                return np.asarray(m.todense(), dtype=np.uint8)
-            except AttributeError:
-                return np.asarray(m, dtype=np.uint8)
-
-        hyper_check = _to_dense(bm_matrices.check_matrix)
-        hyper_obs = _to_dense(bm_matrices.observables_matrix)
-        edge_check = _to_dense(bm_matrices.edge_check_matrix)
-        edge_obs = _to_dense(bm_matrices.edge_observables_matrix)
-        hyper_to_edge = _to_dense(bm_matrices.hyperedge_to_edge_matrix)
-        priors = np.asarray(bm_matrices.priors, dtype=np.float64)
-
-        nD, nH = hyper_check.shape
-        nO = hyper_obs.shape[0]
-
-        mats = _Matrices(
-            hyper_check=hyper_check,
-            hyper_obs=hyper_obs,
-            hyper_priors=priors,
-            hyper_to_edge=hyper_to_edge,
-            edge_check=edge_check,
-            edge_obs=edge_obs,
-            num_detectors=nD,
-            num_observables=nO,
-        )
-        return cls(mats, max_iter=max_iter)
+        return cls.from_detector_error_model(circuit.detector_error_model(decompose_errors=True), max_iter=max_iter)
 
     # -- decoding ----------------------------------------------------------
     def decode(self, syndrome) -> np.ndarray:
@@ -337,9 +220,7 @@ class BeliefMatching:
         arr = np.asarray(shots, dtype=np.uint8)
         if arr.ndim != 2:
             raise ValueError(f"shots must be 2D, got shape {arr.shape}")
-        return np.stack([self.decode(arr[i]) for i in range(arr.shape[0])]).astype(
-            np.uint8
-        )
+        return np.stack([self.decode(arr[i]) for i in range(arr.shape[0])]).astype(np.uint8)
 
     @property
     def num_detectors(self) -> int:

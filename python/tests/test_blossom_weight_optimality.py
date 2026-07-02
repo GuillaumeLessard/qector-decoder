@@ -18,7 +18,7 @@ import pytest
 stim = pytest.importorskip("stim")
 pymatching = pytest.importorskip("pymatching")
 
-from qector_decoder_v3 import pymatching_compat  # noqa: E402
+from qector_decoder_v3 import dem, pymatching_compat  # noqa: E402
 
 
 def _logical_errors(d, shots, seed, basis="x", noise=0.005):
@@ -31,9 +31,7 @@ def _logical_errors(d, shots, seed, basis="x", noise=0.005):
         after_reset_flip_probability=noise,
     )
     sdem = circ.detector_error_model(decompose_errors=True)
-    det, obs = circ.compile_detector_sampler(seed=seed).sample(
-        shots=shots, separate_observables=True
-    )
+    det, obs = circ.compile_detector_sampler(seed=seed).sample(shots=shots, separate_observables=True)
     det = det.astype(np.uint8)
     obs = obs.astype(np.uint8)
     qm = pymatching_compat.Matching.from_detector_error_model(sdem)

@@ -138,9 +138,7 @@ class DemModel:
             for m in members:
                 p = p * (1.0 - m.probability) + m.probability * (1.0 - p)
             best = min(members, key=lambda m: m.weight)  # lowest weight == most likely
-            merged.append(
-                DemError(probability=p, detectors=sig, observables=best.observables)
-            )
+            merged.append(DemError(probability=p, detectors=sig, observables=best.observables))
 
         return DemModel(
             errors=merged,
@@ -234,9 +232,7 @@ class DemModel:
         """Logical observable flips implied by a correction (``L @ c mod 2``)."""
         c = np.asarray(correction, dtype=np.uint8).reshape(-1)
         if c.shape[0] != self.num_errors:
-            raise ValueError(
-                f"correction has length {c.shape[0]}, expected {self.num_errors}"
-            )
+            raise ValueError(f"correction has length {c.shape[0]}, expected {self.num_errors}")
         return (self.observables_matrix() @ c) & 1
 
     def __repr__(self) -> str:  # pragma: no cover - cosmetic
@@ -354,9 +350,7 @@ class DemParseError(ValueError):
     """Raised when DEM text cannot be parsed."""
 
 
-def _exec_instruction(
-    tok: str, state: dict, errors: List[DemError], coords: dict
-) -> None:
+def _exec_instruction(tok: str, state: dict, errors: List[DemError], coords: dict) -> None:
     if tok.startswith("error("):
         m = _ERROR_RE.match(tok)
         if not m:
@@ -399,9 +393,7 @@ def _exec_instruction(
                 state["max_det"] = max(state["max_det"], d)
                 if coord_str:
                     try:
-                        coords[d] = tuple(
-                            float(x) for x in coord_str.split(",") if x.strip()
-                        )
+                        coords[d] = tuple(float(x) for x in coord_str.split(",") if x.strip())
                     except ValueError:
                         pass
         return
@@ -444,57 +436,21 @@ def load_dem_file(path: str) -> DemModel:
 
 
 def from_stim(dem: Any) -> DemModel:
-    """Build a :class:`DemModel` from a ``stim.DetectorErrorModel`` **or** a
-    ``stim.Circuit`` object.
+    """Build a :class:`DemModel` from a ``stim.DetectorErrorModel`` object.
 
-    When given a ``stim.Circuit``, the detector error model is derived first
-    with ``decompose_errors=True`` so that every mechanism is graphlike and can
-    be decoded by MWPM-based decoders.
-
-    The DEM is then flattened (expanding ``repeat`` and ``shift_detectors``)
+    The model is flattened first (expanding ``repeat`` and ``shift_detectors``)
     for an exact column-for-column correspondence with Stim.
-
-    Parameters
-    ----------
-    dem : stim.DetectorErrorModel | stim.Circuit | str
-        A Stim DEM object, a Stim circuit (from which the DEM is derived),
-        or raw DEM text.
-
-    Raises
-    ------
-    TypeError
-        If *dem* is none of the above.
     """
     if isinstance(dem, str):
         return parse_dem(dem)
-
-    # KEY FIX (v0.5.3): distinguish stim.Circuit from stim.DetectorErrorModel.
-    #
-    # Both types expose ``num_detectors``, so the old ``hasattr`` guard silently
-    # accepted a Circuit, called ``circuit.flattened()`` (which exists on Circuit
-    # too but returns another Circuit, not a DEM), then fed circuit text to
-    # ``parse_dem`` — which finds no ``error(...)`` instructions and returns
-    # ``num_errors == 0``.
-    #
-    # The correct distinguishing attribute: ``stim.Circuit`` has
-    # ``detector_error_model()``; ``stim.DetectorErrorModel`` does not.
-    if hasattr(dem, "detector_error_model"):
-        # It's a stim.Circuit — derive the DEM first.
-        dem = dem.detector_error_model(decompose_errors=True)
-
     if not hasattr(dem, "num_detectors"):
-        raise TypeError(
-            f"expected a stim.DetectorErrorModel, stim.Circuit, or DEM text string; "
-            f"got {type(dem).__name__}"
-        )
-
+        raise TypeError(f"expected a stim.DetectorErrorModel (or DEM text), got {type(dem).__name__}")
     try:
         flat = dem.flattened()
-    except Exception:  # pragma: no cover - older Stim builds
+    except Exception:  # pragma: no cover - older Stim
         flat = dem
     model = parse_dem(str(flat))
-    # Trust Stim's declared counts (the text round-trip may under-count when
-    # detectors appear only in shift_detectors annotations, not in error lines).
+    # Trust Stim's declared counts when available.
     model.num_detectors = max(model.num_detectors, int(dem.num_detectors))
     model.num_observables = max(model.num_observables, int(dem.num_observables))
     return model

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-example_streaming.py — QECTOR Decoder v3.4 Streaming Demo
+example_streaming.py - QECTOR Decoder v3 Streaming Demo
 
 Demonstrates real-time streaming decoder with sliding window.
 """
@@ -33,7 +33,7 @@ def main():
     rng = np.random.default_rng(42)
     
     print("=" * 60)
-    print("QECTOR v3.4 — Streaming & Sliding Window Demo")
+    print("QECTOR v3 - Streaming & Sliding Window Demo")
     print("=" * 60)
     print(f"Code: Ring Code d=5 ({n_qubits} qubits, {n_checks} checks)")
     print(f"Simulating {n_rounds} rounds of syndrome extraction...")

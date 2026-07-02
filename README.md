@@ -1,50 +1,71 @@
 # QECTOR Decoder v3
 
-[![PyPI version](https://img.shields.io/pypi/v/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
-[![License](https://img.shields.io/badge/License-Custom-yellow.svg)](https://github.com/GuillaumeLessard/qector-decoder/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/GuillaumeLessard/qector-decoder.svg)](https://github.com/GuillaumeLessard/qector-decoder/stargazers)
-[![GitHub last commit](https://img.shields.io/github/last-commit/GuillaumeLessard/qector-decoder)](https://github.com/GuillaumeLessard/qector-decoder/commits/main)
+<div align="center">
 
-Source-available Rust/Python QEC decoder package — v0.5.7
+[![CI](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/CI.yml/badge.svg)](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/CI.yml)
+[![tests](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/tests.yml/badge.svg)](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/tests.yml)
+[![PyPI](https://img.shields.io/pypi/v/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
+[![Python](https://img.shields.io/pypi/pyversions/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
+[![License](https://img.shields.io/badge/license-Source--Available-blue.svg)](LICENSE)
 
-PyMatching-compatible MWPM validation, belief-matching accuracy mode, BP-OSD for LDPC/qLDPC, CPU/GPU batch decoding, Stim/Sinter integration, and artifact-backed benchmark evidence.
+**Source-available Rust/Python quantum error correction decoding platform.**
 
-Website: https://qector.store  
-PyPI: https://pypi.org/project/qector-decoder-v3/  
-DOI: https://doi.org/10.5281/zenodo.20825980  
-Commercial licensing: https://qector.store
+PyMatching-compatible MWPM validation - Belief-matching accuracy mode - BP-OSD for LDPC/qLDPC - CPU/GPU batch decoding - Artifact-backed benchmark evidence
+
+[Website](https://www.qector.store) - [PyPI](https://pypi.org/project/qector-decoder-v3/) - [Commercial licensing](mailto:admin@qector.store)
+
+</div>
 
 ---
 
 ## Install
 
+### Stable package
+
 ```bash
 pip install qector-decoder-v3
-python -c "from qector_decoder_v3 import UnionFindDecoder, BlossomDecoder; print('QECTOR OK')"
 ```
 
-Optional extras:
+Supported public wheel target: **Python 3.9 to 3.13** on Linux, Windows, and macOS where wheels are published for the release.
+
+### Optional Python extras
 
 ```bash
+# Stim, Sinter, PyMatching, LDPC and belief-matching ecosystem
 pip install "qector-decoder-v3[stim]"
+
+# Benchmark harness: psutil, matplotlib, scipy, tabulate
 pip install "qector-decoder-v3[bench]"
+
+# Everything needed for validation and benchmark scripts
 pip install "qector-decoder-v3[all]"
 ```
 
----
+### GPU runtime check
 
-## Supported wheel targets
+GPU support is runtime and build dependent. The public CI wheel workflow currently builds the CUDA feature path; OpenCL-capable builds are validated in checked-in benchmark artifacts but may require a licensed/custom build. Always detect support on the target machine before quoting performance.
 
-| Platform | Wheel |
-|---|---|
-| Linux x86\_64 | Published |
-| Windows x64 | Published |
-| macOS arm64 / Apple Silicon | Published |
-| macOS Intel x86\_64 | Not published in v0.5.x |
-| CPython free-threaded cp313t | Not published in v0.5.x |
+```python
+from qector_decoder_v3 import CUDABatchDecoder, OpenCLBatchDecoder
 
-Supported Python: CPython 3.9 – 3.13.
+print("CUDA:", CUDABatchDecoder.is_available())
+print("OpenCL:", OpenCLBatchDecoder.is_available())
+```
+
+### Licensed source build
+
+The public repository contains the Python layer and a Rust source stub. The proprietary Rust core is injected during trusted CI/release builds or provided under commercial license.
+
+```bash
+git clone https://github.com/GuillaumeLessard/qector-decoder.git
+cd qector-decoder
+python -m venv .venv
+source .venv/bin/activate  # Windows PowerShell: .\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip maturin
+python -m pip install -e "[stim,bench]"
+```
+
+For a full native Rust extension build, use the licensed Rust source bundle and the commands in [`INSTALL.md`](INSTALL.md).
 
 ---
 
@@ -58,86 +79,221 @@ check_to_qubits = [[0, 1], [1, 2], [2, 3], [3, 4]]
 n_qubits = 5
 syndrome = np.array([0, 1, 0, 0], dtype=np.uint8)
 
-uf = UnionFindDecoder(check_to_qubits, n_qubits)
-print(uf.decode(syndrome))
+fast = UnionFindDecoder(check_to_qubits, n_qubits)
+print(fast.decode(syndrome))
 
 mwpm = BlossomDecoder(check_to_qubits, n_qubits)
 print(mwpm.decode(syndrome))
 ```
 
-Batch decoding:
+### Batch decoding
 
 ```python
 import numpy as np
-from qector_decoder_v3 import BatchDecoder
+from qector_decoder_v3 import BatchDecoder, CUDABatchDecoder
 
 checks = [[0, 1], [1, 2], [2, 3], [3, 4]]
 syndromes = np.random.randint(0, 2, size=(4096, 4), dtype=np.uint8)
 
 cpu = BatchDecoder(checks, n_qubits=5)
 corrections = cpu.parallel_batch_decode(syndromes)
-corrections_single = cpu.decode(syndromes[0])   # single-shot (v0.5.3+)
-print(corrections.shape)
+
+if CUDABatchDecoder.is_available():
+    gpu = CUDABatchDecoder(checks, n_qubits=5)
+    corrections = gpu.batch_decode(syndromes)
+```
+
+### Stim detector-error-model workflow
+
+```python
+import stim
+from qector_decoder_v3 import BlossomDecoder
+from qector_decoder_v3.stim_compat import stim_circuit_to_check_matrix
+
+circuit = stim.Circuit.generated(
+    "surface_code:rotated_memory_z",
+    distance=5,
+    rounds=5,
+    after_clifford_depolarization=0.005,
+)
+
+checks, n_qubits = stim_circuit_to_check_matrix(circuit)
+decoder = BlossomDecoder(checks, n_qubits)
+```
+
+### Belief-matching accuracy mode
+
+```python
+from qector_decoder_v3.belief_matching import BeliefMatching
+
+bm = BeliefMatching(check_to_qubits, n_qubits, error_rate=0.005)
+correction = bm.decode(syndrome)
+```
+
+### BP-OSD for LDPC / qLDPC codes
+
+```python
+from qector_decoder_v3 import codes
+from qector_decoder_v3.bposd import BpOsdDecoder
+
+cx, cz = codes.bivariate_bicycle_code(
+    6,
+    6,
+    [("x", 3), ("y", 1), ("y", 2)],
+    [("y", 3), ("x", 1), ("x", 2)],
+)
+
+decoder = BpOsdDecoder(cx.parity_check_matrix(), error_rate=0.05, osd_order=0)
+correction = decoder.decode(syndrome)
 ```
 
 ---
 
-## API surface
+## What it includes
 
-### Core decoders
+| Decoder / module | Best use | Status |
+|---|---|---|
+| `UnionFindDecoder` | Low-latency approximate decoding | Stable public API |
+| `FastUnionFindDecoder` | Optimized Union-Find hot path | Stable public API |
+| `BlossomDecoder` | Exact MWPM / PyMatching-parity validation | Stable public API |
+| `SparseBlossomDecoder` | Faster near-optimal matching | Experimental correctness envelope |
+| `BeliefMatching` | Correlated-noise accuracy experiments | Accuracy mode, not latency mode |
+| `BpOsdDecoder` | LDPC / qLDPC decoding workflows | Experimental / research |
+| `BatchDecoder` / `CPUBatchDecoder` | CPU batch Monte Carlo sweeps | Stable public API |
+| `CUDABatchDecoder` | CUDA batch decoding | Runtime/build dependent |
+| `OpenCLBatchDecoder` | OpenCL batch decoding | Runtime/build dependent |
+| `AutoDecoder` | CPU/GPU backend calibration | Experimental |
+| `PredecodedDecoder` | Easy-syndrome prefiltering | Experimental |
+| `SlidingWindowDecoder` | Multi-round streaming workflows | Experimental |
+| `stim_compat` | Stim circuit / DEM conversion | Stable utility |
+| `sinter_compat` | Sinter custom decoder integration | Stable utility |
+| `rest_api` | Local service endpoint | Local/partner review only |
 
-```python
-from qector_decoder_v3 import (
-    UnionFindDecoder,
-    FastUnionFindDecoder,
-    BlossomDecoder,
-    SparseBlossomDecoder,
-    BatchDecoder,
-    CUDABatchDecoder,
-    LookupTableDecoder,
-    PredecodedDecoder,
-)
+See [`docs/API_STABILITY.md`](docs/API_STABILITY.md) before building production code on experimental modules.
+
+---
+
+## Validated evidence snapshot
+
+All public claims should cite an artifact, commit, command, machine, and version. The current package release is **v0.5.7**; checked-in evidence should be regenerated before making new performance claims.
+
+### MWPM parity against PyMatching
+
+Artifact: `benchmark_results/stim_ler_d13_d15.json`
+
+Environment: Windows 10/11 class x64 machine, Python 3.11, QECTOR 0.5.7, PyMatching 2.4.0, Stim 1.16.0, 20,000 shots per distance.
+
+| Distance | QECTOR Blossom LER | PyMatching LER | QECTOR us/shot | PyMatching us/shot |
+|---:|---:|---:|---:|---:|
+| 13 | 0.00075 | 0.00075 | 820.46 | 81.12 |
+| 15 | 0.00050 | 0.00050 | 1965.15 | 203.20 |
+
+Interpretation: QECTOR Blossom matched PyMatching logical-error counts on this artifact. PyMatching remains much faster for standard MWPM latency on these workloads.
+
+### Belief-matching accuracy experiment
+
+Artifact: `benchmark_results/competitive_belief.json`
+
+Environment: Windows x64, Python 3.11, QECTOR 0.5.7, PyMatching 2.4.0, Stim 1.16.0, 3,000 shots per distance.
+
+| Distance | PyMatching LER | QECTOR MWPM LER | QECTOR Belief LER | Belief us/shot |
+|---:|---:|---:|---:|---:|
+| 3 | 0.01167 | 0.01167 | 0.01233 | 2331.07 |
+| 5 | 0.00767 | 0.00767 | 0.00500 | 12125.38 |
+| 7 | 0.00600 | 0.00600 | 0.00300 | 54323.56 |
+
+Interpretation: belief-matching improved observed LER at d=5 and d=7 in this artifact but was dramatically slower. It should be positioned as an accuracy/research mode, not a production latency path.
+
+### GPU bit-identity artifact
+
+Artifact: `benchmark_results/gpu_extensive.json`
+
+Environment: NVIDIA GeForce GTX 1660 Ti, Python 3.11, CUDA and OpenCL available, distances 3 to 13, batch sizes 1 to 65,536.
+
+| Claim | Artifact result |
+|---|---|
+| Number of tested configurations | 36 |
+| CUDA bit-identical to CPU | true |
+| OpenCL bit-identical to CPU | true |
+| All tested GPU paths faithful | true |
+
+Interpretation: this is a correctness and reproducibility artifact for one machine. It is not a universal GPU speed claim.
+
+### Native memory artifact
+
+Artifact: `benchmark_results/native_memory.json`
+
+Distance 13, batch 16,384:
+
+| Decoder | RSS base MiB | RSS peak MiB | Native delta MiB |
+|---|---:|---:|---:|
+| `cpu_batch` | 120.98 | 130.39 | 9.41 |
+| `blossom` | 123.64 | 129.52 | 5.88 |
+| `fast_union_find` | 121.98 | 122.00 | 0.02 |
+| `cuda_batch` | 211.57 | 214.24 | 2.67 |
+
+---
+
+## Reproduce locally
+
+```bash
+# MWPM / PyMatching comparison
+python scripts/competitive_stim_ler.py --distances 3 5 7 9 11 13 15 --shots 40000
+
+# Belief-matching comparison
+python scripts/competitive_belief_matching.py --distances 3 5 7 --shots 3000 --no-ref
+
+# GPU correctness and crossover checks
+python scripts/gpu_extensive_test.py --distances 3 5 7 9 11 13 --batches 1 64 1024 4096 16384 65536 --error-rate 0.05
+
+# Native memory profile
+python scripts/native_memory_profile.py --distances 5 9 13 --batch 16384 --out benchmark_results/native_memory
+
+# Full due-diligence bundle
+python scripts/run_due_diligence_bundle.py --out qector_evidence_bundle
 ```
 
-### Stim / DEM integration
+Benchmark results are hardware, driver, compiler, seed, and workload dependent. Regenerate before quoting throughput, latency, GPU speedup, or buyer-facing performance numbers.
 
-`stim_compat` exposes two entry points with different input scopes:
+---
 
-```python
-import stim
-from qector_decoder_v3.stim_compat import (
-    from_stim_detector_error_model,   # accepts DetectorErrorModel or str
-    stim_circuit_to_check_matrix,     # superset: also accepts stim.Circuit
-    to_stim_decoder,
-    stim_decoder_from_dem,
-)
+## Architecture
 
-# from a DetectorErrorModel
-dem = stim.Circuit.generated(
-    "surface_code:rotated_memory_x", distance=5
-).detector_error_model(decompose_errors=True)
-c2q, nq = from_stim_detector_error_model(dem)
-
-# from a full stim.Circuit (stim_circuit_to_check_matrix converts it internally)
-circuit = stim.Circuit.generated("surface_code:rotated_memory_x", distance=5)
-c2q, nq = stim_circuit_to_check_matrix(circuit)
+```text
+qector_decoder_v3/
++-- Rust core, proprietary
+|   +-- Union-Find / Blossom / SparseBlossom engines
+|   +-- CPU batch engine
+|   +-- CUDA / OpenCL batch paths where enabled
+|   +-- DEM collapse and Stim integration support
+|   +-- Native Python extension
+|
++-- Python layer, public in this repository
+    +-- __init__.py
+    +-- belief_matching.py
+    +-- bposd.py
+    +-- predecoder.py
+    +-- backend.py
+    +-- dem.py
+    +-- stim_compat.py
+    +-- sinter_compat.py
+    +-- qiskit_plugin.py
+    +-- rest_api.py
+    +-- workbench.py
+    +-- codes.py
 ```
 
-> **Note (v0.5.6):** `stim_circuit_to_check_matrix` and `from_stim_detector_error_model`
-> are parallel implementations, not a Python alias. Both produce identical results for
-> `DetectorErrorModel` input. `stim_circuit_to_check_matrix` additionally accepts a
-> `stim.Circuit` object by calling `.detector_error_model(decompose_errors=True)`
-> before delegating. Use whichever matches your input type.
+The Rust core is compiled into release wheels. The `src/` directory in this public repository is a placeholder/stub; commercial builds use the licensed source bundle or trusted CI injection.
 
-### Sinter integration
+---
+
+## Sinter integration
 
 ```python
 import sinter
-from qector_decoder_v3.sinter_compat import (
-    QectorSinterDecoder,
-    QectorDecoderWrapper,       # backward-compat alias for QectorSinterDecoder
-    qector_sinter_decoders,
-)
+from qector_decoder_v3.sinter_compat import qector_sinter_decoders
+
+tasks = [...]  # list[sinter.Task]
 
 samples = sinter.collect(
     num_workers=4,
@@ -145,104 +301,119 @@ samples = sinter.collect(
     decoders=["qector_belief", "qector_blossom", "qector_unionfind"],
     custom_decoders=qector_sinter_decoders(),
 )
-
-# standalone single-syndrome decode — no Sinter required (v0.5.3+)
-dec = QectorSinterDecoder("blossom")
-obs = dec.decode(syndrome, dem=dem)
-```
-
-### BeliefMatching
-
-```python
-import numpy as np
-from qector_decoder_v3.belief_matching import BeliefMatching
-
-# from a Stim DEM (recommended for circuit-level noise)
-bm = BeliefMatching.from_detector_error_model(dem)
-
-# from a raw check matrix H with uniform prior (v0.5.3+)
-H = np.array([[1, 1, 0], [0, 1, 1]], dtype=np.uint8)
-bm = BeliefMatching(H, p=0.05)
-obs = bm.decode(syndrome)
-```
-
-### CUDA / GPU
-
-```python
-from qector_decoder_v3 import CUDABatchDecoder
-
-if CUDABatchDecoder.is_available():
-    dec = CUDABatchDecoder(check_to_qubits, n_qubits)
-    corrections = dec.batch_decode(syndromes)
-else:
-    print("No CUDA GPU — use BatchDecoder for CPU batch decoding")
 ```
 
 ---
 
-## Independent validation (v0.5.3)
+## REST API, local only
 
-Validated by independent automated test suite — 87/87 checks PASS on v0.5.3.  
-Platform: Windows 10, AMD Ryzen 16-core, NVIDIA GTX 1660 Ti (CUDA 7.5), Python 3.11, NumPy 2.2.6, PyMatching 2.4.0, stim 1.16.0.  
-Full artifact: `benchmark_results/results_v053_retest.json`
+```bash
+pip install "qector-decoder-v3[stim]" fastapi uvicorn
+python -m qector_decoder_v3.rest_api
+```
 
-| Claim | Result |
+```bash
+curl -X POST http://localhost:8000/decode \
+  -H "Content-Type: application/json" \
+  -d '{"check_to_qubits":[[0,1],[1,2],[2,3],[3,4]],"syndrome":[0,1,0,0]}'
+```
+
+The REST API is for local experiments, partner review, or controlled internal deployments. Do not expose it publicly without authentication, TLS, authorization, logging, input limits, and rate limiting. See [`docs/SECURITY_DEPLOYMENT.md`](docs/SECURITY_DEPLOYMENT.md).
+
+---
+
+## Limits and claim boundaries
+
+| Area | Boundary |
 |---|---|
-| 30 decoder × code combinations, 100% syndrome-valid corrections | ✅ |
-| `pymatching_compat` bit-identical to PyMatching 2.4.0 | ✅ |
-| Blossom LER within 0.00% of PyMatching on rep code d=3–9 | ✅ |
-| Blossom LER within 1.78% of PyMatching on rotated surface code d=3–7 | ✅ |
-| CUDA batch 100% CPU-agreeing at all batch sizes, GTX 1660 Ti | ✅ |
-| CUDA batch 6.9–7.7× faster than CPU batch at 100k shots | ✅ |
-| Workbench single-decode rep d=5 Blossom: 285,713 dec/s · p50 3.50 µs · p99 9.50 µs | ✅ |
-| AutoDecoder backends: cpu, cuda (GTX 1660 Ti), opencl=False | ✅ |
-| Workbench JSON/CSV/PDF export pipeline end-to-end | ✅ |
-| LookupTableDecoder table\_size for rep d=5: 64 entries | ✅ |
-
-### Single-shot latency reference (µs/decode, 2000 samples, independently validated)
-
-| Decoder | rep d=5 | rep d=9 | surf d=3 | surf d=5 |
-|---|---|---|---|---|
-| UnionFindDecoder | 9.3 | 10.0 | 12.2 | 10.1 |
-| FastUnionFindDecoder | 9.5 | 10.2 | 11.4 | 12.1 |
-| BlossomDecoder | 10.6 | 10.6 | 14.8 | 16.8 |
-| SparseBlossomDecoder | 11.8 | 10.6 | 11.5 | 29.2 |
-| BatchDecoder (CPU) | 11.2 | 9.7 | 9.5 | 10.7 |
-| LookupTableDecoder | 8.7 | 10.7 | 9.5 | — |
+| MWPM latency | PyMatching remains the speed leader on standard surface-code MWPM workloads in the provided artifacts. |
+| Belief-matching | Accuracy/research mode. It can improve observed LER on selected workloads but is much slower. |
+| GPU performance | Correctness is artifact-backed for tested machines. Speedup is not universal. |
+| OpenCL wheels | OpenCL support depends on build configuration and target environment. Confirm locally. |
+| SparseBlossom | Near-optimal, not exact MWPM. Use `BlossomDecoder` for exact minimum-weight matching. |
+| UnionFind | Fast approximate path; not a universal decoder for arbitrary graphs. |
+| REST/gRPC/MCP surfaces | Not hardened as public SaaS without a separate deployment/security review. |
 
 ---
 
-## Changelog summary
+## Documentation map
 
-| Version | Date | Key change |
+| Document | Contents |
+|---|---|
+| [`docs/API_STABILITY.md`](docs/API_STABILITY.md) | Stable vs experimental API surface |
+| [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) | Benchmark and validation methodology |
+| [`docs/CORRECTNESS_AUDIT.md`](docs/CORRECTNESS_AUDIT.md) | Correctness invariants |
+| [`docs/REPRODUCE.md`](docs/REPRODUCE.md) | Reproduction commands |
+| [`docs/REPRODUCIBILITY_CHECKLIST.md`](docs/REPRODUCIBILITY_CHECKLIST.md) | Claim checklist before publication |
+| [`docs/SCALING.md`](docs/SCALING.md) | Scaling and backend notes |
+| [`docs/BEYOND_PYMATCHING.md`](docs/BEYOND_PYMATCHING.md) | Positioning beyond PyMatching |
+| [`docs/BENCHMARK_COMPETITIVE.md`](docs/BENCHMARK_COMPETITIVE.md) | Competitive benchmark methodology |
+| [`docs/SECURITY_DEPLOYMENT.md`](docs/SECURITY_DEPLOYMENT.md) | Service deployment hardening |
+| [`docs/SERVICE_API_SCHEMA.md`](docs/SERVICE_API_SCHEMA.md) | REST schema and limitations |
+| [`docs/PLATFORM_ARTIFACT_ROADMAP.md`](docs/PLATFORM_ARTIFACT_ROADMAP.md) | CI, SBOM, wheel and artifact roadmap |
+| [`INSTALL.md`](INSTALL.md) | Source build notes |
+| [`CHANGELOG.md`](CHANGELOG.md) | Release history |
+| [`RELEASE_NOTES.md`](RELEASE_NOTES.md) | Current release notes |
+| [`SECURITY.md`](SECURITY.md) | Vulnerability reporting |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contribution guidelines |
+
+---
+
+## CI / CD
+
+| Workflow | Purpose | Notes |
 |---|---|---|
-| 0.5.7 | 2026-06-29 | Advanced strategic QEC decoders: Fusion/Sparse Blossom, EBP, Restart Belief, KAT/QCT, Astra GNN, GPU pipelines |
-| 0.5.6 | 2026-06-28 | `stim_compat` doc fix: `stim_circuit_to_check_matrix` is parallel impl, not alias |
-| 0.5.5 | 2026-06-28 | `PredecodedDecoder.batch_decode()` wheel fix; PYTHONPATH guard; 775 tests pass |
-| 0.5.4 | 2026-06-27 | `NeuralPredecoder.train()` clear error on numpy>=2.0; 125/125 validation |
-| 0.5.3 | 2026-06-25 | `BatchDecoder.decode()`, `BeliefMatching(H, p)`, `QectorSinterDecoder.decode()` |
-| 0.5.2 | 2026-06-25 | Adaptive Blossom k; QECTOR Workbench; `QectorDecoderWrapper` alias; evidence bundle |
+| `tests.yml` | Ruff, format check, advisory MyPy, Docker smoke, import smoke | Rust source stub means Docker/native build checks can be informational in this workflow. |
+| `CI.yml` | Linux, Windows, macOS wheels and sdist, PyPI publish on `v*` tags | Rust core is injected from GitHub Actions secrets for trusted release builds. |
 
-Full changelog: [CHANGELOG.md](CHANGELOG.md)
+PyPI release uses OIDC Trusted Publisher and does not require a stored PyPI API token.
 
 ---
 
-## Honest limitations
+## Repository cleanup status
 
-- Union-Find is roughly 3× less accurate than MWPM on measured workloads.
-- Single-round code-capacity noise does not produce surface-code threshold curves. Use circuit-level Stim DEM with `qector_sinter_decoders()` for threshold experiments.
-- GPU speedups are hardware and batch-size dependent.
-- `NeuralPredecoder.train()` requires numpy<2.0 until the Rust binding is updated.
-- PyMatching and Stim remain important reference tools.
+The public repository has been cleaned for external review. Internal roadmaps, raw debug dumps, stale GPU notes, old CI setup instructions, and unfinished GNN/legacy scripts were removed in the cleanup commit. Public-facing evidence is now concentrated in `benchmark_results/`, `artifacts/`, `docs/`, and the reproducible scripts under `scripts/`.
 
 ---
 
-## Topics
+## Commercial model
 
-quantum-error-correction qec quantum-computing decoder mwpm union-find bp-osd ldpc qldpc surface-code stim pymatching rust python cuda batch-decoding gpu-acceleration error-correction high-performance reproducible-research benchmarking pyo3 validation belief-propagation high-throughput
+QECTOR Decoder v3 is source-available.
+
+| Use | License required |
+|---|---|
+| Personal, academic, educational, non-commercial research | Free under the repository license |
+| Company use, commercial R&D, institutional funded work | Paid commercial license |
+| SaaS, hosted API, OEM embedding, product integration, redistribution | Paid commercial license |
+| Commercial benchmarking, paid consulting, revenue-linked work | Paid commercial license |
+
+Commercial contact: [admin@qector.store](mailto:admin@qector.store)
+
+Website: [https://www.qector.store](https://www.qector.store)
+
+See [`COMMERCIAL.md`](COMMERCIAL.md) and [`LICENSE`](LICENSE) for full terms.
 
 ---
 
-## License
+## Citation
 
-Source-available. Commercial use requires written licensing: https://qector.store
+```bibtex
+@software{lessard2026qector,
+  author  = {Guillaume Lessard},
+  title   = {{QECTOR Decoder v3}: Rust/Python Quantum Error Correction Decoding Platform},
+  year    = {2026},
+  version = {0.5.7},
+  url     = {https://www.qector.store},
+  note    = {Source-available. Commercial license required for commercial use.}
+}
+```
+
+---
+
+<div align="center">
+
+**Copyright (c) 2026 Guillaume Lessard / iD01t Productions. All rights reserved.**
+
+[https://www.qector.store](https://www.qector.store) - [admin@qector.store](mailto:admin@qector.store)
+
+</div>

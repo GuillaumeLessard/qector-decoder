@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-example_blossom.py — QECTOR Decoder v3.4 Blossom & Sparse Blossom Demo
+example_blossom.py - QECTOR Decoder v3 Blossom & Sparse Blossom Demo
 
 Demonstrates exact MWPM vs sparse region-growing Blossom on challenging cases.
 """
@@ -41,7 +41,7 @@ def main():
     test_cases.append(("Random syndrome", random_syndrome))
     
     print("=" * 60)
-    print("QECTOR v3.4 — Blossom vs Sparse Blossom Demo")
+    print("QECTOR v3 - Blossom vs Sparse Blossom Demo")
     print("=" * 60)
     print(f"Code: Ring Code d=5 ({n_qubits} qubits, {n_checks} checks)")
     

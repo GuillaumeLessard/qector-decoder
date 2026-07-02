@@ -42,9 +42,7 @@ def test_belief_matching_runs_and_is_valid(d):
         after_reset_flip_probability=p,
     )
     sdem = circ.detector_error_model(decompose_errors=True)
-    det, obs = circ.compile_detector_sampler(seed=1234).sample(
-        shots=shots, separate_observables=True
-    )
+    det, obs = circ.compile_detector_sampler(seed=1234).sample(shots=shots, separate_observables=True)
     det = det.astype(np.uint8)
     obs = obs.astype(np.uint8)
 

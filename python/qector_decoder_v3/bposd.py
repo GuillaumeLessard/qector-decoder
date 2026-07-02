@@ -27,6 +27,7 @@ from typing import Any, List
 
 import numpy as np
 
+from . import gpu_backend as _gb
 from ._bp_core import build_incidence, min_sum_bp, sum_product_bp
 from .codes import _to_dense_binary
 
@@ -45,13 +46,12 @@ class BpOsdDecoder:
         ms_scale: float = 1.0,
         osd_order: int = 0,
         bp_method: str = "sum_product",
+        use_gpu: Any = None,
     ):
         self.H = _to_dense_binary(H)
         if self.H.ndim != 2:
             raise ValueError(f"H must be 2D, got {self.H.shape}")
-        self.n_checks: int
-        self.n_qubits: int
-        self.n_checks, self.n_qubits = (int(x) for x in self.H.shape)
+        self.n_checks, self.n_qubits = self.H.shape
         self.ic, self.ie = build_incidence(self.H)
         if priors is None:
             p = np.full(self.n_qubits, float(error_rate), dtype=np.float64)
@@ -66,6 +66,11 @@ class BpOsdDecoder:
         if bp_method not in ("sum_product", "min_sum"):
             raise ValueError("bp_method must be 'sum_product' or 'min_sum'")
         self.bp_method = bp_method
+        # GPU batched-BP policy. ``None`` -> auto (use the GPU iff one is usable);
+        # ``True``/``False`` force the choice. The single-shot ``decode`` path is
+        # never affected; only ``batch_decode`` consults this.
+        self.use_gpu = use_gpu
+        self._batched = None  # lazily built BatchedBpDecoder (device-resident)
 
     # -- public ------------------------------------------------------------
     def decode(self, syndrome) -> np.ndarray:
@@ -99,12 +104,68 @@ class BpOsdDecoder:
         return self._osd(s, posterior)
 
     def batch_decode(self, syndromes) -> np.ndarray:
+        """Decode a stack of syndromes ``[batch, n_checks]`` to ``[batch, n_qubits]``.
+
+        When a CUDA device is usable (and ``use_gpu`` is not ``False``), the BP stage
+        for the whole batch is run **once** on the GPU via
+        :class:`qector_decoder_v3.bp_cupy.BatchedBpDecoder`. Shots that BP already
+        explains (``H @ c == s``) are returned directly (the OSD-0 fast path — no
+        ordered-statistics work); only the residual non-converged shots are sent
+        through the exact GF(2) OSD post-process, seeded with that shot's GPU BP
+        reliabilities. The result is bit-for-bit a valid BP-OSD output and matches
+        the CPU path's correctness contract (every row satisfies its syndrome).
+
+        Falls back to the per-shot CPU path on any GPU error, and is used
+        automatically when no device is present, so behaviour is unchanged on
+        CPU-only machines.
+        """
         arr = np.asarray(syndromes, dtype=np.uint8)
         if arr.ndim != 2:
             raise ValueError(f"syndromes must be 2D, got {arr.shape}")
-        return np.stack([self.decode(arr[i]) for i in range(arr.shape[0])]).astype(
-            np.uint8
-        )
+        if self._gpu_enabled():
+            try:
+                return self._gpu_batch_decode(arr)
+            except Exception:  # pragma: no cover - defensive GPU fallback
+                _gb.note_fallback()
+        return np.stack([self.decode(arr[i]) for i in range(arr.shape[0])]).astype(np.uint8)
+
+    # -- GPU batch path ----------------------------------------------------
+    def _gpu_enabled(self) -> bool:
+        """Return ``True`` iff the GPU batched-BP path should be used right now."""
+        if self.use_gpu is False:
+            return False
+        return bool(_gb.gpu_available() and _gb.get_prefer_gpu())
+
+    def _get_batched(self):
+        """Return the cached device-resident :class:`BatchedBpDecoder` (built once)."""
+        if self._batched is None:
+            from .bp_cupy import BatchedBpDecoder
+
+            self._batched = BatchedBpDecoder(
+                self.H,
+                priors=self.priors,
+                max_iter=self.max_iter,
+                alpha=self.ms_scale,
+                bp_method=self.bp_method,
+                prefer_gpu=True,
+            )
+        return self._batched
+
+    def _gpu_batch_decode(self, arr: np.ndarray) -> np.ndarray:
+        """Batched GPU BP + selective OSD; every returned row satisfies its syndrome."""
+        if arr.shape[1] < self.n_checks:
+            pad = np.zeros((arr.shape[0], self.n_checks - arr.shape[1]), dtype=np.uint8)
+            arr = np.concatenate([arr, pad], axis=1)
+        bd = self._get_batched()
+        corr, converged, llr = bd.decode_batch(arr, return_llr=True, early_stop=True)
+        out = corr.astype(np.uint8, copy=True)
+        # OSD-0 fast path: shots BP already explains skip OSD entirely; only the
+        # residual non-converged shots get the exact GF(2) ordered-statistics solve,
+        # seeded with the GPU BP posterior so OSD inherits BP's reliabilities.
+        for i in np.nonzero(~converged)[0]:
+            s_i = arr[i].reshape(-1).astype(np.uint8)
+            out[i] = self._osd(s_i, llr[i])
+        return out.astype(np.uint8)
 
     @property
     def n_qubits_(self) -> int:
@@ -120,7 +181,7 @@ class BpOsdDecoder:
         order = np.argsort(rel)
         x0, pivots = _gf2_osd_solve(self.H, s, order, hard)
         if self.osd_order <= 0:
-            return x0  # type: ignore[no-any-return]
+            return x0
         # OSD-w (greedy combination sweep over the least-reliable bits): force
         # small combinations on and re-solve, keeping the lowest-weight result.
         best, best_w = x0, int(x0.sum())
@@ -149,9 +210,7 @@ class BpOsdDecoder:
 # ---------------------------------------------------------------------------
 # GF(2) ordered-statistics solve
 # ---------------------------------------------------------------------------
-def _gf2_osd_solve(
-    H: np.ndarray, s: np.ndarray, order: np.ndarray, hard: np.ndarray
-) -> tuple[np.ndarray, np.ndarray]:
+def _gf2_osd_solve(H: np.ndarray, s: np.ndarray, order: np.ndarray, hard: np.ndarray):
     """OSD-0 solve. ``order`` lists columns least-reliable first; the first
     rank(H) independent of them form the basis, the rest (free) take their BP hard
     decision, and the basis is solved so ``H x == s (mod 2)``.

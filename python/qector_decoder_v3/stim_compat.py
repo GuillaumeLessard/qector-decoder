@@ -5,12 +5,11 @@ Stim (https://github.com/quantumlib/stim) est un simulateur de circuits QEC
 trépidant. Ce module permet d'utiliser QECTOR comme back-end de décodage
 pour des modèles d'erreurs produits par Stim.
 
-Usage — code-capacity (matching graph) ::
+Usage ::
 
     import stim
     from qector_decoder_v3.stim_compat import (
         from_stim_detector_error_model,
-        stim_circuit_to_check_matrix,   # superset: also accepts stim.Circuit objects
         to_stim_decoder,
         stim_decoder_from_dem,
     )
@@ -19,40 +18,10 @@ Usage — code-capacity (matching graph) ::
     circuit = stim.Circuit.generated("surface_code:rotated_memory_x", distance=5)
     dem = circuit.detector_error_model(decompose_errors=True)
     c2q, nq = from_stim_detector_error_model(dem)
-    # stim_circuit_to_check_matrix(dem) also works; it additionally accepts stim.Circuit
 
     # 2. Créer un wrapper QECTOR compatible stim.Decoder
     decoder = stim_decoder_from_dem(dem)
     correction = decoder.decode(syndrome)
-
-Usage — circuit-level noise (surface-code threshold, recommended) ::
-
-    # For genuine surface-code threshold curves, use circuit-level Stim DEMs
-    # (depolarizing / phenomenological / circuit noise) rather than a single-round
-    # code-capacity check matrix.  The single-sector code-capacity model does NOT
-    # produce distance-scaling threshold curves for the bundled rotated_surface_code
-    # because the logical and physical error rates converge without additional rounds.
-    # BeliefMatching and the Sinter interface handle circuit-level noise natively:
-
-    import stim, sinter
-    from qector_decoder_v3.sinter_compat import qector_sinter_decoders
-
-    tasks = [
-        sinter.Task(
-            circuit=stim.Circuit.generated(
-                "surface_code:rotated_memory_z",
-                distance=d, rounds=d,
-                after_clifford_depolarization=0.005,
-            ),
-            json_metadata={"d": d},
-        )
-        for d in (3, 5, 7)
-    ]
-    samples = sinter.collect(
-        num_workers=4, tasks=tasks,
-        decoders=["qector_belief", "qector_blossom"],
-        custom_decoders=qector_sinter_decoders(),
-    )
 """
 
 from __future__ import annotations
@@ -106,9 +75,7 @@ def from_stim_detector_error_model(dem: Any) -> Tuple[List[List[int]], int]:
     elif hasattr(dem, "num_detectors"):
         model = from_stim(dem)
     else:
-        raise TypeError(
-            f"dem doit être un stim.DetectorErrorModel (ou un texte .dem), reçu {type(dem).__name__}"
-        )
+        raise TypeError(f"dem doit être un stim.DetectorErrorModel (ou un texte .dem), reçu {type(dem).__name__}")
 
     check_to_qubits = model.check_to_qubits()
     n_qubits = model.num_errors
@@ -178,9 +145,7 @@ def to_stim_decoder(
             return self._inner.decode(syndrome)
 
         def __repr__(self) -> str:
-            return (
-                f"<QECTORStimDecoder n_qubits={self.n_qubits} n_checks={self.n_checks}>"
-            )
+            return f"<QECTORStimDecoder n_qubits={self.n_qubits} n_checks={self.n_checks}>"
 
     return QECTORStimDecoder(inner, check_to_qubits, n_qubits)
 
@@ -202,52 +167,3 @@ def stim_decoder_from_dem(dem: Any, use_batch: bool = False):
     """
     c2q, nq = from_stim_detector_error_model(dem)
     return to_stim_decoder(c2q, n_qubits=nq, use_batch=use_batch)
-
-
-# ---------------------------------------------------------------------------
-# stim_circuit_to_check_matrix — the documented entry-point for Stim circuits
-# ---------------------------------------------------------------------------
-
-
-def stim_circuit_to_check_matrix(circuit_or_dem: Any) -> Tuple[List[List[int]], int]:
-    """Convert a ``stim.Circuit`` **or** ``stim.DetectorErrorModel`` to QECTOR format.
-
-    This is the canonical public function for getting a QECTOR
-    ``(check_to_qubits, n_qubits)`` pair from any Stim object.
-
-    Unlike the original plain alias (which silently returned ``num_errors == 0``
-    when given a Circuit because both Circuit and DetectorErrorModel expose
-    ``num_detectors``), this function correctly identifies Circuit objects by the
-    presence of the ``detector_error_model()`` method and derives the DEM first.
-
-    Parameters
-    ----------
-    circuit_or_dem : stim.Circuit | stim.DetectorErrorModel | str
-        * ``stim.Circuit`` — the DEM is derived with ``decompose_errors=True``
-          before conversion.
-        * ``stim.DetectorErrorModel`` — converted directly.
-        * ``str`` — parsed as raw DEM text.
-
-    Returns
-    -------
-    tuple[list[list[int]], int]
-        ``(check_to_qubits, n_qubits)`` as expected by all QECTOR decoder
-        constructors.
-
-    Examples
-    --------
-    >>> import stim
-    >>> from qector_decoder_v3.stim_compat import stim_circuit_to_check_matrix
-    >>> circuit = stim.Circuit.generated(
-    ...     "surface_code:rotated_memory_x", distance=3, rounds=3,
-    ...     after_clifford_depolarization=0.001,
-    ... )
-    >>> c2q, n_errors = stim_circuit_to_check_matrix(circuit)
-    >>> assert n_errors > 0          # was 0 in v0.5.2 — fixed in v0.5.3
-    """
-    # KEY FIX (v0.5.3): stim.Circuit has detector_error_model(); DetectorErrorModel
-    # does not.  Both have num_detectors, so we cannot use that alone.
-    if _HAS_STIM and hasattr(circuit_or_dem, "detector_error_model"):
-        dem = circuit_or_dem.detector_error_model(decompose_errors=True)
-        return from_stim_detector_error_model(dem)
-    return from_stim_detector_error_model(circuit_or_dem)

@@ -17,9 +17,7 @@ import sys
 import time
 
 _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-import importlib.util
-if importlib.util.find_spec("qector_decoder_v3.qector_decoder_v3") is None:
-    sys.path.insert(0, os.path.join(_REPO, "python"))
+sys.path.insert(0, os.path.join(_REPO, "python"))
 
 import numpy as np  # noqa: E402
 
@@ -36,7 +34,6 @@ def main() -> int:
 
     import stim
     import pymatching
-    from qector_decoder_v3 import dem
 
     # Pre-build problems + reference (independent of the multiplier).
     probs = {}
@@ -47,7 +44,6 @@ def main() -> int:
             before_measure_flip_probability=args.noise,
             after_reset_flip_probability=args.noise)
         sdem = circ.detector_error_model(decompose_errors=True)
-        dem.from_stim(sdem).collapse_to_graph()
         det, obs = circ.compile_detector_sampler(seed=args.seed).sample(
             shots=args.shots, separate_observables=True)
         pmf = pymatching.Matching.from_detector_error_model(sdem)

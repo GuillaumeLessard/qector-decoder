@@ -11,13 +11,7 @@ pytest.importorskip("matplotlib")
 
 def _artifact(wb):
     return wb.run_benchmark(
-        {
-            "code": "rotated_surface",
-            "distances": [3, 5, 7],
-            "decoders": ["blossom"],
-            "trials": 200,
-            "warmup": 30,
-        }
+        {"code": "rotated_surface", "distances": [3, 5, 7], "decoders": ["blossom"], "trials": 200, "warmup": 30}
     )
 
 

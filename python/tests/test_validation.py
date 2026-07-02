@@ -53,9 +53,7 @@ def test_sparse_blossom_vs_pymatching_ring_small():
         assert np.array_equal(syn_sparse, syndrome), "SparseBlossom correction invalid"
         assert np.array_equal(syn_pm, syndrome), "PyMatching correction invalid"
 
-    print(
-        f"SparseBlossom vs PyMatching ring d={d}: {mismatches} mismatches / {n_trials}"
-    )
+    print(f"SparseBlossom vs PyMatching ring d={d}: {mismatches} mismatches / {n_trials}")
 
 
 def test_sparse_blossom_vs_pymatching_surface():
@@ -102,12 +100,8 @@ def test_sparse_blossom_vs_pymatching_surface():
             syn_sparse[ci] = int(np.sum(corr_sparse[qubits]) % 2)
             syn_pm[ci] = int(np.sum(corr_pm[qubits]) % 2)
 
-        assert np.array_equal(syn_sparse, syndrome), (
-            "SparseBlossom correction invalid on ring code"
-        )
-        assert np.array_equal(syn_pm, syndrome), (
-            "PyMatching correction invalid on ring code"
-        )
+        assert np.array_equal(syn_sparse, syndrome), "SparseBlossom correction invalid on ring code"
+        assert np.array_equal(syn_pm, syndrome), "PyMatching correction invalid on ring code"
 
 
 def test_sparse_blossom_vs_pymatching_surface_code_strict():
@@ -157,12 +151,8 @@ def test_sparse_blossom_vs_pymatching_surface_code_strict():
             syn_sparse[ci] = int(np.sum(corr_sparse[qubits]) % 2)
             syn_pm[ci] = int(np.sum(corr_pm[qubits]) % 2)
 
-        assert np.array_equal(syn_sparse, syndrome), (
-            "SparseBlossom correction invalid on surface code"
-        )
-        assert np.array_equal(syn_pm, syndrome), (
-            "PyMatching correction invalid on surface code"
-        )
+        assert np.array_equal(syn_sparse, syndrome), "SparseBlossom correction invalid on surface code"
+        assert np.array_equal(syn_pm, syndrome), "PyMatching correction invalid on surface code"
 
 
 def test_hybrid_decoder_basic():

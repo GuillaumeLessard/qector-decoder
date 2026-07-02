@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-example_batch.py — QECTOR Decoder v3.4 Batch & GPU Demo
+example_batch.py - QECTOR Decoder v3 Batch & GPU Demo
 
 Demonstrates CPU and GPU parallel batch decoding (OpenCL & CUDA if available).
 """
@@ -35,7 +35,7 @@ def main():
     syndromes = rng.integers(0, 2, size=(batch_size, n_checks), dtype=np.uint8)
     
     print("=" * 60)
-    print("QECTOR v3.4 — Batch & GPU Demo")
+    print("QECTOR v3 - Batch & GPU Demo")
     print("=" * 60)
     print(f"Code: Surface Code d=5 ({n_qubits} qubits, {n_checks} checks)")
     print(f"Batch size: {batch_size}")

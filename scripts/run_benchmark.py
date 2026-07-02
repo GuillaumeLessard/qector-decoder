@@ -5,7 +5,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-import qector_decoder_v3 as qd
+import qector_decoder_v3 as qd  # noqa: E402
 
 
 def run_single_benchmark(name, checks, n_qubits, n_samples=10000, seed=42):

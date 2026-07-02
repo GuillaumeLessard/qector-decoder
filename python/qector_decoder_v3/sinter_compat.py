@@ -31,10 +31,7 @@ import numpy as np
 if TYPE_CHECKING:
     pass  # sinter types used only at runtime
 
-__all__ = ["QectorSinterDecoder", "qector_sinter_decoders", "QectorDecoderWrapper"]
-
-# Backward-compat alias — some docs and older examples used this name
-# (defined after QectorSinterDecoder class below)
+__all__ = ["QectorSinterDecoder", "qector_sinter_decoders"]
 
 try:
     import sinter
@@ -56,9 +53,7 @@ class _CompiledQectorDecoder(_COMPILED_BASE):  # type: ignore[misc,valid-type]
         self.num_detectors = int(num_detectors)
         self.num_observables = int(num_observables)
 
-    def decode_shots_bit_packed(
-        self, *, bit_packed_detection_event_data: np.ndarray
-    ) -> np.ndarray:
+    def decode_shots_bit_packed(self, *, bit_packed_detection_event_data: np.ndarray) -> np.ndarray:
         # Sinter/Stim use little-endian bit packing.
         dets = np.unpackbits(
             np.ascontiguousarray(bit_packed_detection_event_data),
@@ -75,7 +70,7 @@ class _CompiledQectorDecoder(_COMPILED_BASE):  # type: ignore[misc,valid-type]
             k = min(self.num_observables, preds.shape[1])
             fixed[:, :k] = preds[:, :k]
             preds = fixed
-        return np.packbits(preds, axis=1, bitorder="little")  # type: ignore[no-any-return]
+        return np.packbits(preds, axis=1, bitorder="little")
 
 
 class QectorSinterDecoder(_SINTER_BASE):  # type: ignore[misc,valid-type]
@@ -83,8 +78,6 @@ class QectorSinterDecoder(_SINTER_BASE):  # type: ignore[misc,valid-type]
 
     ``kind`` selects the backend: ``"blossom"`` (weighted exact MWPM),
     ``"belief"`` (belief-matching), or ``"unionfind"`` (fast, unweighted).
-
-    Also usable standalone via ``.decode(syndrome, dem)`` for non-Sinter testing.
     """
 
     def __init__(self, kind: str = "belief"):
@@ -95,43 +88,6 @@ class QectorSinterDecoder(_SINTER_BASE):  # type: ignore[misc,valid-type]
     def compile_decoder_for_dem(self, *, dem) -> "_CompiledQectorDecoder":
         matcher = _build_matcher(self.kind, dem)
         return _CompiledQectorDecoder(matcher, dem.num_detectors, dem.num_observables)
-
-    def decode(self, syndrome, dem=None) -> np.ndarray:
-        """Decode a single syndrome vector.
-
-        Parameters
-        ----------
-        syndrome : array-like
-            Binary detection event vector of length ``num_detectors``.
-        dem : stim.DetectorErrorModel, optional
-            DEM to build the decoder from. Required on the first call; cached
-            for subsequent calls with the same instance.
-
-        Returns
-        -------
-        np.ndarray
-            Predicted observable flips, shape ``(num_observables,)``.
-        """
-        if dem is not None:
-            self._cached_dem = dem
-        if not hasattr(self, "_cached_dem") or self._cached_dem is None:
-            raise ValueError("dem must be provided on the first call to .decode()")
-        compiled = self.compile_decoder_for_dem(dem=self._cached_dem)
-        s = np.asarray(syndrome, dtype=np.uint8).reshape(1, -1)
-        # pack -> decode -> unpack
-        n_det = compiled.num_detectors
-        packed = np.packbits(
-            np.pad(s, ((0, 0), (0, (8 - n_det % 8) % 8)), mode="constant"),
-            axis=1,
-            bitorder="little",
-        )
-        result_packed = compiled.decode_shots_bit_packed(
-            bit_packed_detection_event_data=packed
-        )
-        result = np.unpackbits(
-            result_packed, axis=1, count=compiled.num_observables, bitorder="little"
-        )
-        return result[0].astype(np.uint8)  # type: ignore[no-any-return]
 
 
 def _build_matcher(kind: str, dem):
@@ -163,9 +119,7 @@ class _UnionFindSinter:
         self._dec = UnionFindDecoder(model.check_to_qubits(), model.num_errors)
 
     def decode_batch(self, shots):
-        corr = np.asarray(
-            self._dec.batch_decode(np.asarray(shots, np.uint8)), dtype=np.uint8
-        )
+        corr = np.asarray(self._dec.batch_decode(np.asarray(shots, np.uint8)), dtype=np.uint8)
         return ((self._L @ corr.T) & 1).T.astype(np.uint8)
 
 
@@ -178,7 +132,3 @@ def qector_sinter_decoders() -> Dict[str, "QectorSinterDecoder"]:
         "qector_belief": QectorSinterDecoder("belief"),
         "qector_unionfind": QectorSinterDecoder("unionfind"),
     }
-
-
-# Backward-compatibility alias — older docs and examples used QectorDecoderWrapper
-QectorDecoderWrapper = QectorSinterDecoder

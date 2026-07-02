@@ -87,9 +87,7 @@ class PredecodedDecoder:
             residual = UnionFindDecoder(self._c2q, self.n_qubits)
         else:
             residual = SparseBlossomDecoder(self._c2q, self.n_qubits)
-        self._residual: Union[
-            BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder
-        ] = residual
+        self._residual: Union[BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder] = residual
         self.last_predecoded = 0  # number of defects resolved by the predecoder
 
     def _predecode(self, syndrome: np.ndarray):
@@ -118,38 +116,16 @@ class PredecodedDecoder:
         self.last_predecoded = resolved
         return committed, s
 
-    def batch_decode(self, syndromes) -> np.ndarray:
-        """Decode a batch of syndromes.
-
-        Parameters
-        ----------
-        syndromes : array-like, shape (n_shots, n_checks)
-            Each row is a single syndrome bit-vector.
-
-        Returns
-        -------
-        np.ndarray, shape (n_shots, n_qubits)
-            Correction vectors, one per shot.
-        """
-        S = np.asarray(syndromes, dtype=np.uint8)
-        if S.ndim == 1:
-            S = S.reshape(1, -1)
-        return np.stack([self.decode(S[i]) for i in range(len(S))], axis=0)
-
     def decode(self, syndrome) -> np.ndarray:
         s = np.asarray(syndrome, dtype=np.uint8).reshape(-1)
         committed, residual = self._predecode(s)
         if not residual.any():
             return committed
-        res_corr = np.asarray(self._residual.decode(residual), dtype=np.uint8).reshape(
-            -1
-        )
+        res_corr = np.asarray(self._residual.decode(residual), dtype=np.uint8).reshape(-1)
         return (committed ^ res_corr).astype(np.uint8)
 
-    def is_matching_graph(self) -> bool:
-        """Return True if the underlying qubit-check graph is a proper matching graph.
-
-        A matching graph for a decoder requires each qubit (edge) to connect exactly two checks.
-        This helper validates that invariant for debugging and documentation purposes.
-        """
-        return all(len(chk) == 2 for chk in self._qubit_checks if chk)
+    def batch_decode(self, syndromes) -> np.ndarray:
+        arr = np.asarray(syndromes, dtype=np.uint8)
+        if arr.ndim != 2:
+            raise ValueError(f"syndromes must be 2D, got {arr.shape}")
+        return np.stack([self.decode(arr[i]) for i in range(arr.shape[0])]).astype(np.uint8)
