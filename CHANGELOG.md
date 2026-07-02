@@ -7,6 +7,37 @@ environment so report figures trace back to a specific build.
 
 ## [Unreleased]
 
+## [0.5.8] - 2026-07-02
+
+### Added
+- **CuPy-accelerated GPU backend** (`gpu_backend.py`, `bp_cupy.py`): batched
+  belief-propagation / BP-OSD decoding on NVIDIA GPUs via CuPy, with automatic
+  NumPy fallback on machines without a GPU. See `docs/GPU_AND_CUPY.md` and
+  `examples/example_cupy_bp.py`.
+- **Decoder auto-routing** (`routing.py`): automatic backend selection (CPU /
+  native CUDA / CuPy) based on batch size and hardware availability. See
+  `examples/example_auto_routing.py`.
+- **Streaming / sliding-window sessions** (`streaming.py`): incremental,
+  multi-round decoding sessions with window + commit semantics for long-running
+  syndrome streams. See `examples/example_streaming_session.py`.
+- Corresponding test suites: `test_gpu_backend.py`, `test_bp_cupy.py`,
+  `test_routing.py`, `test_streaming.py`.
+
+### Removed
+- Superseded `advanced.py` module and its dedicated tests
+  (`test_advanced_decoders.py`, `test_beliefmatching_bridge.py`,
+  `test_kimi_findings.py`, `test_stim_circuit_to_check_matrix.py`), folded into
+  the new routing/streaming/GPU-backend surface.
+- Superseded due-diligence bundle helper scripts (`finalize_bundle.py`,
+  `run_due_diligence_wrapper.py`), superseded by `run_due_diligence_bundle.py`.
+
+### Fixed
+- `ruff format --check python/` was failing in CI (`tests / ruff-and-mypy`) on
+  9 files; reformatted with `ruff format` (lint and mypy were already passing).
+- Version bumped to `0.5.8` across `pyproject.toml`, `Cargo.toml`, `Cargo.lock`,
+  and the Python runtime fallback version, since PyPI `0.5.7` was already
+  published under the prior module layout and cannot be overwritten.
+
 ## [0.5.7] - 2026-06-30
 
 ### Fixed

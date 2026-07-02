@@ -71,7 +71,7 @@ import numpy as np
 # wheel). We never overwrite a real compiled ``__version__`` with it — doing so
 # would falsely claim a version the loaded binary is not — so after a version bump
 # ``__version__`` keeps reporting the *built* value until the Rust wheel is rebuilt.
-__fallback_version__ = "0.5.7"
+__fallback_version__ = "0.5.8"
 
 try:
     from .qector_decoder_v3 import __version__

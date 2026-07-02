@@ -1,3 +1,21 @@
+# QECTOR Decoder v0.5.8 - Release Notes
+
+**Version**: 0.5.8
+**Date**: 2026-07-02
+
+This release adds a CuPy-accelerated GPU backend (`gpu_backend.py`,
+`bp_cupy.py`), automatic decoder backend routing (`routing.py`), and
+streaming/sliding-window decoding sessions (`streaming.py`), with matching
+examples, tests, and docs (`docs/GPU_AND_CUPY.md`). The superseded
+`advanced.py` module and its tests, plus the superseded due-diligence bundle
+helper scripts, were removed. `ruff format` was applied to bring the Python
+layer back in line with CI's `ruff format --check`. Package metadata
+(`pyproject.toml`, `Cargo.toml`, `Cargo.lock`, runtime fallback version) is
+bumped to `0.5.8` since `0.5.7` was already published to PyPI under the prior
+module layout.
+
+---
+
 # QECTOR Decoder v0.5.7 - Release Notes
 
 **Version**: 0.5.7
@@ -280,6 +298,6 @@ From v0.3.0:
 
 ## Links
 
-- Repository: https://github.com/qector/qector-decoder
-- Issues: https://github.com/qector/qector-decoder/issues
-- Documentation: See `README.md` and `DECODER_COMPARISON.md`
+- Repository: https://github.com/GuillaumeLessard/qector-decoder
+- Issues: https://github.com/GuillaumeLessard/qector-decoder/issues
+- Documentation: See `README.md`
