@@ -1,6 +1,6 @@
 # GPU & CuPy Acceleration
 
-**QECTOR Decoder v3 — v0.5.8**
+**QECTOR Decoder v3 — v0.5.9**
 
 This document describes the **hybrid GPU acceleration strategy** in QECTOR
 Decoder v3: a Rust native-CUDA batch hot path plus an optional CuPy backend for

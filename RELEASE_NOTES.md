@@ -1,6 +1,6 @@
-# QECTOR Decoder v0.5.8 - Release Notes
+# QECTOR Decoder v0.5.9 - Release Notes
 
-**Version**: 0.5.8
+**Version**: 0.5.9
 **Date**: 2026-07-02
 
 This release adds a CuPy-accelerated GPU backend (`gpu_backend.py`,
@@ -11,7 +11,7 @@ examples, tests, and docs (`docs/GPU_AND_CUPY.md`). The superseded
 helper scripts, were removed. `ruff format` was applied to bring the Python
 layer back in line with CI's `ruff format --check`. Package metadata
 (`pyproject.toml`, `Cargo.toml`, `Cargo.lock`, runtime fallback version) is
-bumped to `0.5.8` since `0.5.7` was already published to PyPI under the prior
+bumped to `0.5.9` since `0.5.7` was already published to PyPI under the prior
 module layout.
 
 ---

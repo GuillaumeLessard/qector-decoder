@@ -7,7 +7,7 @@ environment so report figures trace back to a specific build.
 
 ## [Unreleased]
 
-## [0.5.8] - 2026-07-02
+## [0.5.9] - 2026-07-02
 
 ### Added
 - **CuPy-accelerated GPU backend** (`gpu_backend.py`, `bp_cupy.py`): batched
@@ -34,7 +34,7 @@ environment so report figures trace back to a specific build.
 ### Fixed
 - `ruff format --check python/` was failing in CI (`tests / ruff-and-mypy`) on
   9 files; reformatted with `ruff format` (lint and mypy were already passing).
-- Version bumped to `0.5.8` across `pyproject.toml`, `Cargo.toml`, `Cargo.lock`,
+- Version bumped to `0.5.9` across `pyproject.toml`, `Cargo.toml`, `Cargo.lock`,
   and the Python runtime fallback version, since PyPI `0.5.7` was already
   published under the prior module layout and cannot be overwritten.
 

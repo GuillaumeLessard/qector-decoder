@@ -173,7 +173,7 @@ admin@qector.store
   author  = {Guillaume Lessard},
   title   = {{QECTOR Decoder v3}: Rust/Python Quantum Error Correction Decoding Platform},
   year    = {2026},
-  version = {0.5.8},
+  version = {0.5.9},
   url     = {https://www.qector.store},
   note    = {Source-available. Commercial license required for commercial use.}
 }
