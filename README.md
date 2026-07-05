@@ -3,11 +3,10 @@
 <div align="center">
 
 [![CI](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/CI.yml/badge.svg)](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/CI.yml)
-(https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/tests.yml)
-[![PyPI](https://img.shields.io/pypi/v/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
-[![Python](https://img.shields.io/pypi/pyversions/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
+[![Tests](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/tests.yml/badge.svg)](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/tests.yml)
+[![PyPI version](https://img.shields.io/pypi/v/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
+[![Python versions](https://img.shields.io/pypi/pyversions/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
 [![License](https://img.shields.io/badge/license-Source--Available-blue.svg)](LICENSE)
-
 **Source-available Rust/Python quantum error correction decoding platform.**
 
 PyMatching-compatible MWPM validation - Belief-matching accuracy mode - BP-OSD for LDPC/qLDPC - CPU/GPU batch decoding - Artifact-backed benchmark evidence
