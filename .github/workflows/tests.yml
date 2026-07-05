@@ -72,13 +72,21 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install from PyPI
-        run: pip install qector-decoder-v3 --pre || echo "PyPI package not yet available -- skipping import test"
+        id: install_py
+        run: |
+          python -m pip install --upgrade pip
+          pip install qector-decoder-v3 --pre
       - name: Import smoke test
+        if: steps.install_py.outcome == 'success'
         run: |
           python -c "
           try:
               import qector_decoder_v3
               print(f'qector_decoder_v3 {getattr(qector_decoder_v3, \"__version__\", \"unknown\")} imported OK')
           except ImportError as e:
-              print(f'ImportError (expected if not on PyPI yet): {e}')
+              print(f'ImportError: {e}')
+              raise
           "
+      - name: Skip smoke import when install fails
+        if: steps.install_py.outcome != 'success'
+        run: echo "PyPI package not yet available -- skipping import test"
