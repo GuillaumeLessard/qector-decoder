@@ -1,3 +1,20 @@
+# QECTOR Decoder v0.6.1 - Release Notes
+
+**Version**: 0.6.1
+**Date**: 2026-07-05
+
+This release fixes a broken `BeliefMatching` constructor call in `README.md`'s
+"Belief-matching accuracy mode" example: it passed
+`(check_to_qubits, n_qubits, error_rate=0.005)`, which doesn't match the real
+constructor and raises `TypeError` if copy-pasted verbatim. Replaced with a
+self-contained example using `BeliefMatching.from_stim_circuit(circuit)`,
+verified by execution against the published `0.6.0` wheel. This was found by
+auditing every documented class instantiation against its real `__init__`
+signature across every `*.md` file in the repo (a deeper check than `0.6.0`'s
+import-existence audit) — it was the only mismatch found.
+
+---
+
 # QECTOR Decoder v0.6.0 - Release Notes
 
 **Version**: 0.6.0

@@ -7,6 +7,21 @@ environment so report figures trace back to a specific build.
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-07-05
+
+### Fixed
+- **README.md**: the "Belief-matching accuracy mode" example called
+  `BeliefMatching(check_to_qubits, n_qubits, error_rate=0.005)`, which does
+  not match the real constructor (`BeliefMatching(matrices, max_iter=30,
+  bp_shortcut=False)`) and raises `TypeError: unexpected keyword argument
+  'error_rate'` if run verbatim. Replaced with a self-contained example using
+  `BeliefMatching.from_stim_circuit(circuit)`, verified by executing it
+  end-to-end against the published `0.6.0` wheel.
+- Audited every class instantiation in every `*.md` file in the repo against
+  the real `__init__` signatures (not just import-name existence, which the
+  `0.6.0` audit covered) — this was the only mismatch found. `BpOsdDecoder`
+  and the Sinter integration example were checked and confirmed correct.
+
 ## [0.6.0] - 2026-07-05
 
 ### Fixed

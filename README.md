@@ -123,10 +123,20 @@ decoder = BlossomDecoder(checks, n_qubits)
 ### Belief-matching accuracy mode
 
 ```python
+import stim
 from qector_decoder_v3.belief_matching import BeliefMatching
 
-bm = BeliefMatching(check_to_qubits, n_qubits, error_rate=0.005)
-correction = bm.decode(syndrome)
+circuit = stim.Circuit.generated(
+    "surface_code:rotated_memory_z",
+    distance=5,
+    rounds=5,
+    after_clifford_depolarization=0.005,
+)
+
+bm = BeliefMatching.from_stim_circuit(circuit)
+sampler = circuit.compile_detector_sampler()
+(syndrome,) = sampler.sample(shots=1)
+correction = bm.decode(syndrome.astype("uint8"))
 ```
 
 ### BP-OSD for LDPC / qLDPC codes
@@ -174,7 +184,7 @@ See [`docs/API_STABILITY.md`](docs/API_STABILITY.md) before building production 
 
 ## Validated evidence snapshot
 
-All public claims should cite an artifact, commit, command, machine, and version. The current package release is **v0.6.0**; checked-in evidence should be regenerated before making new performance claims.
+All public claims should cite an artifact, commit, command, machine, and version. The current package release is **v0.6.1**; checked-in evidence should be regenerated before making new performance claims.
 
 ### MWPM parity against PyMatching
 
@@ -401,7 +411,7 @@ See [`COMMERCIAL.md`](COMMERCIAL.md) and [`LICENSE`](LICENSE) for full terms.
   author  = {Guillaume Lessard},
   title   = {{QECTOR Decoder v3}: Rust/Python Quantum Error Correction Decoding Platform},
   year    = {2026},
-  version = {0.6.0},
+  version = {0.6.1},
   url     = {https://www.qector.store},
   note    = {Source-available. Commercial license required for commercial use.}
 }

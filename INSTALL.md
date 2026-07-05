@@ -1,4 +1,4 @@
-# Installation Guide - QECTOR Decoder v0.6.0
+# Installation Guide - QECTOR Decoder v0.6.1
 
 The current repository does **not** include `install.py`. Use the source build path below.
 
@@ -24,7 +24,7 @@ $env:PYO3_PYTHON = (Resolve-Path .\.venv\Scripts\python.exe).Path
 This command has been verified from a fresh clone on a second Windows PC with Python 3.11. The expected successful ending is:
 
 ```text
-Installed qector-decoder-v3-0.6.0
+Installed qector-decoder-v3-0.6.1
 QECTOR OK
 ```
 
