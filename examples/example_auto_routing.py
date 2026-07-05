@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-example_auto_routing.py — QECTOR Decoder v3 (v0.5.9) decoder auto-routing
+example_auto_routing.py — QECTOR Decoder v3 (v0.6.0) decoder auto-routing
 
 Demonstrates ``qector_decoder_v3.routing``:
 
@@ -29,7 +29,7 @@ from qector_decoder_v3 import codes, routing
 
 def main():
     print("=" * 70)
-    print("QECTOR v3 (0.5.9) — Decoder Auto-Routing")
+    print("QECTOR v3 (0.6.0) — Decoder Auto-Routing")
     print("=" * 70)
     hw = routing.detect_hardware()
     print(f"\nDetected hardware: cuda_rust={hw.cuda_rust}  gpu(cupy)={hw.gpu}")

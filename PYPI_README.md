@@ -78,7 +78,7 @@ Stim workflow:
 ```python
 import stim
 from qector_decoder_v3 import BlossomDecoder
-from qector_decoder_v3.stim_compat import stim_circuit_to_check_matrix
+from qector_decoder_v3.stim_compat import from_stim_detector_error_model
 
 circuit = stim.Circuit.generated(
     "surface_code:rotated_memory_z",
@@ -87,7 +87,8 @@ circuit = stim.Circuit.generated(
     after_clifford_depolarization=0.005,
 )
 
-checks, n_qubits = stim_circuit_to_check_matrix(circuit)
+dem = circuit.detector_error_model(decompose_errors=True)
+checks, n_qubits = from_stim_detector_error_model(dem)
 decoder = BlossomDecoder(checks, n_qubits)
 ```
 
@@ -173,7 +174,7 @@ admin@qector.store
   author  = {Guillaume Lessard},
   title   = {{QECTOR Decoder v3}: Rust/Python Quantum Error Correction Decoding Platform},
   year    = {2026},
-  version = {0.5.9},
+  version = {0.6.0},
   url     = {https://www.qector.store},
   note    = {Source-available. Commercial license required for commercial use.}
 }

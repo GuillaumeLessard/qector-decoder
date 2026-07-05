@@ -106,7 +106,7 @@ if CUDABatchDecoder.is_available():
 ```python
 import stim
 from qector_decoder_v3 import BlossomDecoder
-from qector_decoder_v3.stim_compat import stim_circuit_to_check_matrix
+from qector_decoder_v3.stim_compat import from_stim_detector_error_model
 
 circuit = stim.Circuit.generated(
     "surface_code:rotated_memory_z",
@@ -115,7 +115,8 @@ circuit = stim.Circuit.generated(
     after_clifford_depolarization=0.005,
 )
 
-checks, n_qubits = stim_circuit_to_check_matrix(circuit)
+dem = circuit.detector_error_model(decompose_errors=True)
+checks, n_qubits = from_stim_detector_error_model(dem)
 decoder = BlossomDecoder(checks, n_qubits)
 ```
 
@@ -173,7 +174,7 @@ See [`docs/API_STABILITY.md`](docs/API_STABILITY.md) before building production 
 
 ## Validated evidence snapshot
 
-All public claims should cite an artifact, commit, command, machine, and version. The current package release is **v0.5.9**; checked-in evidence should be regenerated before making new performance claims.
+All public claims should cite an artifact, commit, command, machine, and version. The current package release is **v0.6.0**; checked-in evidence should be regenerated before making new performance claims.
 
 ### MWPM parity against PyMatching
 
@@ -400,7 +401,7 @@ See [`COMMERCIAL.md`](COMMERCIAL.md) and [`LICENSE`](LICENSE) for full terms.
   author  = {Guillaume Lessard},
   title   = {{QECTOR Decoder v3}: Rust/Python Quantum Error Correction Decoding Platform},
   year    = {2026},
-  version = {0.5.9},
+  version = {0.6.0},
   url     = {https://www.qector.store},
   note    = {Source-available. Commercial license required for commercial use.}
 }

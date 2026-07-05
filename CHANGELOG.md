@@ -7,6 +7,30 @@ environment so report figures trace back to a specific build.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-07-05
+
+### Fixed
+- **README.md / PYPI_README.md**: the Stim detector-error-model workflow
+  example referenced `qector_decoder_v3.stim_compat.stim_circuit_to_check_matrix`,
+  a function that does not exist (it was superseded by
+  `from_stim_detector_error_model` during the 0.5.9 cleanup, without the
+  docs being updated). Both quick-start examples now import
+  `from_stim_detector_error_model` and build the `check_to_qubits` mapping
+  from a real `stim.DetectorErrorModel` (`circuit.detector_error_model(...)`),
+  matching the documented function's actual signature.
+- **Python 3.9 compatibility**: replaced PEP 604 `X | None` union syntax with
+  `typing.Optional`/`typing.Union` in `backend.py`, `qiskit_plugin.py`,
+  `stim_compat.py`, and `__init__.py`. This syntax requires Python 3.10+ and
+  would raise `TypeError` at import time on 3.9, contradicting the package's
+  own `requires-python = ">=3.9"` and the `smoke-import-py3.9` CI job.
+- Hardened `test_clean_venv_install.py`'s qiskit-absent smoke test to also
+  stub out `qiskit`, not just `stim`/`pymatching`.
+- Version-string consistency: bumped `pyproject.toml`, `Cargo.toml`,
+  `Cargo.lock`, `python/qector_decoder_v3/__init__.py`, `CITATION.cff`, and
+  `codemeta.json` to `0.6.0`, and updated all plain-text version labels in
+  `INSTALL.md`, `README.md`, `PYPI_README.md`, `docs/GPU_AND_CUPY.md`,
+  `docs/SERVICE_API_SCHEMA.md`, and the `examples/` scripts.
+
 ## [0.5.9] - 2026-07-02
 
 ### Added

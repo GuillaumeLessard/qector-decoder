@@ -1,3 +1,24 @@
+# QECTOR Decoder v0.6.0 - Release Notes
+
+**Version**: 0.6.0
+**Date**: 2026-07-05
+
+This release fixes documented API drift in `README.md` and `PYPI_README.md`:
+the Stim detector-error-model quick-start referenced
+`stim_compat.stim_circuit_to_check_matrix`, a function removed during the
+`0.5.9` cleanup and superseded by `from_stim_detector_error_model`. Both
+examples now use the real function against a `stim.DetectorErrorModel`. This
+release also fixes genuine Python 3.9 incompatibilities: PEP 604 `X | None`
+union syntax (3.10+ only) in `backend.py`, `qiskit_plugin.py`,
+`stim_compat.py`, and `__init__.py` is replaced with
+`typing.Optional`/`typing.Union`, matching the package's stated
+`requires-python = ">=3.9"` and its `smoke-import-py3.9` CI job. Package
+metadata (`pyproject.toml`, `Cargo.toml`, `Cargo.lock`, runtime fallback
+version, `CITATION.cff`, `codemeta.json`) and all plain-text version labels
+across docs and `examples/` are bumped to `0.6.0`.
+
+---
+
 # QECTOR Decoder v0.5.9 - Release Notes
 
 **Version**: 0.5.9
