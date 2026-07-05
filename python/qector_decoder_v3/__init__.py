@@ -78,7 +78,9 @@ try:
 except (ImportError, AttributeError):
     __version__ = __fallback_version__
 
-_OPENCL_HEALTH_CACHE: bool | None = None
+from typing import Optional
+
+_OPENCL_HEALTH_CACHE: Optional[bool] = None
 
 
 def _opencl_raw_available() -> bool:

@@ -26,7 +26,7 @@ Usage ::
 
 from __future__ import annotations
 
-from typing import Any, List, Tuple
+from typing import Any, List, Optional, Tuple
 
 import numpy as np
 
@@ -84,7 +84,7 @@ def from_stim_detector_error_model(dem: Any) -> Tuple[List[List[int]], int]:
 
 def to_stim_decoder(
     check_to_qubits: List[List[int]],
-    n_qubits: int | None = None,
+    n_qubits: Optional[int] = None,
     use_batch: bool = False,
 ):
     """

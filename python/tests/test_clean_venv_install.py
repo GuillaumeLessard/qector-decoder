@@ -50,6 +50,7 @@ def test_import_does_not_require_stim_ecosystem():
         # Make the optional ecosystem packages unimportable for this child.
         sys.modules["stim"] = None
         sys.modules["pymatching"] = None
+        sys.modules["qiskit"] = None
 
         import numpy as np
         import qector_decoder_v3 as qd

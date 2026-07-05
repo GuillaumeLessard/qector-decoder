@@ -23,7 +23,7 @@ Usage (sans Qiskit — mode dict brut) ::
 from __future__ import annotations
 
 import warnings
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -71,9 +71,9 @@ def _bitstring_to_syndrome(bitstring: str, n_checks: int) -> List[int]:
 def decode_qiskit_result(
     result: Any,
     code_distance: int,
-    shots: int | None = None,
+    shots: Optional[int] = None,
     *,
-    n_qubits: int | None = None,
+    n_qubits: Optional[int] = None,
 ) -> Dict[str, Any]:
     """
     Décoder un résultat Qiskit (ou dictionnaire brut) avec QECTOR.
@@ -166,7 +166,7 @@ def decode_qiskit_result(
 
 def create_qiskit_decoder(
     code_distance: int,
-    n_qubits: int | None = None,
+    n_qubits: Optional[int] = None,
 ) -> Any:
     """
     Factory retournant un callable compatible avec l'API Qiskit.

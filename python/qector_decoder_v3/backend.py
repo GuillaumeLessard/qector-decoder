@@ -27,7 +27,7 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass, field
 import os
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import numpy as np
 
@@ -248,7 +248,7 @@ class AutoDecoder:
         n_checks = len(self._c2q)
         timings: dict[str, dict[int, float]] = {"cpu": {}, "gpu": {}}
         gpu_name = None
-        gpu_dec: Optional[CUDABatchDecoder | OpenCLBatchDecoder] = None
+        gpu_dec: Optional[Union[CUDABatchDecoder, OpenCLBatchDecoder]] = None
         if self._cuda_ok:
             gpu_dec, gpu_name = self._get_cuda(), Backend.CUDA
         elif self._opencl_ok:
