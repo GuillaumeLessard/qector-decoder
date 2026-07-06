@@ -184,7 +184,7 @@ See [`docs/API_STABILITY.md`](docs/API_STABILITY.md) before building production 
 
 ## Validated evidence snapshot
 
-All public claims should cite an artifact, commit, command, machine, and version. The current package release is **v0.6.1**; checked-in evidence should be regenerated before making new performance claims.
+All public claims should cite an artifact, commit, command, machine, and version. The current package release is **v0.6.2**; checked-in evidence should be regenerated before making new performance claims.
 
 ### MWPM parity against PyMatching
 
@@ -411,7 +411,7 @@ See [`COMMERCIAL.md`](COMMERCIAL.md) and [`LICENSE`](LICENSE) for full terms.
   author  = {Guillaume Lessard},
   title   = {{QECTOR Decoder v3}: Rust/Python Quantum Error Correction Decoding Platform},
   year    = {2026},
-  version = {0.6.1},
+  version = {0.6.2},
   url     = {https://www.qector.store},
   note    = {Source-available. Commercial license required for commercial use.}
 }

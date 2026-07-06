@@ -71,7 +71,7 @@ import numpy as np
 # wheel). We never overwrite a real compiled ``__version__`` with it — doing so
 # would falsely claim a version the loaded binary is not — so after a version bump
 # ``__version__`` keeps reporting the *built* value until the Rust wheel is rebuilt.
-__fallback_version__ = "0.6.1"
+__fallback_version__ = "0.6.2"
 
 try:
     from .qector_decoder_v3 import __version__
@@ -81,6 +81,77 @@ except (ImportError, AttributeError):
 from typing import Optional
 
 _OPENCL_HEALTH_CACHE: Optional[bool] = None
+
+
+def _validate_check_to_qubits(check_to_qubits, n_qubits=None, *, reject_hyperedges=False):
+    """Validate and normalize check_to_qubits for all decoders.
+
+    Args:
+        check_to_qubits: List of lists of qubit indices.
+        n_qubits: Optional total qubit count.
+        reject_hyperedges: If True, raise ValueError when any qubit appears in
+            more than 2 checks (Union-Find / FastUnionFind limitation).
+
+    Returns:
+        Tuple of (normalized_c2q, resolved_n_qubits).
+
+    Raises:
+        ValueError: On empty input, empty checks, negative indices, out-of-range
+            qubits, duplicate qubits in a check, or hyperedges when rejected.
+        TypeError: On non-integer qubit indices.
+    """
+    if not check_to_qubits:
+        raise ValueError("check_to_qubits must be non-empty")
+
+    normalized = []
+    max_q = -1
+    for i, check in enumerate(check_to_qubits):
+        if not check:
+            raise ValueError("All checks must be non-empty")
+        cleaned = []
+        seen = set()
+        for q in check:
+            if not isinstance(q, (int, np.integer)):
+                raise TypeError(
+                    f"Qubit index must be integer, got {type(q).__name__} in check {i}"
+                )
+            qi = int(q)
+            if qi < 0:
+                raise ValueError(f"Negative qubit index {qi} in check {i}")
+            if qi in seen:
+                raise ValueError(f"Duplicate qubit {qi} in check {i}")
+            seen.add(qi)
+            cleaned.append(qi)
+            if qi > max_q:
+                max_q = qi
+        normalized.append(cleaned)
+
+    inferred_nq = max_q + 1 if max_q >= 0 else 0
+    if n_qubits is not None:
+        nq = int(n_qubits)
+        if nq <= 0:
+            raise ValueError(f"n_qubits must be positive, got {nq}")
+        if max_q >= nq:
+            raise ValueError(f"Qubit index {max_q} >= n_qubits {nq}")
+    else:
+        nq = inferred_nq
+
+    if reject_hyperedges:
+        qubit_degree = {}
+        for ci, check in enumerate(normalized):
+            for q in check:
+                qubit_degree[q] = qubit_degree.get(q, 0) + 1
+        for q, deg in qubit_degree.items():
+            if deg > 2:
+                raise ValueError(
+                    f"UnionFindDecoder / FastUnionFindDecoder only support stabilizer codes "
+                    f"with checks of weight ≤ 2.\n"
+                    f"Check {q} has {deg} qubits (hyperedge).\n"
+                    f"Use BlossomDecoder, SparseBlossomDecoder, or BPOSDDecoder instead.\n"
+                    f"(Codes from generate_surface_code_checks() contain weight-4 checks)"
+                )
+
+    return normalized, nq
 
 
 def _opencl_raw_available() -> bool:
@@ -142,11 +213,7 @@ class UnionFindDecoder:
     """
 
     def __init__(self, check_to_qubits, n_qubits=None):
-        if not check_to_qubits:
-            raise ValueError("check_to_qubits must be non-empty")
-        # Convert Python list-of-lists to Vec<Vec<u32>>
-        c2q = [[int(q) for q in check] for check in check_to_qubits]
-        nq = None if n_qubits is None else int(n_qubits)
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits, reject_hyperedges=True)
         self._inner = _RustUnionFindDecoder(c2q, nq)
 
     def decode(self, syndrome):
@@ -182,10 +249,7 @@ class FastUnionFindDecoder:
     """
 
     def __init__(self, check_to_qubits, n_qubits=None):
-        if not check_to_qubits:
-            raise ValueError("check_to_qubits must be non-empty")
-        c2q = [[int(q) for q in check] for check in check_to_qubits]
-        nq = None if n_qubits is None else int(n_qubits)
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits, reject_hyperedges=True)
         self._inner = _RustFastUnionFindDecoder(c2q, nq)
 
     def decode(self, syndrome):
@@ -220,10 +284,7 @@ class BlossomDecoder:
     """
 
     def __init__(self, check_to_qubits, n_qubits=None, edge_weights=None):
-        if not check_to_qubits:
-            raise ValueError("check_to_qubits must be non-empty")
-        c2q = [[int(q) for q in check] for check in check_to_qubits]
-        nq = None if n_qubits is None else int(n_qubits)
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
         self._inner = _RustBlossomDecoder(c2q, nq, edge_weights)
 
     def decode(self, syndrome):
@@ -265,10 +326,7 @@ class SlidingWindowDecoder:
     """
 
     def __init__(self, check_to_qubits, n_qubits=None, window_size=10, decay_factor=0.8):
-        if not check_to_qubits:
-            raise ValueError("check_to_qubits must be non-empty")
-        c2q = [[int(q) for q in check] for check in check_to_qubits]
-        nq = None if n_qubits is None else int(n_qubits)
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
         self._inner = _RustSlidingWindowDecoder(c2q, nq, window_size, decay_factor)
 
     def update(self, round_syndrome):
@@ -316,10 +374,7 @@ class StreamingDecoder:
     """
 
     def __init__(self, check_to_qubits, n_qubits=None, history_size=10):
-        if not check_to_qubits:
-            raise ValueError("check_to_qubits must be non-empty")
-        c2q = [[int(q) for q in check] for check in check_to_qubits]
-        nq = None if n_qubits is None else int(n_qubits)
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
         self._inner = _RustStreamingDecoder(c2q, nq, history_size)
 
     def update(self, round_syndrome):
@@ -355,10 +410,7 @@ class BatchDecoder:
     """
 
     def __init__(self, check_to_qubits, n_qubits=None):
-        if not check_to_qubits:
-            raise ValueError("check_to_qubits must be non-empty")
-        c2q = [[int(q) for q in check] for check in check_to_qubits]
-        nq = None if n_qubits is None else int(n_qubits)
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits, reject_hyperedges=True)
         self._inner = _RustBatchDecoder(c2q, nq)
 
     def parallel_batch_decode(self, syndromes):
@@ -388,10 +440,7 @@ class CPUBatchDecoder:
     """SIMD-friendly CPU batch decoder with pooled buffers and SoA transposition."""
 
     def __init__(self, check_to_qubits, n_qubits=None):
-        if not check_to_qubits:
-            raise ValueError("check_to_qubits must be non-empty")
-        c2q = [[int(q) for q in check] for check in check_to_qubits]
-        nq = None if n_qubits is None else int(n_qubits)
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits, reject_hyperedges=True)
         self._inner = _RustCPUBatchDecoder(c2q, nq)
 
     def decode(self, syndrome):
@@ -433,10 +482,7 @@ class OpenCLBatchDecoder:
                 "OpenCL backend is unavailable or failed its health check; "
                 "use CPUBatchDecoder/AutoDecoder fallback or set QECTOR_DISABLE_OPENCL=1"
             )
-        if not check_to_qubits:
-            raise ValueError("check_to_qubits must be non-empty")
-        c2q = [[int(q) for q in check] for check in check_to_qubits]
-        nq = None if n_qubits is None else int(n_qubits)
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits, reject_hyperedges=True)
         self._inner = _RustOpenCLBatchDecoder(c2q, nq)
 
     def batch_decode(self, syndromes):
@@ -500,10 +546,7 @@ class CUDABatchDecoder:
     def __init__(self, check_to_qubits, n_qubits=None):
         if _RustCUDABatchDecoder is None:
             raise RuntimeError("qector-decoder-v3 was built without the 'cuda' feature")
-        if not check_to_qubits:
-            raise ValueError("check_to_qubits must be non-empty")
-        c2q = [[int(q) for q in check] for check in check_to_qubits]
-        nq = None if n_qubits is None else int(n_qubits)
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits, reject_hyperedges=True)
         self._inner = _RustCUDABatchDecoder(c2q, nq)
 
     def batch_decode(self, syndromes):
@@ -565,10 +608,7 @@ class SparseBlossomDecoder:
     """
 
     def __init__(self, check_to_qubits, n_qubits=None):
-        if not check_to_qubits:
-            raise ValueError("check_to_qubits must be non-empty")
-        c2q = [[int(q) for q in check] for check in check_to_qubits]
-        nq = None if n_qubits is None else int(n_qubits)
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
         self._inner = _RustSparseBlossomDecoder(c2q, nq)
 
     def decode(self, syndrome):
@@ -630,10 +670,7 @@ class BPOSDDecoder:
     """
 
     def __init__(self, check_to_qubits, n_qubits=None, error_rate=0.1):
-        if not check_to_qubits:
-            raise ValueError("check_to_qubits must be non-empty")
-        c2q = [[int(q) for q in check] for check in check_to_qubits]
-        nq = None if n_qubits is None else int(n_qubits)
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
         self._inner = _RustBPOSDDecoder(c2q, nq, error_rate)
 
     def decode(self, syndrome):
@@ -861,10 +898,7 @@ class HybridDecoder:
         gnn_hidden_size=64,
         gnn_n_layers=3,
     ):
-        if not check_to_qubits:
-            raise ValueError("check_to_qubits must be non-empty")
-        c2q = [[int(q) for q in check] for check in check_to_qubits]
-        nq = None if n_qubits is None else int(n_qubits)
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
         self._inner = _RustHybridDecoder(
             c2q, nq, check_positions, check_types, base_weights, gnn_hidden_size, gnn_n_layers
         )
@@ -976,10 +1010,7 @@ class LookupTableDecoder:
     """
 
     def __init__(self, check_to_qubits, n_qubits=None):
-        if not check_to_qubits:
-            raise ValueError("check_to_qubits must be non-empty")
-        c2q = [[int(q) for q in check] for check in check_to_qubits]
-        nq = None if n_qubits is None else int(n_qubits)
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
         self._inner = _RustLookupTableDecoder(c2q, nq)
 
     def build_table(self, max_entries):
@@ -1048,10 +1079,7 @@ class BenchmarkSuite:
     """Production benchmark suite. Wraps Rust-native benchmarking."""
 
     def __init__(self, check_to_qubits, n_qubits=None, n_samples=10000, seed=42):
-        if not check_to_qubits:
-            raise ValueError("check_to_qubits must be non-empty")
-        c2q = [[int(q) for q in check] for check in check_to_qubits]
-        nq = None if n_qubits is None else int(n_qubits)
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
         self._inner = _RustBenchmarkSuite(c2q, nq, n_samples, seed)
         self.n_samples = n_samples
 

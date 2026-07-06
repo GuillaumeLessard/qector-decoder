@@ -7,6 +7,18 @@ environment so report figures trace back to a specific build.
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-07-06
+
+### Added
+- v0.6.2 release notes: `CHANGELOG_v0.6.2.md`.
+
+### Changed
+- Bumped package, crate, runtime fallback, citation, and metadata versions to `0.6.2` across `pyproject.toml`, `Cargo.toml`, `python/qector_decoder_v3/__init__.py`, `CITATION.cff`, `codemeta.json`, `README.md`, `PYPI_README.md`, docs, and examples.
+
+### Fixed
+- Hardened Union-Find decoder input validation and error handling in `python/qector_decoder_v3/__init__.py`.
+- Expanded regression coverage for hypergraph rejection and relaxed latency validation.
+
 ## [0.6.1] - 2026-07-05
 
 ### Fixed
