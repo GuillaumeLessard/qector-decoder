@@ -17,8 +17,8 @@ Example
 >>> from qector_decoder_v3.backend import AutoDecoder
 >>> code = codes.rotated_surface_code(7)
 >>> dec = AutoDecoder(code.check_to_qubits, code.n_qubits)
->>> dec.calibrate()                      # optional: tune the GPU threshold
->>> out = dec.batch_decode(syndromes)    # picks CPU / Rayon / GPU automatically
+>>> dec.calibrate()  # optional: tune the GPU threshold
+>>> out = dec.batch_decode(syndromes)  # picks CPU / Rayon / GPU automatically
 >>> dec.diagnostics()
 """
 

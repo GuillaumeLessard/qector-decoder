@@ -25,9 +25,9 @@ Example
 -------
 >>> from qector_decoder_v3.workbench import Workbench
 >>> wb = Workbench()
->>> art = wb.run_benchmark({"code": "rotated_surface", "distances": [3, 5],
-...                         "decoders": ["blossom"], "trials": 500})
->>> wb.export_json(art, "out.json"); wb.export_csv(art, "out.csv")
+>>> art = wb.run_benchmark({"code": "rotated_surface", "distances": [3, 5], "decoders": ["blossom"], "trials": 500})
+>>> wb.export_json(art, "out.json")
+... wb.export_csv(art, "out.csv")
 """
 
 from __future__ import annotations

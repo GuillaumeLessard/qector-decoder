@@ -24,9 +24,9 @@ Example
 -------
 >>> import stim
 >>> from qector_decoder_v3.belief_matching import BeliefMatching
->>> dem = stim.Circuit.generated("surface_code:rotated_memory_x", distance=5,
-...        rounds=5, after_clifford_depolarization=0.005).detector_error_model(
-...        decompose_errors=True)
+>>> dem = stim.Circuit.generated(
+...     "surface_code:rotated_memory_x", distance=5, rounds=5, after_clifford_depolarization=0.005
+... ).detector_error_model(decompose_errors=True)
 >>> bm = BeliefMatching.from_detector_error_model(dem)
 >>> predicted_observables = bm.decode_batch(detection_events)
 """

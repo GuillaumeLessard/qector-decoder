@@ -10,7 +10,7 @@ Usage (avec Qiskit installé) ::
     from qector_decoder_v3.qiskit_plugin import decode_qiskit_result, create_qiskit_decoder
 
     decoder = create_qiskit_decoder(code_distance=5)
-    result = job.result()           # qiskit.result.Result
+    result = job.result()  # qiskit.result.Result
     decoded = decoder(result)
 
 Usage (sans Qiskit — mode dict brut) ::

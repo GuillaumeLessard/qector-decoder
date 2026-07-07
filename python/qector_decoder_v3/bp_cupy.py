@@ -35,8 +35,7 @@ Example
 -------
 >>> from qector_decoder_v3 import codes
 >>> from qector_decoder_v3.bp_cupy import batched_bp_decode
->>> cx, _ = codes.bivariate_bicycle_code(6, 6, [("x", 3), ("y", 1), ("y", 2)],
-...                                             [("y", 3), ("x", 1), ("x", 2)])
+>>> cx, _ = codes.bivariate_bicycle_code(6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)])
 >>> H = cx.parity_check_matrix()
 >>> import numpy as np
 >>> errs = (np.random.default_rng(0).random((128, 72)) < 0.05).astype(np.uint8)

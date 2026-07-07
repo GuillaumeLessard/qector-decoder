@@ -13,7 +13,8 @@ Usage
 >>> from qector_decoder_v3.sinter_compat import qector_sinter_decoders
 >>> tasks = [sinter.Task(circuit=c, json_metadata={"d": d}) for ...]
 >>> samples = sinter.collect(
-...     num_workers=4, tasks=tasks,
+...     num_workers=4,
+...     tasks=tasks,
 ...     decoders=["qector_belief"],
 ...     custom_decoders=qector_sinter_decoders(),
 ... )

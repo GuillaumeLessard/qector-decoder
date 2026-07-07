@@ -26,11 +26,11 @@ callers can reason about both GPU paths from one place.
 Example
 -------
 >>> from qector_decoder_v3 import gpu_backend as gb
->>> xp = gb.get_array_module(prefer_gpu=True)      # cupy if usable, else numpy
->>> dev = gb.to_device([1, 0, 1, 1])               # host -> device (counted)
->>> gb.is_on_gpu(dev)                               # True iff really on the GPU
->>> host = gb.to_host(dev)                          # device -> host (counted)
->>> gb.get_backend().summary()                      # one-glance capability report
+>>> xp = gb.get_array_module(prefer_gpu=True)  # cupy if usable, else numpy
+>>> dev = gb.to_device([1, 0, 1, 1])  # host -> device (counted)
+>>> gb.is_on_gpu(dev)  # True iff really on the GPU
+>>> host = gb.to_host(dev)  # device -> host (counted)
+>>> gb.get_backend().summary()  # one-glance capability report
 """
 
 from __future__ import annotations

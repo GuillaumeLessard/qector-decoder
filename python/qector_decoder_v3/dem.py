@@ -23,8 +23,8 @@ is flattened first for exactness.
 Example
 -------
 >>> from qector_decoder_v3 import dem
->>> model = dem.load_dem_file("circuit.dem")     # or dem.from_stim(dem_object)
->>> code = model.to_code()                         # a codes.Code
+>>> model = dem.load_dem_file("circuit.dem")  # or dem.from_stim(dem_object)
+>>> code = model.to_code()  # a codes.Code
 >>> decoder = model.make_decoder("sparse_blossom")
 >>> correction = decoder.decode(syndrome)
 >>> logical_pred = model.predicted_observables(correction)

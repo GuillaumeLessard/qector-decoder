@@ -36,7 +36,7 @@ jobs:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Inject Rust source
         env:
@@ -52,7 +52,7 @@ jobs:
             echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
           fi
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         if: env.SKIP_BUILD == '0'
         with:
           python-version: ${{ matrix.python-version }}
@@ -83,7 +83,7 @@ jobs:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Inject Rust source
         env:
@@ -100,7 +100,7 @@ jobs:
             echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
           fi
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         if: env.SKIP_BUILD == '0'
         with:
           python-version: ${{ matrix.python-version }}
@@ -131,7 +131,7 @@ jobs:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Inject Rust source
         env:
@@ -147,7 +147,7 @@ jobs:
             echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
           fi
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         if: env.SKIP_BUILD == '0'
         with:
           python-version: ${{ matrix.python-version }}
@@ -177,7 +177,7 @@ jobs:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Inject Rust source
         env:
@@ -193,7 +193,7 @@ jobs:
             echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
           fi
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         if: env.SKIP_BUILD == '0'
         with:
           python-version: ${{ matrix.python-version }}

@@ -46,7 +46,7 @@ Examples
 >>> from qector_decoder_v3 import codes
 >>> ar = routing.AutoRouter(priority="accuracy")
 >>> code = codes.rotated_surface_code(5)
->>> corr = ar.decode(code, syndrome)          # picks BlossomDecoder, decodes
+>>> corr = ar.decode(code, syndrome)  # picks BlossomDecoder, decodes
 >>> ar.explain(code)["decoder"]
 'BlossomDecoder'
 """

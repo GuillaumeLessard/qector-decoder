@@ -15,9 +15,9 @@ Example
 >>> code = codes.repetition_code(9)
 >>> s = code.syndrome(code.random_error(0.1))
 >>> res = decode_with_diagnostics(code, s, kind="blossom")
->>> res.correction            # uint8 vector
->>> res.sparse_indices        # nonzero qubit indices
->>> res.bit_packed            # np.packbits view
+>>> res.correction  # uint8 vector
+>>> res.sparse_indices  # nonzero qubit indices
+>>> res.bit_packed  # np.packbits view
 >>> res.to_json()
 """
 

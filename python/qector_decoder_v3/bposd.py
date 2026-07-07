@@ -15,8 +15,7 @@ Example
 -------
 >>> from qector_decoder_v3 import codes
 >>> from qector_decoder_v3.bposd import BpOsdDecoder
->>> cx, cz = codes.bivariate_bicycle_code(6, 6, [("x",3),("y",1),("y",2)],
-...                                              [("y",3),("x",1),("x",2)])
+>>> cx, cz = codes.bivariate_bicycle_code(6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)])
 >>> dec = BpOsdDecoder(cx.parity_check_matrix(), error_rate=0.05, osd_order=0)
 >>> correction = dec.decode(syndrome)
 """

@@ -129,6 +129,13 @@ ignore_missing_imports = true
 line-length = 120
 target-version = "py39"
 
+[tool.ruff.format]
+# Ensure consistent formatting on Linux CI runners (LF) even when edited on Windows.
+line-ending = "lf"
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+
 [tool.ruff.lint]
 # E702: semicolons used intentionally for chained one-liners in plotting helpers.
 # E731: lambda assignments used for compact callback tables in a few helpers.
