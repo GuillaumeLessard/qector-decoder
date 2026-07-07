@@ -1,5 +1,7 @@
 # Correctness Audit
 
+**v0.6.2 update**: Union-Find family now hard-errors on hypergraphs (qubit degree >2) instead of producing invalid corrections. See `uf_core.rs` validation and Python `_validate_check_to_qubits(reject_hyperedges=True)`.
+
 QECTOR correctness is tested continuously, not asserted once. This document
 states the decoder contracts, the test coverage behind each contract, and the
 known limits that must stay attached to public claims.
