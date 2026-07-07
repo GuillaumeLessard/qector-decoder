@@ -25,8 +25,8 @@ check matrix.
 |---|---|---|---|
 | `BlossomDecoder` | Syndrome-faithful and exact minimum-weight on audited small matching codes | Exhaustive brute-force oracle + PyMatching cross-checks | Exact MWPM on the tested audited graph families; do not claim universal hardware layout equivalence |
 | `SparseBlossomDecoder` | Syndrome-faithful and near-optimal | Brute-force small-code audit + PyMatching-compatible matching-graph tests | Region-growing decoder, not exact MWPM by design |
-| `UnionFindDecoder` | Syndrome-faithful on supported QEC matching graphs | Exhaustive small-code tests + family tests + property tests | Fast approximate decoder; not minimum-weight and not guaranteed on arbitrary adversarial hypergraphs |
-| `FastUnionFindDecoder` | Same as Union-Find, lower-overhead path | Cross-decoder faithfulness tests | Fast approximate decoder, not exact MWPM |
+| `UnionFindDecoder` | Syndrome-faithful on supported QEC matching graphs (each qubit in ≤2 checks) | Exhaustive small-code tests + family tests + property tests + hypergraph-rejection tests (v0.6.2) | Fast approximate; explicitly rejects hypergraphs (qubit degree >2) with clear error since v0.6.2. Not minimum-weight. |
+| `FastUnionFindDecoder` | Same as Union-Find (≤2 checks per qubit), lower-overhead path | Cross-decoder faithfulness + rejection tests (v0.6.2) | Same rejection and limits as UnionFindDecoder. |
 | `LookupTableDecoder` | Exact/faithful on stored table entries; faithful fallback on larger cases | Exhaustive table tests + d=5 fallback test | Table size and fallback behavior must be stated |
 | `BPOSDDecoder` / `BpOsdDecoder` | Syndrome-faithful on LDPC/qLDPC-style CSS checks | BP-OSD reference-package comparison + CSS commutation tests | Quote LER from the harness, not from faithfulness alone |
 | `BeliefMatching` | Lower observed LER on selected correlated workloads | Seeded Stim/PyMatching comparison tests and benchmark artifacts | Accuracy mode, not fast path; selected workload only |

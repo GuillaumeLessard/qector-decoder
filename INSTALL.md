@@ -7,7 +7,7 @@ The current repository does **not** include `install.py`. Use the source build p
 Install Rust first from rustup, then run:
 
 ```powershell
-git clone https://github.com/qectorlab/qector-decoder.git
+git clone https://github.com/GuillaumeLessard/qector-decoder.git
 cd qector-decoder
 
 py -3.11 -m venv .venv
@@ -33,7 +33,7 @@ During the base install, pip may print ignored optional-extra messages for packa
 ## Git Bash on Windows
 
 ```bash
-git clone https://github.com/qectorlab/qector-decoder.git
+git clone https://github.com/GuillaumeLessard/qector-decoder.git
 cd qector-decoder
 
 python -m venv .venv

@@ -14,7 +14,7 @@ This roadmap turns the external audit recommendations into explicit public work 
 | GPU bit-identity | Tested configurations and docs | Safe as bit-identity claim, not throughput claim |
 | GPU throughput | Not yet a stable public proof asset | Do not claim speedup without regenerated local artifacts |
 | Linux/macOS benchmark corpus | Not yet published as comparable artifacts | Do not imply cross-platform benchmark equivalence |
-| Prebuilt wheels | Not yet published as release assets | Source build remains the public path |
+| Prebuilt wheels | Published for v0.6.2+ (Linux, Windows, macOS Intel+ARM) | Full matrix in CI; attach attestations |
 
 ## Planned artifact classes
 
@@ -73,23 +73,30 @@ unsafe claim wording
 
 ### 3. Prebuilt wheels
 
-Goal: reduce install friction once release automation and license packaging are ready.
+As of v0.6.2, CPU-safe wheels are published via CI for:
 
-Candidate wheel targets:
+- Linux x86_64 (manylinux)
+- Windows x64
+- macOS Intel x86_64 + Apple Silicon arm64
+
+sdist is also published.
+
+Candidate / supported targets (v0.6.2+):
 
 ```text
-Windows x86_64 CPython 3.10/3.11/3.12 CPU-safe
-Linux x86_64 CPython 3.10/3.11/3.12 CPU-safe
-macOS arm64 CPython 3.10/3.11/3.12 CPU-safe
+Linux x86_64 CPython 3.9–3.13
+Windows x64 CPython 3.9–3.13
+macOS x86_64 CPython 3.9–3.13
+macOS arm64 CPython 3.9–3.13
 ```
 
-Constraints:
+Constraints / notes:
 
 ```text
-Do not publish GPU-enabled wheels until CUDA/OpenCL runtime assumptions are documented.
-Do not publish commercial-use language that conflicts with LICENSE and COMMERCIAL.md.
-Attach license and source-available terms to every release.
-Keep source build path documented even if wheels become available.
+GPU wheels (CUDA feature) are built in CI but require runtime support on the target machine.
+OpenCL support depends on build configuration and host drivers.
+Attach license and source-available terms.
+Keep source build documented for full auditability.
 ```
 
 ### 4. SBOM and dependency audit outputs
@@ -138,6 +145,6 @@ Unsafe:
 
 ```text
 QECTOR already has universal cross-platform benchmark proof.
-QECTOR already ships production wheels for every platform.
+QECTOR ships production wheels for Linux, Windows, macOS Intel x86_64 and Apple Silicon.
 QECTOR GPU throughput is generally faster than PyMatching.
 ```

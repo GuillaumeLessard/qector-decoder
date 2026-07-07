@@ -342,7 +342,7 @@ The REST API is for local experiments, partner review, or controlled internal de
 | GPU performance | Correctness is artifact-backed for tested machines. Speedup is not universal. |
 | OpenCL wheels | OpenCL support depends on build configuration and target environment. Confirm locally. |
 | SparseBlossom | Near-optimal, not exact MWPM. Use `BlossomDecoder` for exact minimum-weight matching. |
-| UnionFind | Fast approximate path; not a universal decoder for arbitrary graphs. |
+| UnionFind / FastUnionFind | Fast approximate; only for codes where each qubit participates in ≤2 checks (graph-like matching codes). Explicitly rejects hypergraphs (v0.6.2+). Use Blossom/SparseBlossom/BPOSD for general cases. |
 | REST/gRPC/MCP surfaces | Not hardened as public SaaS without a separate deployment/security review. |
 
 ---

@@ -21,10 +21,10 @@ pip install qector-decoder-v3
 Supported package target for the public release workflow:
 
 - Python 3.9 to 3.13
-- Linux x86_64 wheels
+- Linux x86_64 wheels (manylinux)
 - Windows x64 wheels
-- macOS arm64 wheels
-- Source distribution for custom/source builds
+- macOS Intel x86_64 + Apple Silicon arm64 wheels
+- Source distribution (sdist) for custom/source builds
 
 Optional research and validation extras:
 
