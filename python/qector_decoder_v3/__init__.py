@@ -111,9 +111,7 @@ def _validate_check_to_qubits(check_to_qubits, n_qubits=None, *, reject_hyperedg
         seen = set()
         for q in check:
             if not isinstance(q, (int, bool, _np.integer, getattr(_np, "bool_", bool))):
-                raise TypeError(
-                    f"Qubit index must be integer, got {type(q).__name__} in check {i}"
-                )
+                raise TypeError(f"Qubit index must be integer, got {type(q).__name__} in check {i}")
             qi = int(q)
             if qi < 0:
                 raise ValueError(f"Negative qubit index {qi} in check {i}")
@@ -485,6 +483,7 @@ class OpenCLBatchDecoder:
 
     def __init__(self, check_to_qubits, n_qubits=None):
         import os as _os_local
+
         if _os_local.environ.get("QECTOR_OPENCL_PROBE_CHILD") != "1" and not _opencl_health_check():
             raise RuntimeError(
                 "OpenCL backend is unavailable or failed its health check; "
