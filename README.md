@@ -26,7 +26,7 @@ PyMatching-compatible MWPM validation - Belief-matching accuracy mode - BP-OSD f
 pip install qector-decoder-v3
 ```
 
-Supported public wheel target: **Python 3.9 to 3.13** on Linux, Windows, and macOS where wheels are published for the release.
+Supported public wheel target: **Python 3.9 to 3.13** on Linux (manylinux), Windows (x64), and macOS (Intel x86_64 + Apple Silicon arm64) where wheels are published for the release.
 
 ### Optional Python extras
 
