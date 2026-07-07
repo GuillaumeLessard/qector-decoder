@@ -84,6 +84,10 @@ print(fast.decode(syndrome))
 
 mwpm = BlossomDecoder(check_to_qubits, n_qubits)
 print(mwpm.decode(syndrome))
+
+# Note: UnionFind/FastUnionFind require codes where each qubit participates in ≤2 checks.
+# They explicitly reject hypergraph codes (any check with >2 qubits) since v0.6.2.
+# For general codes (e.g. from generate_surface_code_checks), use BlossomDecoder or BPOSDDecoder.
 ```
 
 ### Batch decoding

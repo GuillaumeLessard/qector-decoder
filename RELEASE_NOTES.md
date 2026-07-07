@@ -3,7 +3,7 @@
 **Version**: 0.6.2
 **Date**: 2026-07-07
 
-**Focus:** Production hardening, correctness, and audit remediation (9.7–10/10).
+**Focus:** Production hardening, correctness, and audit remediation (addresses the independent 0.6.1 engineering evaluation; now 8.5+/10).
 
 ## Highlights
 - Critical correctness fix: `UnionFindDecoder` and `FastUnionFindDecoder` (and UF-based batch) now explicitly reject hypergraph codes where any qubit participates in >2 checks. `UfGraph::new` returns `Result<Self, String>`. This eliminates the P0 bug of silent syndrome-invalid corrections.

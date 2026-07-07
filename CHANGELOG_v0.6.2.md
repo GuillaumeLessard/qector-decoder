@@ -1,7 +1,7 @@
 # qector-decoder-v3 v0.6.2 Changelog
 
 **Release Date:** 2026-07-06  
-**Focus:** Production hardening, correctness, and audit remediation (target: 9.7–10/10)
+**Focus:** Production hardening, correctness, and audit remediation (addresses independent 0.6.1 engineering evaluation; target: 9.7–10/10)
 
 ## Highlights
 

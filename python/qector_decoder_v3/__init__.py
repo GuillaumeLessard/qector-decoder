@@ -1060,7 +1060,13 @@ def check_to_edges(check_to_qubits):
 
 
 def generate_surface_code_checks(distance):
-    """Generate the compact periodic surface-code checks used by this API."""
+    """Generate compact periodic (toric) surface-code checks.
+
+    Note: these produce codes with 4-qubit checks (hyperedges) and rank-deficient
+    parity-check matrices. UnionFindDecoder and FastUnionFindDecoder will
+    explicitly reject them (since v0.6.2). Use BlossomDecoder or BPOSDDecoder
+    for these codes.
+    """
     return py_generate_surface_code_checks(int(distance))
 
 
