@@ -190,7 +190,7 @@ All public claims should cite an artifact, commit, command, machine, and version
 
 Artifact: `benchmark_results/stim_ler_d13_d15.json`
 
-Environment: Windows 10/11 class x64 machine, Python 3.11, QECTOR 0.5.7, PyMatching 2.4.0, Stim 1.16.0, 20,000 shots per distance.
+Environment: Windows 10/11 class x64 machine, Python 3.12, QECTOR 0.6.2, PyMatching 2.4.0, Stim 1.16.0, 20,000 shots per distance.
 
 | Distance | QECTOR Blossom LER | PyMatching LER | QECTOR us/shot | PyMatching us/shot |
 |---:|---:|---:|---:|---:|
@@ -203,7 +203,7 @@ Interpretation: QECTOR Blossom matched PyMatching logical-error counts on this a
 
 Artifact: `benchmark_results/competitive_belief.json`
 
-Environment: Windows x64, Python 3.11, QECTOR 0.5.7, PyMatching 2.4.0, Stim 1.16.0, 3,000 shots per distance.
+Environment: Windows x64, Python 3.12, QECTOR 0.6.2, PyMatching 2.4.0, Stim 1.16.0, 3,000 shots per distance.
 
 | Distance | PyMatching LER | QECTOR MWPM LER | QECTOR Belief LER | Belief us/shot |
 |---:|---:|---:|---:|---:|

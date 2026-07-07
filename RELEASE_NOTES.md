@@ -1,17 +1,28 @@
-# QECTOR Decoder v0.6.1 - Release Notes
+# QECTOR Decoder v0.6.2 - Release Notes
 
-**Version**: 0.6.1
-**Date**: 2026-07-05
+**Version**: 0.6.2
+**Date**: 2026-07-07
 
-This release fixes a broken `BeliefMatching` constructor call in `README.md`'s
-"Belief-matching accuracy mode" example: it passed
-`(check_to_qubits, n_qubits, error_rate=0.005)`, which doesn't match the real
-constructor and raises `TypeError` if copy-pasted verbatim. Replaced with a
-self-contained example using `BeliefMatching.from_stim_circuit(circuit)`,
-verified by execution against the published `0.6.0` wheel. This was found by
-auditing every documented class instantiation against its real `__init__`
-signature across every `*.md` file in the repo (a deeper check than `0.6.0`'s
-import-existence audit) — it was the only mismatch found.
+**Focus:** Production hardening, correctness, and audit remediation (9.7–10/10).
+
+## Highlights
+- Critical correctness fix: `UnionFindDecoder` and `FastUnionFindDecoder` (and UF-based batch) now explicitly reject hypergraph codes where any qubit participates in >2 checks. `UfGraph::new` returns `Result<Self, String>`. This eliminates the P0 bug of silent syndrome-invalid corrections.
+- Comprehensive input validation (empty, negative, duplicates, range, u32::MAX, non-integer types) with clean `ValueError`/`TypeError`.
+- Improved NumPy type coercion (`np.int*`, `np.bool_`, etc.).
+- Reduced namespace leakage in `__init__.py` (os/sys/subprocess/np no longer pollute the public module).
+- `recommend_decoder` / routing safely avoids recommending UF family on hypergraphs.
+- sdist now published alongside wheels.
+- Expanded test matrix and relaxed d=21 latency threshold for stability.
+- All docs, versioning, and metadata aligned to 0.6.2.
+
+See CHANGELOG_v0.6.2.md for full details, migration guide, and known limitations.
+
+## Breaking Changes
+- Union-Find family constructors now raise on invalid hypergraph inputs instead of producing wrong results.
+
+---
+
+# QECTOR Decoder v0.6.1 - Release Notes (previous)
 
 ---
 

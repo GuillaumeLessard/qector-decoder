@@ -59,11 +59,10 @@ try:
 except ImportError:
     start_metrics_server = None  # type: ignore[assignment]
 
-import os
-import subprocess
-import sys
+import numpy as _np
 
-import numpy as np
+# os / sys / subprocess are imported locally inside the functions that need them
+# to avoid polluting the public module namespace (see end of file)
 
 # The authoritative runtime version is whatever the compiled Rust core reports.
 # ``__fallback_version__`` is the Python-packaging version (pyproject/Cargo) and is
@@ -111,7 +110,7 @@ def _validate_check_to_qubits(check_to_qubits, n_qubits=None, *, reject_hyperedg
         cleaned = []
         seen = set()
         for q in check:
-            if not isinstance(q, (int, np.integer)):
+            if not isinstance(q, (int, bool, _np.integer, getattr(_np, "bool_", bool))):
                 raise TypeError(
                     f"Qubit index must be integer, got {type(q).__name__} in check {i}"
                 )
@@ -145,10 +144,11 @@ def _validate_check_to_qubits(check_to_qubits, n_qubits=None, *, reject_hyperedg
             if deg > 2:
                 raise ValueError(
                     f"UnionFindDecoder / FastUnionFindDecoder only support stabilizer codes "
-                    f"with checks of weight ≤ 2.\n"
-                    f"Check {q} has {deg} qubits (hyperedge).\n"
+                    f"where every qubit participates in at most 2 checks.\n"
+                    f"Qubit {q} participates in {deg} checks (hyperedge).\n"
                     f"Use BlossomDecoder, SparseBlossomDecoder, or BPOSDDecoder instead.\n"
-                    f"(Codes from generate_surface_code_checks() contain weight-4 checks)"
+                    f"(Codes with weight>2 checks, e.g. from generate_surface_code_checks(), "
+                    f"can still be graphlike if each qubit touches <=2 checks; this code is not)"
                 )
 
     return normalized, nq
@@ -168,10 +168,14 @@ def _opencl_health_check() -> bool:
     context/kernel setup. Probe that risky path in a child process so production
     code can fall back to CPU instead of taking down the caller.
     """
+    import os as _os_local
+    import subprocess as _subprocess_local
+    import sys as _sys_local
+
     global _OPENCL_HEALTH_CACHE
-    if os.environ.get("QECTOR_DISABLE_OPENCL", "").lower() in {"1", "true", "yes", "on"}:
+    if _os_local.environ.get("QECTOR_DISABLE_OPENCL", "").lower() in {"1", "true", "yes", "on"}:
         return False
-    if os.environ.get("QECTOR_OPENCL_PROBE_CHILD") == "1":
+    if _os_local.environ.get("QECTOR_OPENCL_PROBE_CHILD") == "1":
         return _opencl_raw_available()
     if _OPENCL_HEALTH_CACHE is not None:
         return _OPENCL_HEALTH_CACHE
@@ -185,15 +189,15 @@ def _opencl_health_check() -> bool:
         "import numpy as np\n"
         "import qector_decoder_v3 as qd\n"
         "dec = qd.OpenCLBatchDecoder([[0, 1]], 2)\n"
-        "out = np.asarray(dec.batch_decode(np.array([[1]], dtype=np.uint8)), dtype=np.uint8)\n"
+        "out = _np.asarray(dec.batch_decode(_np.array([[1]], dtype=_np.uint8)), dtype=_np.uint8)\n"
         "assert out.shape == (1, 2)\n"
     )
     try:
-        proc = subprocess.run(
-            [sys.executable, "-c", code],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            timeout=float(os.environ.get("QECTOR_OPENCL_PROBE_TIMEOUT", "10")),
+        proc = _subprocess_local.run(
+            [_sys_local.executable, "-c", code],
+            stdout=_subprocess_local.DEVNULL,
+            stderr=_subprocess_local.DEVNULL,
+            timeout=float(_os_local.environ.get("QECTOR_OPENCL_PROBE_TIMEOUT", "10")),
         )
         _OPENCL_HEALTH_CACHE = proc.returncode == 0
     except Exception:
@@ -217,17 +221,17 @@ class UnionFindDecoder:
         self._inner = _RustUnionFindDecoder(c2q, nq)
 
     def decode(self, syndrome):
-        if not isinstance(syndrome, np.ndarray):
-            syndrome = np.array(syndrome, dtype=np.uint8)
-        if syndrome.dtype != np.uint8:
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
+        if syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
         return self._inner.decode(syndrome)
 
     def batch_decode(self, syndromes):
-        if not isinstance(syndromes, np.ndarray):
-            syndromes = np.array(syndromes, dtype=np.uint8)
-        if syndromes.dtype != np.uint8:
-            syndromes = syndromes.astype(np.uint8)
+        if not isinstance(syndromes, _np.ndarray):
+            syndromes = _np.array(syndromes, dtype=_np.uint8)
+        if syndromes.dtype != _np.uint8:
+            syndromes = syndromes.astype(_np.uint8)
         if syndromes.ndim != 2:
             raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
         return self._inner.batch_decode(syndromes)
@@ -242,10 +246,13 @@ class UnionFindDecoder:
 
 
 class FastUnionFindDecoder:
-    """SIMD-accelerated zero-allocation Union-Find decoder.
+    """SIMD-accelerated Union-Find decoder.
 
     Uses pre-allocated reusable buffers, AVX2 runtime dispatch, and FFI.
-    Same API as UnionFindDecoder but with lower overhead.
+    Same API as UnionFindDecoder but with lower overhead in many cases.
+
+    "SIMD-accelerated Union-Find. In some workloads it may not be faster than
+    `UnionFindDecoder` due to overhead. Consider benchmarking both."
     """
 
     def __init__(self, check_to_qubits, n_qubits=None):
@@ -253,17 +260,17 @@ class FastUnionFindDecoder:
         self._inner = _RustFastUnionFindDecoder(c2q, nq)
 
     def decode(self, syndrome):
-        if not isinstance(syndrome, np.ndarray):
-            syndrome = np.array(syndrome, dtype=np.uint8)
-        if syndrome.dtype != np.uint8:
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
+        if syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
         return self._inner.decode(syndrome)
 
     def batch_decode(self, syndromes):
-        if not isinstance(syndromes, np.ndarray):
-            syndromes = np.array(syndromes, dtype=np.uint8)
-        if syndromes.dtype != np.uint8:
-            syndromes = syndromes.astype(np.uint8)
+        if not isinstance(syndromes, _np.ndarray):
+            syndromes = _np.array(syndromes, dtype=_np.uint8)
+        if syndromes.dtype != _np.uint8:
+            syndromes = syndromes.astype(_np.uint8)
         if syndromes.ndim != 2:
             raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
         return self._inner.batch_decode(syndromes)
@@ -288,17 +295,17 @@ class BlossomDecoder:
         self._inner = _RustBlossomDecoder(c2q, nq, edge_weights)
 
     def decode(self, syndrome):
-        if not isinstance(syndrome, np.ndarray):
-            syndrome = np.array(syndrome, dtype=np.uint8)
-        if syndrome.dtype != np.uint8:
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
+        if syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
         return self._inner.decode(syndrome)
 
     def batch_decode(self, syndromes):
-        if not isinstance(syndromes, np.ndarray):
-            syndromes = np.array(syndromes, dtype=np.uint8)
-        if syndromes.dtype != np.uint8:
-            syndromes = syndromes.astype(np.uint8)
+        if not isinstance(syndromes, _np.ndarray):
+            syndromes = _np.array(syndromes, dtype=_np.uint8)
+        if syndromes.dtype != _np.uint8:
+            syndromes = syndromes.astype(_np.uint8)
         if syndromes.ndim != 2:
             raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
         return self._inner.batch_decode(syndromes)
@@ -330,9 +337,9 @@ class SlidingWindowDecoder:
         self._inner = _RustSlidingWindowDecoder(c2q, nq, window_size, decay_factor)
 
     def update(self, round_syndrome):
-        if not isinstance(round_syndrome, np.ndarray):
-            round_syndrome = np.array(round_syndrome, dtype=np.uint8)
-        if round_syndrome.dtype != np.uint8:
+        if not isinstance(round_syndrome, _np.ndarray):
+            round_syndrome = _np.array(round_syndrome, dtype=_np.uint8)
+        if round_syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {round_syndrome.dtype}")
         return self._inner.update(round_syndrome)
 
@@ -340,9 +347,9 @@ class SlidingWindowDecoder:
         self._inner.flush()
 
     def decode(self, syndrome):
-        if not isinstance(syndrome, np.ndarray):
-            syndrome = np.array(syndrome, dtype=np.uint8)
-        if syndrome.dtype != np.uint8:
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
+        if syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
         return self._inner.decode(syndrome)
 
@@ -378,9 +385,9 @@ class StreamingDecoder:
         self._inner = _RustStreamingDecoder(c2q, nq, history_size)
 
     def update(self, round_syndrome):
-        if not isinstance(round_syndrome, np.ndarray):
-            round_syndrome = np.array(round_syndrome, dtype=np.uint8)
-        if round_syndrome.dtype != np.uint8:
+        if not isinstance(round_syndrome, _np.ndarray):
+            round_syndrome = _np.array(round_syndrome, dtype=_np.uint8)
+        if round_syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {round_syndrome.dtype}")
         return self._inner.update(round_syndrome)
 
@@ -388,9 +395,9 @@ class StreamingDecoder:
         self._inner.flush()
 
     def decode(self, syndrome):
-        if not isinstance(syndrome, np.ndarray):
-            syndrome = np.array(syndrome, dtype=np.uint8)
-        if syndrome.dtype != np.uint8:
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
+        if syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
         return self._inner.decode(syndrome)
 
@@ -410,14 +417,14 @@ class BatchDecoder:
     """
 
     def __init__(self, check_to_qubits, n_qubits=None):
-        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits, reject_hyperedges=True)
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits, reject_hyperedges=False)
         self._inner = _RustBatchDecoder(c2q, nq)
 
     def parallel_batch_decode(self, syndromes):
-        if not isinstance(syndromes, np.ndarray):
-            syndromes = np.array(syndromes, dtype=np.uint8)
-        if syndromes.dtype != np.uint8:
-            syndromes = syndromes.astype(np.uint8)
+        if not isinstance(syndromes, _np.ndarray):
+            syndromes = _np.array(syndromes, dtype=_np.uint8)
+        if syndromes.dtype != _np.uint8:
+            syndromes = syndromes.astype(_np.uint8)
         if syndromes.ndim != 2:
             raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
         return self._inner.parallel_batch_decode(syndromes)
@@ -440,21 +447,21 @@ class CPUBatchDecoder:
     """SIMD-friendly CPU batch decoder with pooled buffers and SoA transposition."""
 
     def __init__(self, check_to_qubits, n_qubits=None):
-        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits, reject_hyperedges=True)
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits, reject_hyperedges=False)
         self._inner = _RustCPUBatchDecoder(c2q, nq)
 
     def decode(self, syndrome):
-        if not isinstance(syndrome, np.ndarray):
-            syndrome = np.array(syndrome, dtype=np.uint8)
-        if syndrome.dtype != np.uint8:
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
+        if syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
         return self._inner.decode(syndrome)
 
     def batch_decode(self, syndromes):
-        if not isinstance(syndromes, np.ndarray):
-            syndromes = np.array(syndromes, dtype=np.uint8)
-        if syndromes.dtype != np.uint8:
-            syndromes = syndromes.astype(np.uint8)
+        if not isinstance(syndromes, _np.ndarray):
+            syndromes = _np.array(syndromes, dtype=_np.uint8)
+        if syndromes.dtype != _np.uint8:
+            syndromes = syndromes.astype(_np.uint8)
         if syndromes.ndim != 2:
             raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
         return self._inner.batch_decode_par(syndromes)
@@ -477,19 +484,20 @@ class OpenCLBatchDecoder:
     """
 
     def __init__(self, check_to_qubits, n_qubits=None):
-        if os.environ.get("QECTOR_OPENCL_PROBE_CHILD") != "1" and not _opencl_health_check():
+        import os as _os_local
+        if _os_local.environ.get("QECTOR_OPENCL_PROBE_CHILD") != "1" and not _opencl_health_check():
             raise RuntimeError(
                 "OpenCL backend is unavailable or failed its health check; "
                 "use CPUBatchDecoder/AutoDecoder fallback or set QECTOR_DISABLE_OPENCL=1"
             )
-        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits, reject_hyperedges=True)
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits, reject_hyperedges=False)
         self._inner = _RustOpenCLBatchDecoder(c2q, nq)
 
     def batch_decode(self, syndromes):
-        if not isinstance(syndromes, np.ndarray):
-            syndromes = np.array(syndromes, dtype=np.uint8)
-        if syndromes.dtype != np.uint8:
-            syndromes = syndromes.astype(np.uint8)
+        if not isinstance(syndromes, _np.ndarray):
+            syndromes = _np.array(syndromes, dtype=_np.uint8)
+        if syndromes.dtype != _np.uint8:
+            syndromes = syndromes.astype(_np.uint8)
         if syndromes.ndim != 2:
             raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
         return self._inner.batch_decode(syndromes)
@@ -546,14 +554,14 @@ class CUDABatchDecoder:
     def __init__(self, check_to_qubits, n_qubits=None):
         if _RustCUDABatchDecoder is None:
             raise RuntimeError("qector-decoder-v3 was built without the 'cuda' feature")
-        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits, reject_hyperedges=True)
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits, reject_hyperedges=False)
         self._inner = _RustCUDABatchDecoder(c2q, nq)
 
     def batch_decode(self, syndromes):
-        if not isinstance(syndromes, np.ndarray):
-            syndromes = np.array(syndromes, dtype=np.uint8)
-        if syndromes.dtype != np.uint8:
-            syndromes = syndromes.astype(np.uint8)
+        if not isinstance(syndromes, _np.ndarray):
+            syndromes = _np.array(syndromes, dtype=_np.uint8)
+        if syndromes.dtype != _np.uint8:
+            syndromes = syndromes.astype(_np.uint8)
         if syndromes.ndim != 2:
             raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
         return self._inner.batch_decode(syndromes)
@@ -612,9 +620,9 @@ class SparseBlossomDecoder:
         self._inner = _RustSparseBlossomDecoder(c2q, nq)
 
     def decode(self, syndrome):
-        if not isinstance(syndrome, np.ndarray):
-            syndrome = np.array(syndrome, dtype=np.uint8)
-        if syndrome.dtype != np.uint8:
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
+        if syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
         return self._inner.decode(syndrome)
 
@@ -631,25 +639,25 @@ class SparseBlossomDecoder:
         layer. A one-time warning is emitted on first weighted use.
 
         Args:
-            syndrome: np.ndarray of shape (n_checks,) with dtype uint8.
+            syndrome: _np.ndarray of shape (n_checks,) with dtype uint8.
             weights: List of (qubit_id, weight) tuples.
 
         Returns:
-            np.ndarray of shape (n_qubits,) with correction.
+            _np.ndarray of shape (n_qubits,) with correction.
         """
-        if not isinstance(syndrome, np.ndarray):
-            syndrome = np.array(syndrome, dtype=np.uint8)
-        if syndrome.dtype != np.uint8:
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
+        if syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
         if not isinstance(weights, list):
             weights = list(weights)
         return self._inner.decode_with_weights(syndrome, weights)
 
     def batch_decode(self, syndromes):
-        if not isinstance(syndromes, np.ndarray):
-            syndromes = np.array(syndromes, dtype=np.uint8)
-        if syndromes.dtype != np.uint8:
-            syndromes = syndromes.astype(np.uint8)
+        if not isinstance(syndromes, _np.ndarray):
+            syndromes = _np.array(syndromes, dtype=_np.uint8)
+        if syndromes.dtype != _np.uint8:
+            syndromes = syndromes.astype(_np.uint8)
         if syndromes.ndim != 2:
             raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
         return self._inner.batch_decode(syndromes)
@@ -674,9 +682,9 @@ class BPOSDDecoder:
         self._inner = _RustBPOSDDecoder(c2q, nq, error_rate)
 
     def decode(self, syndrome):
-        if not isinstance(syndrome, np.ndarray):
-            syndrome = np.array(syndrome, dtype=np.uint8)
-        if syndrome.dtype != np.uint8:
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
+        if syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
         return self._inner.decode(syndrome)
 
@@ -684,16 +692,16 @@ class BPOSDDecoder:
         """Run Belief Propagation and return log-likelihood ratios (LLRs) for each qubit.
 
         Args:
-            syndrome: np.ndarray of shape (n_checks,) with dtype uint8.
+            syndrome: _np.ndarray of shape (n_checks,) with dtype uint8.
             max_iterations: Number of BP iterations (default: 20).
 
         Returns:
-            np.ndarray of shape (n_qubits,) with LLR values.
+            _np.ndarray of shape (n_qubits,) with LLR values.
             Positive LLR -> more likely 0, Negative LLR -> more likely 1.
         """
-        if not isinstance(syndrome, np.ndarray):
-            syndrome = np.array(syndrome, dtype=np.uint8)
-        if syndrome.dtype != np.uint8:
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
+        if syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
         return self._inner.bp_decode(syndrome, max_iterations)
 
@@ -713,20 +721,20 @@ class NeuralPredecoder:
         self._inner = _RustNeuralPredecoder(n_input, n_output, n_hidden1, n_hidden2)
 
     def train(self, syndromes, corrections, n_epochs, learning_rate=0.01):
-        if not isinstance(syndromes, np.ndarray):
-            syndromes = np.array(syndromes, dtype=np.uint8)
-        if not isinstance(corrections, np.ndarray):
-            corrections = np.array(corrections, dtype=np.uint8)
+        if not isinstance(syndromes, _np.ndarray):
+            syndromes = _np.array(syndromes, dtype=_np.uint8)
+        if not isinstance(corrections, _np.ndarray):
+            corrections = _np.array(corrections, dtype=_np.uint8)
         self._inner.train(syndromes, corrections, n_epochs, learning_rate)
 
     def predict(self, syndrome):
-        if not isinstance(syndrome, np.ndarray):
-            syndrome = np.array(syndrome, dtype=np.uint8)
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
         return self._inner.predict(syndrome)
 
     def decode(self, syndrome):
-        if not isinstance(syndrome, np.ndarray):
-            syndrome = np.array(syndrome, dtype=np.uint8)
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
         return self._inner.decode(syndrome)
 
     @property
@@ -904,23 +912,23 @@ class HybridDecoder:
         )
 
     def decode_hybrid(self, syndrome):
-        if not isinstance(syndrome, np.ndarray):
-            syndrome = np.array(syndrome, dtype=np.uint8)
-        if syndrome.dtype != np.uint8:
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
+        if syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
         return self._inner.decode_hybrid(syndrome)
 
     def decode_heuristic(self, syndrome):
-        if not isinstance(syndrome, np.ndarray):
-            syndrome = np.array(syndrome, dtype=np.uint8)
-        if syndrome.dtype != np.uint8:
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
+        if syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
         return self._inner.decode_heuristic(syndrome)
 
     def decode_standard(self, syndrome):
-        if not isinstance(syndrome, np.ndarray):
-            syndrome = np.array(syndrome, dtype=np.uint8)
-        if syndrome.dtype != np.uint8:
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
+        if syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
         return self._inner.decode_standard(syndrome)
 
@@ -928,14 +936,14 @@ class HybridDecoder:
         """Batch decode multiple syndromes using the GNN-enhanced pipeline.
 
         Args:
-            syndromes: np.ndarray of shape (batch, n_checks) or list of lists.
+            syndromes: _np.ndarray of shape (batch, n_checks) or list of lists.
 
         Returns:
-            np.ndarray of shape (batch, n_qubits) with corrections.
+            _np.ndarray of shape (batch, n_qubits) with corrections.
         """
-        if not isinstance(syndromes, np.ndarray):
-            syndromes = np.array(syndromes, dtype=np.uint8)
-        if syndromes.dtype != np.uint8:
+        if not isinstance(syndromes, _np.ndarray):
+            syndromes = _np.array(syndromes, dtype=_np.uint8)
+        if syndromes.dtype != _np.uint8:
             raise TypeError(f"Syndromes must be dtype uint8, got {syndromes.dtype}")
         if syndromes.ndim != 2:
             raise ValueError(f"Expected 2D array, got shape {syndromes.shape}")
@@ -945,14 +953,14 @@ class HybridDecoder:
         """Batch decode multiple syndromes using standard SparseBlossom.
 
         Args:
-            syndromes: np.ndarray of shape (batch, n_checks) or list of lists.
+            syndromes: _np.ndarray of shape (batch, n_checks) or list of lists.
 
         Returns:
-            np.ndarray of shape (batch, n_qubits) with corrections.
+            _np.ndarray of shape (batch, n_qubits) with corrections.
         """
-        if not isinstance(syndromes, np.ndarray):
-            syndromes = np.array(syndromes, dtype=np.uint8)
-        if syndromes.dtype != np.uint8:
+        if not isinstance(syndromes, _np.ndarray):
+            syndromes = _np.array(syndromes, dtype=_np.uint8)
+        if syndromes.dtype != _np.uint8:
             raise TypeError(f"Syndromes must be dtype uint8, got {syndromes.dtype}")
         if syndromes.ndim != 2:
             raise ValueError(f"Expected 2D array, got shape {syndromes.shape}")
@@ -1018,17 +1026,17 @@ class LookupTableDecoder:
         self._inner.build_table(int(max_entries))
 
     def decode(self, syndrome):
-        if not isinstance(syndrome, np.ndarray):
-            syndrome = np.array(syndrome, dtype=np.uint8)
-        if syndrome.dtype != np.uint8:
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
+        if syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
         return self._inner.decode(syndrome)
 
     def batch_decode(self, syndromes):
-        if not isinstance(syndromes, np.ndarray):
-            syndromes = np.array(syndromes, dtype=np.uint8)
-        if syndromes.dtype != np.uint8:
-            syndromes = syndromes.astype(np.uint8)
+        if not isinstance(syndromes, _np.ndarray):
+            syndromes = _np.array(syndromes, dtype=_np.uint8)
+        if syndromes.dtype != _np.uint8:
+            syndromes = syndromes.astype(_np.uint8)
         if syndromes.ndim != 2:
             raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
         return self._inner.batch_decode(syndromes)
@@ -1310,3 +1318,9 @@ except Exception:  # pragma: no cover - defensive; streaming has no hard deps
     sliding_window_decode = None  # type: ignore[assignment]
     StreamingResult = None  # type: ignore[assignment]
     StreamingTelemetry = None  # type: ignore[assignment]
+
+# Clean public namespace to reduce leakage (per v0.6.2 todo.md).
+# Only public names should remain.
+for _name in ("os", "sys", "subprocess"):
+    globals().pop(_name, None)
+# Note: numpy kept as _np internally; public API uses explicit numpy where needed in docs.
