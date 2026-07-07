@@ -2,6 +2,8 @@
 
 **Source-available Rust/Python quantum error correction decoding platform.**
 
+**v0.6.2 highlights**: hardened Union-Find (`UnionFindDecoder`, `FastUnionFindDecoder`) with explicit rejection of hypergraphs (qubits in >2 checks) + full input validation. No more silent wrong results.
+
 QECTOR Decoder v3 provides a Python package backed by a native Rust extension for quantum error correction research and validation workflows. It includes PyMatching-compatible MWPM validation, Union-Find decoding, belief-matching experiments, BP-OSD/qLDPC workflows, batch decoding, and optional GPU backend checks where the release build and target machine support them.
 
 Website: https://www.qector.store  

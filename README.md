@@ -8,6 +8,8 @@
 [![License](https://img.shields.io/badge/License-Source_Available-blue)](LICENSE)
 **Source-available Rust/Python quantum error correction decoding platform.**
 
+v0.6.2: hardened Union-Find with explicit hypergraph rejection + comprehensive validation (no more silent bad corrections on unsupported codes).
+
 PyMatching-compatible MWPM validation - Belief-matching accuracy mode - BP-OSD for LDPC/qLDPC - CPU/GPU batch decoding - Artifact-backed benchmark evidence
 
 [Website](https://www.qector.store) - [PyPI](https://pypi.org/project/qector-decoder-v3/) - [Commercial licensing](mailto:admin@qector.store)
