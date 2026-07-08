@@ -176,6 +176,7 @@ jobs:
   macos-intel:
     name: macos-x86_64-py${{ matrix.python-version }}
     runs-on: macos-13
+    if: false  # disabled for v0.6.2 release to avoid 8h+ queue; will re-enable later
     strategy:
       fail-fast: false
       matrix:
