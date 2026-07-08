@@ -23,8 +23,10 @@ Supported package target for the public release workflow:
 - Python 3.9 to 3.13
 - Linux x86_64 wheels (manylinux)
 - Windows x64 wheels
-- macOS Intel x86_64 + Apple Silicon arm64 wheels
+- macOS Apple Silicon arm64 wheels
 - Source distribution (sdist) for custom/source builds
+
+macOS Intel (x86_64) wheels are not included in v0.6.2 due to extremely long GitHub Actions runner queues (they will be added in a follow-up).
 
 Optional research and validation extras:
 

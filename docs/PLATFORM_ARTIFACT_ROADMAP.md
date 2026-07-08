@@ -14,7 +14,7 @@ This roadmap turns the external audit recommendations into explicit public work 
 | GPU bit-identity | Tested configurations and docs | Safe as bit-identity claim, not throughput claim |
 | GPU throughput | Not yet a stable public proof asset | Do not claim speedup without regenerated local artifacts |
 | Linux/macOS benchmark corpus | Not yet published as comparable artifacts | Do not imply cross-platform benchmark equivalence |
-| Prebuilt wheels | Published for v0.6.2+ (Linux, Windows, macOS Intel+ARM) | Full matrix in CI; attach attestations |
+| Prebuilt wheels | Published for v0.6.2 (Linux, Windows, macOS arm64). Intel x86_64 excluded due to CI queue delays. | Full matrix in CI (Intel to be added) |
 
 ## Planned artifact classes
 
@@ -77,7 +77,9 @@ As of v0.6.2, CPU-safe wheels are published via CI for:
 
 - Linux x86_64 (manylinux)
 - Windows x64
-- macOS Intel x86_64 + Apple Silicon arm64
+- macOS Apple Silicon arm64
+
+macOS Intel (x86_64) wheels were excluded from this release due to extremely long GitHub Actions runner queues. They will be added in a follow-up.
 
 sdist is also published.
 
@@ -86,7 +88,7 @@ Candidate / supported targets (v0.6.2+):
 ```text
 Linux x86_64 CPython 3.9–3.13
 Windows x64 CPython 3.9–3.13
-macOS x86_64 CPython 3.9–3.13
+macOS x86_64 (Intel) - planned for follow-up (queues too long in v0.6.2)
 macOS arm64 CPython 3.9–3.13
 ```
 
@@ -145,6 +147,6 @@ Unsafe:
 
 ```text
 QECTOR already has universal cross-platform benchmark proof.
-QECTOR ships production wheels for Linux, Windows, macOS Intel x86_64 and Apple Silicon.
+QECTOR ships production wheels for Linux, Windows, macOS Apple Silicon (Intel x86_64 to follow).
 QECTOR GPU throughput is generally faster than PyMatching.
 ```

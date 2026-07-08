@@ -12,6 +12,7 @@
 - Reduced namespace leakage in `__init__.py` (os/sys/subprocess/np no longer pollute the public module).
 - `recommend_decoder` / routing safely avoids recommending UF family on hypergraphs.
 - sdist now published alongside wheels.
+- Wheel matrix for Linux, Windows, macOS arm64 (macOS Intel x86_64 excluded from this release due to 8+ hour GitHub Actions queue times on macos-13; will be added later).
 - Expanded test matrix and relaxed d=21 latency threshold for stability.
 - All docs, versioning, and metadata aligned to 0.6.2.
 
