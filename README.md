@@ -6,8 +6,8 @@
 [![PyPI](https://img.shields.io/pypi/v/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
 [![Python](https://img.shields.io/pypi/pyversions/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
 [![License](https://img.shields.io/badge/License-Source_Available-blue)](LICENSE)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/qector-decoder-v3)](https://pypi.org/project/qector-decoder-v3/)
-
+![Downloads](https://img.shields.io/badge/Downloads-20.8k%20(total)-brightgreen)
+![Monthly](https://img.shields.io/badge/Monthly-9k%2B-brightgreen)
 **Source-available Rust/Python quantum error correction decoding platform.**
 
 **v0.6.2**: Hardened Union-Find family with explicit hypergraph rejection (no more silent wrong results on unsupported codes) + comprehensive validation.
