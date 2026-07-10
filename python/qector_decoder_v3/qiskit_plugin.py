@@ -27,7 +27,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
-from . import UnionFindDecoder, generate_surface_code_checks
+from . import BlossomDecoder, generate_surface_code_checks
 
 # Import optionnel de Qiskit — le plugin reste importable sans Qiskit
 # ------------------------------------------------------------------------
@@ -97,7 +97,7 @@ def decode_qiskit_result(
             "correction": np.ndarray — correction pour chaque shot,
             "syndrome": np.ndarray — syndrome déduit,
             "metadata": {
-                "decoder": "QECTOR UnionFind",
+                "decoder": "QECTOR Blossom",
                 "code_distance": int,
                 "n_qubits": int,
                 "n_checks": int,
@@ -123,7 +123,7 @@ def decode_qiskit_result(
         n_qubits = auto_n_qubits
     n_checks = len(check_to_qubits)
 
-    decoder = UnionFindDecoder(check_to_qubits, n_qubits=n_qubits)
+    decoder = BlossomDecoder(check_to_qubits, n_qubits=n_qubits)
 
     # Extraction des syndromes à partir des comptes
     syndrome_list: List[np.ndarray] = []
@@ -138,7 +138,7 @@ def decode_qiskit_result(
             "correction": np.zeros((0, n_qubits), dtype=np.uint8),
             "syndrome": np.zeros((0, n_checks), dtype=np.uint8),
             "metadata": {
-                "decoder": "QECTOR UnionFind",
+                "decoder": "QECTOR Blossom",
                 "code_distance": code_distance,
                 "n_qubits": n_qubits,
                 "n_checks": n_checks,
@@ -154,7 +154,7 @@ def decode_qiskit_result(
         "correction": corrections,
         "syndrome": syndromes,
         "metadata": {
-            "decoder": "QECTOR UnionFind",
+            "decoder": "QECTOR Blossom",
             "code_distance": code_distance,
             "n_qubits": n_qubits,
             "n_checks": n_checks,
@@ -193,13 +193,13 @@ def create_qiskit_decoder(
     -------
     callable
         Fonction ``(result) -> dict`` avec attribut ``_inner_decoder``
-        pour accéder directement à l'instance ``UnionFindDecoder``.
+        pour accéder directement à l'instance ``BlossomDecoder``.
     """
     check_to_qubits, auto_n_qubits = generate_surface_code_checks(code_distance)
     if n_qubits is None:
         n_qubits = auto_n_qubits
 
-    inner_decoder = UnionFindDecoder(check_to_qubits, n_qubits=n_qubits)
+    inner_decoder = BlossomDecoder(check_to_qubits, n_qubits=n_qubits)
 
     def _decode(result: Any) -> Dict[str, Any]:
         return decode_qiskit_result(

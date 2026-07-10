@@ -26,7 +26,7 @@ uniform-weight graphs and lands in the same logical coset otherwise).
 
 from __future__ import annotations
 
-from typing import Any, List, Optional, Sequence, Tuple
+from typing import Any, List, Optional, Sequence, Tuple, cast
 
 import numpy as np
 
@@ -198,16 +198,19 @@ class Matching:
 
     def _edge_correction(self, syndrome: np.ndarray) -> np.ndarray:
         dec = self._ensure_decoder()
-        return np.asarray(dec.decode(syndrome.astype(np.uint8)), dtype=np.uint8).reshape(-1)
+        return cast(
+            np.ndarray,
+            np.asarray(dec.decode(syndrome.astype(np.uint8)), dtype=np.uint8).reshape(-1),
+        )
 
     def _to_fault_prediction(self, correction: np.ndarray) -> np.ndarray:
         if self._faults_matrix is not None:
-            return (self._faults_matrix @ correction) & 1
+            return cast(np.ndarray, (self._faults_matrix @ correction) & 1)
         return correction
 
     def decode(self, syndrome: Sequence[int]) -> np.ndarray:
         """Decode one syndrome; returns predicted fault-id / observable flips."""
-        s = np.asarray(syndrome, dtype=np.uint8).reshape(-1)
+        s: np.ndarray = np.asarray(syndrome, dtype=np.uint8).reshape(-1)
         if s.shape[0] < self._num_detectors:
             s = np.concatenate([s, np.zeros(self._num_detectors - s.shape[0], np.uint8)])
         corr = self._edge_correction(s)
@@ -237,7 +240,7 @@ class Matching:
 
     def decode_to_edges_array(self, syndrome: Sequence[int]) -> np.ndarray:
         """Return the raw edge correction (length ``num_edges``)."""
-        s = np.asarray(syndrome, dtype=np.uint8).reshape(-1)
+        s: np.ndarray = np.asarray(syndrome, dtype=np.uint8).reshape(-1)
         if s.shape[0] < self._num_detectors:
             s = np.concatenate([s, np.zeros(self._num_detectors - s.shape[0], np.uint8)])
         return self._edge_correction(s)

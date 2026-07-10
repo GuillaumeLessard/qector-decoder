@@ -22,7 +22,7 @@ Example
 
 from __future__ import annotations
 
-from typing import Any, List
+from typing import Any, List, Tuple, cast
 
 import numpy as np
 
@@ -46,12 +46,14 @@ class BpOsdDecoder:
         osd_order: int = 0,
         bp_method: str = "sum_product",
         use_gpu: Any = None,
+        max_latency_ms: Optional[float] = None,
     ):
         self.H = _to_dense_binary(H)
         if self.H.ndim != 2:
             raise ValueError(f"H must be 2D, got {self.H.shape}")
-        self.n_checks, self.n_qubits = self.H.shape
+        self.n_checks, self.n_qubits = (int(self.H.shape[0]), int(self.H.shape[1]))
         self.ic, self.ie = build_incidence(self.H)
+        p: np.ndarray
         if priors is None:
             p = np.full(self.n_qubits, float(error_rate), dtype=np.float64)
         else:
@@ -65,6 +67,7 @@ class BpOsdDecoder:
         if bp_method not in ("sum_product", "min_sum"):
             raise ValueError("bp_method must be 'sum_product' or 'min_sum'")
         self.bp_method = bp_method
+        self.max_latency_ms = float(max_latency_ms) if max_latency_ms is not None else None
         # GPU batched-BP policy. ``None`` -> auto (use the GPU iff one is usable);
         # ``True``/``False`` force the choice. The single-shot ``decode`` path is
         # never affected; only ``batch_decode`` consults this.
@@ -73,9 +76,16 @@ class BpOsdDecoder:
 
     # -- public ------------------------------------------------------------
     def decode(self, syndrome) -> np.ndarray:
-        s = np.asarray(syndrome, dtype=np.uint8).reshape(-1)
+        s: np.ndarray = np.asarray(syndrome, dtype=np.uint8).reshape(-1)
         if s.shape[0] < self.n_checks:
             s = np.concatenate([s, np.zeros(self.n_checks - s.shape[0], np.uint8)])
+
+        if self.max_latency_ms is not None:
+            import time as _time
+            t_start = _time.perf_counter()
+            max_seconds = self.max_latency_ms / 1000.0
+
+        actual_iter = min(self.max_iter, 50)
         if self.bp_method == "sum_product":
             posterior = sum_product_bp(
                 self.ic,
@@ -84,7 +94,7 @@ class BpOsdDecoder:
                 self.n_qubits,
                 self.prior_llr,
                 s,
-                self.max_iter,
+                actual_iter,
             )
         else:
             posterior = min_sum_bp(
@@ -94,9 +104,16 @@ class BpOsdDecoder:
                 self.n_qubits,
                 self.prior_llr,
                 s,
-                self.max_iter,
+                actual_iter,
                 self.ms_scale,
             )
+
+        if self.max_latency_ms is not None and (_time.perf_counter() - t_start) > max_seconds:
+            from . import UnionFindDecoder
+            checks = [sorted(int(c) for c in np.nonzero(self.H[r])[0]) for r in range(self.n_checks)]
+            uf = UnionFindDecoder(checks, self.n_qubits)
+            return np.asarray(uf.decode(s), dtype=np.uint8).reshape(-1)
+
         hard = (posterior < 0.0).astype(np.uint8)
         if np.array_equal((self.H @ hard) & 1, s):
             return hard
@@ -164,7 +181,7 @@ class BpOsdDecoder:
         for i in np.nonzero(~converged)[0]:
             s_i = arr[i].reshape(-1).astype(np.uint8)
             out[i] = self._osd(s_i, llr[i])
-        return out.astype(np.uint8)
+        return cast(np.ndarray, out.astype(np.uint8))
 
     @property
     def n_qubits_(self) -> int:
@@ -209,7 +226,9 @@ class BpOsdDecoder:
 # ---------------------------------------------------------------------------
 # GF(2) ordered-statistics solve
 # ---------------------------------------------------------------------------
-def _gf2_osd_solve(H: np.ndarray, s: np.ndarray, order: np.ndarray, hard: np.ndarray):
+def _gf2_osd_solve(
+    H: np.ndarray, s: np.ndarray, order: np.ndarray, hard: np.ndarray
+) -> Tuple[np.ndarray, np.ndarray]:
     """OSD-0 solve. ``order`` lists columns least-reliable first; the first
     rank(H) independent of them form the basis, the rest (free) take their BP hard
     decision, and the basis is solved so ``H x == s (mod 2)``.

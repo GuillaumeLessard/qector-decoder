@@ -30,6 +30,7 @@ import numpy as np
 from . import UnionFindDecoder, BatchDecoder, __version__
 
 # --- Essai d'import FastAPI, fallback Flask -------------------------------
+_FRAMEWORK: Optional[str] = None
 try:
     from fastapi import FastAPI, HTTPException
     from pydantic import BaseModel
@@ -41,12 +42,7 @@ except ImportError:  # pragma: no cover
 
         _FRAMEWORK = "flask"
     except ImportError:
-        raise ImportError(
-            "Aucun framework web détecté. Installez fastapi+uvicorn ou flask :\n"
-            "    pip install fastapi uvicorn\n"
-            "    # ou\n"
-            "    pip install flask"
-        ) from None
+        pass
 
 
 # --- Modèles de données (FastAPI uniquement) --------------------------------
@@ -198,7 +194,14 @@ def create_app() -> Any:
     """
     if _FRAMEWORK == "fastapi":
         return _create_fastapi_app()
-    return _create_flask_app()
+    if _FRAMEWORK == "flask":
+        return _create_flask_app()
+    raise RuntimeError(
+        "No web framework available. Install fastapi+uvicorn or flask:\n"
+        "    pip install fastapi uvicorn\n"
+        "    # ou\n"
+        "    pip install flask"
+    )
 
 
 def run_server(host: str = "0.0.0.0", port: int = 8000, **kwargs: Any) -> None:
@@ -219,4 +222,4 @@ def run_server(host: str = "0.0.0.0", port: int = 8000, **kwargs: Any) -> None:
 
 
 # Instance globale pour les serveurs WSGI/ASGI standards (uvicorn, gunicorn, etc.)
-app = create_app()
+app: Any = create_app() if _FRAMEWORK is not None else None

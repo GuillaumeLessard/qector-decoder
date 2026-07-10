@@ -147,8 +147,9 @@ def decode_with_diagnostics(
 
     Parameters
     ----------
-    code : qector_decoder_v3.codes.Code
+    code : qector_decoder_v3.codes.Code or (c2q, nq) tuple
         The code being decoded (provides ``H`` and, optionally, logicals).
+        Also accepts a tuple ``(check_to_qubits, n_qubits)``.
     syndrome : array-like
         Binary syndrome of length ``code.n_checks``.
     kind : str
@@ -169,7 +170,15 @@ def decode_with_diagnostics(
     )
 
     s = np.asarray(syndrome, dtype=np.uint8).reshape(-1)
-    c2q, nq = code.check_to_qubits, code.n_qubits
+
+    if hasattr(code, 'check_to_qubits') and hasattr(code, 'n_qubits'):
+        c2q = code.check_to_qubits
+        nq = code.n_qubits
+    elif hasattr(code, '__len__') and len(code) >= 2:
+        c2q = list(code[0])
+        nq = int(code[1])
+    else:
+        raise TypeError("code must be a Code object or (check_to_qubits, n_qubits) tuple")
 
     if decoder is None:
         builders = {
@@ -179,25 +188,41 @@ def decode_with_diagnostics(
             "sparse_blossom": lambda: SparseBlossomDecoder(c2q, nq),
             "bp_osd": lambda: BPOSDDecoder(c2q, nq, 0.05),
         }
-        if kind not in builders:
-            raise ValueError(f"unknown decoder kind: {kind!r}")
-        decoder = builders[kind]()
-        backend = kind
+        kind_lower = kind.lower().replace(" ", "_").replace("-", "_")
+        if kind_lower in ("unionfind",):
+            kind_lower = "union_find"
+        if kind_lower not in builders:
+            raise ValueError(f"unknown decoder kind: {kind_lower!r}")
+        decoder = builders[kind_lower]()
+        backend = kind_lower
     else:
         backend = type(decoder).__name__
 
     t0 = time.perf_counter()
-    correction = np.asarray(decoder.decode(s), dtype=np.uint8).reshape(-1)
+    s_contig = np.ascontiguousarray(s, dtype=np.uint8).reshape(-1)
+    correction = np.asarray(decoder.decode(s_contig), dtype=np.uint8).reshape(-1)
     dt = time.perf_counter() - t0
 
-    H = code.parity_check_matrix()
+    H = None
+    if hasattr(code, 'parity_check_matrix'):
+        H = code.parity_check_matrix()
+    elif hasattr(code, 'H'):
+        H = code.H()
+    if H is None:
+        H = np.zeros((len(c2q), nq), dtype=np.uint8)
+        for ci, qs in enumerate(c2q):
+            for q in qs:
+                H[ci, q] ^= np.uint8(1)
+
     weight = None
-    if code.qubit_weights is not None and code.qubit_weights.shape[0] == nq:
+    if hasattr(code, 'qubit_weights') and code.qubit_weights is not None and code.qubit_weights.shape[0] == nq:
         weight = float(np.dot(code.qubit_weights, correction))
     else:
         weight = float(correction.sum())
 
-    L = logicals if logicals is not None else code.logicals_matrix()
+    L = logicals
+    if L is None and hasattr(code, 'logicals_matrix'):
+        L = code.logicals_matrix()
     logical_flips = None
     if L is not None and L.shape[1] == nq:
         logical_flips = (L @ correction) & 1
@@ -206,11 +231,12 @@ def decode_with_diagnostics(
         correction=correction,
         syndrome=s,
         n_qubits=nq,
-        n_checks=code.n_checks,
+        n_checks=len(c2q),
         weight=weight,
         logical_flips=logical_flips,
         decode_seconds=dt,
         backend=backend,
     )
-    res.verify(H)
+    if H is not None:
+        res.verify(H)
     return res

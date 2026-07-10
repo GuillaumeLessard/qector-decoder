@@ -125,6 +125,7 @@ class BatchedBpDecoder:
         self.alpha = float(alpha)
 
         # Host-side prior model (kept for introspection / reproducibility).
+        p: np.ndarray
         if priors is None:
             p = np.full(self.n_qubits, float(error_rate), dtype=np.float64)
         else:

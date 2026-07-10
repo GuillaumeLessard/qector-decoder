@@ -7,6 +7,30 @@ environment so report figures trace back to a specific build.
 
 ## [Unreleased]
 
+## [0.6.3] - 2026-07-10
+
+### Added
+- **BP-OSD convergence cap**: 50-iteration max, early-exit on belief convergence (max |Δ| < 1e-6), `decode_timed(max_latency_ms)` for tail-latency control.
+- **AVX2 SIMD transpose + gather**: CPU batch decoder auto-detects AVX2 via `is_x86_feature_detected!` — 1.1M shots/s on surface d=3, batch=32768.
+- **Blossom intra-decode Rayon parallelism**: k-NN search parallelized via `into_par_iter()` when n_defects > 40.
+- **DecoderPool**: Multi-process batch decoding with auto-Rayon fallback on Windows (50–500× faster than multi-process IPC).
+- **Cached decoder factory**: `get_decoder()` / `clear_decoder_cache()` / `get_decoder_pool()` — zero construction cost after first call.
+- **`decode_mmap`**: Out-of-core decoding via memory-mapped NumPy arrays.
+- **`DecodeResult` / `decode_with_diagnostics`**: Structured decode results with per-shot diagnostic metadata.
+- **`Workbench`**: High-level orchestration for multi-decoder comparison and benchmarking.
+- **Comprehensive test suite**: `test_comprehensive_suite.py` — 200+ scenario tests across all decoder families.
+
+### Changed
+- `FastUnionFindDecoder` docstring updated: "Consistently faster than UnionFindDecoder on surface and repetition codes (1.1M shots/s)".
+- `run_mcp_server` gated behind `grpc` feature; `OpenCLBatchDecoder`/`opencl_is_available` gated behind `opencl`.
+- CPUBatch `batch_decode()` now calls SIMD path by default; `batch_decode_par()` for explicit Rayon variant.
+- Bumped package to 0.6.3 across all metadata files.
+
+### Fixed
+- `bposd.py` line 118: CRW consistency bug in belief tracking.
+- DecoderPool on Windows: auto-selects single-process Rayon path instead of broken multi-process IPC.
+- Memory layout optimizations: aligned Vecs, pre-reserved capacity in Blossom construction.
+
 ## [0.6.2] - 2026-07-06
 
 ### Added

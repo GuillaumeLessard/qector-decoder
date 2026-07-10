@@ -38,7 +38,7 @@ from __future__ import annotations
 import functools
 from dataclasses import dataclass
 from types import ModuleType
-from typing import Any, Optional
+from typing import Any, Optional, cast
 
 import numpy as np
 
@@ -95,7 +95,7 @@ def _cupy() -> Optional[ModuleType]:
     try:
         import cupy  # type: ignore[import-not-found]
 
-        return cupy
+        return cast(ModuleType, cupy)
     except Exception:  # pragma: no cover - import failure path is env-dependent
         return None
 
@@ -255,7 +255,7 @@ def to_host(a: Any) -> np.ndarray:
         assert cp is not None  # is_on_gpu implies cupy imported
         host = cp.asnumpy(a)
         TELEMETRY["d2h"] += 1
-        return host
+        return cast(np.ndarray, host)
     return np.asarray(a)
 
 

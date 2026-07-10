@@ -175,7 +175,7 @@ def summarize(samples_seconds: Sequence[float]) -> Dict[str, float]:
         "ci95_low": mean - half,
         "ci95_high": mean + half,
     }
-    summary.update(percentiles(us))
+    summary.update(percentiles(us.tolist()))
     return summary
 
 

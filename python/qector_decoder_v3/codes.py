@@ -421,7 +421,7 @@ def bivariate_bicycle_code(
 
     def poly(terms: Sequence[Tuple[str, int]]) -> np.ndarray:
         dim = ell * m
-        M = np.zeros((dim, dim), dtype=np.uint8)
+        M: np.ndarray = np.zeros((dim, dim), dtype=np.uint8)
         for var, power in terms:
             base = x if var == "x" else y
             term = np.linalg.matrix_power(base.astype(np.int64), power) % 2

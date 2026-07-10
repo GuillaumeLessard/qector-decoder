@@ -2,13 +2,16 @@
 
 **Source-available Rust/Python quantum error correction decoding platform.**
 
-**v0.6.2 highlights**: hardened Union-Find (`UnionFindDecoder`, `FastUnionFindDecoder`) with explicit rejection of hypergraphs (qubits in >2 checks) + full input validation. No more silent wrong results.
-
 QECTOR Decoder v3 provides a Python package backed by a native Rust extension for quantum error correction research and validation workflows. It includes PyMatching-compatible MWPM validation, Union-Find decoding, belief-matching experiments, BP-OSD/qLDPC workflows, batch decoding, and optional GPU backend checks where the release build and target machine support them.
 
-Website: https://www.qector.store  
-Repository: https://github.com/GuillaumeLessard/qector-decoder  
-Commercial licensing: https://www.qector.store
+**Companion projects**:
+
+- The public package snapshot focuses on the decoder library, Python API, validation suite, and benchmark evidence.
+- Additional desktop, automation, and documentation tooling may be distributed separately from this checkout.
+
+Website: [https://www.qector.store](https://www.qector.store)  
+Repository: [https://github.com/GuillaumeLessard/qector-decoder](https://github.com/GuillaumeLessard/qector-decoder)  
+Commercial licensing: [https://www.qector.store](https://www.qector.store)
 
 ---
 
@@ -21,12 +24,10 @@ pip install qector-decoder-v3
 Supported package target for the public release workflow:
 
 - Python 3.9 to 3.13
-- Linux x86_64 wheels (manylinux)
+- Linux x86_64 wheels
 - Windows x64 wheels
-- macOS Apple Silicon arm64 wheels
-- Source distribution (sdist) for custom/source builds
-
-macOS Intel (x86_64) wheels are not included in v0.6.2 due to extremely long GitHub Actions runner queues (they will be added in a follow-up).
+- macOS arm64 wheels
+- Source distribution for custom/source builds
 
 Optional research and validation extras:
 
@@ -101,7 +102,7 @@ decoder = BlossomDecoder(checks, n_qubits)
 ## Included decoder families
 
 | Module | Primary use | Status |
-|---|---|---|
+| --- | --- | --- |
 | `UnionFindDecoder` | Fast approximate decoding | Stable public API |
 | `FastUnionFindDecoder` | Optimized Union-Find path | Stable public API |
 | `BlossomDecoder` | Exact MWPM / PyMatching-parity validation | Stable public API |
@@ -111,6 +112,14 @@ decoder = BlossomDecoder(checks, n_qubits)
 | `BatchDecoder` / `CPUBatchDecoder` | CPU Monte Carlo sweeps | Stable public API |
 | `CUDABatchDecoder` | CUDA batch decoding | Runtime/build dependent |
 | `OpenCLBatchDecoder` | OpenCL batch decoding | Runtime/build dependent |
+| `AutoDecoder` | CPU/GPU backend calibration | Experimental |
+| `PredecodedDecoder` | Easy-syndrome prefiltering | Experimental |
+| `DecoderPool` | Multi-process batch decoding | Stable public API |
+| `get_decoder` | Cached decoder factory | Stable public API |
+| `decode_mmap` | Out-of-core decoding via memmap | Stable public API |
+| `DecodeResult` | Structured decode result | Stable public API |
+| `decode_with_diagnostics` | Decode with diagnostics | Stable public API |
+| `Workbench` | High-level orchestration | Stable public API |
 | `stim_compat` | Stim circuit and DEM conversion | Stable utility |
 | `sinter_compat` | Sinter custom decoder integration | Stable utility |
 | `rest_api` | Local decoding service | Local/partner review only |
@@ -135,10 +144,11 @@ Important boundaries:
 - GPU availability and performance depend on wheel build features, drivers, hardware, and runtime checks.
 - OpenCL support must be confirmed on the target machine or built under the appropriate licensed/custom configuration.
 - REST/API surfaces are for local experiments or controlled review unless separately hardened.
+- **v0.6.3**: CPU batch decoder now reaches 1.1M shots/s via AVX2 SIMD transpose. BP-OSD adds `decode_timed` with convergence cap. Blossom intra-decode Rayon parallelism. DecoderPool auto-Rayon on Windows.
 
 Full methodology, reproducibility notes, and benchmark artifacts are in the GitHub repository:
 
-https://github.com/GuillaumeLessard/qector-decoder
+[https://github.com/GuillaumeLessard/qector-decoder](https://github.com/GuillaumeLessard/qector-decoder)
 
 ---
 
@@ -155,6 +165,22 @@ Do this before making any hardware-specific performance claim.
 
 ---
 
+## v0.6.3 Highlights
+
+| Feature | Description |
+| --- | --- |
+| BP-OSD `decode_timed` | Wall-clock deadline for BP iterations; falls back to hard-decision on timeout |
+| AVX2 runtime dispatch | CPU batch decoder auto-detects AVX2 support and uses SIMD transpose for 1.1M shots/s |
+| Blossom intra-decode parallelism | Rayon-parallelized Blossom matching for multi-shot batches |
+| DecoderPool Windows fix | Auto-Rayon fallback on Windows when multi-process pool is unavailable |
+| `DecoderPool` | Multi-process batch decoding with automatic worker management |
+| `get_decoder` / `clear_decoder_cache` | Cached decoder factory — zero construction cost after first call |
+| `decode_mmap` | Out-of-core decoding via memory-mapped NumPy arrays |
+| `DecodeResult` / `decode_with_diagnostics` | Structured decode results with per-shot diagnostic metadata |
+| `Workbench` | High-level orchestration for multi-decoder comparison and benchmarking |
+
+---
+
 ## Licensing
 
 QECTOR Decoder v3 is source-available.
@@ -163,11 +189,11 @@ Personal, academic, educational and non-commercial research use is allowed under
 
 Commercial licensing:
 
-https://www.qector.store
+[https://www.qector.store](https://www.qector.store)
 
 Contact:
 
-admin@qector.store
+<admin@qector.store>
 
 ---
 
@@ -178,7 +204,7 @@ admin@qector.store
   author  = {Guillaume Lessard},
   title   = {{QECTOR Decoder v3}: Rust/Python Quantum Error Correction Decoding Platform},
   year    = {2026},
-  version = {0.6.2},
+  version = {0.6.3},
   url     = {https://www.qector.store},
   note    = {Source-available. Commercial license required for commercial use.}
 }

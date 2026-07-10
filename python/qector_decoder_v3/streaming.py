@@ -138,9 +138,9 @@ def _coerce_decoder(choice: Any, check_to_qubits: list[list[int]], n_qubits: int
     if hasattr(choice, "decode"):
         return choice
     if isinstance(choice, str):
-        from . import __dict__ as _pkg
+        import qector_decoder_v3 as _pkg_mod
 
-        cls = _pkg.get(choice)
+        cls = getattr(_pkg_mod, choice, None)
         if cls is None:
             return None
         return cls(check_to_qubits, n_qubits)

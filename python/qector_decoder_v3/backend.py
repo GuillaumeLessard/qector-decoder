@@ -27,7 +27,7 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass, field
 import os
-from typing import List, Optional, Union
+from typing import List, Optional, Union, cast
 
 import numpy as np
 
@@ -135,6 +135,28 @@ class AutoDecoder:
             avail.append(Backend.OPENCL)
         return avail
 
+    @staticmethod
+    def auto_select(checks, n_qubits, batch_size=1):
+        """Smart backend selection based on code properties and batch size.
+
+        Args:
+            checks: ``check_to_qubits`` list.
+            n_qubits: Number of data qubits.
+            batch_size: Number of syndromes to decode at once.
+
+        Returns:
+            String backend name: ``"lookup_table"``, ``"cpu_batch"``,
+            ``"union_find"``, or ``"blossom"``.
+        """
+        n_det = len(checks)
+        if n_det <= 16 and batch_size == 1:
+            return "lookup_table"
+        if batch_size >= 64:
+            return "cpu_batch"
+        if n_det <= 8:
+            return "union_find"
+        return "blossom"
+
     # -- lazy builders -----------------------------------------------------
     def _get_cpu_single(self) -> FastUnionFindDecoder:
         if self._cpu_single is None:
@@ -192,7 +214,7 @@ class AutoDecoder:
         self._diag.calls += 1
         self._diag.last_backend = Backend.CPU_SINGLE
         self._diag.last_reason = "single syndrome"
-        return self._get_cpu_single().decode(s)
+        return cast(np.ndarray, self._get_cpu_single().decode(s))
 
     def batch_decode(self, syndromes) -> np.ndarray:
         """Decode a 2-D batch, routing to the best available backend."""

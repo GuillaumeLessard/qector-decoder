@@ -23,7 +23,7 @@ Example
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Union
+from typing import TYPE_CHECKING, List, Tuple, Union
 
 import numpy as np
 
@@ -76,9 +76,12 @@ class PredecodedDecoder:
                 key = (min(chk), max(chk))
                 self._pair_edge.setdefault(key, q)
 
-        _valid_backends = ("blossom", "union_find", "sparse_blossom")
+        _valid_backends = ("blossom", "union_find", "unionfind", "sparse_blossom")
+        _backend_map = {"unionfind": "union_find"}
+        if backend in _backend_map:
+            backend = _backend_map[backend]
         if backend not in _valid_backends:
-            raise ValueError(f"backend must be one of {list(_valid_backends)}")
+            raise ValueError(f"backend must be one of ['blossom', 'union_find', 'sparse_blossom']")
         self.backend = backend
         residual: Union[BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder]
         if backend == "blossom":
@@ -90,7 +93,7 @@ class PredecodedDecoder:
         self._residual: Union[BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder] = residual
         self.last_predecoded = 0  # number of defects resolved by the predecoder
 
-    def _predecode(self, syndrome: np.ndarray):
+    def _predecode(self, syndrome: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """Greedily commit adjacent defect-pair edges. Returns (committed, residual_syndrome)."""
         s = syndrome.copy()
         committed = np.zeros(self.n_qubits, dtype=np.uint8)

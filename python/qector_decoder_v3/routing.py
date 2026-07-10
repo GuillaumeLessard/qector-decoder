@@ -54,7 +54,7 @@ Examples
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, replace
-from typing import Any, Mapping, Optional, Sequence, Union
+from typing import Any, Mapping, Optional, Sequence, Union, cast
 
 import numpy as np
 
@@ -746,7 +746,7 @@ class AutoRouter:
             return np.asarray(dec.decode(s)).astype(np.uint8).reshape(-1)
         # Batch-only decoder (e.g. BatchDecoder / CUDABatchDecoder): wrap as 1xN.
         out = AutoRouter._batch_call(dec, s.reshape(1, -1))
-        return np.asarray(out)[0].astype(np.uint8).reshape(-1)
+        return cast(np.ndarray, np.asarray(out)[0].astype(np.uint8).reshape(-1))
 
     @staticmethod
     def _decode_many(dec: Any, syn: np.ndarray) -> np.ndarray:

@@ -187,9 +187,72 @@ class BeliefMatching:
     def from_stim_circuit(cls, circuit, max_iter: int = 20) -> "BeliefMatching":
         return cls.from_detector_error_model(circuit.detector_error_model(decompose_errors=True), max_iter=max_iter)
 
+    @classmethod
+    def from_numpy_h(cls, H, error_rate: float = 0.05, max_iter: int = 20) -> "BeliefMatching":
+        """Construct from a raw NumPy parity-check matrix ``H`` (n_checks x n_qubits).
+
+        Builds the internal ``_Matrices`` from a dense parity-check matrix.
+        Each column of H is treated as a hyperedge. Edge graph is derived
+        from weight-2 columns. Priors are set to ``error_rate`` uniformly.
+
+        Args:
+            H: NumPy array of shape ``(n_checks, n_qubits)``, dtype uint8.
+            error_rate: Physical error rate for prior probabilities.
+            max_iter: Max BP iterations.
+
+        Returns:
+            BeliefMatching instance.
+        """
+        H = np.asarray(H, dtype=np.uint8)
+        if H.ndim != 2:
+            raise ValueError(f"H must be 2D, got {H.shape}")
+        nD, nQ = H.shape
+
+        hyper_ids = {}
+        edge_ids = {}
+        hyper_to_edges = {}
+        hyper_obs_dict = {}
+        edge_obs_dict = {}
+        priors = {}
+
+        for q in range(nQ):
+            dets = tuple(sorted(np.nonzero(H[:, q])[0].tolist()))
+            if not dets:
+                continue
+            if dets not in hyper_ids:
+                hyper_ids[dets] = len(hyper_ids)
+                priors[hyper_ids[dets]] = error_rate
+            hid = hyper_ids[dets]
+            if len(dets) <= 2:
+                if dets not in edge_ids:
+                    edge_ids[dets] = len(edge_ids)
+                eid = edge_ids[dets]
+                hyper_to_edges.setdefault(hid, set()).add(eid)
+
+        nH = len(hyper_ids)
+        nE = len(edge_ids)
+        hyper_check = np.zeros((nD, nH), dtype=np.uint8)
+        for dets, hid in hyper_ids.items():
+            for d in dets:
+                hyper_check[d, hid] ^= 1
+        hyper_obs_m = np.zeros((0, nH), dtype=np.uint8)
+        edge_check = np.zeros((nD, nE), dtype=np.uint8)
+        for dets, eid in edge_ids.items():
+            for d in dets:
+                edge_check[d, eid] ^= 1
+        edge_obs_m = np.zeros((0, nE), dtype=np.uint8)
+        hyper_to_edge = np.zeros((nE, nH), dtype=np.uint8)
+        for hid, eids in hyper_to_edges.items():
+            for eid in eids:
+                hyper_to_edge[eid, hid] = 1
+        prior_arr = np.full(nH, error_rate, dtype=np.float64)
+
+        matrices = _Matrices(hyper_check, hyper_obs_m, prior_arr, hyper_to_edge, edge_check, edge_obs_m, nD, 0)
+        return cls(matrices, max_iter=max_iter)
+
     # -- decoding ----------------------------------------------------------
     def decode(self, syndrome) -> np.ndarray:
-        s = np.asarray(syndrome, dtype=np.uint8).reshape(-1)
+        s: np.ndarray = np.asarray(syndrome, dtype=np.uint8).reshape(-1)
         if s.shape[0] < self.n_checks:
             s = np.concatenate([s, np.zeros(self.n_checks - s.shape[0], np.uint8)])
 
