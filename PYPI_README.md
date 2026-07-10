@@ -144,7 +144,7 @@ Important boundaries:
 - GPU availability and performance depend on wheel build features, drivers, hardware, and runtime checks.
 - OpenCL support must be confirmed on the target machine or built under the appropriate licensed/custom configuration.
 - REST/API surfaces are for local experiments or controlled review unless separately hardened.
-- **v0.6.3**: CPU batch decoder now reaches 1.1M shots/s via AVX2 SIMD transpose. BP-OSD adds `decode_timed` with convergence cap. Blossom intra-decode Rayon parallelism. DecoderPool auto-Rayon on Windows.
+- **v0.6.4**: CPU batch decoder now reaches 1.1M shots/s via AVX2 SIMD transpose. BP-OSD adds `decode_timed` with convergence cap. Blossom intra-decode Rayon parallelism. DecoderPool auto-Rayon on Windows.
 
 Full methodology, reproducibility notes, and benchmark artifacts are in the GitHub repository:
 
@@ -165,7 +165,7 @@ Do this before making any hardware-specific performance claim.
 
 ---
 
-## v0.6.3 Highlights
+## v0.6.4 Highlights
 
 | Feature | Description |
 | --- | --- |

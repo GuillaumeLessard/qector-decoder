@@ -1,4 +1,4 @@
-# Installation Guide - QECTOR Decoder v0.6.3
+# Installation Guide - QECTOR Decoder v0.6.4
 
 The current repository does **not** include `install.py`. Use the source build path below.
 

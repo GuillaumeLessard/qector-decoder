@@ -188,7 +188,7 @@ See the public API regression coverage in [python/tests](python/tests) before bu
 
 ---
 
-## New in v0.6.3
+## New in v0.6.4
 
 | Feature | Description |
 | --- | --- |
@@ -214,9 +214,9 @@ If you need the full desktop GUI, hosted automation stack, or additional documen
 
 ## Validated evidence snapshot
 
-All public claims should cite an artifact, commit, command, machine, and version. The current package release is **v0.6.3**; checked-in evidence should be regenerated before making new performance claims.
+All public claims should cite an artifact, commit, command, machine, and version. The current package release is **v0.6.4**; checked-in evidence should be regenerated before making new performance claims.
 
-> **v0.6.3 additions**: AVX2 SIMD transpose (CPU batch 1.1M shots/s), BP-OSD convergence cap (`decode_timed`), Blossom intra-decode Rayon parallelism, DecoderPool auto-Rayon on Windows.
+> **v0.6.4 additions**: AVX2 SIMD transpose (CPU batch 1.1M shots/s), BP-OSD convergence cap (`decode_timed`), Blossom intra-decode Rayon parallelism, DecoderPool auto-Rayon on Windows.
 
 ### MWPM parity against PyMatching
 

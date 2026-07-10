@@ -96,7 +96,7 @@ import numpy as _np
 # wheel). We never overwrite a real compiled ``__version__`` with it — doing so
 # would falsely claim a version the loaded binary is not — so after a version bump
 # ``__version__`` keeps reporting the *built* value until the Rust wheel is rebuilt.
-__fallback_version__ = "0.6.3"
+__fallback_version__ = "0.6.4"
 
 try:
     __version__ = _native_module.__version__

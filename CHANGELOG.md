@@ -7,6 +7,11 @@ environment so report figures trace back to a specific build.
 
 ## [Unreleased]
 
+## [0.6.4] - 2026-07-10
+
+### Fixed
+- **CI secrets updated**: Rust source injected at build time now matches the v0.6.4 Python layer. The v0.6.3 wheel was built with stale Rust source (missing `LERBenchmark` and other v0.6.3 Rust changes) — it has been superseded by v0.6.4.
+
 ## [0.6.3] - 2026-07-10
 
 ### Added
