@@ -1,39 +1,139 @@
-# Repository Guidelines
+# AGENTS.md — QECTOR Decoder v3
 
-## Project Structure & Module Organization
+Project-specific instructions for working in this repository.
 
-This repository packages QECTOR Decoder v3 as a Rust/Python project. Python source lives in `python/qector_decoder_v3/`, with public modules such as `backend.py`, `dem.py`, `routing.py`, and `workbench.py`. Python tests are in `python/tests/` and follow the `test_*.py` pattern configured in `pyproject.toml`. Rust packaging and extension metadata are in `Cargo.toml`, `Cargo.lock`, `build.rs`, and `src/lib.rs`; the public `src/` tree is a stub for licensed source builds. Examples are under `examples/`, benchmark and validation utilities under `scripts/`, protobuf definitions under `proto/`, and design/reproducibility notes under `docs/`.
+## Project Overview
 
-## Build, Test, and Development Commands
+QECTOR Decoder v3 is a high-performance, source-available Rust/Python platform for quantum error correction (QEC) decoding.
 
-Create a local environment before development:
+- **Core**: Rust (PyO3 cdylib) implementing Union-Find, Blossom (exact MWPM), Sparse Blossom, BP-OSD, sliding-window, streaming, batch decoders, lookup tables, neural/GNN predecoders, hybrid decoders.
+- **Python package**: `qector_decoder_v3` (published on PyPI).
+- **Bindings**: maturin + PyO3. Zero-copy NumPy arrays, GIL-free hot paths where possible.
+- **Hardware**: CPU (Rayon), optional CUDA batch, optional OpenCL batch. Runtime detection + graceful fallback.
+- **Ecosystem**: PyMatching-compatible, Stim/Sinter integration, belief-matching, Qiskit plugin, REST/gRPC + full-featured MCP server (25 tools in the QectorWorkbench companion).
+- **Emphasis**: Syndrome faithfulness, CPU/GPU bit-identical results, extensive regression + artifact-backed benchmarks, reproducibility.
+
+**Current version**: 0.6.4 (Cargo + Python packaging).
+
+**Workspace layout** (this checkout):
+
+- `src/` — Rust core (all decoder implementations, batch engines, kernels, utils).
+- `python/qector_decoder_v3/` — Python package sources (`__init__.py`, `backend.py`, `belief_matching.py`, `bposd.py`, `stim_compat.py`, `sinter_compat.py`, `workbench.py`, `dem.py`, etc.).
+- `python/tests/` — 100+ pytest tests covering correctness, faithfulness, performance, GPU parity, edge cases, benchmarks.
+- `proto/` — gRPC `.proto` (only for `grpc` / `full` features).
+- `lib/` — Windows import libs (OpenCL etc.).
+- `build.rs` — Handles optional protoc for gRPC + link paths.
+- `Cargo.toml` / `pyproject.toml` — maturin build.
+
+Note: This appears to be a full-source "build" checkout (src/ contains real implementations + .cu kernels).
+
+## Build & Install (Windows PowerShell)
+
+Use a virtual environment.
 
 ```powershell
-py -3.11 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install --upgrade pip maturin
-.\.venv\Scripts\python.exe -m pip install -e ".[dev,stim,bench]"
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip maturin
+python -m pip install -e ".[stim,bench]"   # or [all], [cuda], [opencl] etc.
 ```
 
-Build the Python extension in-place with:
+- For iterative Rust+Python dev: `maturin develop --release` (or without --release for faster debug).
+- Features are controlled in Cargo (default includes opencl + cuda in this workspace).
+- gRPC/MCP: `--features full` or `maturin develop --features full`.
+- CUDA kernels are compiled at runtime via NVRTC (no special build step for kernels).
+- After changes to Rust, re-run `maturin develop` (or restart Python interpreter).
+
+Verify:
 
 ```powershell
-.\.venv\Scripts\python.exe -m maturin develop --release --no-default-features
+python -c "from qector_decoder_v3 import UnionFindDecoder, BlossomDecoder, CUDABatchDecoder; print('CUDA available:', CUDABatchDecoder.is_available() if hasattr(CUDABatchDecoder,'is_available') else 'check'); import qector_decoder_v3; print(qector_decoder_v3.__version__)"
 ```
 
-Run the full Python test suite with `.\.venv\Scripts\python.exe -m pytest python/tests -q --tb=short`. Run targeted tests by passing a file, for example `python/tests/test_backend.py`. Use `cargo test --release --lib` for Rust library tests when licensed Rust sources are available.
+## Testing
 
-## Coding Style & Naming Conventions
+Run the full Python test suite (primary validation lives here):
 
-Python targets 3.9+ and uses Ruff with a 120-character line length. Keep modules and functions in `snake_case`, classes in `PascalCase`, and tests named `test_<behavior>.py` with `test_<expected_result>` functions. Preserve lazy optional imports for GPU and ecosystem dependencies. Rust uses edition 2021; prefer `cargo fmt` style and feature-gated code for optional CUDA, OpenCL, and gRPC paths.
+```powershell
+pytest python/tests/ -q
+```
 
-## Testing Guidelines
+Useful filters:
 
-Use `pytest` and `hypothesis` where property coverage is useful. Add tests beside related coverage in `python/tests/`, especially for decoder correctness, API compatibility, fallback behavior, and reproducibility commands. GPU tests must tolerate unavailable hardware unless explicitly marked or guarded by availability checks.
+- `pytest python/tests/ -k "unionfind or blossom or faithfulness"`
+- `pytest python/tests/test_gpu* -q` (GPU paths)
+- `pytest python/tests/test_bposd* python/tests/test_belief*`
+- `pytest python/tests/test_clean_venv_install.py` (install hygiene)
+- `pytest python/tests/test_public_api_imports.py test_type_hints.py`
 
-## Commit & Pull Request Guidelines
+Many tests are **correctness audits** (syndrome faithful, bit-identical across backends, regression against known good results). Do not weaken or skip them lightly.
 
-Git history is unavailable in this environment, so use concise imperative commit subjects, for example `Fix batch decode dtype handling`. Pull requests should include a scoped description, commands run, environment details for benchmark claims, linked issues when applicable, and screenshots or artifacts for Workbench or report-output changes. Follow `CONTRIBUTING.md` for licensing, benchmark evidence, and security disclosure rules.
+Rust unit tests (if present):
 
-## Security & Configuration Tips
+```powershell
+cargo test
+```
 
-Do not publish exploit details in issues; follow `SECURITY.md`. Treat performance claims as hardware- and build-specific. Include raw outputs, hashes, and environment blocks for benchmark submissions as described in `docs/REPRODUCIBILITY_CHECKLIST.md`.
+Before claiming performance or correctness improvements, re-run relevant benchmark scripts (see README) and the due-diligence style tests.
+
+## Coding Conventions & Style
+
+### Rust
+
+- Keep hot paths allocation-free or with reusable scratch (see `uf_core`, batch workspaces).
+- Use `rayon` for data-parallel batch paths.
+- Feature-gate GPU modules (`#[cfg(feature = "cuda")]`, `#[cfg(feature = "opencl")]`).
+- Strong error messages for invalid inputs (see decoder constructors).
+- Preserve exact numerical behavior across CPU/GPU; bit-identical results are a hard requirement in many tests.
+- Update `build.rs` only when adding new rerun-if-changed or build-time dependencies.
+
+### Python
+
+- NumPy-centric. Use `numpy.typing`, keep dtypes explicit (uint8 for syndromes usually).
+- Public API re-exports from the compiled extension + pure-Python shims/fallbacks.
+- Backend selection logic lives in `backend.py` (AutoDecoder, calibration).
+- Compat layers (`stim_compat`, `sinter_compat`, `pymatching_compat`) must stay faithful to the wrapped behavior.
+- Type hints + mypy/ruff clean (dev deps include them).
+- Avoid holding GIL during long Rust calls where the extension releases it.
+
+### General
+
+- Prefer adding tests over comments for invariants.
+- Benchmark numbers and claims must be reproducible via checked-in scripts + artifacts.
+- GPU code must degrade gracefully; never assume a device is present.
+- Changes touching DEM handling, observables, or sliding window must touch the corresponding faithfulness tests.
+
+## Common Tasks
+
+- Add a new decoder variant: implement in Rust (new `Py*` class + registration in `lib.rs`), expose in `__init__.py`, add Python wrapper if needed, add tests under `python/tests/`.
+- Fix a bug reported by a specific test: run that test in isolation first, then broader faithfulness suite.
+- Change Python-only logic (e.g. `belief_matching.py`): no rebuild needed.
+- Touch CUDA: ensure `cuda_is_available` and fallback paths still work; run GPU parity tests.
+- Update public API: also update `test_public_api_imports.py`, docs if present, and type stubs if any.
+- Release prep: version bumps in `Cargo.toml` + `pyproject.toml`, update `__fallback_version__` in `__init__.py`.
+
+## Things to Watch Out For
+
+- The compiled extension (`qector_decoder_v3*.pyd` or .so) must be rebuilt after any Rust change. Stale .pyd is a common source of confusion.
+- Feature flags affect what symbols are present (CUDA/OpenCL/gRPC may be missing).
+- Windows: OpenCL uses the pre-bundled .lib in `lib/`.
+- Hyperedges: some fast decoders reject them (see validation code).
+- Memory: batch decoders and large distance codes can be memory-heavy; tests include growth/leak checks.
+- Never claim "faster than X" or "better LER" without running the competitive scripts on this machine and recording artifacts.
+
+## When Running Commands
+
+- Prefer `python -m pytest ...` over bare `pytest` for consistency.
+- Use the activated venv.
+- For long-running tests/benchmarks use the monitor tool or background where appropriate.
+- When editing across Rust/Python boundary, verify roundtrips (encode/decode result objects, JSON, etc.).
+
+## Project Rules Priority
+
+These instructions apply in addition to any higher-level or user `AGENTS.md` / rules. Deeper directory rules (if added) take precedence for files within them.
+
+Follow the spirit of the existing extensive test suite: prioritize correctness, reproducibility, and faithful behavior over micro-optimizations.
+
+---
+
+Generated by /init on first session in this workspace. Update this file as conventions evolve.

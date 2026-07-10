@@ -2,8 +2,8 @@
 Compatibilité Stim — Conversion et wrappers pour l'écosystème Stim.
 
 .. deprecated::
-    This module is deprecated since v0.6.3. Use ``qector_decoder_v3.dem`` instead.
-    See https://qector.store/docs/migration-v0.6.3 for the migration guide.
+    This module is deprecated since v0.6.4. Use ``qector_decoder_v3.dem`` instead.
+    See https://qector.store/docs/migration-v0.6.4 for the migration guide.
 
 Stim (https://github.com/quantumlib/stim) est un simulateur de circuits QEC
 trépidant. Ce module permet d'utiliser QECTOR comme back-end de décodage
@@ -13,17 +13,17 @@ Usage (deprecated) ::
 
     import stim
     from qector_decoder_v3.stim_compat import (
-        from_stim_detector_error_model,  # DEPRECATED
-        to_stim_decoder,  # DEPRECATED
-        stim_decoder_from_dem,  # DEPRECATED
+        from_stim_detector_error_model,   # DEPRECATED
+        to_stim_decoder,                   # DEPRECATED
+        stim_decoder_from_dem,             # DEPRECATED
     )
 
 New API (preferred)::
 
     import stim
     from qector_decoder_v3 import dem
-
-    circuit = stim.Circuit.generated("surface_code:rotated_memory_x", distance=5, before_round_data_depolarization=0.01)
+    circuit = stim.Circuit.generated("surface_code:rotated_memory_x", distance=5,
+                                      before_round_data_depolarization=0.01)
     model = dem.from_stim(circuit.detector_error_model(decompose_errors=True))
     decoder = model.make_decoder("blossom")
     correction = decoder.decode(syndrome)
@@ -39,9 +39,9 @@ import numpy as np
 from . import UnionFindDecoder, BatchDecoder
 
 _DEPRECATION_MSG = (
-    "stim_compat is deprecated since v0.6.3. "
+    "stim_compat is deprecated since v0.6.4. "
     "Use qector_decoder_v3.dem.from_stim() instead. "
-    "See the migration guide at https://qector.store/docs/migration-v0.6.3"
+    "See the migration guide at https://qector.store/docs/migration-v0.6.4"
 )
 
 # Import optionnel de stim — le module reste importable sans Stim

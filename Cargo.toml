@@ -33,6 +33,10 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 fastrand = "2.4"
 chrono = "0.4"
+safetensors = "0.5"
+memmap2 = "0.9"
+thiserror = "2"
+rand = "0.8"
 
 # OpenCL (GPU batch decoder)
 ocl = { version = "0.19", optional = true }
@@ -51,7 +55,7 @@ rand_distr = "0.4"
 
 [build-dependencies]
 tonic-prost-build = "0.14"
-prost-build = { version = "0.14" }
+prost-build = "0.14"
 # Vendored `protoc` so the `grpc`/`full` builds compile the gRPC proto with no
 # system install. Only invoked by build.rs when the `grpc` feature is enabled.
 protoc-bin-vendored = "3"
