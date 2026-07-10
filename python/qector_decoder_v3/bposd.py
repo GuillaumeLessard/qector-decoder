@@ -22,7 +22,7 @@ Example
 
 from __future__ import annotations
 
-from typing import Any, List, Tuple, cast
+from typing import Any, List, Optional, Tuple, cast
 
 import numpy as np
 
@@ -82,6 +82,7 @@ class BpOsdDecoder:
 
         if self.max_latency_ms is not None:
             import time as _time
+
             t_start = _time.perf_counter()
             max_seconds = self.max_latency_ms / 1000.0
 
@@ -110,6 +111,7 @@ class BpOsdDecoder:
 
         if self.max_latency_ms is not None and (_time.perf_counter() - t_start) > max_seconds:
             from . import UnionFindDecoder
+
             checks = [sorted(int(c) for c in np.nonzero(self.H[r])[0]) for r in range(self.n_checks)]
             uf = UnionFindDecoder(checks, self.n_qubits)
             return np.asarray(uf.decode(s), dtype=np.uint8).reshape(-1)
@@ -226,9 +228,7 @@ class BpOsdDecoder:
 # ---------------------------------------------------------------------------
 # GF(2) ordered-statistics solve
 # ---------------------------------------------------------------------------
-def _gf2_osd_solve(
-    H: np.ndarray, s: np.ndarray, order: np.ndarray, hard: np.ndarray
-) -> Tuple[np.ndarray, np.ndarray]:
+def _gf2_osd_solve(H: np.ndarray, s: np.ndarray, order: np.ndarray, hard: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """OSD-0 solve. ``order`` lists columns least-reliable first; the first
     rank(H) independent of them form the basis, the rest (free) take their BP hard
     decision, and the basis is solved so ``H x == s (mod 2)``.

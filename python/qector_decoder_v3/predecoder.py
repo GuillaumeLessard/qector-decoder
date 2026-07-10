@@ -81,7 +81,7 @@ class PredecodedDecoder:
         if backend in _backend_map:
             backend = _backend_map[backend]
         if backend not in _valid_backends:
-            raise ValueError(f"backend must be one of ['blossom', 'union_find', 'sparse_blossom']")
+            raise ValueError("backend must be one of ['blossom', 'union_find', 'sparse_blossom']")
         self.backend = backend
         residual: Union[BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder]
         if backend == "blossom":

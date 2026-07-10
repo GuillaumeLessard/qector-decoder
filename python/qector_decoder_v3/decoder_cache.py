@@ -19,7 +19,7 @@ import functools as _functools
 import hashlib as _hashlib
 import json as _json
 import os as _os
-from typing import Any, Dict, Optional, Tuple
+from typing import Optional, Tuple
 
 import numpy as _np
 
@@ -29,12 +29,16 @@ __all__ = ["get_decoder", "clear_decoder_cache", "get_decoder_pool"]
 def _normalize_decoder_name(name: str) -> str:
     """Normalize decoder name aliases to canonical form."""
     mapping = {
-        'uf': 'union_find', 'unionfind': 'union_find',
-        'fast_uf': 'fast_union_find', 'fastuf': 'fast_union_find', 'fastunionfind': 'fast_union_find',
-        'sparse': 'sparse_blossom',
-        'batch': 'cpu_batch', 'cpu': 'cpu_batch',
+        "uf": "union_find",
+        "unionfind": "union_find",
+        "fast_uf": "fast_union_find",
+        "fastuf": "fast_union_find",
+        "fastunionfind": "fast_union_find",
+        "sparse": "sparse_blossom",
+        "batch": "cpu_batch",
+        "cpu": "cpu_batch",
     }
-    return mapping.get(name.lower().replace('-', '_').replace(' ', '_'), name)
+    return mapping.get(name.lower().replace("-", "_").replace(" ", "_"), name)
 
 
 @_functools.lru_cache(maxsize=256)
@@ -42,6 +46,7 @@ def _build_decoder(checks_tuple: Tuple[Tuple[int, ...]], n_qubits: int, decoder_
     """Internal LRU-cached decoder factory."""
     checks = [list(c) for c in checks_tuple]
     from . import BlossomDecoder, CPUBatchDecoder, FastUnionFindDecoder, SparseBlossomDecoder, UnionFindDecoder
+
     builders = {
         "union_find": lambda: UnionFindDecoder(checks, n_qubits),
         "fast_union_find": lambda: FastUnionFindDecoder(checks, n_qubits),
@@ -91,6 +96,7 @@ def get_decoder_pool(
         A :class:`DecoderPool` instance.
     """
     from .decoder_pool import DecoderPool
+
     return DecoderPool(
         [list(c) for c in checks_tuple],
         n_qubits=n_qubits,

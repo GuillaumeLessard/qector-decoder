@@ -40,6 +40,7 @@ py_generate_repetition_code_checks = _native_module.py_generate_repetition_code_
 try:
     run_mcp_server = _native_module.run_mcp_server
 except AttributeError:
+
     def run_mcp_server(*args, **kwargs):
         raise RuntimeError("run_mcp_server requires the 'grpc' feature (maturin develop --features full)")
 
@@ -863,6 +864,7 @@ class GNNPredecoder:
         # Load PyTorch implementation if torch is installed.
         try:
             from .torch_predecoder import TorchGNNPredecoder
+
             self._torch_model = TorchGNNPredecoder(nfd, efd, hidden_size, n_layers)
             self._torch_model.double()  # Cast to float64 to match Rust f64.
             self.use_torch = True
@@ -873,6 +875,7 @@ class GNNPredecoder:
         if self.use_torch:
             import tempfile
             import os
+
             with tempfile.NamedTemporaryFile(suffix=".safetensors", delete=False) as tmp:
                 tmp_path = tmp.name
             try:
@@ -886,6 +889,7 @@ class GNNPredecoder:
         if self.use_torch:
             import tempfile
             import os
+
             with tempfile.NamedTemporaryFile(suffix=".safetensors", delete=False) as tmp:
                 tmp_path = tmp.name
             try:
@@ -936,6 +940,7 @@ class GNNPredecoder:
         """Predict adjusted edge weights for a DetectorGraph."""
         if self.use_torch:
             import torch
+
             self._torch_model.eval()
             with torch.no_grad():
                 node_feats = torch.tensor(graph.node_features, dtype=torch.float64)
@@ -954,9 +959,10 @@ class GNNPredecoder:
                 raise ImportError("PyTorch is required to train GNNPredecoder")
             import torch
             import torch.optim as optim
+
             optimizer = optim.SGD(self._torch_model.parameters(), lr=self.learning_rate, weight_decay=self.l2_lambda)
             self._torch_model.train()
-            
+
             for epoch in range(n_epochs):
                 for graph, target in zip(graphs, targets):
                     node_feats = torch.tensor(graph.node_features, dtype=torch.float64)
@@ -964,7 +970,7 @@ class GNNPredecoder:
                     edge_src = torch.tensor(graph.edge_src, dtype=torch.long)
                     edge_dst = torch.tensor(graph.edge_dst, dtype=torch.long)
                     target_t = torch.tensor(target, dtype=torch.float64)
-                    
+
                     optimizer.zero_grad()
                     preds = self._torch_model(node_feats, edge_feats, edge_src, edge_dst)
                     loss = F.mse_loss(preds, target_t)
@@ -979,33 +985,33 @@ class GNNPredecoder:
         """Predict edge weights and node error probabilities."""
         if self.use_torch:
             import torch
+
             self._torch_model.eval()
             with torch.no_grad():
                 node_feats = torch.tensor(graph.node_features, dtype=torch.float64)
                 edge_feats = torch.tensor(graph.edge_features, dtype=torch.float64)
                 edge_src = torch.tensor(graph.edge_src, dtype=torch.long)
                 edge_dst = torch.tensor(graph.edge_dst, dtype=torch.long)
-                
+
                 weights = self._torch_model(node_feats, edge_feats, edge_src, edge_dst)
-                
+
                 N = node_feats.size(0)
                 node_probs = torch.zeros(N, dtype=torch.float64)
                 node_counts = torch.zeros(N, dtype=torch.float64)
-                
+
                 node_probs.scatter_add_(0, edge_src, weights)
                 node_probs.scatter_add_(0, edge_dst, weights)
-                
+
                 node_counts.scatter_add_(0, edge_src, torch.ones_like(edge_src, dtype=torch.float64))
                 node_counts.scatter_add_(0, edge_dst, torch.ones_like(edge_dst, dtype=torch.float64))
-                
+
                 mask = node_counts > 0
                 node_probs[mask] /= node_counts[mask]
                 node_probs = 1.0 / (1.0 + (-node_probs + 1.0).exp())
-                
+
                 return weights.cpu().numpy().tolist(), node_probs.cpu().numpy().tolist()
         else:
             return self._inner.predict_with_node_probs(graph._inner if isinstance(graph, DetectorGraph) else graph)
-
 
 
 class DetectorGraph:

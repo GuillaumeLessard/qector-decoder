@@ -29,7 +29,7 @@ from __future__ import annotations
 import multiprocessing as _mp
 import os
 import platform as _platform
-from typing import Any, List, Optional
+from typing import Optional
 
 import numpy as np
 
@@ -45,6 +45,7 @@ def _worker_init(checks_tuple, n_qubits, decoder_type):
     global _WORKER_DECODER
     checks = [list(c) for c in checks_tuple]
     from . import BlossomDecoder, CPUBatchDecoder, FastUnionFindDecoder, SparseBlossomDecoder, UnionFindDecoder
+
     builders = {
         "union_find": lambda: UnionFindDecoder(checks, n_qubits),
         "fast_union_find": lambda: FastUnionFindDecoder(checks, n_qubits),
@@ -74,10 +75,16 @@ def _worker_decode(chunk_and_idx):
 
 
 _DECODER_BUILDERS = {
-    "union_find": lambda c2q, nq: __import__("qector_decoder_v3", fromlist=["UnionFindDecoder"]).UnionFindDecoder(c2q, nq),
-    "fast_union_find": lambda c2q, nq: __import__("qector_decoder_v3", fromlist=["FastUnionFindDecoder"]).FastUnionFindDecoder(c2q, nq),
+    "union_find": lambda c2q, nq: __import__("qector_decoder_v3", fromlist=["UnionFindDecoder"]).UnionFindDecoder(
+        c2q, nq
+    ),
+    "fast_union_find": lambda c2q, nq: __import__(
+        "qector_decoder_v3", fromlist=["FastUnionFindDecoder"]
+    ).FastUnionFindDecoder(c2q, nq),
     "blossom": lambda c2q, nq: __import__("qector_decoder_v3", fromlist=["BlossomDecoder"]).BlossomDecoder(c2q, nq),
-    "sparse_blossom": lambda c2q, nq: __import__("qector_decoder_v3", fromlist=["SparseBlossomDecoder"]).SparseBlossomDecoder(c2q, nq),
+    "sparse_blossom": lambda c2q, nq: __import__(
+        "qector_decoder_v3", fromlist=["SparseBlossomDecoder"]
+    ).SparseBlossomDecoder(c2q, nq),
     "cpu_batch": lambda c2q, nq: __import__("qector_decoder_v3", fromlist=["CPUBatchDecoder"]).CPUBatchDecoder(c2q, nq),
 }
 
@@ -150,7 +157,7 @@ class DecoderPool:
 
         nw = min(self._n_workers, n)
         chunk_size = (n + nw - 1) // nw
-        chunks = [(arr[i:i + chunk_size], i // chunk_size) for i in range(0, n, chunk_size)]
+        chunks = [(arr[i : i + chunk_size], i // chunk_size) for i in range(0, n, chunk_size)]
 
         results = [None] * len(chunks)
         for idx, result in self._pool.imap_unordered(_worker_decode, chunks):

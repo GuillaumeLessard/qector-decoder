@@ -211,8 +211,6 @@ class BeliefMatching:
         hyper_ids = {}
         edge_ids = {}
         hyper_to_edges = {}
-        hyper_obs_dict = {}
-        edge_obs_dict = {}
         priors = {}
 
         for q in range(nQ):
