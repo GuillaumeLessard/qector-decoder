@@ -361,10 +361,10 @@ def test_predecoded_backward_compat():
 def test_predecoded_unionfind_name():
     code = codes.repetition_code(5)
     c2q, nq = code.check_to_qubits, code.n_qubits
-    # PredecodedDecoder accepts positional decoder name
+    # PredecodedDecoder accepts positional decoder name (canonical: "union_find")
     from qector_decoder_v3 import PredecodedDecoder as PDC
 
-    dec = PDC(c2q, nq, "unionfind")
+    dec = PDC(c2q, nq, "union_find")
     # Should decode without error
     H = code.parity_check_matrix()
     syndrome = np.zeros(len(c2q), dtype=np.uint8)
@@ -375,15 +375,31 @@ def test_predecoded_unionfind_name():
 # =====================================================================
 # 11. BELIEF MATCHING
 # =====================================================================
-def test_belief_matching_from_numpy_h():
-    H = np.array([[1, 1, 0], [0, 1, 1]], dtype=np.uint8)
-    bm = BeliefMatching.from_numpy_h(H)
+def test_belief_matching_from_stim_circuit():
+    import stim
+    circuit = stim.Circuit("""
+        R 0 1 2
+        CX 0 1
+        CX 1 2
+        M 0 1 2
+        DETECTOR rec[-3] rec[-2]
+        DETECTOR rec[-2] rec[-1]
+    """)
+    bm = BeliefMatching.from_stim_circuit(circuit)
     assert bm is not None
 
 
 def test_belief_matching_decode():
-    H = np.array([[1, 1, 0], [0, 1, 1]], dtype=np.uint8)
-    bm = BeliefMatching.from_numpy_h(H, [0.08, 0.08, 0.08])
+    import stim
+    circuit = stim.Circuit("""
+        R 0 1 2
+        CX 0 1
+        CX 1 2
+        M 0 1 2
+        DETECTOR rec[-3] rec[-2]
+        DETECTOR rec[-2] rec[-1]
+    """)
+    bm = BeliefMatching.from_stim_circuit(circuit)
     syndrome = np.array([1, 0], dtype=np.uint8)
     try:
         corr = bm.decode(syndrome)
@@ -399,7 +415,7 @@ def test_auto_decoder_select():
     code = codes.repetition_code(5)
     c2q, nq = code.check_to_qubits, code.n_qubits
     auto = AutoDecoder(c2q, nq)
-    selected = auto.auto_select(c2q, nq)
+    selected = auto.select(1024)  # select backend for batch_size=1024
     assert isinstance(selected, str) and len(selected) > 0
 
 
