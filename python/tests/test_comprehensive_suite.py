@@ -13,7 +13,9 @@ import time
 import numpy as np
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+# Insert local source path FIRST to override installed package
+src_path = os.path.join(os.path.dirname(__file__), "..", "qector_decoder_v3")
+sys.path.insert(0, src_path)
 
 from qector_decoder_v3 import (
     codes,

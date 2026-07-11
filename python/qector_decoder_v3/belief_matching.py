@@ -208,10 +208,17 @@ class BeliefMatching:
             raise ValueError(f"H must be 2D, got {H.shape}")
         nD, nQ = H.shape
 
-        hyper_ids = {}
-        edge_ids = {}
-        hyper_to_edges = {}
-        priors = {}
+        hyper_ids: dict[tuple[int, ...], int] = {}
+        edge_ids: dict[tuple[int, ...], int] = {}
+        hyper_to_edges: dict[int, set[int]] = {}
+        priors: dict[int, float] = {}
+        # Type hints for mypy
+        _hyper_ids: dict[tuple[int, ...], int] = hyper_ids
+        _edge_ids: dict[tuple[int, ...], int] = edge_ids
+        _hyper_to_edges: dict[int, set[int]] = hyper_to_edges
+        _priors: dict[int, float] = priors
+        # Avoid unused variable warnings
+        _ = _hyper_ids, _edge_ids, _hyper_to_edges, _priors
 
         for q in range(nQ):
             dets = tuple(sorted(np.nonzero(H[:, q])[0].tolist()))

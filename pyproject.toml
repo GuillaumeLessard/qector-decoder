@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "qector-decoder-v3"
-version = "0.6.4"
+version = "0.6.5"
 description = "Source-available Rust/Python QEC R&D platform: PyMatching-compatible validation, belief-matching, BP-OSD (LDPC/qLDPC), CPU/GPU batch decoding, and artifact-hashed benchmark evidence"
 readme = {file = "PYPI_README.md", content-type = "text/markdown"}
 requires-python = ">=3.9"

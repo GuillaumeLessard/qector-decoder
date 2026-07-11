@@ -7,6 +7,17 @@ environment so report figures trace back to a specific build.
 
 ## [Unreleased]
 
+## [0.6.5] - 2026-07-10
+
+### Fixed
+- **mypy clean**: Resolved all 8 type errors across `decode_mmap.py`, `decoder_pool.py`, and `belief_matching.py` — strict type checking now passes on the full Python layer.
+- **Test imports**: `test_comprehensive_suite.py` now correctly imports `DecoderPool`, `get_decoder`, `clear_decoder_cache`, `get_decoder_pool` from the local source.
+- **CI resilience**: Ensured v0.6.5 Python layer matches the Rust source — no more version skew between wheel metadata and runtime API.
+- **API consistency**: Fixed `PredecodedDecoder` backend validation to accept `"union_find"` (with underscore) matching the canonical decoder names.
+
+### Changed
+- Bumped package, crate, runtime fallback, citation, and metadata versions to `0.6.5` across `pyproject.toml`, `Cargo.toml`, `python/qector_decoder_v3/__init__.py`, `CITATION.cff`, `codemeta.json`, `README.md`, `PYPI_README.md`, docs, and examples.
+
 ## [0.6.4] - 2026-07-10
 
 ### Fixed

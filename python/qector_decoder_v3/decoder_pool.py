@@ -32,6 +32,7 @@ import platform as _platform
 from typing import Optional
 
 import numpy as np
+from numpy.typing import NDArray
 
 __all__ = ["DecoderPool"]
 
@@ -118,7 +119,7 @@ class DecoderPool:
         self._nq = int(n_qubits) if n_qubits is not None else None
         self._decoder_type = str(decoder_type)
         self._n_workers = n_workers or os.cpu_count() or 1
-        self._pool = None
+        self._pool: Optional[_mp.pool.Pool] = None
 
     def decode(self, syndromes) -> np.ndarray:
         """Decode a batch of syndromes.
@@ -155,11 +156,12 @@ class DecoderPool:
                 initargs=(checks_tuple, self._nq, self._decoder_type),
             )
 
+        assert self._pool is not None
         nw = min(self._n_workers, n)
         chunk_size = (n + nw - 1) // nw
         chunks = [(arr[i : i + chunk_size], i // chunk_size) for i in range(0, n, chunk_size)]
 
-        results = [None] * len(chunks)
+        results: list[NDArray[np.uint8]] = [None] * len(chunks)  # type: ignore[list-item]
         for idx, result in self._pool.imap_unordered(_worker_decode, chunks):
             results[idx] = result
         return np.concatenate(results, axis=0).astype(np.uint8)

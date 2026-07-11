@@ -36,7 +36,7 @@ def decode_mmap(
     decoder_type: str = "cpu_batch",
     batch_size: int = 65536,
     n_shots: Optional[int] = None,
-    dtype: _np.dtype = _np.uint8,
+    dtype: _np.dtype[_np.uint8] = _np.dtype(_np.uint8),
     verbose: bool = False,
 ):
     """Out-of-core batch decoding via memory-mapped arrays.
@@ -71,13 +71,23 @@ def decode_mmap(
     output = _np.memmap(output_path, dtype=_np.uint8, mode="w+", shape=(n_shots, n_qubits))
 
     from . import CPUBatchDecoder, UnionFindDecoder
+    from typing import Union
+
+    _Decoder = Union[CPUBatchDecoder, UnionFindDecoder]
 
     if decoder_type == "cpu_batch":
-        decoder = CPUBatchDecoder(c2q, n_qubits)
+        decoder: _Decoder = CPUBatchDecoder(c2q, n_qubits)
         batch_fn = decoder.batch_decode
     else:
         decoder = UnionFindDecoder(c2q, n_qubits)
-        batch_fn = lambda batch: _np.array([decoder.decode(batch[i]) for i in range(batch.shape[0])])
+
+        def _batch_decode_uf(batch: _np.ndarray) -> _np.ndarray:
+            out = _np.zeros((batch.shape[0], n_qubits), dtype=_np.uint8)
+            for i in range(batch.shape[0]):
+                out[i] = decoder.decode(batch[i])
+            return out
+
+        batch_fn = _batch_decode_uf
 
     n_chunks = (n_shots + batch_size - 1) // batch_size
     for chunk_idx in range(n_chunks):
