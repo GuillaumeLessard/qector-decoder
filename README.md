@@ -188,7 +188,7 @@ See the public API regression coverage in [python/tests](python/tests) before bu
 
 ---
 
-## New in v0.6.4
+## New in v0.6.5
 
 | Feature | Description |
 | --- | --- |
@@ -214,15 +214,15 @@ If you need the full desktop GUI, hosted automation stack, or additional documen
 
 ## Validated evidence snapshot
 
-All public claims should cite an artifact, commit, command, machine, and version. The current package release is **v0.6.4**; checked-in evidence should be regenerated before making new performance claims.
+All public claims should cite an artifact, commit, command, machine, and version. The current package release is **v0.6.5**; checked-in evidence should be regenerated before making new performance claims.
 
-> **v0.6.4 additions**: AVX2 SIMD transpose (CPU batch 1.1M shots/s), BP-OSD convergence cap (`decode_timed`), Blossom intra-decode Rayon parallelism, DecoderPool auto-Rayon on Windows.
+> **v0.6.5 additions**: mypy-clean Python layer, test suite API fixes, decoder name consistency (`union_find` canonical).
 
 ### MWPM parity against PyMatching
 
 Artifact: `benchmark_results/stim_ler_d13_d15.json`
 
-Environment: Windows 10/11 class x64 machine, Python 3.11+, QECTOR v0.6.4 + v3.3 Workbench, PyMatching 2.4+, Stim 1.16+, 20,000 shots per distance.
+Environment: Windows 10/11 class x64 machine, Python 3.11+, QECTOR v0.6.5 + v3.3 Workbench, PyMatching 2.4+, Stim 1.16+, 20,000 shots per distance.
 
 | Distance | QECTOR Blossom LER | PyMatching LER | QECTOR us/shot | PyMatching us/shot |
 | ---: | ---: | ---: | ---: | ---: |
@@ -428,7 +428,7 @@ See [LICENSE](LICENSE) for the repository terms and contact the commercial team 
   author  = {Guillaume Lessard},
   title   = {{QECTOR Decoder v3}: Rust/Python Quantum Error Correction Decoding Platform},
   year    = {2026},
-  version = {0.6.4},
+  version = {0.6.5},
   url     = {https://www.qector.store},
   note    = {Source-available. Commercial license required for commercial use.}
 }

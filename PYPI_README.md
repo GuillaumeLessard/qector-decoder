@@ -144,7 +144,7 @@ Important boundaries:
 - GPU availability and performance depend on wheel build features, drivers, hardware, and runtime checks.
 - OpenCL support must be confirmed on the target machine or built under the appropriate licensed/custom configuration.
 - REST/API surfaces are for local experiments or controlled review unless separately hardened.
-- **v0.6.4**: CPU batch decoder now reaches 1.1M shots/s via AVX2 SIMD transpose. BP-OSD adds `decode_timed` with convergence cap. Blossom intra-decode Rayon parallelism. DecoderPool auto-Rayon on Windows.
+- **v0.6.5**: mypy-clean Python layer (zero type errors), test suite aligned with installed API, decoder name consistency (`union_find` canonical), all lint/type checks pass.
 
 Full methodology, reproducibility notes, and benchmark artifacts are in the GitHub repository:
 
@@ -165,7 +165,7 @@ Do this before making any hardware-specific performance claim.
 
 ---
 
-## v0.6.4 Highlights
+## v0.6.5 Highlights
 
 | Feature | Description |
 | --- | --- |
@@ -204,7 +204,7 @@ Contact:
   author  = {Guillaume Lessard},
   title   = {{QECTOR Decoder v3}: Rust/Python Quantum Error Correction Decoding Platform},
   year    = {2026},
-  version = {0.6.4},
+  version = {0.6.5},
   url     = {https://www.qector.store},
   note    = {Source-available. Commercial license required for commercial use.}
 }
