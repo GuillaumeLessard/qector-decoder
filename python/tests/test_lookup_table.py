@@ -39,7 +39,9 @@ class TestLookupTableDecoder:
 
     def test_surface_code_d3_partial(self):
         """Code de surface d=3 - table partielle (low-weight)."""
-        check_to_qubits, n_qubits = qd.generate_surface_code_checks(3)
+        code = qd.codes.rotated_surface_code(3)
+        assert code.is_matching_graph(), "test requires a matching graph code"
+        check_to_qubits, n_qubits = code.check_to_qubits, code.n_qubits
         n_checks = len(check_to_qubits)
 
         lt = qd.LookupTableDecoder(check_to_qubits, n_qubits)
@@ -65,7 +67,9 @@ class TestLookupTableDecoder:
 
     def test_surface_code_d5_fallback(self):
         """Code de surface d=5 - table partielle, fallback pour les syndromes non precalcules."""
-        check_to_qubits, n_qubits = qd.generate_surface_code_checks(5)
+        code = qd.codes.rotated_surface_code(5)
+        assert code.is_matching_graph(), "test requires a matching graph code"
+        check_to_qubits, n_qubits = code.check_to_qubits, code.n_qubits
         n_checks = len(check_to_qubits)
 
         lt = qd.LookupTableDecoder(check_to_qubits, n_qubits)
@@ -110,7 +114,9 @@ class TestLookupTableDecoder:
 
     def test_table_size_respect_max_entries(self):
         """La taille de la table ne doit pas depasser max_entries."""
-        check_to_qubits, n_qubits = qd.generate_surface_code_checks(3)
+        code = qd.codes.rotated_surface_code(3)
+        assert code.is_matching_graph(), "test requires a matching graph code"
+        check_to_qubits, n_qubits = code.check_to_qubits, code.n_qubits
 
         lt = qd.LookupTableDecoder(check_to_qubits, n_qubits)
         lt.build_table(max_entries=10)

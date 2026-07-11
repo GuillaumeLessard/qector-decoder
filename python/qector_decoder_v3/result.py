@@ -171,10 +171,10 @@ def decode_with_diagnostics(
 
     s = np.asarray(syndrome, dtype=np.uint8).reshape(-1)
 
-    if hasattr(code, "check_to_qubits") and hasattr(code, "n_qubits"):
+    if hasattr(code, 'check_to_qubits') and hasattr(code, 'n_qubits'):
         c2q = code.check_to_qubits
         nq = code.n_qubits
-    elif hasattr(code, "__len__") and len(code) >= 2:
+    elif hasattr(code, '__len__') and len(code) >= 2:
         c2q = list(code[0])
         nq = int(code[1])
     else:
@@ -204,9 +204,9 @@ def decode_with_diagnostics(
     dt = time.perf_counter() - t0
 
     H = None
-    if hasattr(code, "parity_check_matrix"):
+    if hasattr(code, 'parity_check_matrix'):
         H = code.parity_check_matrix()
-    elif hasattr(code, "H"):
+    elif hasattr(code, 'H'):
         H = code.H()
     if H is None:
         H = np.zeros((len(c2q), nq), dtype=np.uint8)
@@ -215,13 +215,13 @@ def decode_with_diagnostics(
                 H[ci, q] ^= np.uint8(1)
 
     weight = None
-    if hasattr(code, "qubit_weights") and code.qubit_weights is not None and code.qubit_weights.shape[0] == nq:
+    if hasattr(code, 'qubit_weights') and code.qubit_weights is not None and code.qubit_weights.shape[0] == nq:
         weight = float(np.dot(code.qubit_weights, correction))
     else:
         weight = float(correction.sum())
 
     L = logicals
-    if L is None and hasattr(code, "logicals_matrix"):
+    if L is None and hasattr(code, 'logicals_matrix'):
         L = code.logicals_matrix()
     logical_flips = None
     if L is not None and L.shape[1] == nq:

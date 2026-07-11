@@ -129,6 +129,7 @@ ignore_missing_imports = true
 [tool.ruff]
 line-length = 120
 target-version = "py39"
+extend-exclude = [".venv", ".venv_clean_test", "target", "dist", "lib", "proto"]
 
 [tool.ruff.format]
 # Ensure consistent formatting on Linux CI runners (LF) even when edited on Windows.
@@ -156,3 +157,9 @@ ignore = ["E702", "E731", "E741"]
 # f-strings used as comment-like strings for readability (F541).
 "python/tests/*.py" = ["E402", "F401", "F541", "F841"]
 "python/tests/**/*.py" = ["E402", "F401", "F541", "F841"]
+# matplotlib.use("Agg") must precede pyplot import to force a non-interactive
+# backend before any GUI backend can be auto-selected; this ordering is required.
+"cpu_benchmark_report.py" = ["E402"]
+# test_exports.py runs a manual integration script top-to-bottom; the smoke_test_wheel
+# import is intentionally placed after other exercises run, and imported for side effects.
+"test_exports.py" = ["E402"]

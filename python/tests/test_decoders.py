@@ -206,7 +206,9 @@ class TestBatchDecoder:
             assert np.array_equal(batch_corr[i], single_corr)
 
     def test_large_batch(self):
-        checks, n_qubits = qd.generate_surface_code_checks(10)
+        code = qd.codes.rotated_surface_code(10)
+        assert code.is_matching_graph(), "test requires a matching graph code"
+        checks, n_qubits = code.check_to_qubits, code.n_qubits
         dec = qd.BatchDecoder(checks, n_qubits)
         syndromes = np.random.randint(0, 2, size=(1000, len(checks)), dtype=np.uint8)
         corr = dec.parallel_batch_decode(syndromes)
@@ -225,7 +227,8 @@ class TestCUDABatchDecoder:
     def test_cuda_available_and_device_metadata(self):
         if not qd.CUDABatchDecoder.is_available():
             pytest.skip("CUDA device or CUDA runtime compiler not available")
-        checks, n_qubits = qd.generate_surface_code_checks(5)
+        code = qd.codes.rotated_surface_code(5)
+        checks, n_qubits = code.check_to_qubits, code.n_qubits
         dec = qd.CUDABatchDecoder(checks, n_qubits)
         assert "NVIDIA" in dec.device_name
         major, minor = dec.compute_capability
@@ -235,7 +238,8 @@ class TestCUDABatchDecoder:
     def test_cuda_matches_cpu(self):
         if not qd.CUDABatchDecoder.is_available():
             pytest.skip("CUDA device or CUDA runtime compiler not available")
-        checks, n_qubits = qd.generate_surface_code_checks(5)
+        code = qd.codes.rotated_surface_code(5)
+        checks, n_qubits = code.check_to_qubits, code.n_qubits
         cpu = qd.CPUBatchDecoder(checks, n_qubits)
         cuda = qd.CUDABatchDecoder(checks, n_qubits)
         rng = np.random.default_rng(2026)
@@ -247,7 +251,8 @@ class TestCUDABatchDecoder:
     def test_cuda_rejects_wrong_shape(self):
         if not qd.CUDABatchDecoder.is_available():
             pytest.skip("CUDA device or CUDA runtime compiler not available")
-        checks, n_qubits = qd.generate_surface_code_checks(3)
+        code = qd.codes.rotated_surface_code(3)
+        checks, n_qubits = code.check_to_qubits, code.n_qubits
         dec = qd.CUDABatchDecoder(checks, n_qubits)
         with pytest.raises(ValueError):
             dec.batch_decode(np.zeros((8, len(checks) + 1), dtype=np.uint8))

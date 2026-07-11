@@ -1,10 +1,12 @@
 import numpy as np
+import pytest
 import qector_decoder_v3 as qd
 
 
 def test_qiskit_plugin_integration():
     """Qiskit plugin exists and is importable."""
-    assert qd.qiskit_plugin is not None or True  # may be None if qiskit not installed
+    if qd.qiskit_plugin is None:
+        pytest.skip("qiskit_plugin not available")
     from qector_decoder_v3.qiskit_plugin import decode_qiskit_result
 
     raw = {"counts": {"0x0": 400, "0x3": 100}}
@@ -15,7 +17,8 @@ def test_qiskit_plugin_integration():
 
 def test_stim_compat_integration():
     """Stim compat module exists and is importable."""
-    assert qd.stim_compat is not None or True
+    if qd.stim_compat is None:
+        pytest.skip("stim_compat not available")
     from qector_decoder_v3.stim_compat import to_stim_decoder
 
     c2q = [[0, 1], [1, 2]]
@@ -26,7 +29,9 @@ def test_stim_compat_integration():
 
 def test_rest_api_exists():
     """REST API module exists and create_app works."""
-    from qector_decoder_v3.rest_api import create_app
+    import qector_decoder_v3 as qd
 
-    app = create_app()
+    if qd.rest_api is None:
+        pytest.skip("REST API not available (fastapi/flask not installed)")
+    app = qd.rest_api.create_app()
     assert app is not None

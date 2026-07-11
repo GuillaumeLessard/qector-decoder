@@ -5,11 +5,25 @@ import sys
 import os
 from pathlib import Path
 
+import pytest
+
 
 def test_run_examples():
     # Resolve the repository root directory
-    repo_root = Path(__file__).resolve().parent.parent.parent
+    # __file__ is in python/tests/test_examples.py -> parent.parent.parent = repo root
+    try:
+        repo_root = Path(__file__).resolve().parent.parent.parent
+    except Exception:
+        # Fallback to CWD if path resolution fails
+        repo_root = Path.cwd()
+        for _ in range(4):
+            if (repo_root / "examples").is_dir():
+                break
+            repo_root = repo_root.parent
+
     examples_dir = repo_root / "examples"
+    if not examples_dir.is_dir():
+        pytest.skip(f"examples directory not found at {examples_dir}")
 
     # List of examples to run
     examples = [
@@ -25,7 +39,9 @@ def test_run_examples():
 
     # Set PYTHONPATH to include the python/ directory in the repo
     env = os.environ.copy()
-    env["PYTHONPATH"] = str(repo_root / "python") + os.pathsep + env.get("PYTHONPATH", "")
+    python_dir = repo_root / "python"
+    if python_dir.is_dir():
+        env["PYTHONPATH"] = str(python_dir) + os.pathsep + env.get("PYTHONPATH", "")
 
     for example in examples:
         example_path = examples_dir / example

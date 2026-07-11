@@ -1,11 +1,10 @@
 """
-Comprehensive QECTOR v0.6.3 Test Suite.
+Comprehensive QECTOR v0.6.4 Test Suite.
 Covers: correctness, syndrome faithfulness, edge cases, memory, decoder construction,
 DecoderPool, BP-OSD, sliding window, hybrid decoder, type stability, boundary conditions.
 
 Run with:  pytest python/tests/test_comprehensive_suite.py -v
 """
-
 import sys
 import os
 import gc
@@ -13,23 +12,12 @@ import time
 import numpy as np
 import pytest
 
-# Insert local source path FIRST to override installed package
-src_path = os.path.join(os.path.dirname(__file__), "..", "qector_decoder_v3")
-sys.path.insert(0, src_path)
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from qector_decoder_v3 import (
-    codes,
-    UnionFindDecoder,
-    FastUnionFindDecoder,
-    BlossomDecoder,
-    SparseBlossomDecoder,
-    CPUBatchDecoder,
-    BPOSDDecoder,
-    DecoderPool,
-    get_decoder,
-    HybridDecoder,
-    PredecodedDecoder,
-    BeliefMatching,
+    codes, UnionFindDecoder, FastUnionFindDecoder, BlossomDecoder,
+    SparseBlossomDecoder, CPUBatchDecoder, BPOSDDecoder, DecoderPool,
+    get_decoder, HybridDecoder, PredecodedDecoder, BeliefMatching,
     AutoDecoder,
 )
 
@@ -63,7 +51,9 @@ def test_syndrome_faithfulness_union_find_repetition(dist):
     dec = UnionFindDecoder(c2q, nq)
     syndrome, _, _ = make_syndrome(code)
     correction = dec.decode(syndrome)
-    assert np.array_equal((H @ correction) & 1, syndrome), f"Union-Find d={dist} failed faithfulness"
+    assert np.array_equal((H @ correction) & 1, syndrome), (
+        f"Union-Find d={dist} failed faithfulness"
+    )
 
 
 @pytest.mark.parametrize("dist", [3, 5, 7])
@@ -81,7 +71,9 @@ def test_syndrome_faithfulness_all_surface(dist):
         dec = maker()
         syndrome, _, _ = make_syndrome(code, seed=dist)
         correction = dec.decode(syndrome)
-        assert np.array_equal((H @ correction) & 1, syndrome), f"{name} on surface d={dist} failed faithfulness"
+        assert np.array_equal((H @ correction) & 1, syndrome), (
+            f"{name} on surface d={dist} failed faithfulness"
+        )
 
 
 @pytest.mark.parametrize("seed", [42, 1234, 9999])
@@ -225,7 +217,7 @@ def test_bposd_batch_decode():
     code = codes.repetition_code(5)
     c2q, nq = code.check_to_qubits, code.n_qubits
     dec = BPOSDDecoder(c2q, nq, 0.08)
-    assert not hasattr(dec, "batch_decode"), "BP-OSD should not have batch_decode"
+    assert not hasattr(dec, 'batch_decode'), "BP-OSD should not have batch_decode"
 
 
 def test_bposd_multiple_shots():
@@ -247,26 +239,27 @@ def _run_pool_test(module_guard=False):
     code = codes.repetition_code(5)
     c2q, nq = code.check_to_qubits, code.n_qubits
     H = code.parity_check_matrix()
-    pool = DecoderPool(c2q, nq, "union_find", n_workers=2)
+    pool = DecoderPool(c2q, nq, 'union_find', n_workers=2)
     syndromes, errors, _ = make_syndrome(code, n_shots=100)
     corrections = pool.decode(syndromes)
     pool.close()
     assert len(corrections) == 100
     for i in range(100):
-        assert np.array_equal((H @ corrections[i]) & 1, syndromes[i]), f"DecoderPool shot {i} failed faithfulness"
+        assert np.array_equal((H @ corrections[i]) & 1, syndromes[i]), (
+            f"DecoderPool shot {i} failed faithfulness"
+        )
 
 
 def test_decoderpool_basic():
     """DecoderPool with 2 workers, 100 shots.
-
+    
     Note: DecoderPool uses multiprocessing spawn context on Windows,
     which requires the test function to be importable. If it fails,
     run with: python -m pytest python/tests/test_comprehensive_suite.py::test_decoderpool_basic
     """
     import multiprocessing as _mp
-
     try:
-        ctx = _mp.get_context("spawn")
+        ctx = _mp.get_context('spawn')
         pool = ctx.Pool(processes=1)
         pool.apply_async(lambda: 42).get(timeout=5)
         pool.close()
@@ -280,7 +273,7 @@ def test_decoderpool_single_worker():
     code = codes.repetition_code(5)
     c2q, nq = code.check_to_qubits, code.n_qubits
     H = code.parity_check_matrix()
-    pool = DecoderPool(c2q, nq, "union_find", n_workers=1)
+    pool = DecoderPool(c2q, nq, 'union_find', n_workers=1)
     syndrome = np.zeros((1, len(c2q)), dtype=np.uint8)
     corr = pool.decode(syndrome)
     pool.close()
@@ -294,8 +287,8 @@ def test_decoderpool_single_worker():
 def test_get_decoder_basic():
     code = codes.repetition_code(5)
     c2q, nq = code.check_to_qubits, code.n_qubits
-    dec1 = get_decoder(tuple(map(tuple, c2q)), nq, "blossom")
-    dec2 = get_decoder(tuple(map(tuple, c2q)), nq, "blossom")
+    dec1 = get_decoder(tuple(map(tuple, c2q)), nq, 'blossom')
+    dec2 = get_decoder(tuple(map(tuple, c2q)), nq, 'blossom')
     assert dec1 is dec2, "LRU cache should return the same instance"
 
 
@@ -303,12 +296,11 @@ def test_get_decoder_aliases():
     code = codes.repetition_code(5)
     c2q, nq = code.check_to_qubits, code.n_qubits
     tup = tuple(map(tuple, c2q))
-    d1 = get_decoder(tup, nq, "fast_uf")
-    d2 = get_decoder(tup, nq, "fast_union_find")
-    d3 = get_decoder(tup, nq, "fastuf")
+    d1 = get_decoder(tup, nq, 'fast_uf')
+    d2 = get_decoder(tup, nq, 'fast_union_find')
+    d3 = get_decoder(tup, nq, 'fastuf')
     # Cache entries may differ by alias, but they should be the same type
     from qector_decoder_v3 import FastUnionFindDecoder
-
     assert isinstance(d1, FastUnionFindDecoder)
     assert isinstance(d2, FastUnionFindDecoder)
     assert isinstance(d3, FastUnionFindDecoder)
@@ -318,7 +310,7 @@ def test_get_decoder_invalid_name():
     code = codes.repetition_code(5)
     c2q, nq = code.check_to_qubits, code.n_qubits
     with pytest.raises(ValueError):
-        get_decoder(tuple(map(tuple, c2q)), nq, "nonexistent_decoder")
+        get_decoder(tuple(map(tuple, c2q)), nq, 'nonexistent_decoder')
 
 
 # =====================================================================
@@ -361,10 +353,9 @@ def test_predecoded_backward_compat():
 def test_predecoded_unionfind_name():
     code = codes.repetition_code(5)
     c2q, nq = code.check_to_qubits, code.n_qubits
-    # PredecodedDecoder accepts positional decoder name (canonical: "union_find")
+    # PredecodedDecoder accepts positional decoder name
     from qector_decoder_v3 import PredecodedDecoder as PDC
-
-    dec = PDC(c2q, nq, "union_find")
+    dec = PDC(c2q, nq, "unionfind")
     # Should decode without error
     H = code.parity_check_matrix()
     syndrome = np.zeros(len(c2q), dtype=np.uint8)
@@ -375,31 +366,15 @@ def test_predecoded_unionfind_name():
 # =====================================================================
 # 11. BELIEF MATCHING
 # =====================================================================
-def test_belief_matching_from_stim_circuit():
-    import stim
-    circuit = stim.Circuit("""
-        R 0 1 2
-        CX 0 1
-        CX 1 2
-        M 0 1 2
-        DETECTOR rec[-3] rec[-2]
-        DETECTOR rec[-2] rec[-1]
-    """)
-    bm = BeliefMatching.from_stim_circuit(circuit)
+def test_belief_matching_from_numpy_h():
+    H = np.array([[1, 1, 0], [0, 1, 1]], dtype=np.uint8)
+    bm = BeliefMatching.from_numpy_h(H)
     assert bm is not None
 
 
 def test_belief_matching_decode():
-    import stim
-    circuit = stim.Circuit("""
-        R 0 1 2
-        CX 0 1
-        CX 1 2
-        M 0 1 2
-        DETECTOR rec[-3] rec[-2]
-        DETECTOR rec[-2] rec[-1]
-    """)
-    bm = BeliefMatching.from_stim_circuit(circuit)
+    H = np.array([[1, 1, 0], [0, 1, 1]], dtype=np.uint8)
+    bm = BeliefMatching.from_numpy_h(H, [0.08, 0.08, 0.08])
     syndrome = np.array([1, 0], dtype=np.uint8)
     try:
         corr = bm.decode(syndrome)
@@ -415,7 +390,7 @@ def test_auto_decoder_select():
     code = codes.repetition_code(5)
     c2q, nq = code.check_to_qubits, code.n_qubits
     auto = AutoDecoder(c2q, nq)
-    selected = auto.select(1024)  # select backend for batch_size=1024
+    selected = auto.auto_select(c2q, nq)
     assert isinstance(selected, str) and len(selected) > 0
 
 
@@ -466,7 +441,9 @@ def test_surface_code_all_decoders(dist):
         for _ in range(10):
             syndrome, _, _ = make_syndrome(code, seed=dist * 100 + _)
             corr = dec.decode(syndrome)
-            assert np.array_equal((H @ corr) & 1, syndrome), f"{name} surface d={dist} shot={_} faithfulness"
+            assert np.array_equal((H @ corr) & 1, syndrome), (
+                f"{name} surface d={dist} shot={_} faithfulness"
+            )
 
 
 # =====================================================================
@@ -517,7 +494,7 @@ def test_cold_path_construction():
     c2q, nq = code.check_to_qubits, code.n_qubits
     t0 = time.perf_counter()
     for _ in range(100):
-        _ = get_decoder(tuple(map(tuple, c2q)), nq, "blossom")
+        _ = get_decoder(tuple(map(tuple, c2q)), nq, 'blossom')
     t = (time.perf_counter() - t0) / 100 * 1e6
     assert t < 5000, f"Cold path too slow: {t:.1f}us average"
 
@@ -531,7 +508,6 @@ def test_no_memory_leak_on_repeated_decode():
     H = code.parity_check_matrix()
     gc.collect()
     import tracemalloc
-
     tracemalloc.start()
     dec = UnionFindDecoder(c2q, nq)
     for _ in range(1000):
@@ -598,14 +574,14 @@ def test_codes_repetition_code_attributes():
     code = codes.repetition_code(5)
     assert code.n_qubits == 5
     assert code.distance == 5
-    assert "repetition" in code.name
+    assert 'repetition' in code.name
 
 
 def test_codes_rotated_surface_code_attributes():
     code = codes.rotated_surface_code(3)
     assert code.n_qubits == 9
     assert code.distance == 3
-    assert "surface" in code.name.lower() or "rotated" in code.name.lower()
+    assert 'surface' in code.name.lower() or 'rotated' in code.name.lower()
 
 
 def test_codes_parity_check_matrix_shape():
@@ -623,7 +599,6 @@ def test_codes_parity_check_matrix_shape():
 def test_stim_compat_import():
     try:
         from qector_decoder_v3 import stim_compat
-
         assert stim_compat is not None
     except ImportError:
         pytest.skip("stim not installed")
@@ -632,7 +607,6 @@ def test_stim_compat_import():
 def test_sinter_compat_import():
     try:
         from qector_decoder_v3 import sinter_compat
-
         assert sinter_compat is not None
     except ImportError:
         pytest.skip("sinter not installed")
@@ -643,7 +617,6 @@ def test_sinter_compat_import():
 # =====================================================================
 def test_decode_mmap_import():
     from qector_decoder_v3 import decode_mmap
-
     assert callable(decode_mmap)
 
 
@@ -653,7 +626,6 @@ def test_decode_mmap_import():
 def test_hyperedges_rejected():
     """Decoders with hyperedges should be handled gracefully (not crash)."""
     from qector_decoder_v3 import UnionFindDecoder
-
     hyper_check = [[0, 1, 2]]
     try:
         dec = BlossomDecoder(hyper_check, 3)

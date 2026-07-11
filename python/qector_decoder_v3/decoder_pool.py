@@ -29,10 +29,9 @@ from __future__ import annotations
 import multiprocessing as _mp
 import os
 import platform as _platform
-from typing import Optional
+from typing import List, Optional, cast
 
 import numpy as np
-from numpy.typing import NDArray
 
 __all__ = ["DecoderPool"]
 
@@ -46,7 +45,6 @@ def _worker_init(checks_tuple, n_qubits, decoder_type):
     global _WORKER_DECODER
     checks = [list(c) for c in checks_tuple]
     from . import BlossomDecoder, CPUBatchDecoder, FastUnionFindDecoder, SparseBlossomDecoder, UnionFindDecoder
-
     builders = {
         "union_find": lambda: UnionFindDecoder(checks, n_qubits),
         "fast_union_find": lambda: FastUnionFindDecoder(checks, n_qubits),
@@ -76,16 +74,10 @@ def _worker_decode(chunk_and_idx):
 
 
 _DECODER_BUILDERS = {
-    "union_find": lambda c2q, nq: __import__("qector_decoder_v3", fromlist=["UnionFindDecoder"]).UnionFindDecoder(
-        c2q, nq
-    ),
-    "fast_union_find": lambda c2q, nq: __import__(
-        "qector_decoder_v3", fromlist=["FastUnionFindDecoder"]
-    ).FastUnionFindDecoder(c2q, nq),
+    "union_find": lambda c2q, nq: __import__("qector_decoder_v3", fromlist=["UnionFindDecoder"]).UnionFindDecoder(c2q, nq),
+    "fast_union_find": lambda c2q, nq: __import__("qector_decoder_v3", fromlist=["FastUnionFindDecoder"]).FastUnionFindDecoder(c2q, nq),
     "blossom": lambda c2q, nq: __import__("qector_decoder_v3", fromlist=["BlossomDecoder"]).BlossomDecoder(c2q, nq),
-    "sparse_blossom": lambda c2q, nq: __import__(
-        "qector_decoder_v3", fromlist=["SparseBlossomDecoder"]
-    ).SparseBlossomDecoder(c2q, nq),
+    "sparse_blossom": lambda c2q, nq: __import__("qector_decoder_v3", fromlist=["SparseBlossomDecoder"]).SparseBlossomDecoder(c2q, nq),
     "cpu_batch": lambda c2q, nq: __import__("qector_decoder_v3", fromlist=["CPUBatchDecoder"]).CPUBatchDecoder(c2q, nq),
 }
 
@@ -119,7 +111,7 @@ class DecoderPool:
         self._nq = int(n_qubits) if n_qubits is not None else None
         self._decoder_type = str(decoder_type)
         self._n_workers = n_workers or os.cpu_count() or 1
-        self._pool: Optional[_mp.pool.Pool] = None
+        self._pool: Optional["_mp.pool.Pool"] = None
 
     def decode(self, syndromes) -> np.ndarray:
         """Decode a batch of syndromes.
@@ -156,15 +148,14 @@ class DecoderPool:
                 initargs=(checks_tuple, self._nq, self._decoder_type),
             )
 
-        assert self._pool is not None
         nw = min(self._n_workers, n)
         chunk_size = (n + nw - 1) // nw
-        chunks = [(arr[i : i + chunk_size], i // chunk_size) for i in range(0, n, chunk_size)]
+        chunks = [(arr[i:i + chunk_size], i // chunk_size) for i in range(0, n, chunk_size)]
 
-        results: list[NDArray[np.uint8]] = [None] * len(chunks)  # type: ignore[list-item]
+        results: List[Optional[np.ndarray]] = [None] * len(chunks)
         for idx, result in self._pool.imap_unordered(_worker_decode, chunks):
             results[idx] = result
-        return np.concatenate(results, axis=0).astype(np.uint8)
+        return cast(np.ndarray, np.concatenate(cast(List[np.ndarray], results), axis=0).astype(np.uint8))
 
     def close(self):
         if self._pool is not None:
