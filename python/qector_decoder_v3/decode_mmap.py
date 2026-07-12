@@ -12,12 +12,10 @@ Example
 >>> checks, nq = generate_repetition_code_checks(distance=5)
 >>> n_shots = 10000
 >>> # Create a memory-mapped syndrome file
->>> syn = np.memmap("syndromes.bin", dtype=np.uint8, mode="w+",
-...                  shape=(n_shots, len(checks)))
+>>> syn = np.memmap("syndromes.bin", dtype=np.uint8, mode="w+", shape=(n_shots, len(checks)))
 >>> syn[:] = (np.random.random((n_shots, len(checks))) < 0.1).astype(np.uint8)
 >>> syn.flush()
->>> decode_mmap("syndromes.bin", "corrections.bin",
-...             checks, nq, batch_size=1024, n_shots=n_shots)
+>>> decode_mmap("syndromes.bin", "corrections.bin", checks, nq, batch_size=1024, n_shots=n_shots)
 """
 
 from __future__ import annotations
@@ -66,14 +64,14 @@ def decode_mmap(
         n_shots = file_size // bytes_per_shot
     if file_size < n_shots * bytes_per_shot:
         raise ValueError(
-            f"syndrome file too small: {file_size} bytes, "
-            f"need {n_shots * bytes_per_shot} for {n_shots} shots"
+            f"syndrome file too small: {file_size} bytes, need {n_shots * bytes_per_shot} for {n_shots} shots"
         )
 
     syndromes = _np.memmap(syndrome_path, dtype=dtype, mode="r", shape=(n_shots, n_checks))
     output = _np.memmap(output_path, dtype=_np.uint8, mode="w+", shape=(n_shots, n_qubits))
 
     from . import CPUBatchDecoder, UnionFindDecoder
+
     decoder: Union[CPUBatchDecoder, UnionFindDecoder]
     if decoder_type == "cpu_batch":
         decoder = CPUBatchDecoder(c2q, n_qubits)

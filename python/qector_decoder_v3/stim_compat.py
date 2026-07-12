@@ -13,17 +13,17 @@ Usage (deprecated) ::
 
     import stim
     from qector_decoder_v3.stim_compat import (
-        from_stim_detector_error_model,   # DEPRECATED
-        to_stim_decoder,                   # DEPRECATED
-        stim_decoder_from_dem,             # DEPRECATED
+        from_stim_detector_error_model,  # DEPRECATED
+        to_stim_decoder,  # DEPRECATED
+        stim_decoder_from_dem,  # DEPRECATED
     )
 
 New API (preferred)::
 
     import stim
     from qector_decoder_v3 import dem
-    circuit = stim.Circuit.generated("surface_code:rotated_memory_x", distance=5,
-                                      before_round_data_depolarization=0.01)
+
+    circuit = stim.Circuit.generated("surface_code:rotated_memory_x", distance=5, before_round_data_depolarization=0.01)
     model = dem.from_stim(circuit.detector_error_model(decompose_errors=True))
     decoder = model.make_decoder("blossom")
     correction = decoder.decode(syndrome)
