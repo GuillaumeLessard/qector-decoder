@@ -95,3 +95,6 @@ test_v0*.py
 # kimi probe/fix helpers
 _kimi_fix_probe.py
 _fix_fixtures.py
+
+# --- Local-only docs (contain secret names / infra details, never push) ---
+RELEASE_PROCEDURE.md
