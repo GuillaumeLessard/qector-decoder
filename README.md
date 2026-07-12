@@ -180,11 +180,31 @@ correction = decoder.decode(syndrome)
 | `decode_with_diagnostics` | Decode with detailed diagnostic info | Stable public API |
 | `Workbench` | High-level workbench orchestration | Stable public API |
 | `SlidingWindowDecoder` | Multi-round streaming workflows | Experimental |
+| `StreamingDecoder` | Continuous streaming decode session | Experimental |
+| `HybridDecoder` | Combined Union-Find + Blossom fallback routing | Experimental |
+| `LookupTableDecoder` | Precomputed small-code lookup decoding | Experimental |
+| `NeuralPredecoder` | Learned predecoder front-end | Research/experimental |
+| `GNNPredecoder` | Graph neural network predecoder | Research/experimental |
+| `GNNTrainer` | Training harness for `GNNPredecoder` | Research/experimental |
+| `LERBenchmark` | Logical error rate benchmarking harness | Experimental |
 | `stim_compat` | Stim circuit / DEM conversion | Stable utility |
 | `sinter_compat` | Sinter custom decoder integration | Stable utility |
 | `rest_api` | Local service endpoint | Local/partner review only |
 
 See the public API regression coverage in [python/tests](python/tests) before building production code on experimental modules.
+
+---
+
+## New in v0.6.5
+
+| Fix | Description |
+| --- | --- |
+| mypy clean | Resolved all 8 type errors across `decode_mmap.py`, `decoder_pool.py`, and `belief_matching.py` — strict type checking passes on the full Python layer |
+| Test suite fix | Genuine `NameError` (`syndrome` → `syndromes`) in `test_comprehensive_suite.py::_run_pool_test` fixed — was a live crash risk on any machine where Windows spawn multiprocessing succeeds |
+| `PredecodedDecoder` fix | Backend validation now accepts `"union_find"` (with underscore), matching the canonical decoder names |
+| ruff clean | Full repo passes `ruff format --check` and `ruff check` with zero errors; `.venv`/`.venv_clean_test`/`target`/`dist`/`lib`/`proto` excluded from lint scope |
+| `examples/example_batch.py` fix | Was constructing `CPUBatchDecoder`/`OpenCLBatchDecoder`/`CUDABatchDecoder` (Union-Find-based, weight ≤2 only) against a weight-4 surface code; switched to `generate_ring_code_checks()`, the correct weight-2 code family for this decoder class |
+| CI reliability | Verified full 15-platform wheel build (Linux/Windows/macOS × Python 3.9–3.13) and full test suite (1005 passed, 83 skipped) against the release build |
 
 ---
 
@@ -214,7 +234,7 @@ If you need the full desktop GUI, hosted automation stack, or additional documen
 
 ## Validated evidence snapshot
 
-All public claims should cite an artifact, commit, command, machine, and version. The current package release is **v0.6.4**; checked-in evidence should be regenerated before making new performance claims.
+All public claims should cite an artifact, commit, command, machine, and version. The current package release is **v0.6.5**; checked-in evidence below was generated under v0.6.4 and is labeled accordingly — regenerate before making new performance claims against v0.6.5.
 
 > **v0.6.4 additions**: AVX2 SIMD transpose (CPU batch 1.1M shots/s), BP-OSD convergence cap (`decode_timed`), Blossom intra-decode Rayon parallelism, DecoderPool auto-Rayon on Windows.
 
@@ -428,7 +448,7 @@ See [LICENSE](LICENSE) for the repository terms and contact the commercial team 
   author  = {Guillaume Lessard},
   title   = {{QECTOR Decoder v3}: Rust/Python Quantum Error Correction Decoding Platform},
   year    = {2026},
-  version = {0.6.4},
+  version = {0.6.5},
   url     = {https://www.qector.store},
   note    = {Source-available. Commercial license required for commercial use.}
 }

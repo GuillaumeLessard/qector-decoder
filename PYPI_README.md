@@ -120,6 +120,14 @@ decoder = BlossomDecoder(checks, n_qubits)
 | `DecodeResult` | Structured decode result | Stable public API |
 | `decode_with_diagnostics` | Decode with diagnostics | Stable public API |
 | `Workbench` | High-level orchestration | Stable public API |
+| `SlidingWindowDecoder` | Multi-round streaming workflows | Experimental |
+| `StreamingDecoder` | Continuous streaming decode session | Experimental |
+| `HybridDecoder` | Combined Union-Find + Blossom fallback routing | Experimental |
+| `LookupTableDecoder` | Precomputed small-code lookup decoding | Experimental |
+| `NeuralPredecoder` | Learned predecoder front-end | Research/experimental |
+| `GNNPredecoder` | Graph neural network predecoder | Research/experimental |
+| `GNNTrainer` | Training harness for `GNNPredecoder` | Research/experimental |
+| `LERBenchmark` | Logical error rate benchmarking harness | Experimental |
 | `stim_compat` | Stim circuit and DEM conversion | Stable utility |
 | `sinter_compat` | Sinter custom decoder integration | Stable utility |
 | `rest_api` | Local decoding service | Local/partner review only |
@@ -165,6 +173,18 @@ Do this before making any hardware-specific performance claim.
 
 ---
 
+## v0.6.5 Highlights
+
+| Fix | Description |
+| --- | --- |
+| mypy clean | Resolved all 8 type errors across `decode_mmap.py`, `decoder_pool.py`, and `belief_matching.py` |
+| Test suite fix | Genuine `NameError` (`syndrome` → `syndromes`) in the comprehensive test suite's multiprocessing pool test |
+| `PredecodedDecoder` fix | Backend validation now accepts `"union_find"` (with underscore), matching canonical decoder names |
+| ruff clean | Full repo passes `ruff format --check` and `ruff check` with zero errors |
+| `examples/example_batch.py` fix | Was using a weight-4 surface code against Union-Find-only batch decoders (weight ≤2 only); switched to a ring code |
+
+---
+
 ## v0.6.4 Highlights
 
 | Feature | Description |
@@ -204,7 +224,7 @@ Contact:
   author  = {Guillaume Lessard},
   title   = {{QECTOR Decoder v3}: Rust/Python Quantum Error Correction Decoding Platform},
   year    = {2026},
-  version = {0.6.4},
+  version = {0.6.5},
   url     = {https://www.qector.store},
   note    = {Source-available. Commercial license required for commercial use.}
 }

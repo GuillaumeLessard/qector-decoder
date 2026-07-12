@@ -14,6 +14,10 @@ environment so report figures trace back to a specific build.
 - **Test imports**: `test_comprehensive_suite.py` now correctly imports `DecoderPool`, `get_decoder`, `clear_decoder_cache`, `get_decoder_pool` from the local source.
 - **CI resilience**: Ensured v0.6.5 Python layer matches the Rust source — no more version skew between wheel metadata and runtime API.
 - **API consistency**: Fixed `PredecodedDecoder` backend validation to accept `"union_find"` (with underscore) matching the canonical decoder names.
+- **Test suite NameError**: `test_comprehensive_suite.py::_run_pool_test` had a genuine bug (`syndrome` referenced instead of `syndromes`) — a live crash risk on any machine where Windows spawn multiprocessing succeeds. Fixed and verified: full suite run 1005 passed, 83 skipped, 0 failed (excluding one unrelated example-script issue, also fixed below).
+- **ruff clean**: Full repo now passes `ruff format --check` and `ruff check` with zero errors; `.venv`, `.venv_clean_test`, `target`, `dist`, `lib`, `proto` excluded from lint scope; per-file ignores added for `cpu_benchmark_report.py` and `test_exports.py`.
+- **`examples/example_batch.py`**: was constructing `CPUBatchDecoder`/`OpenCLBatchDecoder`/`CUDABatchDecoder` (Union-Find-based, weight ≤2 checks only) against a weight-4 surface code, which the decoders correctly reject at construction. Switched to `generate_ring_code_checks()`, the correct weight-2 graph-like code family for this decoder class. Verified: `python/tests/test_examples.py` passes (1 passed in 154.39s), and the script runs end-to-end.
+- **CI secret injection**: Regenerated and verified the `RUST_SRC_B64_1/2/3` GitHub Actions secrets (byte-identical round-trip checked before upload). Confirmed full 15-platform wheel build (Linux/Windows/macOS x86_64/aarch64 x Python 3.9-3.13) succeeds end-to-end.
 
 ### Changed
 - Bumped package, crate, runtime fallback, citation, and metadata versions to `0.6.5` across `pyproject.toml`, `Cargo.toml`, `python/qector_decoder_v3/__init__.py`, `CITATION.cff`, `codemeta.json`, `README.md`, `PYPI_README.md`, docs, and examples.
