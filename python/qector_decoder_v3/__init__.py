@@ -21,7 +21,6 @@ _RustSlidingWindowDecoder = _native_module.SlidingWindowDecoder
 _RustStreamingDecoder = _native_module.StreamingDecoder
 _RustBatchDecoder = _native_module.BatchDecoder
 _RustCPUBatchDecoder = _native_module.CPUBatchDecoder
-_RustOpenCLBatchDecoder = _native_module.OpenCLBatchDecoder
 _RustBenchmarkSuite = _native_module.BenchmarkSuite
 _RustLookupTableDecoder = _native_module.LookupTableDecoder
 _RustBPOSDDecoder = _native_module.BPOSDDecoder
@@ -99,7 +98,7 @@ import numpy as _np
 # wheel). We never overwrite a real compiled ``__version__`` with it — doing so
 # would falsely claim a version the loaded binary is not — so after a version bump
 # ``__version__`` keeps reporting the *built* value until the Rust wheel is rebuilt.
-__fallback_version__ = "0.6.5"
+__fallback_version__ = "0.6.6"
 
 try:
     __version__ = _native_module.__version__

@@ -173,6 +173,12 @@ Do this before making any hardware-specific performance claim.
 
 ---
 
+## v0.6.6 — critical fix, upgrade immediately if on v0.6.5
+
+**v0.6.5 fails to import at all** (`AttributeError` on `OpenCLBatchDecoder`) on every published wheel, because the release build (`--no-default-features --features cuda`) never compiles in OpenCL support, and `__init__.py` had a leftover unguarded reference to it. Fixed in v0.6.6 by removing the dead line; the properly-guarded assignment further down in the file (which already existed) now runs as intended. Verified against a clean install of the exact CI-built wheel.
+
+---
+
 ## v0.6.5 Highlights
 
 | Fix | Description |
@@ -224,7 +230,7 @@ Contact:
   author  = {Guillaume Lessard},
   title   = {{QECTOR Decoder v3}: Rust/Python Quantum Error Correction Decoding Platform},
   year    = {2026},
-  version = {0.6.5},
+  version = {0.6.6},
   url     = {https://www.qector.store},
   note    = {Source-available. Commercial license required for commercial use.}
 }

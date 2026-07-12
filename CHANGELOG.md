@@ -7,6 +7,12 @@ environment so report figures trace back to a specific build.
 
 ## [Unreleased]
 
+## [0.6.6] - 2026-07-12
+
+### Fixed
+- **Critical: package import broken on every published v0.6.5 wheel.** `python/qector_decoder_v3/__init__.py` had a leftover, unguarded `_RustOpenCLBatchDecoder = _native_module.OpenCLBatchDecoder` line (a duplicate of the properly try/except-guarded assignment later in the file). Since the public CI release wheels are built with `--no-default-features --features cuda` (no `opencl` feature), the compiled module never has this attribute, so `import qector_decoder_v3` raised `AttributeError` immediately on a completely clean install. This was masked in local development because default-feature builds include `opencl`. Root cause found and reproduced by testing a fresh `pip install qector-decoder-v3==0.6.5` in an isolated venv and by rebuilding locally with the exact CI feature flags. Fixed by removing the dead duplicate line; verified the corrected package imports cleanly under the exact CI build configuration in a clean venv, with `cuda_is_available()` / `opencl_is_available()` correctly returning `False` rather than crashing.
+- **v0.6.5 is not usable and should not be installed** — use v0.6.6 or later.
+
 ## [0.6.5] - 2026-07-10
 
 ### Fixed
