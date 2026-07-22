@@ -18,14 +18,18 @@ def _guard(name):
     try:
         return getattr(_native_module, name)
     except (AttributeError, ImportError):
-        def _unavailable(*args, **kwargs):
-            raise RuntimeError(
-                f"{name} is not available in this build. "
-                "Install a wheel with the required features enabled."
-            )
-        _unavailable.__name__ = name
-        _unavailable.__qualname__ = name
-        return _unavailable
+        class _Unavailable:
+            def __init__(self, *args, **kwargs):
+                raise RuntimeError(
+                    f"{name} is not available in this build. "
+                    "Install a wheel with the required features enabled."
+                )
+            def __repr__(self):
+                return f"<unavailable {name}>"
+        _Unavailable.__name__ = name
+        _Unavailable.__qualname__ = name
+        _Unavailable.__module__ = __name__
+        return _Unavailable
 
 
 _RustUnionFindDecoder = _guard("UnionFindDecoder")
@@ -110,7 +114,7 @@ import numpy as _np
 # wheel). We never overwrite a real compiled ``__version__`` with it — doing so
 # would falsely claim a version the loaded binary is not — so after a version bump
 # ``__version__`` keeps reporting the *built* value until the Rust wheel is rebuilt.
-__fallback_version__ = "0.6.7"
+__fallback_version__ = "0.6.8"
 
 try:
     __version__ = _native_module.__version__
