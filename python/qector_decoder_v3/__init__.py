@@ -14,18 +14,21 @@ def _load_native_module():
 
 _native_module = _load_native_module()
 
+
 def _guard(name):
     try:
         return getattr(_native_module, name)
     except (AttributeError, ImportError):
+
         class _Unavailable:
             def __init__(self, *args, **kwargs):
                 raise RuntimeError(
-                    f"{name} is not available in this build. "
-                    "Install a wheel with the required features enabled."
+                    f"{name} is not available in this build. Install a wheel with the required features enabled."
                 )
+
             def __repr__(self):
                 return f"<unavailable {name}>"
+
         _Unavailable.__name__ = name
         _Unavailable.__qualname__ = name
         _Unavailable.__module__ = __name__
