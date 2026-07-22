@@ -4,9 +4,9 @@ from cryptography.hazmat.primitives.asymmetric import ed25519
 from cryptography.hazmat.primitives import serialization
 from cryptography.exceptions import InvalidSignature
 
-# Embedded Public Key — Production Ed25519 Key
+# Embedded Public Key — Production Ed25519 Key (rotated 2026-07-22)
 PUBLIC_KEY_PEM = b"""-----BEGIN PUBLIC KEY-----
-MCowBQYDK2VwAyEAeTTINio5n5SlaNFN9I3l73P1cnoe+Y08H5GuGGe3+iI=
+MCowBQYDK2VwAyEAQh9t19EZ4KWZEYjY3EwHCUzUIehZBlovaMtrpLQXeGA=
 -----END PUBLIC KEY-----"""
 
 try:

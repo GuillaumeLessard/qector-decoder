@@ -28,7 +28,10 @@ logger = logging.getLogger("qector_decoder_v3.stripe")
 # Retrieve keys from environment
 STRIPE_SECRET_KEY: str = os.getenv("STRIPE_SECRET_KEY") or os.getenv("STRIPE_SECRET", "")
 STRIPE_PUBLISHABLE_KEY: str = os.getenv("STRIPE_PUBLISHABLE_KEY") or os.getenv("STRIPE_PUBLISHABLE", "")
-STRIPE_WEBHOOK_SECRET: str = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+STRIPE_PURCHASE_LINK: str = os.getenv(
+    "STRIPE_PURCHASE_LINK",
+    "https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00?locale=en&__embed_source=buy_btn_1TsoKxRsa9cg9l8A7ExMmc77"
+)
 
 if STRIPE_SECRET_KEY:
     stripe.api_key = STRIPE_SECRET_KEY
@@ -41,6 +44,7 @@ def get_stripe_keys() -> Dict[str, str]:
         "secret_key_configured": bool(STRIPE_SECRET_KEY),
         "secret_key_prefix": STRIPE_SECRET_KEY[:8] + "..." if STRIPE_SECRET_KEY else "",
         "webhook_secret_configured": bool(STRIPE_WEBHOOK_SECRET),
+        "purchase_link": STRIPE_PURCHASE_LINK,
     }
 
 
@@ -49,8 +53,8 @@ def create_checkout_session(
     license_tier: str = "commercial",
     amount_cents: int = 49900,
     currency: str = "usd",
-    success_url: str = "https://qector.store/success?session_id={CHECKOUT_SESSION_ID}",
-    cancel_url: str = "https://qector.store/pricing",
+    success_url: str = "https://www.qector.store/success?session_id={CHECKOUT_SESSION_ID}",
+    cancel_url: str = "https://www.qector.store/pricing",
 ) -> Dict[str, Any]:
     """
     Creates a Stripe Checkout Session for purchasing a QECTOR Decoder license.
@@ -99,7 +103,9 @@ def handle_stripe_webhook_payload(
     upon successful payment.
     """
     secret = webhook_secret or STRIPE_WEBHOOK_SECRET
-    if secret and sig_header:
+    if secret:
+        if not sig_header:
+            raise ValueError("Stripe signature header ('stripe-signature') is missing.")
         try:
             event = stripe.Webhook.construct_event(payload, sig_header, secret)
         except Exception as e:

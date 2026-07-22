@@ -8,9 +8,11 @@ All notable changes to QECTOR Decoder will be documented in this file.
 ### Added
 - **Self-Auto-Debug Backend**: `AutoDecoder` implements a 7-tier fault-tolerant fallback engine (`CUDA` -> `OpenCL` -> `CPU Rayon` -> `CPU Batch` -> `CPU Single` -> `Blossom` -> `Lookup Table`) with automatic exception trapping, per-tier health scoring, and transparent recovery. `reset_backend_health()` restores suspended tiers.
 - **Ed25519 Offline License Verification**: `verify_license_token()` validates signed license tokens fully offline against an embedded public key. Supports both legacy 2-part and self-contained 3-part (`receipt_id.email_b64.sig_b64`) token formats. Configurable via `QECTOR_LICENSE` and `QECTOR_SILENT` environment variables.
-- **Stripe Checkout & Webhook Fulfillment**: `stripe_integration.py` and `stripe_webhook_server.py` provide end-to-end commercial license fulfillment - Checkout Session creation, webhook signature verification, and automatic Ed25519 token issuance on payment confirmation.
+- **Stripe Checkout & Webhook Fulfillment**: `stripe_integration.py` and `stripe_webhook_server.py` provide end-to-end commercial license fulfillment - Checkout Session creation, webhook signature verification, and automatic Ed25519 token issuance on payment confirmation. Direct purchase link: [Buy Commercial License](https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00?locale=en&__embed_source=buy_btn_1TsoKxRsa9cg9l8A7ExMmc77).
+- **DecoderPool LRU Caching**: Added LRU pool caching for `get_decoder_pool` in `decoder_cache.py`, preventing redundant process pool initialization across repeated multi-process decodes.
 
 ### Fixed
+- **Stripe Webhook Signature Verification**: Enforced strict signature verification in `handle_stripe_webhook_payload` whenever a webhook secret is set, preventing unauthenticated payload bypass.
 - `SparseBlossomDecoder::grow_regions` no longer collapses the compressed edge set - decoded syndromes are now bit-identical to the Blossom decoder.
 - `BPOSDDecoder.bp_decode_timed` initializes the wall-clock deadline before the iteration loop, so the latency budget is honored from the first iteration.
 - LER benchmark's rotated-surface generator now emits a proper two-half (X + Z) graphlike code.

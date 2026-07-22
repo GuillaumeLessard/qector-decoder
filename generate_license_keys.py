@@ -1,16 +1,37 @@
 """
 QECTOR Decoder v3 - Key Generation & License Token Signing Utility
+
+The production private key is NEVER hardcoded here. It is loaded from the
+QECTOR_LICENSE_PRIVATE_KEY_B64 environment variable (see .env, git-ignored).
+This file is safe to publish: it contains no secret material.
 """
 
 from __future__ import annotations
 import base64
+import os
+from pathlib import Path
 from cryptography.hazmat.primitives.asymmetric import ed25519
 from cryptography.hazmat.primitives import serialization
 
-# Embedded Production Private Key (matching the embedded PUBLIC_KEY_PEM in license.py)
-PRODUCTION_PRIVATE_KEY_PEM = b"""-----BEGIN PRIVATE KEY-----
-MC4CAQAwBQYDK2VwBCIEIK1kjPcTlbGSqrFbAE3p1wy/BUvVej8yquSCXqEq8oMR
------END PRIVATE KEY-----"""
+try:
+    from dotenv import load_dotenv
+    env_path = Path(__file__).resolve().parent / ".env"
+    if env_path.exists():
+        load_dotenv(dotenv_path=env_path)
+    else:
+        load_dotenv()
+except ImportError:
+    pass
+
+def _load_production_private_key_pem() -> bytes:
+    """Loads the production private key PEM from the environment (base64-encoded)."""
+    b64 = os.getenv("QECTOR_LICENSE_PRIVATE_KEY_B64", "")
+    if not b64:
+        raise RuntimeError(
+            "QECTOR_LICENSE_PRIVATE_KEY_B64 is not set. Set it in .env (git-ignored) "
+            "to sign production license tokens. Never commit the private key."
+        )
+    return base64.b64decode(b64)
 
 
 def generate_key_pair() -> tuple[bytes, bytes]:
@@ -32,12 +53,15 @@ def generate_key_pair() -> tuple[bytes, bytes]:
 def create_license_token(
     receipt_id: str,
     customer_email: str = "",
-    private_key_pem: bytes = PRODUCTION_PRIVATE_KEY_PEM
+    private_key_pem: bytes | None = None
 ) -> str:
     """
     Creates an Ed25519 signed license token.
-    Format: `{receipt_id}.{email_b64}.{signature_b64}` (with email) or `{receipt_id}.{signature_b64}`
+    Format: `{receipt_id}.{email_b64}.{signature_b64}` (with email)
+         or `{receipt_id}.{signature_b64}` (without email)
     """
+    if private_key_pem is None:
+        private_key_pem = _load_production_private_key_pem()
     priv_key = serialization.load_pem_private_key(private_key_pem, password=None)
     email_clean = customer_email.strip().lower()
     payload = f"{receipt_id}:{email_clean}".encode("utf-8")

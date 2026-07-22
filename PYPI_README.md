@@ -1,8 +1,9 @@
 # QECTOR Decoder v3
 
-**Source-available Rust/Python quantum error correction decoding platform.**
+**Source-Available Python Suite & Proprietary Rust Core.**  
+*Copyright © 2026 Guillaume Lessard. All Rights Reserved.*
 
-QECTOR Decoder v3 provides a Python package backed by a native Rust extension for quantum error correction research and validation workflows. It includes PyMatching-compatible MWPM validation, Union-Find decoding, belief-matching experiments, BP-OSD/qLDPC workflows, batch decoding, optional GPU backend checks, a 7-tier self-auto-debug fallback engine, Ed25519 cryptographic license verification, and Stripe-integrated commercial license fulfillment.
+QECTOR Decoder v3 provides a Python package backed by a native Rust extension for quantum error correction research and validation workflows. It includes PyMatching-compatible MWPM validation, Union-Find decoding, belief-matching experiments, BP-OSD/qLDPC workflows, batch decoding, optional GPU backend checks, a 7-tier self-auto-debug fallback engine, Ed25519 cryptographic license verification, and Stripe-integrated commercial license fulfillment. Direct Commercial License Purchase: [Buy via Stripe](https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00?locale=en&__embed_source=buy_btn_1TsoKxRsa9cg9l8A7ExMmc77).
 
 **Companion projects**:
 

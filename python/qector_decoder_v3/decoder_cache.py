@@ -85,6 +85,23 @@ def get_decoder(
     return _build_decoder(hashable, n_qubits, decoder_type)
 
 
+@_functools.lru_cache(maxsize=32)
+def _build_decoder_pool(
+    checks_tuple: Tuple[Tuple[int, ...]],
+    n_qubits: int,
+    decoder_type: str,
+    n_workers: Optional[int],
+):
+    from .decoder_pool import DecoderPool
+    checks = [list(c) for c in checks_tuple]
+    return DecoderPool(
+        checks,
+        n_qubits=n_qubits,
+        decoder_type=_normalize_decoder_name(decoder_type),
+        n_workers=n_workers,
+    )
+
+
 def get_decoder_pool(
     checks_tuple: Tuple[Tuple[int, ...]],
     n_qubits: int,
@@ -102,19 +119,14 @@ def get_decoder_pool(
     Returns:
         A :class:`DecoderPool` instance.
     """
-    from .decoder_pool import DecoderPool
-
-    return DecoderPool(
-        [list(c) for c in checks_tuple],
-        n_qubits=n_qubits,
-        decoder_type=decoder_type,
-        n_workers=n_workers,
-    )
+    hashable = tuple(tuple(int(q) for q in c) for c in checks_tuple)
+    return _build_decoder_pool(hashable, n_qubits, decoder_type, n_workers)
 
 
 def clear_decoder_cache():
-    """Clear the in-memory decoder LRU cache."""
+    """Clear the in-memory decoder and decoder pool LRU caches."""
     _build_decoder.cache_clear()
+    _build_decoder_pool.cache_clear()
 
 
 # ---------------------------------------------------------------------------

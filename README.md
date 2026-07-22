@@ -5,7 +5,8 @@
 [![Python](https://img.shields.io/pypi/pyversions/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
 [![License](https://img.shields.io/badge/License-Source_Available-blue)](LICENSE)
 
-**Source-available Rust/Python quantum error correction decoding platform.**
+**Source-Available Python Suite & Proprietary Rust Core.**  
+*Copyright © 2026 Guillaume Lessard. All Rights Reserved.*
 
 PyMatching-compatible MWPM validation - Belief-matching accuracy mode - BP-OSD for LDPC/qLDPC - CPU/GPU batch decoding - Artifact-backed benchmark evidence
 
@@ -473,7 +474,7 @@ QECTOR Decoder v3 is source-available.
 
 Commercial contact: [admin@qector.store](mailto:admin@qector.store)
 
-Website: [https://www.qector.store](https://www.qector.store)
+Website: [https://www.qector.store](https://www.qector.store) | [Direct Commercial License Checkout](https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00?locale=en&__embed_source=buy_btn_1TsoKxRsa9cg9l8A7ExMmc77)
 
 See [LICENSE](LICENSE) for the repository terms and contact the commercial team above for separate licensing.
 
@@ -489,7 +490,8 @@ QECTOR Decoder is free for personal, academic, and non-commercial research.
 - 📖 **Architecture Whitepaper:** [DOI: 10.5281/zenodo.21320543](https://doi.org/10.5281/zenodo.21320543)
 
 For commercial inquiries or to request access to the restricted technical archive for due diligence, contact: **admin@qector.store**  
-View pricing and license tiers: **https://qector.store/pricing**
+View pricing and license tiers: **https://www.qector.store/pricing**  
+Direct Stripe License Purchase: **[Buy Commercial License](https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00?locale=en&__embed_source=buy_btn_1TsoKxRsa9cg9l8A7ExMmc77)**
 
 ```bibtex
 @software{lessard2026qector,

@@ -53,7 +53,7 @@ def test_stripe_webhook_fulfillment_unauthenticated_fallback():
         }
     }).encode("utf-8")
 
-    result = handle_stripe_webhook_payload(payload=mock_payload, sig_header="")
+    result = handle_stripe_webhook_payload(payload=mock_payload, sig_header="", webhook_secret="")
     assert result["issued"] is True
     assert result["customer_email"] == "purchaser@qector.store"
     assert result["receipt_id"] == "cs_live_998877665544"

@@ -125,7 +125,8 @@ Unless explicitly granted in a written commercial agreement, no license tier inc
 
 Self-serve purchasing for the Commercial Evaluation License and Solo / Indie tiers is available at:
 
-**https://www.qector.store**
+- Licensing Portal: **https://www.qector.store**
+- Direct Stripe Checkout: **[Buy Commercial License via Stripe](https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00?locale=en&__embed_source=buy_btn_1TsoKxRsa9cg9l8A7ExMmc77)**
 
 Higher tiers, Validation Sprints, and custom services are initiated via:
 

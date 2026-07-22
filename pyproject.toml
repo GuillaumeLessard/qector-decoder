@@ -5,7 +5,7 @@ build-backend = "maturin"
 [project]
 name = "qector-decoder-v3"
 version = "0.6.7"
-description = "Production-grade quantum error correction decoding library."
+description = "Production-grade quantum error correction decoding library. Source-Available Python Suite & Proprietary Rust Core (Copyright (c) 2026 Guillaume Lessard. All Rights Reserved)."
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "LicenseRef-QECTOR-Source-Available" }

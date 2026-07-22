@@ -15,20 +15,10 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 import qector_decoder_v3 as qd
 from qector_decoder_v3.license import verify_license_token
 
-# ---- inline token creation using the production private key ----
-from cryptography.hazmat.primitives.asymmetric import ed25519 as _ed25519
-from cryptography.hazmat.primitives import serialization as _ser
-
-_PROD_PRIV_PEM = b"""-----BEGIN PRIVATE KEY-----
-MC4CAQAwBQYDK2VwBCIEIK1kjPcTlbGSqrFbAE3p1wy/BUvVej8yquSCXqEq8oMR
------END PRIVATE KEY-----"""
+from generate_license_keys import create_license_token
 
 def _create_token(receipt_id: str, email: str = "") -> str:
-    priv_key = _ser.load_pem_private_key(_PROD_PRIV_PEM, password=None)
-    payload = f"{receipt_id}:{email.lower()}".encode("utf-8")
-    sig = priv_key.sign(payload)
-    sig_b64 = base64.urlsafe_b64encode(sig).decode("utf-8").rstrip("=")
-    return f"{receipt_id}.{sig_b64}"
+    return create_license_token(receipt_id, customer_email=email)
 
 
 def test_1_version_and_exports():
