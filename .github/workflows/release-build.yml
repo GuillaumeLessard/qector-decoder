@@ -216,7 +216,7 @@ jobs:
       - name: Smoke-test the wheel before publishing
         run: |
           set -euo pipefail
-          WHEEL=$(echo dist/qector_decoder_v3-*.whl | cut -d' ' -f1)
+          WHEEL=$(ls dist/qector_decoder_v3-*linux*.whl | head -1)
           python -m venv /tmp/smoke_venv
           /tmp/smoke_venv/bin/pip install "$WHEEL"
           /tmp/smoke_venv/bin/python -c "
