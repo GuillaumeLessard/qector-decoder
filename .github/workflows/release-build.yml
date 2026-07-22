@@ -216,10 +216,11 @@ jobs:
       - name: Smoke-test the wheel before publishing
         run: |
           set -euo pipefail
-          WHEEL=$(ls dist/qector_decoder_v3-*linux*.whl | head -1)
+          PY_TAG=$(python3 -c "import sys; print(f'cp{sys.version_info.major}{sys.version_info.minor}')")
+          WHEEL=$(ls dist/qector_decoder_v3-*${PY_TAG}*linux*.whl | head -1)
           python -m venv /tmp/smoke_venv
-          SITE_PKG=$(/tmp/smoke_venv/bin/python -c "import site; print(site.getsitepackages()[0])")
-          unzip -q -o "$WHEEL" -d "$SITE_PKG"
+          /tmp/smoke_venv/bin/pip install --upgrade pip
+          /tmp/smoke_venv/bin/pip install "$WHEEL"
           /tmp/smoke_venv/bin/python -c "
           import qector_decoder_v3 as q
           print('version:', q.__version__)
