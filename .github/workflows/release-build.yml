@@ -224,9 +224,9 @@ jobs:
           /tmp/smoke_venv/bin/python -c "
           import qector_decoder_v3 as q
           print('version:', q.__version__)
-          from qector_decoder_v3 import codes, sinter_compat
+          from qector_decoder_v3 import codes, get_decoder
           c = codes.repetition_code(5)
-          d = c.make_decoder('sparse_blossom')
+          d = get_decoder(c.check_to_qubits, c.n_qubits, 'sparse_blossom')
           print('decoder:', type(d).__name__)
           print('OK')
           "
