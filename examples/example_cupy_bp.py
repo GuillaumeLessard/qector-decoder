@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-example_cupy_bp.py — QECTOR Decoder v3 (v0.6.2) batched GPU BP-OSD
+example_cupy_bp.py — QECTOR Decoder v3 (v0.6.7) batched GPU BP-OSD
 
 Demonstrates the CuPy-accelerated, GPU-resident batched belief propagation that
 feeds BP-OSD (``qector_decoder_v3.bp_cupy`` + ``qector_decoder_v3.bposd``) on a
@@ -40,7 +40,7 @@ def syndrome_validity(H: np.ndarray, corr: np.ndarray, syn: np.ndarray) -> np.nd
 
 def main():
     print("=" * 64)
-    print("QECTOR v3 (0.6.2) — Batched GPU BP-OSD on a qLDPC code")
+    print("QECTOR v3 (0.6.7) — Batched GPU BP-OSD on a qLDPC code")
     print("=" * 64)
 
     # ---- Capability snapshot (honest hardware report) --------------------

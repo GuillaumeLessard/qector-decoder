@@ -332,7 +332,7 @@ None — this is a forward-compatible release from v0.3.0. Feature flags are add
 **QECTOR Decoder Source-Available License v1.0** — see `LICENSE`.
 Copyright © 2026 Guillaume Lessard / iD01t Productions. All rights reserved.
 Free for non-commercial use; commercial use requires a paid license
-(guiliguili2705@gmail.com · https://www.qector.store).
+(admin@qector.store · https://www.qector.store).
 
 ---
 

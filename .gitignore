@@ -1,6 +1,10 @@
 # QECTOR Decoder v3 -- .gitignore
 # =================================
 
+# --- Proprietary Rust Core (Never commit to public repo) ---
+src/*
+!src/lib.rs
+
 # --- Build artifacts ---
 /target/
 /dist/
@@ -96,5 +100,35 @@ test_v0*.py
 _kimi_fix_probe.py
 _fix_fixtures.py
 
+# --- Secret environment & credentials ---
+.env
+licenses_issued.json
+
+# --- Log files & scratch test outputs ---
+*.log
+*.txt
+!SHA256SUMS.txt
+!bp_osd_fns.txt
+!mwpm_fns.txt
+!tags.txt
+
+# --- Temporary test environments & scratch scripts ---
+.venv*/
+repro_*.py
+_fix_*.py
+check_*.py
+check_*.txt
+clippy_*.txt
+cargo_*.txt
+errcheck_*.txt
+maturin_*.txt
+pip_show_*.txt
+install_*.txt
+test_*.txt
+verify_*.log
+wheel_build_*.log
+wheel_verify.log
+
 # --- Local-only docs (contain secret names / infra details, never push) ---
 RELEASE_PROCEDURE.md
+

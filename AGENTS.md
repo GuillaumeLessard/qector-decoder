@@ -13,7 +13,7 @@ QECTOR Decoder v3 is a high-performance, source-available Rust/Python platform f
 - **Ecosystem**: PyMatching-compatible, Stim/Sinter integration, belief-matching, Qiskit plugin, REST/gRPC + full-featured MCP server (25 tools in the QectorWorkbench companion).
 - **Emphasis**: Syndrome faithfulness, CPU/GPU bit-identical results, extensive regression + artifact-backed benchmarks, reproducibility.
 
-**Current version**: 0.6.4 (Cargo + Python packaging).
+**Current version**: 0.6.7 (Cargo + Python packaging).
 
 **Workspace layout** (this checkout):
 

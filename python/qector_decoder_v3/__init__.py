@@ -34,6 +34,7 @@ except (AttributeError, ImportError):
     _RustLERBenchmark = None  # type: ignore[assignment]
 _RustSparseBlossomDecoder = _native_module.SparseBlossomDecoder
 _RustHybridDecoder = _native_module.HybridDecoder
+_RustHybridCascadeDecoder = _native_module.HybridCascadeDecoder
 py_check_to_edges = _native_module.py_check_to_edges
 py_generate_surface_code_checks = _native_module.py_generate_surface_code_checks
 py_generate_toy_code_checks = _native_module.py_generate_toy_code_checks
@@ -98,12 +99,61 @@ import numpy as _np
 # wheel). We never overwrite a real compiled ``__version__`` with it — doing so
 # would falsely claim a version the loaded binary is not — so after a version bump
 # ``__version__`` keeps reporting the *built* value until the Rust wheel is rebuilt.
-__fallback_version__ = "0.6.6"
+__fallback_version__ = "0.6.7"
 
 try:
     __version__ = _native_module.__version__
 except (AttributeError, ImportError):
     __version__ = __fallback_version__
+
+import os as _os_mod
+import sys as _sys_mod
+import logging
+from .license import verify_license_token
+from . import license
+
+__license__ = "LicenseRef-QECTOR-Source-Available"
+
+# Prevent logger warnings
+logging.getLogger("qector_decoder_v3").addHandler(logging.NullHandler())
+
+# Core threading configuration
+MAX_WORKERS: int = _os_mod.cpu_count() or 1
+
+
+def _is_license_active() -> bool:
+    """Checks if a valid license signature or override is present."""
+    token = _os_mod.environ.get("QECTOR_LICENSE", "").strip()
+    if not token:
+        return False
+    return verify_license_token(token)
+
+
+def _emit_startup_notice() -> None:
+    """Emits notice only in interactive environments when unlicensed."""
+    if _os_mod.environ.get("QECTOR_SILENT") or _is_license_active():
+        return
+
+    ci_vars = {"CI", "GITHUB_ACTIONS", "GITLAB_CI", "BUILDKITE", "CIRCLECI"}
+    if any(var in _os_mod.environ for var in ci_vars):
+        return
+
+    is_interactive = (
+        hasattr(_sys_mod, "ps1")
+        or "ipykernel" in _sys_mod.modules
+        or "IPython" in _sys_mod.modules
+    )
+
+    if is_interactive:
+        _sys_mod.stderr.write(
+            f"[QECTOR v{__version__}] High-performance Rust/PyO3 QEC Decoder initialized.\n"
+            f"[QECTOR v{__version__}] Academic/Personal use is free. Institutional/Commercial licenses: https://qector.store/pricing\n"
+        )
+        _sys_mod.stderr.flush()
+
+
+_emit_startup_notice()
+
 
 from typing import Optional
 
@@ -245,7 +295,7 @@ def _opencl_health_check() -> bool:
         "import numpy as np\n"
         "import qector_decoder_v3 as qd\n"
         "dec = qd.OpenCLBatchDecoder([[0, 1]], 2)\n"
-        "out = _np.asarray(dec.batch_decode(_np.array([[1]], dtype=_np.uint8)), dtype=_np.uint8)\n"
+        "out = np.asarray(dec.batch_decode(np.array([[1]], dtype=np.uint8)), dtype=np.uint8)\n"
         "assert out.shape == (1, 2)\n"
     )
     try:
@@ -536,144 +586,58 @@ class CPUBatchDecoder:
         return self._inner.n_checks
 
 
-class OpenCLBatchDecoder:
-    """GPU-accelerated OpenCL batch decoder.
+try:
+    from .qector_decoder_v3 import CUDABatchDecoder as _CudaReal
 
-    Uses NVIDIA/AMD/Intel GPU via OpenCL for parallel batch decoding.
-    Falls back to CPU UnionFind for small batches (< 8) or after repeated GPU failures.
-    Automatically recovers from degraded mode after periodic GPU health checks.
-    """
+    CUDABatchDecoder = _CudaReal
+except (ImportError, AttributeError):
 
-    def __init__(self, check_to_qubits, n_qubits=None):
-        import os as _os_local
+    class CUDABatchDecoder:  # type: ignore[no-redef]
+        """CUDA batch decoder — build feature cuda, runtime needs NVIDIA driver.
 
-        if _os_local.environ.get("QECTOR_OPENCL_PROBE_CHILD") != "1" and not _opencl_health_check():
-            raise RuntimeError(
-                "OpenCL backend is unavailable or failed its health check; "
-                "use CPUBatchDecoder/AutoDecoder fallback or set QECTOR_DISABLE_OPENCL=1"
-            )
-        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits, reject_hyperedges=False)
-        self._inner = _RustOpenCLBatchDecoder(c2q, nq)
-
-    def batch_decode(self, syndromes):
-        if not isinstance(syndromes, _np.ndarray):
-            syndromes = _np.array(syndromes, dtype=_np.uint8)
-        if syndromes.dtype != _np.uint8:
-            syndromes = syndromes.astype(_np.uint8)
-        if syndromes.ndim != 2:
-            raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
-        return self._inner.batch_decode(syndromes)
-
-    def reset(self):
-        """Reset all GPU counters and exit degraded mode.
-
-        Forces the decoder to retry GPU on the next call.
-        Useful after driver update, GPU maintenance, or manual intervention.
+        Public wheels are built with --no-default-features --features cuda;
+        this stub is used when the native module is absent.
         """
-        self._inner.reset()
 
-    @property
-    def n_qubits(self):
-        return self._inner.n_qubits
+        @classmethod
+        def is_available(cls):
+            """Return True if CUDA was compiled and a CUDA-capable driver+device is present.
 
-    @property
-    def n_checks(self):
-        return self._inner.n_checks
-
-    @property
-    def consecutive_failures(self):
-        """Number of consecutive GPU failures since last success."""
-        return self._inner.consecutive_failures
-
-    @property
-    def total_failures(self):
-        """Total number of GPU failures since decoder creation."""
-        return self._inner.total_failures
-
-    @property
-    def is_degraded(self):
-        """True if decoder is in CPU-only mode after repeated GPU failures."""
-        return self._inner.is_degraded
-
-    @property
-    def gpu_recoveries(self):
-        """Number of times the GPU recovered after being in degraded mode."""
-        return self._inner.gpu_recoveries
-
-    @property
-    def device_name(self):
-        """Human-readable OpenCL GPU device name (e.g. 'NVIDIA GeForce RTX 3080')."""
-        return self._inner.device_name
-
-    @staticmethod
-    def is_available():
-        """Return True if OpenCL is available and passes a safe decode probe."""
-        return _opencl_health_check()
-
-
-class CUDABatchDecoder:
-    """GPU-accelerated native CUDA batch decoder.
-
-    Uses a compiled CUDA kernel loaded through the CUDA Driver API. Falls back
-    to CPU UnionFind for tiny batches or after repeated CUDA failures.
-    """
-
-    def __init__(self, check_to_qubits, n_qubits=None):
-        if _RustCUDABatchDecoder is None:
-            raise RuntimeError("qector-decoder-v3 was built without the 'cuda' feature")
-        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits, reject_hyperedges=False)
-        self._inner = _RustCUDABatchDecoder(c2q, nq)
-
-    def batch_decode(self, syndromes):
-        if not isinstance(syndromes, _np.ndarray):
-            syndromes = _np.array(syndromes, dtype=_np.uint8)
-        if syndromes.dtype != _np.uint8:
-            syndromes = syndromes.astype(_np.uint8)
-        if syndromes.ndim != 2:
-            raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
-        return self._inner.batch_decode(syndromes)
-
-    def reset(self):
-        self._inner.reset()
-
-    @property
-    def n_qubits(self):
-        return self._inner.n_qubits
-
-    @property
-    def n_checks(self):
-        return self._inner.n_checks
-
-    @property
-    def device_name(self):
-        return self._inner.device_name
-
-    @property
-    def compute_capability(self):
-        return self._inner.compute_capability
-
-    @property
-    def consecutive_failures(self):
-        return self._inner.consecutive_failures
-
-    @property
-    def total_failures(self):
-        return self._inner.total_failures
-
-    @property
-    def is_degraded(self):
-        return self._inner.is_degraded
-
-    @property
-    def gpu_recoveries(self):
-        return self._inner.gpu_recoveries
-
-    @staticmethod
-    def is_available():
-        """Return True if a CUDA driver device is available in this build."""
-        if _RustCUDABatchDecoder is None:
+            A False return may mean the build lacked the cuda feature, or no
+            CUDA driver/device was detected at runtime.
+            """
             return False
-        return _RustCUDABatchDecoder.is_available()
+
+        def __init__(self, *a, **k):
+            raise RuntimeError("CUDABatchDecoder not available — wheel built without CUDA or no driver.")
+
+
+try:
+    from .qector_decoder_v3 import OpenCLBatchDecoder as _OclReal
+
+    OpenCLBatchDecoder = _OclReal
+except (ImportError, AttributeError):
+
+    class OpenCLBatchDecoder:  # type: ignore[no-redef]
+        """OpenCL batch decoder — requires source build with --features opencl.
+
+        Public PyPI wheels are CUDA-only, so this returns False by design.
+        """
+
+        @classmethod
+        def is_available(cls):
+            """Return True if OpenCL was compiled and the driver+device pass a live decode probe.
+
+            A False return may mean the build lacked the opencl feature, or the
+            driver/device is absent or failed the probe.
+            """
+            return False
+
+        def __init__(self, *a, **k):
+            raise RuntimeError(
+                "OpenCLBatchDecoder not available in CUDA-only wheel. "
+                "Build from source: maturin develop --features opencl"
+            )
 
 
 class SparseBlossomDecoder:
@@ -796,6 +760,107 @@ class BPOSDDecoder:
     @property
     def n_checks(self):
         return self._inner.n_checks
+
+
+class HybridCascadeDecoder:
+    """Hybrid cascading decoder: Union-Find pre-filter + Blossom/BP-OSD escalation.
+
+    Runs the fast Union-Find decoder (~85,000 dec/s even at d=13) as a
+    pre-filter over every syndrome and only escalates non-trivial or
+    high-weight patterns to the slower, more accurate escalation decoder.
+    This keeps total pipeline throughput high while preserving near-zero
+    logical error rates for the hard cases.
+
+    Args:
+        check_to_qubits: For each check, the list of qubits it measures.
+        n_qubits: Total number of qubits (inferred if omitted).
+        edge_weights: Optional per-qubit weights (Blossom escalation only).
+        max_accept_weight: Optional cap on the pre-filter correction weight;
+            heavier UF results escalate. Default: derived from defect count.
+        escalation: "blossom" (default) or "bposd" (wall-clock-capable).
+        error_rate: Physical error rate for the BP-OSD escalation decoder.
+    """
+
+    def __init__(
+        self,
+        check_to_qubits,
+        n_qubits=None,
+        edge_weights=None,
+        max_accept_weight=None,
+        escalation=None,
+        error_rate=None,
+    ):
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
+        self._inner = _RustHybridCascadeDecoder(c2q, nq, edge_weights, max_accept_weight, escalation, error_rate)
+
+    def decode(self, syndrome):
+        """Decode one syndrome: UF pre-filter first, escalation on decline."""
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
+        if syndrome.dtype != _np.uint8:
+            raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
+        return self._inner.decode(syndrome)
+
+    def decode_timed(self, syndrome, max_latency_ms=10.0):
+        """Decode with a wall-clock deadline (ms) on the escalation stage."""
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
+        if syndrome.dtype != _np.uint8:
+            raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
+        return self._inner.decode_timed(syndrome, max_latency_ms)
+
+    def batch_decode(self, syndromes):
+        """Batch cascade decode — the fast path for the pre-decoder strategy.
+
+        Runs the Union-Find pre-filter in parallel (Rayon) across the whole
+        batch and escalates only the syndromes the pre-filter declines.
+
+        Args:
+            syndromes: np.ndarray of shape (batch, n_checks), dtype uint8.
+
+        Returns:
+            np.ndarray of shape (batch, n_qubits), dtype uint8.
+        """
+        if not isinstance(syndromes, _np.ndarray):
+            syndromes = _np.array(syndromes, dtype=_np.uint8)
+        if syndromes.dtype != _np.uint8:
+            raise TypeError(f"Syndromes must be dtype uint8, got {syndromes.dtype}")
+        if syndromes.ndim != 2:
+            raise ValueError(f"Syndromes must be 2D (batch, n_checks), got {syndromes.ndim}D")
+        return self._inner.batch_decode(syndromes)
+
+    def batch_decode_timed(self, syndromes, max_latency_ms=10.0):
+        """Batch cascade decode with a wall-clock deadline (ms) per escalation."""
+        if not isinstance(syndromes, _np.ndarray):
+            syndromes = _np.array(syndromes, dtype=_np.uint8)
+        if syndromes.dtype != _np.uint8:
+            raise TypeError(f"Syndromes must be dtype uint8, got {syndromes.dtype}")
+        if syndromes.ndim != 2:
+            raise ValueError(f"Syndromes must be 2D (batch, n_checks), got {syndromes.ndim}D")
+        return self._inner.batch_decode_timed(syndromes, max_latency_ms)
+
+    @property
+    def n_qubits(self):
+        return self._inner.n_qubits
+
+    @property
+    def n_checks(self):
+        return self._inner.n_checks
+
+    @property
+    def prefilter_hits(self):
+        """Number of syndromes resolved by the Union-Find pre-filter."""
+        return self._inner.prefilter_hits
+
+    @property
+    def escalations(self):
+        """Number of syndromes escalated to Blossom/BP-OSD."""
+        return self._inner.escalations
+
+    @property
+    def prefilter_hit_rate(self):
+        """Fraction of decoded syndromes resolved by the pre-filter."""
+        return self._inner.prefilter_hit_rate
 
 
 class NeuralPredecoder:
@@ -1385,6 +1450,7 @@ __all__ = [
     "GNNPredecoder",
     "GNNTrainer",
     "HybridDecoder",
+    "HybridCascadeDecoder",
     "LookupTableDecoder",
     "BenchmarkSuite",
     "LERBenchmark",
@@ -1476,10 +1542,19 @@ try:
 except Exception:  # pragma: no cover
     rest_api = None  # type: ignore[assignment]
 
+try:
+    from . import stripe_integration
+except Exception:  # pragma: no cover
+    stripe_integration = None  # type: ignore[assignment]
+
 __all__ += [
     "qiskit_plugin",
     "stim_compat",
     "rest_api",
+    "stripe_integration",
+    "MAX_WORKERS",
+    "verify_license_token",
+    "license",
 ]
 
 # ---------------------------------------------------------------------------
@@ -1651,3 +1726,78 @@ except Exception:  # pragma: no cover - defensive; streaming has no hard deps
 for _name in ("os", "sys", "subprocess"):
     globals().pop(_name, None)
 # Note: numpy kept as _np internally; public API uses explicit numpy where needed in docs.
+
+
+# ===========================================================================
+# v0.6.7 release notes (public)
+# ===========================================================================
+__changelog__ = {
+    "0.6.7": [
+        "Bugfix: SparseBlossomDecoder::grow_regions no longer collapses the "
+        "compressed edge set — the previous version drained edges through a "
+        "RadixHeap and back, which silently zeroed the `source_defect` field. "
+        "All decoded syndromes are now bit-identical to the Blossom decoder.",
+        "Bugfix: BPOSDDecoder.bp_decode_timed now initializes the wall-clock "
+        "deadline before the iteration loop, not inside it, so the latency "
+        "budget is honored on the first iteration.",
+        "Bugfix: LER benchmark's rotated-surface generator now emits a proper "
+        "two-half (X + Z) graphlike code, so the logical operator and weight "
+        "gap statistics are meaningful.",
+        "Feature: SparseBlossomDecoder.k_nearest_via_radix — public event-driven "
+        "candidate-edge discovery backed by a new RadixHeap<u32, HeapEvent> "
+        "structure exposed to downstream callers that need fine control over "
+        "the candidate set.",
+        "Feature: MCP server (mcp_server) now exposes 5 new tools: "
+        "decode_syndrome_blossom, batch_decode_blossom, run_ler_benchmark, "
+        "plus expanded get_decoder_info listing all 11 decoder families.",
+        "Quality: cross-decoder syndrome-validity test suite "
+        "src/cross_decoder_tests.rs covers UF / FastUF / LookupTable / "
+        "SparseBlossom / BP-OSD / SlidingWindow / Streaming / Hybrid.",
+        "Quality: SafeTensors loader now has a full round-trip test suite "
+        "covering generic + runtime dispatch, dtype mismatch, missing tensors, "
+        "and shape round-trip.",
+        "Quality: dead-code warnings eliminated across the crate (8 → 0).",
+    ],
+    "0.6.6": [
+        "Rust core upgraded with cluster-growth memory reuse and Sparse Blossom "
+        "shattering. Python 3.9-3.13 wheel support, smarter numpy cap in the "
+        "[all] extra.",
+    ],
+}
+
+
+def changelog() -> str:
+    """Return a human-readable changelog string for the loaded package."""
+    lines = [f"QECTOR Decoder v{__version__}", "=" * 40]
+    for ver, items in __changelog__.items():
+        lines.append(f"\n## v{ver}")
+        for it in items:
+            lines.append(f"  - {it}")
+    return "\n".join(lines)
+
+
+# v0.6.7: Expose the new SparseBlossom event-driven k-NN candidate discovery
+# as a thin Python convenience for callers that already use the Rust decoder.
+def sparse_blossom_radix_neighbors(decoder, defects, k=8):
+    """Return the k-nearest candidate edges (sorted by distance) for `defects`.
+
+    Backed by the new Rust `SparseBlossomDecoder::k_nearest_via_radix` method
+    introduced in v0.6.7. Use this when you want to build a custom MWPM
+    candidate set or analyze the region-growth candidate distribution.
+
+    Parameters
+    ----------
+    decoder : qector_decoder_v3.SparseBlossomDecoder
+        The decoder (must be a `SparseBlossomDecoder`).
+    defects : list[int]
+        Check indices that fired (1 in the syndrome).
+    k : int, default 8
+        Number of nearest neighbours to keep per defect.
+
+    Returns
+    -------
+    list[tuple[int, int, int, int]]
+        ``(source_defect, target_defect, distance, observables_bitmask)``
+        sorted by ascending distance.
+    """
+    return list(decoder.k_nearest_via_radix(list(defects), int(k)))

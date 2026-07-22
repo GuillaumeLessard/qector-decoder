@@ -9,8 +9,9 @@ those two defects exactly with no side effects, then decode whatever remains.
 
 The result is always syndrome-faithful: committed edges toggle exactly their two
 checks, and the residual is decoded by an exact MWPM decoder, so
-``H @ correction == syndrome`` holds. Pair it with ``UnionFindDecoder`` (speed) or
-``BlossomDecoder`` (exact residual).
+``H @ correction == syndrome`` holds. Pair it with ``UnionFindDecoder`` or
+``FastUnionFindDecoder`` (speed), ``BlossomDecoder`` (exact residual), or
+``SparseBlossomDecoder`` (exact residual, better scaling at large distance).
 
 Example
 -------
@@ -28,7 +29,12 @@ from typing import TYPE_CHECKING, List, Tuple, Union
 import numpy as np
 
 if TYPE_CHECKING:
-    from . import BlossomDecoder, SparseBlossomDecoder, UnionFindDecoder
+    from . import (
+        BlossomDecoder,
+        FastUnionFindDecoder,
+        SparseBlossomDecoder,
+        UnionFindDecoder,
+    )
 
 __all__ = ["PredecodedDecoder", "quantize_weights"]
 
@@ -54,7 +60,12 @@ class PredecodedDecoder:
     """Local-matching predecoder + exact/fast residual decoder."""
 
     def __init__(self, check_to_qubits, n_qubits=None, backend: str = "blossom"):
-        from . import BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder
+        from . import (
+            BlossomDecoder,
+            FastUnionFindDecoder,
+            SparseBlossomDecoder,
+            UnionFindDecoder,
+        )
 
         if not check_to_qubits:
             raise ValueError("check_to_qubits must be non-empty")
@@ -76,21 +87,40 @@ class PredecodedDecoder:
                 key = (min(chk), max(chk))
                 self._pair_edge.setdefault(key, q)
 
-        _valid_backends = ("blossom", "union_find", "unionfind", "sparse_blossom")
-        _backend_map = {"unionfind": "union_find"}
+        _valid_backends = (
+            "blossom",
+            "union_find",
+            "unionfind",
+            "sparse_blossom",
+            "fast_union_find",
+            "fastunionfind",
+        )
+        _backend_map = {
+            "unionfind": "union_find",
+            "fastunionfind": "fast_union_find",
+        }
         if backend in _backend_map:
             backend = _backend_map[backend]
         if backend not in _valid_backends:
-            raise ValueError("backend must be one of ['blossom', 'union_find', 'sparse_blossom']")
+            raise ValueError(
+                "backend must be one of "
+                "['blossom', 'union_find', 'sparse_blossom', 'fast_union_find']"
+            )
         self.backend = backend
-        residual: Union[BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder]
+        residual: Union[
+            BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder, FastUnionFindDecoder
+        ]
         if backend == "blossom":
             residual = BlossomDecoder(self._c2q, self.n_qubits)
         elif backend == "union_find":
             residual = UnionFindDecoder(self._c2q, self.n_qubits)
+        elif backend == "fast_union_find":
+            residual = FastUnionFindDecoder(self._c2q, self.n_qubits)
         else:
             residual = SparseBlossomDecoder(self._c2q, self.n_qubits)
-        self._residual: Union[BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder] = residual
+        self._residual: Union[
+            BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder, FastUnionFindDecoder
+        ] = residual
         self.last_predecoded = 0  # number of defects resolved by the predecoder
 
     def _predecode(self, syndrome: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:

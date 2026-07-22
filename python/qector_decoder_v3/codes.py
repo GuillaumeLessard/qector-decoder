@@ -379,11 +379,46 @@ def from_parity_check_matrix(H: Any, name: str = "custom", distance: Optional[in
 
 
 def _to_dense_binary(H: Any) -> np.ndarray:
-    """Convert dense/scipy-sparse input to a dense uint8 GF(2) array."""
+    """Convert dense/scipy-sparse input to a dense uint8 GF(2) array.
+
+    Raises ``ValueError`` rather than silently mis-converting when ``H``
+    clearly isn't a parity-check matrix. The most common misuse: passing a
+    check-to-qubits adjacency list (rows of *qubit indices*, as returned by
+    ``generate_repetition_code_checks`` / ``generate_surface_code_checks``
+    and consumed by ``BPOSDDecoder`` / ``BlossomDecoder`` /
+    ``UnionFindDecoder``) where this function instead expects a dense
+    ``(n_checks, n_qubits)`` 0/1 matrix. Left unchecked, that mistake
+    silently "succeeds": the adjacency list is read as if it were already a
+    dense matrix, so ``n_qubits`` becomes the check *weight* (e.g. 2)
+    instead of the true qubit count, and every decode call then returns a
+    correction of the wrong length with no error at all.
+    """
     if hasattr(H, "toarray"):  # scipy.sparse
         arr = H.toarray()
     else:
-        arr = np.asarray(H)
+        try:
+            arr = np.asarray(H)
+        except ValueError as e:
+            raise ValueError(
+                "Could not interpret H as a dense array (ragged rows?). If you "
+                "have a check-to-qubits adjacency list (rows of qubit indices, "
+                "e.g. from generate_surface_code_checks), this function expects "
+                "a dense 0/1 parity-check matrix instead -- use "
+                "BPOSDDecoder(check_to_qubits, n_qubits, error_rate) for the "
+                f"adjacency-list format. Original error: {e}"
+            ) from e
+    if arr.size > 0 and arr.dtype != bool:
+        max_abs = float(np.abs(arr).max())
+        if max_abs > 1:
+            raise ValueError(
+                f"H has entries with magnitude up to {int(max_abs)}, but a GF(2) "
+                "parity-check matrix must contain only 0/1. This usually means a "
+                "check-to-qubits adjacency list (rows of qubit indices) was "
+                "passed where a dense matrix was expected. For that format, use "
+                "BPOSDDecoder(check_to_qubits, n_qubits, error_rate) instead; for "
+                "a dense matrix, pass shape (n_checks, n_qubits) with only 0s "
+                "and 1s (e.g. code.parity_check_matrix())."
+            )
     arr = (np.asarray(arr) % 2).astype(np.uint8)
     return arr
 

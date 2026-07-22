@@ -21,6 +21,7 @@ EXPECTED_CLASSES = [
     "CUDABatchDecoder",
     "OpenCLBatchDecoder",
     "BPOSDDecoder",
+    "HybridCascadeDecoder",
     "StreamingDecoder",
     "SlidingWindowDecoder",
     "AutoDecoder",

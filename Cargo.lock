@@ -1290,7 +1290,7 @@ dependencies = [
 
 [[package]]
 name = "qector_decoder_v3"
-version = "0.6.6"
+version = "0.6.7"
 dependencies = [
  "chrono",
  "fastrand",

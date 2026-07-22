@@ -7,6 +7,35 @@ environment so report figures trace back to a specific build.
 
 ## [Unreleased]
 
+### Known gap — publish pipeline
+- **v0.6.7 is built and installed locally but has not been published to PyPI.** Verified via `pip index versions qector-decoder-v3`: live PyPI latest is `0.6.6`; `0.6.7` does not appear in the available-versions list at all. All 8 local version-of-record locations (`pyproject.toml`, `Cargo.toml`, `CITATION.cff`, `codemeta.json`, `python/qector_decoder_v3/__init__.py` fallback, `README.md`, `PYPI_README.md`, `CHANGELOG.md`) are internally consistent at `0.6.7` — the inconsistency is between local/GitHub state and the live PyPI index, not within local metadata. Before any further version work (including a v1.0.0 bump), either publish `0.6.7` per `RELEASE_PROCEDURE.md` §6, or explicitly decide `0.6.7` will be superseded by the next tag without ever going live. Do not tag v1.0.0 while a prior tagged version sits unpublished — pick one before proceeding.
+
+### Known gap — unclosed verification from 0.6.7
+- **The 0.6.7 entry below contains several items marked as not independently re-verified this session** (see "Not independently re-tested this session" under Added; `cargo check --all-targets` explicitly not re-run; the Retracted entry itself documents a claim that was carried as fixed in a prior draft before being caught and walked back). This is honest changelog discipline — better to record an open gap than a false confirmation — but it means 0.6.7's own verification loop is not fully closed. Any release that becomes v1.0.0 should either be a later version where these specific items get their own confirmed re-test entries, or v1.0.0's own changelog entry should explicitly re-verify (not just repeat) each item this note points at before the tag.
+
+## [0.6.7] - 2026-07-20
+
+### Fixed
+- **`indices[self.n_checks..]` panic in `bp_osd.rs` (`BPOSDDecoder.decode`)**: crashed the entire Python process (unrecoverable Rust panic across the PyO3 boundary, not a catchable exception) on hyperedge check structures, e.g. the 18-check/9-qubit rotated surface code. Reproduced deterministically in an isolated process, patched, rebuilt, reinstalled, and re-verified via the exact original repro (exit 0, correct output). Confirmed specific to hyperedge structures — the same call path runs cleanly on a graphlike repetition code both before and after the patch.
+- **NaN `error_rate` panic in `bp_osd.rs`**: an unclamped NaN error rate silently poisoned belief propagation, burning through all 50 iterations before crashing (~133s wall time). Fixed by clamping `error_rate` at the constructor. Re-verified via the exact original repro: now returns in ~17s — matching the baseline runtime of every other clean script this session — instead of crashing at 133s.
+- **`_opencl_health_check()`'s child-process probe script referenced an undefined `_np` name.** The probe script imports `numpy` as `np` in the child process, but the probe line referenced `_np` (the parent module's private alias, not defined in that child scope), raising a silent `NameError` on every invocation. This unconditionally set `_OPENCL_HEALTH_CACHE = False`, meaning `opencl_is_available()` always reported `False` regardless of real hardware or driver support. Fixed by using `np` consistently in the probe script. Verified directly against the shipped `__init__.py`: the embedded child-process script now reads `import numpy as np` and uses `np.asarray(...)` / `np.array(...)` throughout the probe, with no `_np` reference anywhere in that scope. (A same-machine black-box call to `opencl_is_available()` alone can't confirm this fix, since this machine has no OpenCL hardware and would correctly return `False` either way — the source-level check above is what closes the question.)
+- **`SparseBlossomDecoder::grow_regions` / `RadixHeap` — bit-identical to `BlossomDecoder`.** Re-confirmed empirically: 10/10 trials with genuinely syndrome-reachable errors (constructed via `H @ error`, not hand-picked) on the 18-check hyperedge code produced bit-for-bit identical corrections between the two decoders. Note: this repo's own tests named "bitperfect" (`test_sparse_vs_blossom_bitperfect_ring`, `..._ring_20`) do not actually assert cross-decoder equality — they only check each decoder's own output independently satisfies the syndrome. The bit-identical claim rests on this session's empirical test, not on those two Rust tests.
+- **`BPOSDDecoder`'s `bp_decode_timed` (Rust) / `decode_timed` (Python) — deadline honored before the first iteration.** Confirmed at three independent levels: source shows `Instant::now()` initialized before the loop with the deadline check as the literal first statement of each iteration; both relevant Rust unit tests pass (`test_bp_decode_timed_converges_and_matches_untimed`, `test_bp_decode_timed_respects_zero_latency_deadline`); and live timing on the 18-check hyperedge code shows `max_latency_ms=0.0` stabilizing at ~0.02ms vs. a generous budget's consistent ~0.68ms — a clean ~30x gap.
+
+### Retracted
+- **LER benchmark's rotated-surface generator does *not* emit a graphlike code.** A prior draft of this entry claimed `generate_surface_code_checks` was fixed to emit "a proper two-half (X + Z) graphlike code." Re-tested directly against the live 0.6.7 install: `generate_surface_code_checks(3)` still returns an 18-check, 9-qubit matrix where every qubit participates in 8 checks (graphlike requires ≤2). Unchanged from prior versions — still a rank-4-of-18 hyperedge code, exactly as its own docstring describes ("periodic/toric surface code," "hyperedges," "rank-deficient"). No code change was made here this cycle; the claim was inaccurate and is retracted, not fixed.
+
+### Added
+*(Not independently re-tested this session — carried over as-is from a prior draft of this entry.)*
+- `SparseBlossomDecoder.k_nearest_via_radix` — public event-driven candidate-edge discovery backed by a new `RadixHeap<u32, HeapEvent>` structure exposed to downstream callers that need fine control over the candidate set.
+- MCP server (`mcp_server`) now exposes 5 new tools: `decode_syndrome_blossom`, `batch_decode_blossom`, `run_ler_benchmark`, plus expanded `get_decoder_info` listing all 11 decoder families.
+
+### Quality
+- Cross-decoder syndrome-validity test suite (`src/cross_decoder_tests.rs`) covers UF / FastUF / LookupTable / SparseBlossom / BP-OSD / SlidingWindow / Streaming / Hybrid.
+- SafeTensors loader now has a full round-trip test suite covering generic + runtime dispatch, dtype mismatch, missing tensors, and shape round-trip.
+- Dead-code warnings eliminated across the crate (8 → 0).
+- `cargo test --lib`: 142 passed, 0 failed, 0 ignored — re-run directly this session (finished in 14.91s), unchanged after this session's two `bp_osd.rs` edits. `cargo check --all-targets` not re-run this session.
+
 ## [0.6.6] - 2026-07-12
 
 ### Fixed
