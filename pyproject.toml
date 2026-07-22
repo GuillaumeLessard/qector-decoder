@@ -5,20 +5,32 @@ build-backend = "maturin"
 [project]
 name = "qector-decoder-v3"
 version = "0.6.7"
-description = "Production-grade quantum error correction decoding library. Source-Available Python Suite & Proprietary Rust Core (Copyright (c) 2026 Guillaume Lessard. All Rights Reserved)."
+description = "Production-grade Rust/Python quantum error correction decoder. 25+ decoder families: MWPM Blossom, Union-Find, BP-OSD, LDPC/qLDPC, belief-matching, CUDA/GPU batch decoding, 7-tier AutoDecoder fallback. PyMatching/Stim/Sinter compatible. Ed25519 license verification."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = { text = "LicenseRef-QECTOR-Source-Available" }
 authors = [
     {name = "Guillaume Lessard / iD01t Productions", email = "admin@qector.store"}
 ]
-keywords = ["quantum", "error correction", "decoder", "union-find", "QEC", "rust", "MWPM", "Stim", "PyMatching", "LDPC", "qLDPC"]
+keywords = ["quantum", "error correction", "decoder", "union-find", "QEC", "rust", "MWPM", "Stim", "PyMatching", "LDPC", "qLDPC", "blossom", "belief propagation", "GPU decoding", "surface code", "quantum computing"]
 classifiers = [
     "License :: Other/Proprietary License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Rust",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
     "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Intended Audience :: Science/Research",
+    "Development Status :: 4 - Beta",
 ]
 dependencies = [
     "numpy>=1.24.0,<2.3",

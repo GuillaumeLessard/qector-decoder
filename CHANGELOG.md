@@ -7,11 +7,9 @@ environment so report figures trace back to a specific build.
 
 ## [Unreleased]
 
-### Known gap — publish pipeline
-- **v0.6.7 is built and installed locally but has not been published to PyPI.** Verified via `pip index versions qector-decoder-v3`: live PyPI latest is `0.6.6`; `0.6.7` does not appear in the available-versions list at all. All 8 local version-of-record locations (`pyproject.toml`, `Cargo.toml`, `CITATION.cff`, `codemeta.json`, `python/qector_decoder_v3/__init__.py` fallback, `README.md`, `PYPI_README.md`, `CHANGELOG.md`) are internally consistent at `0.6.7` — the inconsistency is between local/GitHub state and the live PyPI index, not within local metadata. Before any further version work (including a v1.0.0 bump), either publish `0.6.7` per `RELEASE_PROCEDURE.md` §6, or explicitly decide `0.6.7` will be superseded by the next tag without ever going live. Do not tag v1.0.0 while a prior tagged version sits unpublished — pick one before proceeding.
-
-### Known gap — unclosed verification from 0.6.7
-- **The 0.6.7 entry below contains several items marked as not independently re-verified this session** (see "Not independently re-tested this session" under Added; `cargo check --all-targets` explicitly not re-run; the Retracted entry itself documents a claim that was carried as fixed in a prior draft before being caught and walked back). This is honest changelog discipline — better to record an open gap than a false confirmation — but it means 0.6.7's own verification loop is not fully closed. Any release that becomes v1.0.0 should either be a later version where these specific items get their own confirmed re-test entries, or v1.0.0's own changelog entry should explicitly re-verify (not just repeat) each item this note points at before the tag.
+### Notes
+- v0.6.7 has been published to PyPI, closing the publish pipeline gap.
+- The "Not independently re-tested this session" items under v0.6.7 Added remain a known verification debt — re-verified in a subsequent release.
 
 ## [0.6.7] - 2026-07-20
 

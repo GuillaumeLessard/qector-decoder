@@ -157,6 +157,20 @@ make_*.py
 generate_pdf_report.py
 cpu_benchmark_report.py
 
+# --- IDE / editor config (never push) ---
+cspell.json
+pyrightconfig.json
+
+# --- Scratch/repo notes (never push) ---
+REPO_TOPICS.md
+howto.md
+install.md
+llms.txt
+seo_keywords.md
+perf_check.log
+.__all_tests_dump.txt
+PYPI_README.md
+
 # --- Local-only docs (contain secret names / infra details, never push) ---
 RELEASE_PROCEDURE.md
 
