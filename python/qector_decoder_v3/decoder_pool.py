@@ -33,6 +33,9 @@ from typing import List, Optional, cast
 
 import numpy as np
 
+# MAX_WORKERS fallback if accessed before full initialization
+MAX_WORKERS: int = os.cpu_count() or 1
+
 __all__ = ["DecoderPool"]
 
 # On Windows, spawn overhead makes multi-process slower than single-process
@@ -96,29 +99,40 @@ class DecoderPool:
     best throughput.  Falls back to multi-process on Linux/macOS.
 
     Args:
-        check_to_qubits: List of lists of qubit indices per check.
+        check_to_qubits: List of lists of qubit indices per check (optional).
         n_qubits: Number of data qubits (inferred if None).
         decoder_type: Which decoder to use in each worker.
             One of ``"union_find"``, ``"fast_union_find"``, ``"blossom"``,
             ``"sparse_blossom"``, ``"cpu_batch"``.
             Default: ``"fast_union_find"``.
-        n_workers: Number of worker processes. Defaults to ``os.cpu_count()``.
+        n_workers: Number of worker processes. Defaults to ``MAX_WORKERS``.
+        num_threads: Alias for n_workers (bounded by MAX_WORKERS).
     """
 
     def __init__(
         self,
-        check_to_qubits,
+        check_to_qubits=None,
         n_qubits=None,
         decoder_type: str = "fast_union_find",
         n_workers: Optional[int] = None,
+        num_threads: Optional[int] = None,
     ):
-        if not check_to_qubits:
-            raise ValueError("check_to_qubits must be non-empty")
-        self._c2q = [[int(q) for q in c] for c in check_to_qubits]
+        workers_arg = num_threads if num_threads is not None else n_workers
+        if workers_arg is None:
+            self.num_threads = MAX_WORKERS
+        else:
+            self.num_threads = max(1, min(int(workers_arg), MAX_WORKERS))
+        self._n_workers = self.num_threads
+        if check_to_qubits is not None:
+            if not check_to_qubits:
+                raise ValueError("check_to_qubits must be non-empty")
+            self._c2q = [[int(q) for q in c] for c in check_to_qubits]
+        else:
+            self._c2q = []
         self._nq = int(n_qubits) if n_qubits is not None else None
         self._decoder_type = str(decoder_type)
-        self._n_workers = n_workers or os.cpu_count() or 1
         self._pool: Optional["_mp.pool.Pool"] = None
+
 
     def decode(self, syndromes) -> np.ndarray:
         """Decode a batch of syndromes.

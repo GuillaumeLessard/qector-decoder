@@ -780,6 +780,21 @@ class AutoRouter:
             c2q = _H_to_c2q(H)
             return H, c2q, int(H.shape[1]), int(H.shape[0])
 
+        # A 1-D array here is never a valid checks_or_H (Code / 2-D H / list-of-
+        # lists are the only accepted forms) -- it is almost always a syndrome
+        # passed in the wrong argument position, e.g. ``decode(syndrome, checks)``
+        # instead of ``decode(checks, syndrome)``. Fail with an actionable message
+        # rather than crashing inside the check_to_qubits fallback below with an
+        # opaque "not iterable" error on a numpy scalar.
+        if isinstance(obj, np.ndarray) and obj.ndim == 1:
+            raise TypeError(
+                "checks_or_H must be a codes.Code, a 2-D parity-check matrix, or a "
+                "check_to_qubits list of lists -- got a 1-D array of shape "
+                f"{obj.shape}. This usually means the syndrome and checks_or_H "
+                "arguments were swapped: decode() takes checks_or_H first, then "
+                "syndromes (see AutoRouter.decode.__doc__)."
+            )
+
         # Otherwise treat as check_to_qubits (list of lists of qubit indices).
         c2q = [[int(q) for q in check] for check in obj]
         if not c2q:

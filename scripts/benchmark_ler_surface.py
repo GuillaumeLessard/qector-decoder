@@ -14,11 +14,18 @@ Decodeurs compares:
 
 import json
 import math
+import os
 import time
 
 import numpy as np
 
 import qector_decoder_v3 as qd
+
+# Wall-clock deadline per BP-OSD decode (decode_timed, v0.6.4+). The Rust core
+# hard-caps BP at 50 iterations, but on dense matrices even capped iterations
+# are slow; a per-decode deadline keeps LER sweeps from hanging. Override via
+# QECTOR_BENCH_BPOSD_DEADLINE_MS.
+BPOSD_DECODE_DEADLINE_MS = float(os.environ.get("QECTOR_BENCH_BPOSD_DEADLINE_MS", "50"))
 
 
 def wilson_score_interval(k, n, z=1.96):
@@ -104,9 +111,12 @@ def run_ler_benchmark(decoder_cls, checks, n_qubits, distances, error_rates, n_t
                 for ci, qubits in enumerate(checks_d):
                     syndrome[ci] = int(np.sum(error[qubits]) % 2)
                 
-                # Decode
+                # Decode (BP-OSD routed through the wall-clock-bounded
+                # decode_timed path so dense-matrix sweeps cannot hang)
                 if decoder_cls == qd.HybridDecoder:
                     correction = dec.decode_hybrid(syndrome)
+                elif decoder_cls == qd.BPOSDDecoder and hasattr(dec, "decode_timed"):
+                    correction = dec.decode_timed(syndrome, BPOSD_DECODE_DEADLINE_MS)
                 else:
                     correction = dec.decode(syndrome)
                 

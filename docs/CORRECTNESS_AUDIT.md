@@ -46,6 +46,18 @@ The v0.5 local validation report records:
 | Rust unit tests | Core Rust modules and backend internals | 87 passed |
 | Total | Python + Rust | 919 passed, 0 deferred |
 
+**STALE — pending re-verification against v0.6.7.** The table above is the v0.5
+report and has not been regenerated for any 0.6.x release, including 0.6.7. Do not
+quote "919 passed, 0 deferred" as current-state evidence in a v1.0.0 announcement,
+README, or commercial report — it describes a different, older build. `python/tests/`
+now contains 127 test files, more than existed at the time of the v0.5 report, so a
+re-run is not just a refresh of the same number — the actual current scope is larger
+and unverified end-to-end as of this writing. Before any v1.0.0 claim referencing test
+coverage: re-run the full `python/tests` suite plus `cargo test --release --lib`
+against the exact 0.6.7 (or whatever version tags v1.0.0) wheels, record the real
+pass/fail/skip counts here with the date and git commit, and only then treat this
+table as current.
+
 Representative Python coverage:
 
 | Test file | What it proves |

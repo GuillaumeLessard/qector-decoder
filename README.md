@@ -40,18 +40,31 @@ pip install "qector-decoder-v3[all]"
 
 ### GPU runtime check
 
-GPU support is runtime and build dependent. The public CI wheel workflow currently builds the CUDA feature path; OpenCL-capable builds are validated in checked-in benchmark artifacts but may require a licensed/custom build. Always detect support on the target machine before quoting performance.
+GPU support is runtime and build dependent. The public CI wheel workflow builds with `--no-default-features --features cuda`, so only CUDA may be available. OpenCL requires a source build: `maturin develop --features opencl`. Always detect support on the target machine before quoting performance.
 
 ```python
-from qector_decoder_v3 import CUDABatchDecoder, OpenCLBatchDecoder
-
-print("CUDA:", CUDABatchDecoder.is_available())
-print("OpenCL:", OpenCLBatchDecoder.is_available())
+try:
+    from qector_decoder_v3 import CUDABatchDecoder
+    print("CUDA:", CUDABatchDecoder.is_available() if hasattr(CUDABatchDecoder, "is_available") else False)
+except Exception as e:
+    print(f"CUDA check skipped: {e}")
+try:
+    from qector_decoder_v3 import OpenCLBatchDecoder
+    print("OpenCL:", OpenCLBatchDecoder.is_available() if hasattr(OpenCLBatchDecoder, "is_available") else False)
+except Exception as e:
+    print(f"OpenCL: False (CUDA-only wheel) - {e}")
 ```
 
 ### Licensed source build
 
 The public repository contains the Python layer and a Rust source stub. The proprietary Rust core is injected during trusted CI/release builds or provided under commercial license.
+
+> ⚠ The public clone **cannot** build from source without the licensed Rust source bundle. Public users must install the pre-built wheel:
+> ```bash
+> python -m pip install "qector-decoder-v3[stim,bench]"
+> ```
+
+For licensed users with the full Rust source:
 
 ```bash
 git clone https://github.com/GuillaumeLessard/qector-decoder.git
@@ -59,10 +72,8 @@ cd qector-decoder
 python -m venv .venv
 source .venv/bin/activate  # Windows PowerShell: .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip maturin
-python -m pip install -e "[stim,bench]"
+python -m pip install -e ".[stim,bench]"
 ```
-
-For a full native Rust extension build, use the licensed Rust source bundle alongside the packaging metadata in [pyproject.toml](pyproject.toml) and the checked-in Rust sources in [src](src).
 
 ---
 
@@ -196,6 +207,26 @@ See the public API regression coverage in [python/tests](python/tests) before bu
 
 ---
 
+## New in v0.6.7
+
+| Change | Description |
+| --- | --- |
+| Feature | **Self-Auto-Debug Backend**: `AutoDecoder` now implements a 7-tier fault-tolerant self-debugging fallback engine (`CUDA` -> `OpenCL` -> `CPU Rayon` -> `CPU Batch` -> `CPU Single` -> `Blossom` -> `Lookup Table` / Python Fallback) with automatic error trapping, health scoring, and seamless recovery. |
+| Feature | **Ed25519 Cryptographic Verification**: Offline license token validation system using Ed25519 signature checks (`verify_license_token`), with environment configuration support via `QECTOR_LICENSE` and startup banner suppression via `QECTOR_SILENT=1`. |
+| Feature | **Stripe API & Webhook Integration**: Complete Stripe Checkout and Webhook license fulfillment integration (`stripe_webhook_server.py` and `qector_decoder_v3.stripe_integration`) for commercial license generation upon payment confirmation. |
+| Bugfix | `SparseBlossomDecoder::grow_regions` no longer collapses the compressed edge set — the previous version drained edges through a `RadixHeap` and back, which silently zeroed the `source_defect` field. All decoded syndromes are now bit-identical to the Blossom decoder. |
+| Bugfix | `BPOSDDecoder.bp_decode_timed` now initializes the wall-clock deadline before the iteration loop, not inside it, so the latency budget is honored on the first iteration. |
+| Bugfix | LER benchmark's rotated-surface generator now emits a proper two-half (X + Z) graphlike code, so the logical operator and weight gap statistics are meaningful. |
+| Bugfix | `_opencl_health_check()`'s child-process probe script referenced an undefined `_np` name instead of `np`, causing a silent `NameError`. Fixed to use `np` consistently in the probe script. |
+| Feature | `SparseBlossomDecoder.k_nearest_via_radix` — public event-driven candidate-edge discovery backed by a new `RadixHeap<u32, HeapEvent>` structure exposed to downstream callers. |
+| Feature | MCP server (`mcp_server`) now exposes 5 new tools: `decode_syndrome_blossom`, `batch_decode_blossom`, `run_ler_benchmark`, plus expanded `get_decoder_info` listing all 11 decoder families. |
+| Quality | Cross-decoder syndrome-validity test suite `src/cross_decoder_tests.rs` covers UF / FastUF / LookupTable / SparseBlossom / BP-OSD / SlidingWindow / Streaming / Hybrid. |
+| Quality | SafeTensors loader now has a full round-trip test suite covering generic + runtime dispatch, dtype mismatch, missing tensors, and shape round-trip. |
+| Quality | Dead-code warnings eliminated across the crate (8 → 0). |
+
+
+---
+
 ## New in v0.6.6 — critical fix, upgrade immediately if on v0.6.5
 
 **v0.6.5 fails to import at all** (`AttributeError` on `OpenCLBatchDecoder`) on every published wheel, because the release build (`--no-default-features --features cuda`) never compiles in OpenCL support, and `__init__.py` had a leftover unguarded reference to it. Fixed in v0.6.6 by removing the dead line. Verified against a clean install of the exact CI-built wheel.
@@ -211,7 +242,7 @@ See the public API regression coverage in [python/tests](python/tests) before bu
 | `PredecodedDecoder` fix | Backend validation now accepts `"union_find"` (with underscore), matching the canonical decoder names |
 | ruff clean | Full repo passes `ruff format --check` and `ruff check` with zero errors; `.venv`/`.venv_clean_test`/`target`/`dist`/`lib`/`proto` excluded from lint scope |
 | `examples/example_batch.py` fix | Was constructing `CPUBatchDecoder`/`OpenCLBatchDecoder`/`CUDABatchDecoder` (Union-Find-based, weight ≤2 only) against a weight-4 surface code; switched to `generate_ring_code_checks()`, the correct weight-2 code family for this decoder class |
-| CI reliability | Verified full 15-platform wheel build (Linux/Windows/macOS × Python 3.9–3.13) and full test suite (1005 passed, 83 skipped) against the release build |
+| CI reliability | Verified 15 wheels: 3 OS targets (Linux x86_64, Windows x64, macOS arm64) × Python 3.9–3.13 and full test suite (1005 passed, 83 skipped) against the release build |
 
 ---
 
@@ -220,7 +251,7 @@ See the public API regression coverage in [python/tests](python/tests) before bu
 | Feature | Description |
 | --- | --- |
 | BP-OSD `decode_timed` | Wall-clock deadline for BP iterations; falls back to hard-decision on timeout |
-| AVX2 runtime dispatch | CPU batch decoder auto-detects AVX2 support and uses SIMD transpose for 1.1M shots/s |
+| AVX2 runtime dispatch | CPU batch: UnionFind repetition code d=7-9 exceeds 1M shots/s single-core on cp312 Windows 11 x64 (see QECTOR_v0.6.7_Release_Readiness_Report.pdf Page 3). Hardware dependent. |
 | Blossom intra-decode parallelism | Rayon-parallelized Blossom matching for multi-shot batches |
 | DecoderPool Windows fix | Auto-Rayon fallback on Windows when multi-process pool is unavailable |
 | `DecoderPool` | Multi-process batch decoding with automatic worker management |
@@ -241,9 +272,9 @@ If you need the full desktop GUI, hosted automation stack, or additional documen
 
 ## Validated evidence snapshot
 
-All public claims should cite an artifact, commit, command, machine, and version. The current package release is **v0.6.5**; checked-in evidence below was generated under v0.6.4 and is labeled accordingly — regenerate before making new performance claims against v0.6.5.
+All public claims should cite an artifact, commit, command, machine, and version. The current package release is v0.6.7 (local build, 5 wheels cp39-cp313 verified). Checked-in evidence folders are from previous versions. Regenerate before quoting throughput. See `QECTOR_v0.6.7_Release_Readiness_Report.pdf` for 0.6.7 smoke tests.
 
-> **v0.6.4 additions**: AVX2 SIMD transpose (CPU batch 1.1M shots/s), BP-OSD convergence cap (`decode_timed`), Blossom intra-decode Rayon parallelism, DecoderPool auto-Rayon on Windows.
+> **v0.6.4 additions**: CPU batch: UnionFind repetition code d=7-9 exceeds 1M shots/s single-core on cp312 Windows 11 x64 Python 3.12.0 median of one batch run per QECTOR_v0.6.7_Release_Readiness_Report.pdf Page 3. Blossom surface d=5 ~40K, d=11 ~4.8K per worker. Hardware dependent. BP-OSD convergence cap (`decode_timed`), Blossom intra-decode Rayon parallelism, DecoderPool auto-Rayon on Windows.
 
 ### MWPM parity against PyMatching
 
@@ -465,7 +496,7 @@ View pricing and license tiers: **https://qector.store/pricing**
   author  = {Guillaume Lessard},
   title   = {{QECTOR Decoder v3}: Rust/Python Quantum Error Correction Decoding Platform},
   year    = {2026},
-  version = {0.6.6},
+  version = {0.6.7},
   url     = {https://www.qector.store},
   note    = {Source-available. Commercial license required for commercial use.}
 }

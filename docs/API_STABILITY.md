@@ -6,7 +6,7 @@ QECTOR Decoder v3 is a source-available research and commercial-evaluation platf
 
 | Level | Meaning | Examples |
 |---|---|---|
-| Stable local API | Expected to remain usable across compatible `0.5.x` releases, with bug-fix-level changes only | Core Python decoders, code generators, local source build, benchmark artifact format basics |
+| Stable local API | Expected to remain usable across compatible `0.6.x` releases, with bug-fix-level changes only | Core Python decoders, code generators, local source build, benchmark artifact format basics |
 | Supported but workload-sensitive | Supported, but claims must be regenerated for the local code family, hardware, batch size, and dependency set | Stim/PyMatching comparisons, BP-OSD/LDPC experiments, CPU/GPU batch workflows |
 | Experimental / preview | Available for research, demos, or partner review, but not a compatibility promise | REST service, gRPC, MCP, metrics, hybrid/GNN paths, hosted API, OEM embedding |
 | Internal implementation detail | May change without notice | Rust module internals, fallback heuristics, private helper functions, benchmark script internals not documented here |
@@ -96,9 +96,9 @@ docs/SECURITY_DEPLOYMENT.md
 COMMERCIAL.md
 ```
 
-## Versioning policy for 0.5.x
+## Versioning policy for 0.6.x
 
-During the `0.5.x` line:
+During the `0.6.x` line:
 
 ```text
 Patch releases may fix decoder behavior, docs, build issues, or benchmark scripts.
@@ -106,6 +106,58 @@ Public local Python classes should not be renamed without a compatibility note.
 Experimental service surfaces may change schema or behavior.
 Benchmark numbers may be replaced only with regenerated artifacts and clear environment metadata.
 Commercial rights remain governed by LICENSE and COMMERCIAL.md, not by API availability.
+```
+
+## What changes at v1.0.0 (and what does not)
+
+A `v1.0.0` tag conventionally signals API stability to users. That promise must be
+earned per surface, not granted by the version number alone. This section exists so
+that a version bump cannot silently imply more stability than has actually been
+verified.
+
+**Stays experimental at v1.0.0 unless explicitly promoted below, with a dated entry
+and the specific review that justified the promotion:**
+
+```text
+REST service
+Docker REST deployment
+gRPC service
+MCP service
+metrics exporter
+hybrid decoder
+GNN / neural predecoder components
+hosted API
+OEM / embedded integration
+```
+
+None of these surfaces have been promoted as of this writing. If v1.0.0 ships before
+a surface is promoted here, the public wording for that surface stays exactly as
+described in "Experimental / preview surfaces" above — the version number does not
+retroactively upgrade it, and public-facing docs/README/site copy must not describe
+it as stable just because the package is now 1.0.0.
+
+**Promotion log** (append an entry here, do not just delete the surface from the
+experimental list above, when a surface is promoted):
+
+```text
+(none yet)
+```
+
+**Required before promoting any experimental surface to stable:**
+
+```text
+A deployment/security review specific to that surface (see docs/SECURITY_DEPLOYMENT.md).
+Test coverage equivalent to what "Stable local API" surfaces already have.
+A compatibility note added to this file describing the new stability guarantee.
+```
+
+**Unconditionally true at v1.0.0, regardless of which surfaces get promoted:**
+
+```text
+The core correctness contract (H · correction == syndrome, mod 2) does not change —
+it is already the v1.0 bar for every decoder in the "Stable local API" table.
+Commercial rights remain governed by LICENSE and COMMERCIAL.md, not by version number.
+Safe/unsafe public wording (see below) applies identically before and after v1.0.0.
 ```
 
 ## Safe public wording

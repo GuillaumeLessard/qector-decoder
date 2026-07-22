@@ -22,6 +22,7 @@ import argparse
 import csv
 import json
 import math
+import os
 import platform
 import time
 from dataclasses import asdict, dataclass, field
@@ -32,6 +33,19 @@ from typing import List, Tuple
 import numpy as np
 
 import qector_decoder_v3 as qd
+
+# Wall-clock deadline per BP-OSD decode (decode_timed, v0.6.4+). The Rust core
+# hard-caps BP at 50 iterations, but on dense matrices even capped iterations
+# are slow; a per-decode deadline keeps LER sweeps from hanging. Override via
+# QECTOR_BENCH_BPOSD_DEADLINE_MS.
+BPOSD_DECODE_DEADLINE_MS = float(os.environ.get("QECTOR_BENCH_BPOSD_DEADLINE_MS", "50"))
+
+
+def _bounded_decode(decoder, syndrome):
+    """Decode with a wall-clock deadline for BP-OSD; plain decode otherwise."""
+    if isinstance(decoder, qd.BPOSDDecoder) and hasattr(decoder, "decode_timed"):
+        return decoder.decode_timed(syndrome, BPOSD_DECODE_DEADLINE_MS)
+    return decoder.decode(syndrome)
 
 
 # ---------------------------------------------------------------------------
@@ -177,7 +191,7 @@ def benchmark_bitflip(
             syndrome ^= (rng.random(len(syndrome)) < q_measure).astype(np.uint8)
 
         t0 = time.perf_counter()
-        correction = decoder.decode(syndrome)
+        correction = _bounded_decode(decoder, syndrome)
         t1 = time.perf_counter()
         latencies.append((t1 - t0) * 1e6)  # us
 
@@ -235,7 +249,7 @@ def benchmark_phaseflip(
             syndrome ^= (rng.random(len(syndrome)) < q_measure).astype(np.uint8)
 
         t0 = time.perf_counter()
-        correction = decoder.decode(syndrome)
+        correction = _bounded_decode(decoder, syndrome)
         t1 = time.perf_counter()
         latencies.append((t1 - t0) * 1e6)
 
@@ -301,8 +315,8 @@ def benchmark_depolarizing(
             syndrome_z ^= (rng.random(len(syndrome_z)) < q_measure).astype(np.uint8)
 
         t0 = time.perf_counter()
-        correction_x = dec_x.decode(syndrome_x)
-        correction_z = dec_z.decode(syndrome_z)
+        correction_x = _bounded_decode(dec_x, syndrome_x)
+        correction_z = _bounded_decode(dec_z, syndrome_z)
         t1 = time.perf_counter()
         latencies.append((t1 - t0) * 1e6)
 

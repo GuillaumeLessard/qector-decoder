@@ -36,7 +36,7 @@ def test_predecoder_all_backends_faithful():
     H = code.parity_check_matrix()
     rng = np.random.default_rng(1)
     syns = (((rng.random((200, code.n_qubits)) < 0.08).astype(np.uint8)) @ H.T) & 1
-    for backend in ("blossom", "union_find", "sparse_blossom"):
+    for backend in ("blossom", "union_find", "sparse_blossom", "fast_union_find"):
         dec = PredecodedDecoder(code.check_to_qubits, code.n_qubits, backend=backend)
         out = dec.batch_decode(syns.astype(np.uint8))
         for i in range(len(syns)):

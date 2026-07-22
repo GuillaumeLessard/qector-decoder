@@ -68,14 +68,21 @@ def get_decoder(
     """Get a decoder, constructing it once and caching for reuse.
 
     Args:
-        checks_tuple: ``tuple(tuple(c) for c in check_to_qubits)`` — hashable.
+        checks_tuple: Ideally ``tuple(tuple(c) for c in check_to_qubits)``,
+            but a plain list of lists (the format returned directly by
+            ``generate_repetition_code_checks`` etc.) is also accepted — it
+            is normalized to a canonical hashable tuple here before the
+            cache lookup, so the LRU cache still hits on repeated calls with
+            equal values either way. Passing a tuple directly on a hot path
+            avoids the (cheap) per-call normalization.
         n_qubits: Number of data qubits.
         decoder_type: Which decoder to create.
 
     Returns:
         A decoder instance with ``decode(syndrome)`` method.
     """
-    return _build_decoder(checks_tuple, n_qubits, decoder_type)
+    hashable = tuple(tuple(int(q) for q in c) for c in checks_tuple)
+    return _build_decoder(hashable, n_qubits, decoder_type)
 
 
 def get_decoder_pool(
