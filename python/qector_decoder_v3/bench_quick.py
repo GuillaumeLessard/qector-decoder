@@ -1,4 +1,4 @@
-"""bench_quick — smoke diagnostic for qector-decoder-v3 v0.6.7"""
+"""bench_quick — smoke diagnostic for qector-decoder-v3 v0.6.8"""
 
 from __future__ import annotations
 import platform
@@ -17,7 +17,7 @@ def _ver():
 
             return v
         except Exception:
-            return "0.6.7-unknown"
+            return "0.6.8-unknown"
 
 
 def _detect_avx2():

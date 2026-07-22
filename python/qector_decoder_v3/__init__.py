@@ -1743,9 +1743,16 @@ for _name in ("os", "sys", "subprocess"):
 
 
 # ===========================================================================
-# v0.6.7 release notes (public)
+# v0.6.8 release notes (public)
 # ===========================================================================
 __changelog__ = {
+    "0.6.8": [
+        "Hotfix: v0.6.7 wheel was completely unimportable - "
+        "_native_module.HybridCascadeDecoder does not exist in the compiled .so. "
+        "All 18 native-module lookups now guarded via _guard() helper.",
+        "CI: smoke test before publish catches unimportable wheels.",
+        "CI: fixed YAML syntax error in release-build.yml smoke-test run step.",
+    ],
     "0.6.7": [
         "Bugfix: SparseBlossomDecoder::grow_regions no longer collapses the "
         "compressed edge set — the previous version drained edges through a "

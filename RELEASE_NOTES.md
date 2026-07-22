@@ -2,6 +2,18 @@
 
 All notable changes to QECTOR Decoder will be documented in this file.
 
+## [0.6.8] - 2026-07-22
+**Focus**: Hotfix for unimportable v0.6.7 wheel — guarded imports, CI smoke test, YAML fix.
+
+### Fixed
+- **v0.6.7 was completely unimportable** on all published wheels. `__init__.py:37` unconditionally accessed `_native_module.HybridCascadeDecoder`, which does not exist in the current Rust build (symbol never registered in `#[pymodule]`). All 18 native-module lookups are now guarded by `_guard("ClassName")` — missing symbols return a callable stub that raises `RuntimeError` on instantiation. `import qector_decoder_v3` now always succeeds.
+- **CI YAML syntax error**: the smoke-test `run:` step contained unindented Python code inside a literal block scalar, causing GitHub's parser to fail on the entire workflow file. This broke `workflow_dispatch`, tag-push triggers, and all CI runs silently (0 jobs, `failure` conclusion). Fixed by indenting the inline Python script to match the literal block's content level.
+
+### Added
+- **CI smoke test**: `release` job now installs the built wheel, runs `import qector_decoder_v3`, creates a code, and decodes before `twine upload`. This would have caught the v0.6.7 regression.
+
+---
+
 ## [0.6.7] - 2026-07-22
 **Focus**: Self-auto-debug backend, offline licensing, and Stripe fulfillment.
 

@@ -166,7 +166,7 @@ samples = sinter.collect(
 
 ---
 
-## Self-Auto-Debug Backend Architecture (v0.6.7)
+## Self-Auto-Debug Backend Architecture (v0.6.8)
 
 `AutoDecoder` implements a **7-tier fault-tolerant self-debugging fallback engine** that automatically selects, monitors, and recovers from hardware failures:
 
@@ -188,7 +188,7 @@ Key features:
 
 ---
 
-## Licensing & Activation (v0.6.7)
+## Licensing & Activation (v0.6.8)
 
 ### Ed25519 Cryptographic License Verification
 
@@ -216,7 +216,7 @@ Commercial licenses are issued automatically via Stripe Checkout:
 
 ---
 
-## v0.6.7 highlights
+## v0.6.8 highlights
 
 | Area | Description |
 | --- | --- |
@@ -374,7 +374,7 @@ QECTOR Decoder v3 is **source-available**. Personal, academic, educational, and 
   author  = {Guillaume Lessard},
   title   = {{QECTOR Decoder v3}: Rust/Python Quantum Error Correction Decoding Platform},
   year    = {2026},
-  version = {0.6.7},
+  version = {0.6.8},
   url     = {https://www.qector.store},
   note    = {Source-available. Commercial license required for commercial use.}
 }

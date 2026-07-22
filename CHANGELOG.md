@@ -8,8 +8,16 @@ environment so report figures trace back to a specific build.
 ## [Unreleased]
 
 ### Notes
-- v0.6.7 has been published to PyPI, closing the publish pipeline gap.
-- The "Not independently re-tested this session" items under v0.6.7 Added remain a known verification debt — re-verified in a subsequent release.
+- v0.6.8 hotfix published to PyPI, superseding the broken v0.6.7.
+
+## [0.6.8] - 2026-07-22
+
+### Fixed
+- **v0.6.7 was completely unimportable**: `__init__.py` unconditionally accessed `_native_module.HybridCascadeDecoder`, which is absent from the compiled module. All 18 native-module lookups now use `_guard("ClassName")` — missing symbols return a callable stub that raises `RuntimeError` at decode-time. Import always succeeds.
+- **CI YAML broken**: smoke-test `run:` step had unindented Python code inside a literal block scalar, breaking GitHub's parser. No workflow triggers worked (`workflow_dispatch`, tag push, pull_request). Fixed by indenting the inline Python to match the content level.
+
+### Added
+- **CI smoke test before publish**: installs wheel, imports `qector_decoder_v3`, instantiates `sparse_blossom` decoder. Catches unimportable wheels before they reach PyPI.
 
 ## [0.6.7] - 2026-07-20
 
