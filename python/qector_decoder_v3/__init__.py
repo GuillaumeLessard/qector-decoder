@@ -14,27 +14,38 @@ def _load_native_module():
 
 _native_module = _load_native_module()
 
-_RustUnionFindDecoder = _native_module.UnionFindDecoder
-_RustFastUnionFindDecoder = _native_module.FastUnionFindDecoder
-_RustBlossomDecoder = _native_module.BlossomDecoder
-_RustSlidingWindowDecoder = _native_module.SlidingWindowDecoder
-_RustStreamingDecoder = _native_module.StreamingDecoder
-_RustBatchDecoder = _native_module.BatchDecoder
-_RustCPUBatchDecoder = _native_module.CPUBatchDecoder
-_RustBenchmarkSuite = _native_module.BenchmarkSuite
-_RustLookupTableDecoder = _native_module.LookupTableDecoder
-_RustBPOSDDecoder = _native_module.BPOSDDecoder
-_RustNeuralPredecoder = _native_module.NeuralPredecoder
-_RustDetectorGraph = _native_module.DetectorGraph
-_RustGNNPredecoder = _native_module.GNNPredecoder
-_RustGNNTrainer = _native_module.GNNTrainer
-try:
-    _RustLERBenchmark = _native_module.LERBenchmark
-except (AttributeError, ImportError):
-    _RustLERBenchmark = None  # type: ignore[assignment]
-_RustSparseBlossomDecoder = _native_module.SparseBlossomDecoder
-_RustHybridDecoder = _native_module.HybridDecoder
-_RustHybridCascadeDecoder = _native_module.HybridCascadeDecoder
+def _guard(name):
+    try:
+        return getattr(_native_module, name)
+    except (AttributeError, ImportError):
+        def _unavailable(*args, **kwargs):
+            raise RuntimeError(
+                f"{name} is not available in this build. "
+                "Install a wheel with the required features enabled."
+            )
+        _unavailable.__name__ = name
+        _unavailable.__qualname__ = name
+        return _unavailable
+
+
+_RustUnionFindDecoder = _guard("UnionFindDecoder")
+_RustFastUnionFindDecoder = _guard("FastUnionFindDecoder")
+_RustBlossomDecoder = _guard("BlossomDecoder")
+_RustSlidingWindowDecoder = _guard("SlidingWindowDecoder")
+_RustStreamingDecoder = _guard("StreamingDecoder")
+_RustBatchDecoder = _guard("BatchDecoder")
+_RustCPUBatchDecoder = _guard("CPUBatchDecoder")
+_RustBenchmarkSuite = _guard("BenchmarkSuite")
+_RustLookupTableDecoder = _guard("LookupTableDecoder")
+_RustBPOSDDecoder = _guard("BPOSDDecoder")
+_RustNeuralPredecoder = _guard("NeuralPredecoder")
+_RustDetectorGraph = _guard("DetectorGraph")
+_RustGNNPredecoder = _guard("GNNPredecoder")
+_RustGNNTrainer = _guard("GNNTrainer")
+_RustLERBenchmark = _guard("LERBenchmark")
+_RustSparseBlossomDecoder = _guard("SparseBlossomDecoder")
+_RustHybridDecoder = _guard("HybridDecoder")
+_RustHybridCascadeDecoder = _guard("HybridCascadeDecoder")
 py_check_to_edges = _native_module.py_check_to_edges
 py_generate_surface_code_checks = _native_module.py_generate_surface_code_checks
 py_generate_toy_code_checks = _native_module.py_generate_toy_code_checks
