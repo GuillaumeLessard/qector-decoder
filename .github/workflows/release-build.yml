@@ -202,7 +202,6 @@ jobs:
       github.repository == 'GuillaumeLessard/qector-decoder' &&
       github.event_name != 'pull_request'
     needs: [linux-x86_64, windows-x64, macos-arm]
-    environment: pypi
     permissions:
       id-token: write
       contents: write
