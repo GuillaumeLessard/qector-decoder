@@ -102,14 +102,9 @@ class PredecodedDecoder:
         if backend in _backend_map:
             backend = _backend_map[backend]
         if backend not in _valid_backends:
-            raise ValueError(
-                "backend must be one of "
-                "['blossom', 'union_find', 'sparse_blossom', 'fast_union_find']"
-            )
+            raise ValueError("backend must be one of ['blossom', 'union_find', 'sparse_blossom', 'fast_union_find']")
         self.backend = backend
-        residual: Union[
-            BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder, FastUnionFindDecoder
-        ]
+        residual: Union[BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder, FastUnionFindDecoder]
         if backend == "blossom":
             residual = BlossomDecoder(self._c2q, self.n_qubits)
         elif backend == "union_find":
@@ -118,9 +113,7 @@ class PredecodedDecoder:
             residual = FastUnionFindDecoder(self._c2q, self.n_qubits)
         else:
             residual = SparseBlossomDecoder(self._c2q, self.n_qubits)
-        self._residual: Union[
-            BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder, FastUnionFindDecoder
-        ] = residual
+        self._residual: Union[BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder, FastUnionFindDecoder] = residual
         self.last_predecoded = 0  # number of defects resolved by the predecoder
 
     def _predecode(self, syndrome: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:

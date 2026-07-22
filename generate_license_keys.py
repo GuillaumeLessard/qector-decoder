@@ -63,6 +63,14 @@ def create_license_token(
     if private_key_pem is None:
         private_key_pem = _load_production_private_key_pem()
     priv_key = serialization.load_pem_private_key(private_key_pem, password=None)
+    if not isinstance(priv_key, ed25519.Ed25519PrivateKey):
+        # load_pem_private_key() returns a union of every key type cryptography
+        # supports (RSA, DSA, EC, X25519, ML-DSA, ML-KEM, ...). This project only
+        # ever signs with Ed25519, so fail loudly if anything else is provided.
+        raise TypeError(
+            "QECTOR license tokens require an Ed25519 private key; "
+            f"got {type(priv_key).__name__}."
+        )
     email_clean = customer_email.strip().lower()
     payload = f"{receipt_id}:{email_clean}".encode("utf-8")
     sig = priv_key.sign(payload)

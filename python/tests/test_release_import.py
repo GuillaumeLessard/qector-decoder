@@ -17,6 +17,7 @@ from qector_decoder_v3.license import verify_license_token
 
 from generate_license_keys import create_license_token
 
+
 def _create_token(receipt_id: str, email: str = "") -> str:
     return create_license_token(receipt_id, customer_email=email)
 

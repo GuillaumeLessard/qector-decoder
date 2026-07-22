@@ -6,11 +6,12 @@ from __future__ import annotations
 import os
 import json
 import logging
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 from pathlib import Path
 
 try:
     from dotenv import load_dotenv
+
     # Load environment variables from .env at repo root or current working dir
     env_path = Path(__file__).resolve().parents[2] / ".env"
     if env_path.exists():
@@ -26,18 +27,21 @@ from generate_license_keys import create_license_token
 logger = logging.getLogger("qector_decoder_v3.stripe")
 
 # Retrieve keys from environment
-STRIPE_SECRET_KEY: str = os.getenv("STRIPE_SECRET_KEY") or os.getenv("STRIPE_SECRET", "")
-STRIPE_PUBLISHABLE_KEY: str = os.getenv("STRIPE_PUBLISHABLE_KEY") or os.getenv("STRIPE_PUBLISHABLE", "")
+# Use the default-argument form of os.getenv so the static type is `str` rather
+# than `str | None`; the `or os.getenv(..., "")` pattern confuses mypy.
+STRIPE_SECRET_KEY: str = os.getenv("STRIPE_SECRET_KEY", "") or os.getenv("STRIPE_SECRET", "")
+STRIPE_PUBLISHABLE_KEY: str = os.getenv("STRIPE_PUBLISHABLE_KEY", "") or os.getenv("STRIPE_PUBLISHABLE", "")
+STRIPE_WEBHOOK_SECRET: str = os.getenv("STRIPE_WEBHOOK_SECRET", "")
 STRIPE_PURCHASE_LINK: str = os.getenv(
     "STRIPE_PURCHASE_LINK",
-    "https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00?locale=en&__embed_source=buy_btn_1TsoKxRsa9cg9l8A7ExMmc77"
+    "https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00?locale=en&__embed_source=buy_btn_1TsoKxRsa9cg9l8A7ExMmc77",
 )
 
 if STRIPE_SECRET_KEY:
     stripe.api_key = STRIPE_SECRET_KEY
 
 
-def get_stripe_keys() -> Dict[str, str]:
+def get_stripe_keys() -> Dict[str, Any]:
     """Returns configured Stripe keys snapshot."""
     return {
         "publishable_key": STRIPE_PUBLISHABLE_KEY,
@@ -94,9 +98,7 @@ def create_checkout_session(
 
 
 def handle_stripe_webhook_payload(
-    payload: bytes,
-    sig_header: str = "",
-    webhook_secret: Optional[str] = None
+    payload: bytes, sig_header: str = "", webhook_secret: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Parses and verifies Stripe webhook events, issuing a signed Ed25519 license token
@@ -114,14 +116,13 @@ def handle_stripe_webhook_payload(
         payload_text = payload.decode("utf-8") if isinstance(payload, bytes) else str(payload)
         event = json.loads(payload_text)
 
-
     event_type = event.get("type", "")
     response_data = {"event_type": event_type, "license_token": None, "issued": False}
 
     if event_type in ("checkout.session.completed", "payment_intent.succeeded"):
         session_obj = event.get("data", {}).get("object", {})
         receipt_id = session_obj.get("id") or session_obj.get("payment_intent") or "rec_stripe_live"
-        
+
         customer_details = session_obj.get("customer_details") or {}
         customer_email = (
             session_obj.get("customer_email")
@@ -130,7 +131,7 @@ def handle_stripe_webhook_payload(
         )
 
         token = create_license_token(receipt_id=receipt_id, customer_email=customer_email)
-        
+
         # Save issued license record locally
         _save_issued_license(receipt_id, customer_email, token)
 
@@ -151,9 +152,11 @@ def _save_issued_license(receipt_id: str, email: str, token: str) -> None:
             records = json.loads(record_file.read_text(encoding="utf-8"))
         except Exception:
             records = []
-    records.append({
-        "receipt_id": receipt_id,
-        "customer_email": email,
-        "license_token": token,
-    })
+    records.append(
+        {
+            "receipt_id": receipt_id,
+            "customer_email": email,
+            "license_token": token,
+        }
+    )
     record_file.write_text(json.dumps(records, indent=2), encoding="utf-8")

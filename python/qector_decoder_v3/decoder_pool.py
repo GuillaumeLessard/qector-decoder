@@ -133,7 +133,6 @@ class DecoderPool:
         self._decoder_type = str(decoder_type)
         self._pool: Optional["_mp.pool.Pool"] = None
 
-
     def decode(self, syndromes) -> np.ndarray:
         """Decode a batch of syndromes.
 

@@ -1,7 +1,8 @@
 from __future__ import annotations
 import base64
-from cryptography.hazmat.primitives.asymmetric import ed25519
+from typing import Optional
 from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from cryptography.exceptions import InvalidSignature
 
 # Embedded Public Key — Production Ed25519 Key (rotated 2026-07-22)
@@ -9,10 +10,25 @@ PUBLIC_KEY_PEM = b"""-----BEGIN PUBLIC KEY-----
 MCowBQYDK2VwAyEAQh9t19EZ4KWZEYjY3EwHCUzUIehZBlovaMtrpLQXeGA=
 -----END PUBLIC KEY-----"""
 
-try:
-    _PUBLIC_KEY = serialization.load_pem_public_key(PUBLIC_KEY_PEM)
-except Exception:
-    _PUBLIC_KEY = None
+
+def _load_ed25519_public_key() -> Optional[Ed25519PublicKey]:
+    """Loads the embedded PEM and narrows it to Ed25519PublicKey.
+
+    load_pem_public_key() returns a union of every key type cryptography
+    supports (RSA, DSA, EC, X25519, ML-DSA, ML-KEM, ...). This project only
+    ever signs/verifies with Ed25519, so we assert that narrowly here rather
+    than propagating the full union to every call site.
+    """
+    try:
+        key = serialization.load_pem_public_key(PUBLIC_KEY_PEM)
+    except Exception:
+        return None
+    if not isinstance(key, Ed25519PublicKey):
+        return None
+    return key
+
+
+_PUBLIC_KEY: Optional[Ed25519PublicKey] = _load_ed25519_public_key()
 
 
 def verify_license_token(token: str, customer_email: str = "") -> bool:
@@ -38,11 +54,11 @@ def verify_license_token(token: str, customer_email: str = "") -> bool:
             if missing_pad:
                 email_b64 += "=" * (4 - missing_pad)
             embedded_email = base64.urlsafe_b64decode(email_b64).decode("utf-8").lower()
-            
+
             # If caller provided explicit email check, ensure match
             if customer_email and customer_email.strip().lower() != embedded_email:
                 return False
-            
+
             target_email = embedded_email
         except Exception:
             return False

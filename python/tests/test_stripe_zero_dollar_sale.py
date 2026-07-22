@@ -49,9 +49,9 @@ def test_zero_dollar_webhook_issues_valid_token():
                 "metadata": {
                     "license_tier": "commercial_trial",
                     "customer_email": test_email,
-                }
+                },
             }
-        }
+        },
     }
     payload_bytes = json.dumps(payload_dict).encode("utf-8")
 
@@ -92,9 +92,9 @@ def test_license_activates_via_environment(monkeypatch):
                 "customer_email": test_email,
                 "amount_total": 0,
                 "payment_status": "paid",
-                "metadata": {"customer_email": test_email}
+                "metadata": {"customer_email": test_email},
             }
-        }
+        },
     }
     payload_bytes = json.dumps(payload_dict).encode("utf-8")
 

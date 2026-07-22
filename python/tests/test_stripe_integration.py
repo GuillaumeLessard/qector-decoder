@@ -42,22 +42,24 @@ def test_stripe_checkout_session_structure(mock_create):
 
 
 def test_stripe_webhook_fulfillment_unauthenticated_fallback():
-    mock_payload = json.dumps({
-        "type": "checkout.session.completed",
-        "data": {
-            "object": {
-                "id": "cs_live_998877665544",
-                "customer_email": "purchaser@qector.store",
-                "payment_status": "paid",
-            }
+    mock_payload = json.dumps(
+        {
+            "type": "checkout.session.completed",
+            "data": {
+                "object": {
+                    "id": "cs_live_998877665544",
+                    "customer_email": "purchaser@qector.store",
+                    "payment_status": "paid",
+                }
+            },
         }
-    }).encode("utf-8")
+    ).encode("utf-8")
 
     result = handle_stripe_webhook_payload(payload=mock_payload, sig_header="", webhook_secret="")
     assert result["issued"] is True
     assert result["customer_email"] == "purchaser@qector.store"
     assert result["receipt_id"] == "cs_live_998877665544"
-    
+
     # Assert issued license token is cryptographically valid Ed25519 token
     token = result["license_token"]
     assert verify_license_token(token, "purchaser@qector.store") is True
@@ -73,7 +75,7 @@ def test_stripe_webhook_fulfillment_authenticated_signature(mock_construct_event
                 "customer_email": "vip_user@qector.store",
                 "payment_status": "paid",
             }
-        }
+        },
     }
     mock_construct_event.return_value = mock_event
 
@@ -81,11 +83,7 @@ def test_stripe_webhook_fulfillment_authenticated_signature(mock_construct_event
     test_secret = "whsec_test_secret_for_local_development"
     sig_header = "t=123456,v1=signature_hash_bytes"
 
-    result = handle_stripe_webhook_payload(
-        payload=payload_bytes,
-        sig_header=sig_header,
-        webhook_secret=test_secret
-    )
+    result = handle_stripe_webhook_payload(payload=payload_bytes, sig_header=sig_header, webhook_secret=test_secret)
 
     assert result["issued"] is True
     assert result["customer_email"] == "vip_user@qector.store"

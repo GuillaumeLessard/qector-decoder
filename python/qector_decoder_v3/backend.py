@@ -1,7 +1,7 @@
 """
 qector_decoder_v3.backend — Workload-Aware AutoDecoder with Self-Auto-Debug & Multi-Tier Fallback.
 
-Provides automatic hardware routing, real-time performance calibration, and a 
+Provides automatic hardware routing, real-time performance calibration, and a
 7-tier fault-tolerant self-debugging fallback engine for quantum error correction decoding.
 """
 
@@ -20,7 +20,6 @@ from . import (
     CPUBatchDecoder,
     CUDABatchDecoder,
     FastUnionFindDecoder,
-    UnionFindDecoder,
     BlossomDecoder,
     SparseBlossomDecoder,
     LookupTableDecoder,
@@ -128,7 +127,7 @@ class AutoDecoder:
         self._cuda_ok = bool(self.config.allow_gpu and cuda_is_available())
         opencl_auto = os.environ.get("QECTOR_ENABLE_OPENCL_AUTO", "").lower() in {"1", "true", "yes", "on"}
         self._opencl_ok = bool(self.config.allow_gpu and opencl_auto and opencl_is_available())
-        
+
         if self.config.allow_gpu and not opencl_auto and opencl_is_available():
             self._diag.warnings.append("OpenCL auto-routing disabled; set QECTOR_ENABLE_OPENCL_AUTO=1 to enable it")
 
@@ -173,7 +172,11 @@ class AutoDecoder:
         if backend in self._decoders:
             return self._decoders[backend]
 
-        dec = None
+        # `dec` holds a heterogeneous set of decoder types (one per backend
+        # branch below). Typing it as Any avoids mypy flagging every elif
+        # branch as a type-incompatible assignment while remaining accurate
+        # at runtime.
+        dec: Any = None
         if backend == Backend.CPU_SINGLE:
             dec = FastUnionFindDecoder(self._c2q, self._nq)
         elif backend == Backend.CPU_RAYON:
@@ -211,16 +214,16 @@ class AutoDecoder:
         return dec
 
     def _get_cpu_single(self) -> FastUnionFindDecoder:
-        return self._get_decoder(Backend.CPU_SINGLE)
+        return cast(FastUnionFindDecoder, self._get_decoder(Backend.CPU_SINGLE))
 
     def _get_cpu_rayon(self) -> BatchDecoder:
-        return self._get_decoder(Backend.CPU_RAYON)
+        return cast(BatchDecoder, self._get_decoder(Backend.CPU_RAYON))
 
     def _get_cuda(self) -> Optional[CUDABatchDecoder]:
-        return self._get_decoder(Backend.CUDA)
+        return cast(Optional[CUDABatchDecoder], self._get_decoder(Backend.CUDA))
 
     def _get_opencl(self) -> Optional[OpenCLBatchDecoder]:
-        return self._get_decoder(Backend.OPENCL)
+        return cast(Optional[OpenCLBatchDecoder], self._get_decoder(Backend.OPENCL))
 
     # -- selection ---------------------------------------------------------
     def select(self, batch_size: int) -> str:
@@ -229,7 +232,11 @@ class AutoDecoder:
             return self.config.force
 
         if self.config.allow_gpu and batch_size >= self.config.gpu_threshold:
-            if self.config.prefer == Backend.OPENCL and self._opencl_ok and self._diag.backend_health.get(Backend.OPENCL, True):
+            if (
+                self.config.prefer == Backend.OPENCL
+                and self._opencl_ok
+                and self._diag.backend_health.get(Backend.OPENCL, True)
+            ):
                 return Backend.OPENCL
             if self._cuda_ok and self._diag.backend_health.get(Backend.CUDA, True):
                 return Backend.CUDA
@@ -283,7 +290,14 @@ class AutoDecoder:
 
         # Robust multi-tier self-debugging execution chain
         fallback_chain = [chosen]
-        for t in [Backend.CUDA, Backend.OPENCL, Backend.CPU_RAYON, Backend.CPU_BATCH, Backend.CPU_SINGLE, Backend.BLOSSOM]:
+        for t in [
+            Backend.CUDA,
+            Backend.OPENCL,
+            Backend.CPU_RAYON,
+            Backend.CPU_BATCH,
+            Backend.CPU_SINGLE,
+            Backend.BLOSSOM,
+        ]:
             if t not in fallback_chain:
                 fallback_chain.append(t)
 
@@ -362,12 +376,14 @@ class AutoDecoder:
         self._diag.backend_health[backend] = False
         msg = f"AutoDebug caught error on {backend} [{context}]: {exc}"
         self._diag.warnings.append(msg)
-        self._diag.debug_log.append({
-            "timestamp": time.time(),
-            "backend": backend,
-            "context": context,
-            "error": str(exc),
-        })
+        self._diag.debug_log.append(
+            {
+                "timestamp": time.time(),
+                "backend": backend,
+                "context": context,
+                "error": str(exc),
+            }
+        )
         logger.warning(msg)
 
     def _python_fallback_decode(self, syndrome: np.ndarray) -> np.ndarray:

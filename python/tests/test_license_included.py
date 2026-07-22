@@ -41,7 +41,8 @@ def test_license_file_exists_and_non_empty():
     # Section 3 — accept any of the well-known phrasings used across revisions.
     assert (
         "commercial use requires a paid license" in text_lower
-        or "commercial use" in text_lower and "license" in text_lower
+        or "commercial use" in text_lower
+        and "license" in text_lower
     )
 
 

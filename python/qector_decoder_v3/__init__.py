@@ -138,11 +138,7 @@ def _emit_startup_notice() -> None:
     if any(var in _os_mod.environ for var in ci_vars):
         return
 
-    is_interactive = (
-        hasattr(_sys_mod, "ps1")
-        or "ipykernel" in _sys_mod.modules
-        or "IPython" in _sys_mod.modules
-    )
+    is_interactive = hasattr(_sys_mod, "ps1") or "ipykernel" in _sys_mod.modules or "IPython" in _sys_mod.modules
 
     if is_interactive:
         _sys_mod.stderr.write(

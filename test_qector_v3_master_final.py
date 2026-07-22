@@ -16,7 +16,10 @@ Run:
 """
 from __future__ import annotations
 
-import sys, os, site, types, time
+import sys
+import site
+import types
+import time
 import numpy as np
 import pytest
 
@@ -25,11 +28,10 @@ user_site = site.getusersitepackages()
 if user_site not in sys.path:
     sys.path.insert(0, user_site)
 
-import qector_decoder_v3 as qd
 from qector_decoder_v3 import (
     # === 36 CLASSES ===
     AutoDecoder, AutoRouter, BPOSDDecoder, Backend, BackendConfig,
-    BatchDecoder, BatchedBpDecoder, BeliefMatching, BenchmarkSuite,
+    BatchDecoder, BatchedBpDecoder, BenchmarkSuite,
     BlossomDecoder, BpOsdDecoder, CPUBatchDecoder, CUDABatchDecoder,
     DecodeResult, DecoderName, DecoderPool, DetectorGraph,
     FastUnionFindDecoder, GNNPredecoder, GNNTrainer, HardwareProfile,
@@ -40,15 +42,13 @@ from qector_decoder_v3 import (
     UnionFindDecoder, Workbench,
     # === 27 FUNCTIONS ===
     batched_bp_decode, check_to_edges, clear_decoder_cache,
-    cuda_is_available, decode_mmap, decode_with_diagnostics,
+    cuda_is_available, decode_with_diagnostics,
     detect_hardware, generate_repetition_code_checks,
     generate_ring_code_checks, generate_surface_code_checks,
     generate_toy_code_checks, get_backend, get_decoder,
     get_decoder_pool, gpu_available, has_cuda_rust, has_cupy,
     opencl_is_available, py_check_to_edges,
-    py_generate_repetition_code_checks, py_generate_ring_code_checks,
-    py_generate_surface_code_checks, py_generate_toy_code_checks,
-    recommend, recommend_decoder, sliding_window_decode,
+    py_generate_repetition_code_checks, recommend, recommend_decoder, sliding_window_decode,
     # === 22 MODULES ===
     backend, belief_matching, benchmarking, bp_cupy, bposd, codes,
     decoder_cache, decoder_pool, dem, gpu_backend, predecoder,
@@ -1146,6 +1146,7 @@ class TestDecoderCache:
         clear_decoder_cache()
         dec2 = get_decoder(checks_tuple, nq, decoder_type="union_find")
         assert dec2 is not None
+        assert dec1 is not dec2
 
 
 # ═══════════════════════════════════════════════════════════════════════════

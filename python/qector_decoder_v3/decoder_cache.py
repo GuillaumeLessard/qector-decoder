@@ -93,6 +93,7 @@ def _build_decoder_pool(
     n_workers: Optional[int],
 ):
     from .decoder_pool import DecoderPool
+
     checks = [list(c) for c in checks_tuple]
     return DecoderPool(
         checks,
