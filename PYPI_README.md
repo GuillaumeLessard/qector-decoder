@@ -323,11 +323,11 @@ Personal, academic, educational and non-commercial research use is allowed under
 
 Commercial licensing:
 
-[https://www.qector.store](https://www.qector.store)
+https://www.qector.store
 
 Contact:
 
-<admin@qector.store>
+admin@qector.store
 
 ---
 

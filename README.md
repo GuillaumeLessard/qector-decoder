@@ -461,20 +461,19 @@ The public checkout now emphasizes the package sources, Python API, regression t
 
 ---
 
-## Commercial model
+## Licensing
 
 QECTOR Decoder v3 is source-available.
 
-| Use | License required |
-| --- | --- |
-| Personal, academic, educational, non-commercial research | Free under the repository license |
-| Company use, commercial R&D, institutional funded work | Paid commercial license |
-| SaaS, hosted API, OEM embedding, product integration, redistribution | Paid commercial license |
-| Commercial benchmarking, paid consulting, revenue-linked work | Paid commercial license |
+Personal, academic, educational and non-commercial research use is allowed under the repository license. Company use, funded institutional work, SaaS, hosted API deployment, OEM integration, redistribution, paid consulting, or commercial benchmarking requires a commercial license.
 
-Commercial contact: [admin@qector.store](mailto:admin@qector.store)
+Commercial licensing:
 
-Website: [https://www.qector.store](https://www.qector.store) | [Direct Commercial License Checkout](https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00?locale=en&__embed_source=buy_btn_1TsoKxRsa9cg9l8A7ExMmc77)
+https://www.qector.store
+
+Contact:
+
+admin@qector.store
 
 See [LICENSE](LICENSE) for the repository terms and contact the commercial team above for separate licensing.
 
