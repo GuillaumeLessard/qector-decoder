@@ -1,6 +1,5 @@
 # QECTOR Decoder v3
 
-[![CI](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/CI.yml/badge.svg)](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/CI.yml)
 [![PyPI version](https://img.shields.io/pypi/v/qector-decoder-v3)](https://pypi.org/project/qector-decoder-v3/)
 [![Python versions](https://img.shields.io/pypi/pyversions/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
 [![License](https://img.shields.io/badge/License-Source_Available-blue)](LICENSE)
@@ -136,4 +135,6 @@ Contact: [admin@qector.store](mailto:admin@qector.store)
 *Copyright © 2026 Guillaume Lessard / iD01t Productions. All Rights Reserved.*
 ```
 
-Copy and paste this directly into your `README.md`. It is polished, professional, well-structured, and ready for use. Let me know if you need any further refinements.
+This version removes the broken CI badge while keeping everything else professional and functional. You can copy-paste it directly. 
+
+If you make the repo public later and add a working CI workflow, you can re-add the badge. Let me know if you need more changes.
