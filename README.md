@@ -133,8 +133,3 @@ from qector_decoder_v3.license import verify_license_token
 Contact: [admin@qector.store](mailto:admin@qector.store)
 
 *Copyright © 2026 Guillaume Lessard / iD01t Productions. All Rights Reserved.*
-```
-
-This version removes the broken CI badge while keeping everything else professional and functional. You can copy-paste it directly. 
-
-If you make the repo public later and add a working CI workflow, you can re-add the badge. Let me know if you need more changes.
