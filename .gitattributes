@@ -1,0 +1,20 @@
+# Normalize line endings -- enforce LF for all text files regardless of OS
+* text=auto eol=lf
+
+# Binaries
+*.whl binary
+*.pyd binary
+*.so binary
+*.dll binary
+*.dylib binary
+*.lib binary
+*.exp binary
+*.a binary
+*.gz binary
+*.zip binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary

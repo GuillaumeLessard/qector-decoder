@@ -1,0 +1,192 @@
+{
+  "environment": {
+    "timestamp_unix": null,
+    "python_version": "3.11.0",
+    "python_implementation": "CPython",
+    "platform": "Windows-10-10.0.26100-SP0",
+    "system": "Windows",
+    "machine": "AMD64",
+    "processor": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+    "cpu_count_logical": 16,
+    "numpy_version": "2.2.6",
+    "rust_version": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+    "cargo_version": "cargo 1.96.0 (30a34c682 2026-05-25)",
+    "qector_decoder_v3_version": "0.5.0",
+    "pymatching_version": "2.4.0",
+    "stim_version": "1.16.0",
+    "scipy_version": "1.17.1",
+    "ram_total_gb": 16.51,
+    "ram_available_gb": 2.59,
+    "cuda_available": true,
+    "opencl_available": true,
+    "command": "scripts/belief_grid.py --distance 5 --probs 0.004 0.005 0.006 --seeds 5 --shots 3000 --out benchmark_results/belief_grid"
+  },
+  "distance": 5,
+  "shots": 3000,
+  "cells": [
+    {
+      "p": 0.004,
+      "seed": 0,
+      "pm_errors": 11,
+      "belief_errors": 5,
+      "pm_ler": 0.0036666666666666666,
+      "belief_ler": 0.0016666666666666668,
+      "reduction_pct": 54.54545454545454
+    },
+    {
+      "p": 0.004,
+      "seed": 1,
+      "pm_errors": 10,
+      "belief_errors": 6,
+      "pm_ler": 0.0033333333333333335,
+      "belief_ler": 0.002,
+      "reduction_pct": 40.0
+    },
+    {
+      "p": 0.004,
+      "seed": 2,
+      "pm_errors": 12,
+      "belief_errors": 11,
+      "pm_ler": 0.004,
+      "belief_ler": 0.0036666666666666666,
+      "reduction_pct": 8.333333333333337
+    },
+    {
+      "p": 0.004,
+      "seed": 3,
+      "pm_errors": 15,
+      "belief_errors": 16,
+      "pm_ler": 0.005,
+      "belief_ler": 0.005333333333333333,
+      "reduction_pct": -6.666666666666665
+    },
+    {
+      "p": 0.004,
+      "seed": 4,
+      "pm_errors": 9,
+      "belief_errors": 9,
+      "pm_ler": 0.003,
+      "belief_ler": 0.003,
+      "reduction_pct": 0.0
+    },
+    {
+      "p": 0.005,
+      "seed": 0,
+      "pm_errors": 27,
+      "belief_errors": 24,
+      "pm_ler": 0.009,
+      "belief_ler": 0.008,
+      "reduction_pct": 11.111111111111116
+    },
+    {
+      "p": 0.005,
+      "seed": 1,
+      "pm_errors": 26,
+      "belief_errors": 17,
+      "pm_ler": 0.008666666666666666,
+      "belief_ler": 0.005666666666666667,
+      "reduction_pct": 34.61538461538461
+    },
+    {
+      "p": 0.005,
+      "seed": 2,
+      "pm_errors": 24,
+      "belief_errors": 20,
+      "pm_ler": 0.008,
+      "belief_ler": 0.006666666666666667,
+      "reduction_pct": 16.666666666666664
+    },
+    {
+      "p": 0.005,
+      "seed": 3,
+      "pm_errors": 22,
+      "belief_errors": 21,
+      "pm_ler": 0.007333333333333333,
+      "belief_ler": 0.007,
+      "reduction_pct": 4.545454545454541
+    },
+    {
+      "p": 0.005,
+      "seed": 4,
+      "pm_errors": 22,
+      "belief_errors": 19,
+      "pm_ler": 0.007333333333333333,
+      "belief_ler": 0.006333333333333333,
+      "reduction_pct": 13.636363636363635
+    },
+    {
+      "p": 0.006,
+      "seed": 0,
+      "pm_errors": 41,
+      "belief_errors": 29,
+      "pm_ler": 0.013666666666666667,
+      "belief_ler": 0.009666666666666667,
+      "reduction_pct": 29.268292682926834
+    },
+    {
+      "p": 0.006,
+      "seed": 1,
+      "pm_errors": 32,
+      "belief_errors": 24,
+      "pm_ler": 0.010666666666666666,
+      "belief_ler": 0.008,
+      "reduction_pct": 25.0
+    },
+    {
+      "p": 0.006,
+      "seed": 2,
+      "pm_errors": 40,
+      "belief_errors": 24,
+      "pm_ler": 0.013333333333333334,
+      "belief_ler": 0.008,
+      "reduction_pct": 40.0
+    },
+    {
+      "p": 0.006,
+      "seed": 3,
+      "pm_errors": 42,
+      "belief_errors": 33,
+      "pm_ler": 0.014,
+      "belief_ler": 0.011,
+      "reduction_pct": 21.42857142857143
+    },
+    {
+      "p": 0.006,
+      "seed": 4,
+      "pm_errors": 56,
+      "belief_errors": 48,
+      "pm_ler": 0.018666666666666668,
+      "belief_ler": 0.016,
+      "reduction_pct": 14.28571428571429
+    }
+  ],
+  "summary": [
+    {
+      "p": 0.004,
+      "n_seeds": 5,
+      "belief_le_pm": 4,
+      "mean_reduction_pct": 19.242424242424242,
+      "pooled_pm_ler": 0.0038,
+      "pooled_belief_ler": 0.0031333333333333335,
+      "pooled_reduction_pct": 17.543859649122805
+    },
+    {
+      "p": 0.005,
+      "n_seeds": 5,
+      "belief_le_pm": 5,
+      "mean_reduction_pct": 16.114996114996114,
+      "pooled_pm_ler": 0.008066666666666666,
+      "pooled_belief_ler": 0.006733333333333333,
+      "pooled_reduction_pct": 16.528925619834713
+    },
+    {
+      "p": 0.006,
+      "n_seeds": 5,
+      "belief_le_pm": 5,
+      "mean_reduction_pct": 25.996515679442513,
+      "pooled_pm_ler": 0.014066666666666667,
+      "pooled_belief_ler": 0.010533333333333334,
+      "pooled_reduction_pct": 25.118483412322277
+    }
+  ]
+}

@@ -1,0 +1,196 @@
+# QECTOR Decoder v3 -- .gitignore
+# =================================
+
+# --- Proprietary Rust Core (Never commit to public repo) ---
+src/*
+!src/lib.rs
+
+# --- Build artifacts ---
+/target/
+/dist/
+*.whl
+*.tar.gz
+*.pyd
+*.so
+*.dll
+*.dylib
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+.eggs/
+build/
+develop-eggs/
+downloads/
+eggs/
+.installed.cfg
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.spec
+pip-wheel-metadata/
+share/python-wheels/
+MANIFEST
+
+# --- Secrets (never commit live keys) ---
+.env
+.env.local
+.env.*.local
+licenses_issued.json
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Rust ---
+Cargo.lock.bak
+
+# --- Generated lib artifacts (only OpenCL.def is tracked) ---
+lib/OpenCL.lib
+lib/OpenCL.exp
+
+# --- Local build/dev directories ---
+actions-runner/
+artifacts/
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Benchmark outputs (tracked selectively) ---
+# benchmark_results/ is tracked intentionally for reproducibility evidence
+
+# --- Testing ---
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# --- Temporary ---
+*.tmp
+*.bak
+*.orig
+
+# --- Session scratch / probe files (never committed) ---
+_kimi_probe*.py
+_kimi_probe*.txt
+_probe*.py
+_opencl_probe.py
+_check_gitignore.ps1
+_search_*.ps1
+_search_*.txt
+_pytest_*.log
+_pytest_v*.log
+test_full_v*.py
+test_v0*.py
+_smoke_test.py
+_scratch*.py
+
+# kimi probe/fix helpers
+_kimi_fix_probe.py
+_fix_fixtures.py
+
+# --- Secret environment & credentials ---
+.env
+licenses_issued.json
+
+# --- Log files & scratch test outputs ---
+*.log
+*.txt
+*.xml
+run_status.json
+__all_tests_dump.txt
+cpu_benchmark_output/
+
+# --- Temporary test environments & scratch scripts ---
+.venv*/
+/tests/
+repro_*.py
+verify_*.py
+verify_*.ps1
+_fix_*.py
+_audit_*.ps1
+check_*.py
+check_*.ps1
+run_*.ps1
+scan_*.ps1
+clippy_*.txt
+cargo_*.txt
+errcheck_*.txt
+maturin_*.txt
+pip_show_*.txt
+install_*.txt
+test_*.txt
+verify_*.log
+wheel_build_*.log
+wheel_verify.log
+wheel_verify.py
+smoke_test_wheel.py
+test.py
+test_exports.py
+Qwen_*.py
+print_benchmark_summary.py
+
+# --- Local scratch notes & temporary planning docs ---
+deepseek_*.md
+gem.md
+todo2.md
+topplan.md
+QECTOR_v0.6.3_Development_Plan.md
+dev.md
+finaltodo.md
+Kimi.md
+todo_claude*.md
+test_market_leadership_suite.py
+*.tex
+*.pdf
+perf_chart_*.png
+genus5*.json
+Genus5*.json
+benchmark_*.py
+make_*.py
+generate_pdf_report.py
+cpu_benchmark_report.py
+
+# --- Local-only archives / scratch artifacts ---
+*.zip
+node_modules/
+package*.json
+proto.zip
+qector-build-rc-0.6.2.zip
+
+# --- IDE / editor config (never push) ---
+cspell.json
+pyrightconfig.json
+
+# --- Scratch/repo notes (never push) ---
+REPO_TOPICS.md
+howto.md
+install.md
+llms.txt
+seo_keywords.md
+perf_check.log
+.__all_tests_dump.txt
+PYPI_README.md
+
+# --- Local-only docs (contain secret names / infra details, never push) ---
+RELEASE_PROCEDURE.md
+

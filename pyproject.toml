@@ -1,0 +1,169 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "qector-decoder-v3"
+version = "0.6.9"
+description = "Production-grade Rust/Python quantum error correction decoder. 25+ decoder families: MWPM Blossom, Union-Find, BP-OSD, LDPC/qLDPC, belief-matching, CUDA/GPU batch decoding, 7-tier AutoDecoder fallback. PyMatching/Stim/Sinter compatible. Ed25519 license verification."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "LicenseRef-QECTOR-Source-Available" }
+authors = [
+    {name = "Guillaume Lessard / iD01t Productions", email = "admin@qector.store"}
+]
+keywords = ["quantum", "error correction", "decoder", "union-find", "QEC", "rust", "MWPM", "Stim", "PyMatching", "LDPC", "qLDPC", "blossom", "belief propagation", "GPU decoding", "surface code", "quantum computing"]
+classifiers = [
+    "License :: Other/Proprietary License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Rust",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Intended Audience :: Science/Research",
+    "Development Status :: 4 - Beta",
+]
+dependencies = [
+    "numpy>=1.24.0,<2.3",
+    "cryptography>=3.4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "hypothesis>=6.0.0",
+    "fastapi>=0.110.0",
+    "uvicorn>=0.29.0",
+    "httpx>=0.27.0",
+    "mypy>=1.0.0",
+    "ruff>=0.1.0",
+    "pytest-cov>=4.0.0",
+    "stripe>=5.0",
+]
+# Stim ecosystem: DEM loading, syndrome sampling, Sinter harness, and
+# PyMatching / belief-matching / BP-OSD cross-checks.
+stim = [
+    "stim>=1.12",
+    "pymatching>=2.0",
+    "sinter>=1.12",
+    "ldpc>=2.0",
+    "beliefmatching>=0.2,<=2.2.6",
+]
+# Reproducible benchmark harness: memory probing, plots and tables.
+bench = [
+    "psutil>=5.9",
+    "matplotlib>=3.7",
+    "tabulate>=0.9",
+    "scipy>=1.10",
+]
+# Stripe license fulfillment: checkout sessions, webhook signature verification.
+stripe = [
+    "stripe>=5.0",
+]
+cuda = []
+opencl = []
+cupy = ["cupy"]
+cupy-cuda12x = ["cupy-cuda12x>=13"]
+all = [
+    "stim>=1.12",
+    "pymatching>=2.0",
+    "sinter>=1.12",
+    "ldpc>=2.0",
+    "beliefmatching>=0.2,<=2.2.6",
+    "psutil>=5.9",
+    "matplotlib>=3.7",
+    "tabulate>=0.9",
+    "scipy>=1.10",
+    "cupy-cuda12x>=13",
+    "stripe>=5.0",
+]
+
+[project.urls]
+Homepage = "https://qector.store"
+Documentation = "https://github.com/GuillaumeLessard/qector-decoder"
+Repository = "https://github.com/GuillaumeLessard/qector-decoder"
+Pricing = "https://qector.store/pricing"
+Purchase = "https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00"
+
+
+[project.scripts]
+qector-bench-quick = "qector_decoder_v3.bench_quick:main"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+module-name = "qector_decoder_v3.qector_decoder_v3"
+python-source = "python"
+manifest-path = "Cargo.toml"
+exclude = [
+  "src/**",
+  "tests/**",
+  "actions-runner/**",
+  "artifacts/**",
+  "target/**",
+  ".venv/**",
+]
+strip = true
+
+[tool.pytest.ini_options]
+testpaths = ["python/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+filterwarnings = [
+    # Starlette's TestClient warns that httpx is deprecated in favor of httpx2;
+    # this is upstream noise, not actionable from this project.
+    "ignore::starlette.exceptions.StarletteDeprecationWarning",
+]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+extend-exclude = [".venv", ".venv_clean_test", "target", "dist", "lib", "proto"]
+
+[tool.ruff.format]
+# Ensure consistent formatting on Linux CI runners (LF) even when edited on Windows.
+line-ending = "lf"
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+
+[tool.ruff.lint]
+# E702: semicolons used intentionally for chained one-liners in plotting helpers.
+# E731: lambda assignments used for compact callback tables in a few helpers.
+# E741: single-letter variable names (l, I, O) are domain-conventional in QEC math.
+# These are minor style choices that do not affect correctness.
+ignore = ["E702", "E731", "E741"]
+
+[tool.ruff.lint.per-file-ignores]
+# __init__: late imports (E402) are intentional (runtime optional deps).
+"python/qector_decoder_v3/__init__.py" = ["E402"]
+# workbench.py: json imported for optional serialization path, Tuple aliased for py3.8 compat.
+"python/qector_decoder_v3/workbench.py" = ["F401"]
+# qiskit_plugin.py: Tuple re-exported for downstream type annotations.
+"python/qector_decoder_v3/qiskit_plugin.py" = ["F401"]
+# Test files: many use sys.path manipulation (E402), conditional imports (F401),
+# convenience imports kept for symmetry (F401), unused locals in scaffolding (F841),
+# f-strings used as comment-like strings for readability (F541).
+"python/tests/*.py" = ["E402", "F401", "F541", "F841"]
+"python/tests/**/*.py" = ["E402", "F401", "F541", "F841"]
+# matplotlib.use("Agg") must precede pyplot import to force a non-interactive
+# backend before any GUI backend can be auto-selected; this ordering is required.
+"cpu_benchmark_report.py" = ["E402"]
+# test_exports.py runs a manual integration script top-to-bottom; the smoke_test_wheel
+# import is intentionally placed after other exercises run, and imported for side effects.
+"test_exports.py" = ["E402"]

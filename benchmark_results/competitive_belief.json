@@ -1,0 +1,117 @@
+{
+  "environment": {
+    "timestamp_unix": 1782215691,
+    "python_version": "3.11.0",
+    "python_implementation": "CPython",
+    "platform": "Windows-10-10.0.26100-SP0",
+    "system": "Windows",
+    "machine": "AMD64",
+    "processor": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+    "cpu_count_logical": 16,
+    "numpy_version": "2.2.6",
+    "rust_version": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+    "cargo_version": "cargo 1.96.0 (30a34c682 2026-05-25)",
+    "git_commit": "729282fabffdd8b3fafb45c22f0d4b6b6adeac7d",
+    "qector_decoder_v3_version": "0.5.0",
+    "pymatching_version": "2.4.0",
+    "stim_version": "1.16.0",
+    "scipy_version": "1.17.1",
+    "ram_total_gb": 16.51,
+    "ram_available_gb": 5.04,
+    "cuda_available": true,
+    "opencl_available": true,
+    "command": "D:\\QECTOR\\Qiskit\\qector-decoder-v3\\scripts\\competitive_belief_matching.py --distances 3 5 7 --shots 3000 --no-ref --out D:\\QECTOR\\Qiskit\\qector-decoder-v3\\benchmark_results\\competitive_belief"
+  },
+  "results": [
+    {
+      "distance": 3,
+      "noise": 0.005,
+      "shots": 3000,
+      "detectors": 24,
+      "pymatching": {
+        "ler": 0.011666666666666667,
+        "ler_ci95": [
+          0.008400690167400108,
+          0.016181652088253708
+        ],
+        "us_per_shot": 0.6379333353834227
+      },
+      "qector_mwpm": {
+        "ler": 0.011666666666666667,
+        "ler_ci95": [
+          0.008400690167400108,
+          0.016181652088253708
+        ],
+        "us_per_shot": 1.3629000022774562
+      },
+      "qector_belief": {
+        "ler": 0.012333333333333333,
+        "ler_ci95": [
+          0.0089611270973523,
+          0.016952843360000282
+        ],
+        "us_per_shot": 2331.0666666705706
+      }
+    },
+    {
+      "distance": 5,
+      "noise": 0.005,
+      "shots": 3000,
+      "detectors": 120,
+      "pymatching": {
+        "ler": 0.007666666666666666,
+        "ler_ci95": [
+          0.0051141865595478635,
+          0.011478386485913355
+        ],
+        "us_per_shot": 3.409533334585528
+      },
+      "qector_mwpm": {
+        "ler": 0.007666666666666666,
+        "ler_ci95": [
+          0.0051141865595478635,
+          0.011478386485913355
+        ],
+        "us_per_shot": 7.874100003391504
+      },
+      "qector_belief": {
+        "ler": 0.005,
+        "ler_ci95": [
+          0.003032453348026033,
+          0.008233606890640123
+        ],
+        "us_per_shot": 12125.384133333378
+      }
+    },
+    {
+      "distance": 7,
+      "noise": 0.005,
+      "shots": 3000,
+      "detectors": 336,
+      "pymatching": {
+        "ler": 0.006,
+        "ler_ci95": [
+          0.00379870282955767,
+          0.009464799711656636
+        ],
+        "us_per_shot": 8.755066664889455
+      },
+      "qector_mwpm": {
+        "ler": 0.006,
+        "ler_ci95": [
+          0.00379870282955767,
+          0.009464799711656636
+        ],
+        "us_per_shot": 42.346133336347215
+      },
+      "qector_belief": {
+        "ler": 0.003,
+        "ler_ci95": [
+          0.001579132514064168,
+          0.005692043119505691
+        ],
+        "us_per_shot": 54323.55530000253
+      }
+    }
+  ]
+}

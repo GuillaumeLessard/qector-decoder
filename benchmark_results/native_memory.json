@@ -1,0 +1,147 @@
+{
+  "environment": {
+    "timestamp_unix": null,
+    "python_version": "3.11.0",
+    "python_implementation": "CPython",
+    "platform": "Windows-10-10.0.26100-SP0",
+    "system": "Windows",
+    "machine": "AMD64",
+    "processor": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+    "cpu_count_logical": 16,
+    "numpy_version": "2.2.6",
+    "rust_version": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+    "cargo_version": "cargo 1.96.0 (30a34c682 2026-05-25)",
+    "qector_decoder_v3_version": "0.5.0",
+    "pymatching_version": "2.4.0",
+    "stim_version": "1.16.0",
+    "scipy_version": "1.17.1",
+    "ram_total_gb": 16.51,
+    "ram_available_gb": 3.19,
+    "cuda_available": true,
+    "opencl_available": true,
+    "command": "scripts/native_memory_profile.py --distances 5 9 13 --batch 16384 --out benchmark_results/native_memory"
+  },
+  "batch": 16384,
+  "results": [
+    {
+      "decoder": "cpu_batch",
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "batch": 16384,
+      "rss_base_mib": 107.21,
+      "rss_peak_mib": 112.5,
+      "native_delta_mib": 5.29
+    },
+    {
+      "decoder": "blossom",
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "batch": 16384,
+      "rss_base_mib": 112.69,
+      "rss_peak_mib": 112.75,
+      "native_delta_mib": 0.06
+    },
+    {
+      "decoder": "fast_union_find",
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "batch": 16384,
+      "rss_base_mib": 110.21,
+      "rss_peak_mib": 110.27,
+      "native_delta_mib": 0.06
+    },
+    {
+      "decoder": "cuda_batch",
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "batch": 16384,
+      "rss_base_mib": 203.29,
+      "rss_peak_mib": 203.31,
+      "native_delta_mib": 0.02
+    },
+    {
+      "decoder": "cpu_batch",
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "batch": 16384,
+      "rss_base_mib": 116.5,
+      "rss_peak_mib": 121.38,
+      "native_delta_mib": 4.88
+    },
+    {
+      "decoder": "blossom",
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "batch": 16384,
+      "rss_base_mib": 117.68,
+      "rss_peak_mib": 117.74,
+      "native_delta_mib": 0.06
+    },
+    {
+      "decoder": "fast_union_find",
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "batch": 16384,
+      "rss_base_mib": 116.31,
+      "rss_peak_mib": 116.33,
+      "native_delta_mib": 0.02
+    },
+    {
+      "decoder": "cuda_batch",
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "batch": 16384,
+      "rss_base_mib": 206.02,
+      "rss_peak_mib": 207.31,
+      "native_delta_mib": 1.29
+    },
+    {
+      "decoder": "cpu_batch",
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "batch": 16384,
+      "rss_base_mib": 120.98,
+      "rss_peak_mib": 130.39,
+      "native_delta_mib": 9.41
+    },
+    {
+      "decoder": "blossom",
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "batch": 16384,
+      "rss_base_mib": 123.64,
+      "rss_peak_mib": 129.52,
+      "native_delta_mib": 5.88
+    },
+    {
+      "decoder": "fast_union_find",
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "batch": 16384,
+      "rss_base_mib": 121.98,
+      "rss_peak_mib": 122.0,
+      "native_delta_mib": 0.02
+    },
+    {
+      "decoder": "cuda_batch",
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "batch": 16384,
+      "rss_base_mib": 211.57,
+      "rss_peak_mib": 214.24,
+      "native_delta_mib": 2.67
+    }
+  ]
+}

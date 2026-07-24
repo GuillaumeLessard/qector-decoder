@@ -1,0 +1,22 @@
+include LICENSE
+include README.md
+include CHANGELOG.md
+include CITATION.cff
+include codemeta.json
+include pyproject.toml
+include Cargo.toml
+include Cargo.lock
+include build.rs
+
+recursive-include python *.py py.typed
+recursive-include src *.rs
+recursive-include proto *.proto
+recursive-include examples *.py
+recursive-include docs *.md
+recursive-include lib *.def
+recursive-include scripts *.py
+recursive-include python/tests *.py
+
+global-exclude *.pyc
+global-exclude __pycache__
+global-exclude .DS_Store

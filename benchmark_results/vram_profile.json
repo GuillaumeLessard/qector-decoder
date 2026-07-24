@@ -1,0 +1,22 @@
+{
+  "device": "NVIDIA GeForce GTX 1660 Ti",
+  "batch": 65536,
+  "results": [
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "batch": 65536,
+      "vram_base_mib": 4102.0,
+      "vram_peak_mib": 4100.0,
+      "vram_delta_mib": 0.0
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "batch": 65536,
+      "vram_base_mib": 4241.0,
+      "vram_peak_mib": 4241.0,
+      "vram_delta_mib": 0.0
+    }
+  ]
+}

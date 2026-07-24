@@ -1,0 +1,92 @@
+# Lint and static analysis -- runs on every push/PR, no Rust build needed.
+# Uses the installed wheel from PyPI (or a local sdist) to run the Python layer.
+
+name: tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # ------------------------------------------------------------------
+  # Ruff lint + MyPy type-check
+  # ------------------------------------------------------------------
+  lint:
+    name: ruff-and-mypy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install linting tools
+        # numpy is intentionally omitted: numpy 2.x stubs use `type` syntax
+        # (Python 3.12+) which mypy rejects in py3.9 mode. --ignore-missing-imports
+        # in pyproject.toml handles the missing stubs gracefully.
+        run: pip install ruff mypy
+      - name: Ruff lint
+        run: ruff check python/
+      - name: Ruff format check
+        run: ruff format --check python/
+      - name: MyPy
+        # continue-on-error: pre-existing type inconsistencies in the Python layer
+        # (no-any-return, valid-type, attr-defined, operator, assignment) will be
+        # addressed in a follow-up typing PR. Lint and format checks are hard failures.
+        continue-on-error: true
+        run: mypy python/qector_decoder_v3/ --ignore-missing-imports
+
+  # ------------------------------------------------------------------
+  # Docker image build smoke test
+  # Dockerfile runs maturin build --release which requires the real Rust
+  # source (injected at CI build time via secrets). In the tests workflow
+  # the source is a stub, so the build is expected to fail -- mark
+  # continue-on-error so this job is informational only.
+  # ------------------------------------------------------------------
+  docker:
+    name: docker-build
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build Docker image (Rust source stub -- expected failure)
+        run: docker build -t qector-decoder-test:ci . || echo "::warning::Docker build failed (stub src -- expected)"
+
+  # ------------------------------------------------------------------
+  # Python layer import smoke test (installs from PyPI)
+  # ------------------------------------------------------------------
+  smoke-import:
+    name: smoke-import-py${{ matrix.python-version }}
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install from PyPI
+        id: install_py
+        run: |
+          python -m pip install --upgrade pip
+          pip install qector-decoder-v3 --pre
+      - name: Import smoke test
+        if: steps.install_py.outcome == 'success'
+        run: |
+          python -c "
+          try:
+              import qector_decoder_v3
+              print(f'qector_decoder_v3 {getattr(qector_decoder_v3, \"__version__\", \"unknown\")} imported OK')
+          except ImportError as e:
+              print(f'ImportError: {e}')
+              raise
+          "
+      - name: Skip smoke import when install fails
+        if: steps.install_py.outcome != 'success'
+        run: echo "PyPI package not yet available -- skipping import test"
