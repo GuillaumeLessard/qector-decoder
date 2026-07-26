@@ -93,6 +93,9 @@ Documentation = "https://github.com/GuillaumeLessard/qector-decoder"
 Repository = "https://github.com/GuillaumeLessard/qector-decoder"
 Pricing = "https://qector.store/pricing"
 Purchase = "https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00"
+Changelog = "https://github.com/GuillaumeLessard/qector-decoder/blob/main/CHANGELOG.md"
+"Release Notes" = "https://github.com/GuillaumeLessard/qector-decoder/blob/main/RELEASE_NOTES.md"
+Issues = "https://github.com/GuillaumeLessard/qector-decoder/issues"
 
 
 [project.scripts]

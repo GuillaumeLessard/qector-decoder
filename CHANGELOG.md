@@ -7,19 +7,9 @@ environment so report figures trace back to a specific build.
 
 ## [Unreleased]
 
-### Fixed
-- **`verify_license_token` raised instead of rejecting malformed input.** The
-  `except RuntimeError` clauses caught neither `binascii.Error` nor
-  `UnicodeDecodeError` (both `ValueError` subclasses), so a garbage token
-  propagated an exception to the caller rather than returning `False`. Any
-  caller passing attacker-influenced input crashed. Now catches
-  `(InvalidSignature, ValueError, TypeError)`; nine adversarial inputs are
-  locked by tests.
-- **Checkout no longer pins `payment_method_types=["card"]`.** Pinning it
-  disables Stripe dynamic payment methods, so Link, Apple/Google Pay and local
-  methods never render and every buyer must type a card number. Omitting the
-  parameter lets Stripe show the highest-converting eligible methods per
-  customer, configured from the Dashboard.
+_Nothing yet._
+
+## [0.6.9] - 2026-07-26
 
 ### Added
 - **v2 licence tokens carrying `tier` and `exp`.** Legacy tokens sign only
@@ -34,13 +24,6 @@ environment so report figures trace back to a specific build.
   `QECTOR_BLOSSOM_INTRA_PAR`, `QECTOR_BLOSSOM_INTRA_THREADS`,
   `QECTOR_CUDA_DEVICE_ID`, `QECTOR_OPENCL_DEVICE_ALLOW` — with which of them can
   change results rather than only throughput.
-
-### Notes
-- v0.6.8 hotfix published to PyPI, superseding the broken v0.6.7.
-
-## [0.6.9] - 2026-07-24
-
-### Added
 - **Task A — Exact log-domain BP**: `BpMethod{MinSum,Exact}` enum in `bp_osd.rs`, default `Exact`. `phi(x) = -ln(tanh(x/2))` via hybrid exact (<0.25) + 65536-entry interpolated LUT ([0.25, 20]) + 0.0 (≥20). Deterministic reliability ranking (`rel_key` 1e-6 quantization + index tie-break) fixes float-noise OSD-0 basis flipping. PyO3 `bp_method` kwarg (`"exact"`/`"min_sum"`).
 - **Task B — Higher-order OSD**: true combination-sweep OSD-1/2 in `bp_osd.rs` — flip subsets of W≤12 least-reliable selected columns, residual GF(2) re-solve with syndrome pre-subtraction, min-weight faithful candidate wins. PyO3 `osd_order` kwarg (0 default preserved, non-breaking).
 - **Task C — GNN-enhanced belief matching**: `GNNBeliefMatcher` class in `belief_matching.py` — end-to-end GNN-guided MWPM pipeline (`DetectorGraph` → `GNNPredecoder.predict_with_node_probs` → per-edge weights → max-per-qubit fan-in → `SparseBlossomDecoder.decode_with_weights` → faithfulness fallback). Optional synthetic training (`train_samples`/`error_rate`/`train_epochs`/`seed`). `decode_with_gnn` one-shot helper. Both re-exported at package top level.
@@ -49,6 +32,26 @@ environment so report figures trace back to a specific build.
 - **`stripe_integration.py`**: `create_license_token` import fallback when `generate_license_keys` is absent.
 
 ### Fixed
+- **`BeliefMatching.from_numpy_h` produced a decoder that returned an empty
+  array for every syndrome.** The constructor built `hyper_obs` with zero rows,
+  and `decode` returns `hyper_obs @ hard` — so any `BeliefMatching` built from a
+  raw parity-check matrix silently decoded nothing and reported no error.
+  `edge_obs` carried the identical defect, breaking the matching fallback for
+  exactly the syndromes BP found hardest. Both matrices now carry qubit
+  incidence, so `decode` returns a length-`n_qubits` correction; verified
+  faithful (`H @ corr == syndrome`) on all 16 repetition-code d=5 syndromes.
+- **`verify_license_token` raised instead of rejecting malformed input.** The
+  `except RuntimeError` clauses caught neither `binascii.Error` nor
+  `UnicodeDecodeError` (both `ValueError` subclasses), so a garbage token
+  propagated an exception to the caller rather than returning `False`. Any
+  caller passing attacker-influenced input crashed. Now catches
+  `(InvalidSignature, ValueError, TypeError)`; nine adversarial inputs are
+  locked by tests.
+- **Checkout no longer pins `payment_method_types=["card"]`.** Pinning it
+  disables Stripe dynamic payment methods, so Link, Apple/Google Pay and local
+  methods never render and every buyer must type a card number. Omitting the
+  parameter lets Stripe show the highest-converting eligible methods per
+  customer, configured from the Dashboard.
 - **blossom.rs boundary bug**: boundary node matched without `boundary_spt`, panicking on odd-defect boundary-less codes.
 
 ### Performance / internals (dev.md items, this cycle)

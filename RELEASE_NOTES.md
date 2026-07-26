@@ -2,6 +2,25 @@
 
 All notable changes to QECTOR Decoder will be documented in this file.
 
+## [0.6.9] - 2026-07-26
+**Focus**: BP-OSD accuracy (exact log-domain BP, true OSD-1/2), belief-matching correctness, licence hardening.
+
+### Fixed
+- **`BeliefMatching.from_numpy_h` decoders returned an empty array for every syndrome** — zero observable rows meant `decode` produced length-0 output with no error. Now returns a length-`n_qubits` correction with `H @ corr == syndrome` verified.
+- **`verify_license_token` raised on malformed input** instead of returning `False` (`binascii.Error`/`UnicodeDecodeError` escaped the old `except RuntimeError`). Nine adversarial inputs now locked by tests.
+- **Blossom boundary bug**: odd-defect boundary-less codes no longer panic.
+- Stripe checkout no longer pins `payment_method_types=["card"]`, restoring Link/wallets/local payment methods.
+
+### Added
+- **Exact log-domain sum-product BP** (default; `bp_method="min_sum"` opt-out) and **true combination-sweep OSD-1/2** (`osd_order` kwarg).
+- **`GNNBeliefMatcher`** — GNN-guided MWPM pipeline with faithfulness fallback.
+- **v2 licence tokens** carrying `tier` + `exp` inside the Ed25519 signature; legacy tokens keep verifying; `license_claims()` exposes verified, unexpired claims.
+- **Tuning env vars documented** (`QECTOR_BLOSSOM_K_MULT`, `QECTOR_BLOSSOM_INTRA_PAR`, `QECTOR_BLOSSOM_INTRA_THREADS`, `QECTOR_CUDA_DEVICE_ID`, `QECTOR_OPENCL_DEVICE_ALLOW`) — with which of them change results vs. only throughput.
+- Licensing notice now reaches non-interactive runs (one stderr message at import; `QECTOR_SILENT=1` suppresses; silent when licensed; skipped in CI).
+
+### Validation
+`cargo test --lib` 203 passed · clippy 0 warnings · pytest 1237 passed, 1 skipped, 0 failed · ruff check/format clean · captured under `test-results/`.
+
 ## [0.6.8] - 2026-07-22
 **Focus**: Hotfix for unimportable v0.6.7 wheel — guarded imports, CI smoke test, YAML fix.
 

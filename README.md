@@ -1,9 +1,9 @@
 # QECTOR Decoder v3
 
-[![CI](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/CI.yml/badge.svg)](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/CI.yml)
+[![CI](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/tests.yml/badge.svg)](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/tests.yml)
 [![PyPI](https://img.shields.io/pypi/v/qector-decoder-v3)](https://pypi.org/project/qector-decoder-v3/)
 [![Python](https://img.shields.io/pypi/pyversions/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
-[![License](https://img.shields.io/badge/License-Source_Available-blue)](LICENSE)
+[![License](https://img.shields.io/badge/License-Source_Available-blue)](https://github.com/GuillaumeLessard/qector-decoder/blob/main/LICENSE)
 
 **Production-grade quantum error correction decoding library — Python + Rust.**  
 *Copyright © 2026 Guillaume Lessard / iD01t Productions. All Rights Reserved.*
@@ -234,6 +234,17 @@ Commercial licenses are issued automatically via Stripe Checkout:
 
 ---
 
+## v0.6.9 highlights
+
+| Area | Description |
+| --- | --- |
+| **Belief matching** | `from_numpy_h` decoders no longer return empty corrections — output is a faithful length-`n_qubits` vector (`H @ corr == syndrome`) |
+| **BP-OSD accuracy** | Exact log-domain sum-product BP by default; true combination-sweep OSD-1/2 via `osd_order` |
+| **GNN belief matching** | `GNNBeliefMatcher` end-to-end GNN-guided MWPM with faithfulness fallback |
+| **Licence hardening** | Malformed tokens return `False` instead of raising; v2 tokens carry tier + expiry inside the signature |
+| **Payments** | Dynamic payment methods restored at checkout (Link, wallets, local methods) |
+| **Docs** | Tuning env vars documented, incl. which change results vs. throughput; `docs/RELEASING.md` added |
+
 ## v0.6.8 highlights
 
 | Area | Description |
@@ -392,7 +403,7 @@ QECTOR Decoder v3 is **source-available**. Personal, academic, educational, and 
   author  = {Guillaume Lessard},
   title   = {{QECTOR Decoder v3}: Rust/Python Quantum Error Correction Decoding Platform},
   year    = {2026},
-  version = {0.6.8},
+  version = {0.6.9},
   url     = {https://www.qector.store},
   note    = {Source-available. Commercial license required for commercial use.}
 }
