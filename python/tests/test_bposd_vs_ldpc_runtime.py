@@ -51,7 +51,6 @@ def _in_span(basis, v):
 def test_bposd_vs_ldpc_runtime():
     pytest.importorskip("ldpc")
     from ldpc import BpOsdDecoder as RefBpOsd
-
     from qector_decoder_v3.bposd import BpOsdDecoder
 
     cx, cz = _bb72()

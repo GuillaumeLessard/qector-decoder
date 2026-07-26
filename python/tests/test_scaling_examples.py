@@ -16,7 +16,6 @@ thresholds — so the test does not flake under machine load.
 
 import numpy as np
 import pytest
-
 from qector_decoder_v3 import benchmarking as bm
 from qector_decoder_v3 import codes
 

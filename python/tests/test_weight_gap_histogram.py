@@ -17,7 +17,7 @@ import pytest
 stim = pytest.importorskip("stim")
 pymatching = pytest.importorskip("pymatching")
 
-from qector_decoder_v3 import dem, pymatching_compat  # noqa: E402
+from qector_decoder_v3 import dem, pymatching_compat
 
 TOL = 1e-3
 

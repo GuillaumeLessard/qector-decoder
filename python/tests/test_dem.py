@@ -6,9 +6,7 @@ replaced the earlier broken stim_compat heuristic.
 """
 
 import numpy as np
-
 from qector_decoder_v3 import dem
-
 
 REP_DEM = """
 error(0.1) D0 L0

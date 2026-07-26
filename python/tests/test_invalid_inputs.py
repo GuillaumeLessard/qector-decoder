@@ -6,9 +6,8 @@ segfault. Each case is wrapped in ``pytest.raises``.
 
 import numpy as np
 import pytest
-
 import qector_decoder_v3 as qd
-from qector_decoder_v3 import codes, dem, result, bposd, pymatching_compat
+from qector_decoder_v3 import bposd, codes, dem, pymatching_compat, result
 
 
 def _small_dem():

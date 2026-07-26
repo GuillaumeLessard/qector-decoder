@@ -61,7 +61,7 @@ def test_no_native_rss_leak():
     assert growth < MAX_GROWTH_MIB, (
         f"RSS grew {growth:.1f} MiB (first-quarter {first_quarter:.1f} -> "
         f"last {last_quarter:.1f}); limit {MAX_GROWTH_MIB} MiB -- possible native leak. "
-        f"samples={['%.1f' % s for s in samples]}"
+        f"samples={[f'{s:.1f}' for s in samples]}"
     )
 
     # The loop did real, correct work.

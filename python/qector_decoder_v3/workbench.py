@@ -1,9 +1,9 @@
 """
-qector_decoder_v3.workbench — the QECTOR Workbench application controller.
+qector_decoder_v3.workbench - the QECTOR Workbench application controller.
 
 A headless, fully-testable backend for the QECTOR desktop Workbench.  It loads
 real ``.stim`` / ``.dem`` files, runs real decode benchmarks through a cancelable
-background job queue, and exports the resulting artifacts to JSON / CSV / PDF —
+background job queue, and exports the resulting artifacts to JSON / CSV / PDF -
 every number traced to a real decode (no fabricated data).  A thin GUI (see
 ``rest_api`` / the ``run-qector`` skill) wraps this controller; the controller is
 what the test-suite drives, so the GUI stays a presentation shell.
@@ -38,14 +38,14 @@ import threading
 import time
 import uuid
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 
 from . import benchmarking as _bm
 from . import codes as _codes
 
-__all__ = ["Workbench", "Job", "WorkbenchError"]
+__all__ = ["Job", "Workbench", "WorkbenchError"]
 
 
 class WorkbenchError(RuntimeError):
@@ -79,13 +79,13 @@ class Job:
     spec: dict
     status: str = "queued"  # queued | running | completed | cancelled | failed
     submitted_unix: float = 0.0
-    started_unix: Optional[float] = None
-    finished_unix: Optional[float] = None
+    started_unix: float | None = None
+    finished_unix: float | None = None
     progress: float = 0.0  # 0..1
     units_done: int = 0
     units_total: int = 0
     error: str = ""
-    artifact: Optional[dict] = None
+    artifact: dict | None = None
     _cancel: threading.Event = field(default_factory=threading.Event, repr=False)
 
     def to_dict(self) -> dict:
@@ -108,12 +108,12 @@ class Workbench:
     """Controller for the QECTOR Workbench (load → benchmark → export)."""
 
     def __init__(self) -> None:
-        self._loaded: Optional[dict] = None  # last loaded stim/dem problem
-        self._jobs: Dict[str, Job] = {}
-        self._queue: List[str] = []
+        self._loaded: dict | None = None  # last loaded stim/dem problem
+        self._jobs: dict[str, Job] = {}
+        self._queue: list[str] = []
         self._lock = threading.Lock()
         self._cv = threading.Condition(self._lock)
-        self._worker: Optional[threading.Thread] = None
+        self._worker: threading.Thread | None = None
         self._shutdown = False
 
     # ------------------------------------------------------------------ load
@@ -137,7 +137,7 @@ class Workbench:
 
         try:
             sdem = circuit.detector_error_model(decompose_errors=True)
-        except Exception:  # not decomposable
+        except RuntimeError:
             sdem = circuit.detector_error_model()
         desc = {
             "kind": "stim",
@@ -182,7 +182,7 @@ class Workbench:
         return desc
 
     @property
-    def loaded(self) -> Optional[dict]:
+    def loaded(self) -> dict | None:
         if self._loaded is None:
             return None
         return {k: v for k, v in self._loaded.items() if not k.startswith("_")}
@@ -192,22 +192,21 @@ class Workbench:
         """Detect available decode backends and GPU device names."""
         import qector_decoder_v3 as qd
 
-        info: Dict[str, Any] = {
+        info: dict[str, Any] = {
             "cpu": True,
             "cuda": bool(qd.cuda_is_available()),
             "opencl": bool(qd.opencl_is_available()),
             "cuda_device": None,
             "opencl_device": None,
         }
-        if info["cuda"]:
-            try:
-                info["cuda_device"] = qd.CUDABatchDecoder([[0]], 1).device_name
-            except Exception:
-                pass
+        try:
+            info["cuda_device"] = qd.CUDABatchDecoder([[0]], 1).device_name
+        except RuntimeError:
+            pass
         if info["opencl"]:
             try:
                 info["opencl_device"] = qd.OpenCLBatchDecoder([[0]], 1).device_name
-            except Exception:
+            except RuntimeError:
                 pass
         return info
 
@@ -220,7 +219,7 @@ class Workbench:
         return env
 
     # ------------------------------------------------------------- benchmark
-    def run_benchmark(self, spec: dict, job: Optional[Job] = None) -> dict:
+    def run_benchmark(self, spec: dict, job: Job | None = None) -> dict:
         """Run a real decode benchmark (synchronously) and return an artifact.
 
         ``spec`` keys:
@@ -248,7 +247,7 @@ class Workbench:
         if job is not None:
             job.units_total = units_total
 
-        results: List[dict] = []
+        results: list[dict] = []
         done = 0
         for code, ler_ctx in problems:
             for kind in decoders:
@@ -304,10 +303,11 @@ class Workbench:
         dists = spec.get("distances", [spec.get("distance", 5)])
         return [(_CODE_FAMILIES[fam](int(d)), None) for d in dists]
 
-    def _ler(self, kind, code, ler_ctx, shots) -> Optional[float]:
+    def _ler(self, kind, code, ler_ctx, shots) -> float | None:
         """Real LER from Stim shots for a stim-loaded problem (graphlike only)."""
         try:
-            import stim  # noqa: F401
+            import stim
+
             from . import pymatching_compat
 
             circuit = ler_ctx["circuit"]
@@ -318,7 +318,7 @@ class Workbench:
             m = pymatching_compat.Matching.from_detector_error_model(sdem)
             pred = np.asarray(m.decode_batch(det), np.uint8).reshape(shots, -1)
             return float(np.any(pred != obs, axis=1).mean())
-        except Exception:
+        except RuntimeError:
             return None
 
     # ------------------------------------------------------------- job queue
@@ -339,11 +339,11 @@ class Workbench:
                 raise WorkbenchError(f"unknown job {job_id!r}")
             return job.to_dict()
 
-    def list_jobs(self) -> List[dict]:
+    def list_jobs(self) -> list[dict]:
         with self._lock:
             return [j.to_dict() for j in self._jobs.values()]
 
-    def job_artifact(self, job_id: str) -> Optional[dict]:
+    def job_artifact(self, job_id: str) -> dict | None:
         with self._lock:
             job = self._jobs.get(job_id)
             return None if job is None else job.artifact
@@ -363,7 +363,7 @@ class Workbench:
                 job._cancel.set()
             return job.status
 
-    def wait(self, job_id: str, timeout: Optional[float] = None) -> dict:
+    def wait(self, job_id: str, timeout: float | None = None) -> dict:
         """Block until a job reaches a terminal state (or timeout)."""
         deadline = None if timeout is None else time.perf_counter() + timeout
         while True:
@@ -416,7 +416,7 @@ class Workbench:
                 with self._lock:
                     job.status = "cancelled"
                     job.finished_unix = time.time()
-            except Exception as exc:  # pragma: no cover - defensive
+            except RuntimeError as exc:  # pragma: no cover - defensive
                 with self._lock:
                     job.status = "failed"
                     job.error = f"{type(exc).__name__}: {exc}"
@@ -485,7 +485,7 @@ class Workbench:
             matplotlib.use("Agg")
             import matplotlib.pyplot as plt
             from matplotlib.backends.backend_pdf import PdfPages
-        except Exception as exc:  # pragma: no cover
+        except RuntimeError as exc:  # pragma: no cover
             raise WorkbenchError(f"PDF export needs matplotlib: {exc}")
 
         _ensure_parent(path)
@@ -496,7 +496,7 @@ class Workbench:
             fig = plt.figure(figsize=(8.27, 11.69))
             fig.clf()
             txt = [
-                "QECTOR Workbench — Benchmark Report",
+                "QECTOR Workbench - Benchmark Report",
                 "",
                 f"git commit : {env.get('git_commit')}",
                 f"platform   : {env.get('platform')}",
@@ -507,7 +507,7 @@ class Workbench:
             ]
             for r in rows[:30]:
                 txt.append(
-                    f"  {r.get('decoder'):16s} {str(r.get('code')):18s} "
+                    f"  {r.get('decoder'):16s} {r.get('code')!s:18s} "
                     f"faithful={r.get('syndrome_faithful')} "
                     f"p50={r.get('latency_us', {}).get('p50', 0):.2f}us"
                 )

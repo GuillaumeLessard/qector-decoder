@@ -12,7 +12,7 @@ import pytest
 stim = pytest.importorskip("stim")
 pymatching = pytest.importorskip("pymatching")
 
-from qector_decoder_v3.belief_matching import BeliefMatching, build_matching_matrices  # noqa: E402
+from qector_decoder_v3.belief_matching import BeliefMatching, build_matching_matrices
 
 
 def _circ(d, p=0.005):

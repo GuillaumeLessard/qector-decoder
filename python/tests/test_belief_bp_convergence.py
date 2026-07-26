@@ -17,8 +17,8 @@ import pytest
 stim = pytest.importorskip("stim")
 pymatching = pytest.importorskip("pymatching")
 
-from qector_decoder_v3.belief_matching import BeliefMatching, build_matching_matrices
 from qector_decoder_v3._bp_core import build_incidence, sum_product_bp
+from qector_decoder_v3.belief_matching import BeliefMatching, build_matching_matrices
 
 
 def _circuit(d, p):

@@ -1,5 +1,5 @@
 """
-qector_decoder_v3.decoder_pool — Multi-process decoder pool.
+qector_decoder_v3.decoder_pool - Multi-process decoder pool.
 
 Distributes batch decoding across multiple worker processes for
 near-linear speedup on multi-core machines.
@@ -29,7 +29,7 @@ from __future__ import annotations
 import multiprocessing as _mp
 import os
 import platform as _platform
-from typing import List, Optional, cast
+from typing import cast
 
 import numpy as np
 
@@ -114,8 +114,8 @@ class DecoderPool:
         check_to_qubits=None,
         n_qubits=None,
         decoder_type: str = "fast_union_find",
-        n_workers: Optional[int] = None,
-        num_threads: Optional[int] = None,
+        n_workers: int | None = None,
+        num_threads: int | None = None,
     ):
         workers_arg = num_threads if num_threads is not None else n_workers
         if workers_arg is None:
@@ -131,13 +131,13 @@ class DecoderPool:
             self._c2q = []
         self._nq = int(n_qubits) if n_qubits is not None else None
         self._decoder_type = str(decoder_type)
-        self._pool: Optional["_mp.pool.Pool"] = None
+        self._pool: _mp.pool.Pool | None = None
 
     def decode(self, syndromes) -> np.ndarray:
         """Decode a batch of syndromes.
 
         On Windows, uses single-process Rayon parallel (``batch_decode_par``
-        or ``batch_decode_simd``) for all batch sizes — this is 50-500x faster
+        or ``batch_decode_simd``) for all batch sizes - this is 50-500x faster
         than multi-process due to spawn overhead.
 
         On Linux/macOS, uses multi-process pool for batches > 100K.
@@ -172,10 +172,10 @@ class DecoderPool:
         chunk_size = (n + nw - 1) // nw
         chunks = [(arr[i : i + chunk_size], i // chunk_size) for i in range(0, n, chunk_size)]
 
-        results: List[Optional[np.ndarray]] = [None] * len(chunks)
+        results: list[np.ndarray | None] = [None] * len(chunks)
         for idx, result in self._pool.imap_unordered(_worker_decode, chunks):
             results[idx] = result
-        return cast(np.ndarray, np.concatenate(cast(List[np.ndarray], results), axis=0).astype(np.uint8))
+        return cast(np.ndarray, np.concatenate(cast(list[np.ndarray], results), axis=0).astype(np.uint8))
 
     def close(self):
         if self._pool is not None:

@@ -3,7 +3,7 @@
 These tests cover the wiring gaps that were closed in this session:
 - CPUBatchDecoder.decode() single-syndrome path
 - HybridDecoder full API (no stray test_method, all 4 decode paths)
-- GPU resilience (CUDA + OpenCL) — counters, fallback, recovery
+- GPU resilience (CUDA + OpenCL) - counters, fallback, recovery
 - MCP server protocol (JSON-RPC initialize / tools/list / tools/call)
 - gRPC server exposure when built with the `grpc` feature
 - Input validation at system boundaries (wrong dtype, wrong shape, empty)
@@ -16,12 +16,10 @@ import sys
 
 import numpy as np
 import pytest
-
 import qector_decoder_v3 as qd
 
-
 # ---------------------------------------------------------------------------
-# CPUBatchDecoder.decode() — single-syndrome path (was missing in source)
+# CPUBatchDecoder.decode() - single-syndrome path (was missing in source)
 # ---------------------------------------------------------------------------
 
 
@@ -70,7 +68,7 @@ class TestCPUBatchDecoderSingleDecode:
 
 
 # ---------------------------------------------------------------------------
-# HybridDecoder — full API surface (verify no stray test_method)
+# HybridDecoder - full API surface (verify no stray test_method)
 # ---------------------------------------------------------------------------
 
 
@@ -117,7 +115,7 @@ class TestHybridDecoderAPI:
 
 
 # ---------------------------------------------------------------------------
-# GPU resilience — verify counters behave correctly on both backends
+# GPU resilience - verify counters behave correctly on both backends
 # ---------------------------------------------------------------------------
 
 
@@ -204,7 +202,7 @@ class TestGPUBackends:
 
 
 # ---------------------------------------------------------------------------
-# MCP server protocol — JSON-RPC over stdio
+# MCP server protocol - JSON-RPC over stdio
 # ---------------------------------------------------------------------------
 
 
@@ -219,6 +217,7 @@ class TestMCPServer:
                 capture_output=True,
                 text=True,
                 timeout=30,
+                check=True,
             )
         except subprocess.TimeoutExpired:
             pytest.skip("MCP server did not respond within 30s (may be built without grpc feature)")
@@ -244,7 +243,7 @@ class TestMCPServer:
         assert r["jsonrpc"] == "2.2" or r["jsonrpc"] == "2.0"
         assert "result" in r
         result = r["result"]
-        # MCP servers may use camelCase or snake_case keys — accept both.
+        # MCP servers may use camelCase or snake_case keys - accept both.
         assert "capabilities" in result
         server_info = result.get("serverInfo") or result.get("server_info")
         assert server_info is not None
@@ -341,7 +340,7 @@ class TestGRPCExposure:
     def test_grpc_optional_import(self):
         """run_grpc_server is only present when built with the grpc feature."""
         try:
-            from qector_decoder_v3.qector_decoder_v3 import run_grpc_server  # noqa: F401
+            from qector_decoder_v3.qector_decoder_v3 import run_grpc_server
 
             grpc_exposed = True
         except ImportError:
@@ -355,18 +354,18 @@ class TestGRPCExposure:
         except ImportError:
             pytest.skip("grpc feature not enabled")
         try:
-            import grpc  # noqa: F401
+            import grpc
         except ImportError:
             pytest.skip("grpc Python package not installed")
         try:
-            from proto.qector_pb2 import DecodeRequest, DecodeResponse  # noqa: F401
-            from proto.qector_pb2_grpc import QECTORDecoderStub  # noqa: F401
+            from proto.qector_pb2 import DecodeRequest, DecodeResponse
+            from proto.qector_pb2_grpc import QECTORDecoderStub
         except ImportError:
             pytest.skip("gRPC proto stubs not available in test checkout")
 
 
 # ---------------------------------------------------------------------------
-# Cross-decoder consistency — every decoder must agree on simple syndromes
+# Cross-decoder consistency - every decoder must agree on simple syndromes
 # ---------------------------------------------------------------------------
 
 
@@ -413,7 +412,7 @@ class TestCrossDecoderConsistency:
 
 
 # ---------------------------------------------------------------------------
-# Boundary validation — every decoder must validate input shape & dtype
+# Boundary validation - every decoder must validate input shape & dtype
 # ---------------------------------------------------------------------------
 
 
@@ -433,7 +432,7 @@ class TestBoundaryValidation:
         }
 
     def test_all_reject_wrong_dtype(self, decoder_set):
-        for name, dec in decoder_set.items():
+        for dec in decoder_set.values():
             with pytest.raises((TypeError, ValueError)):
                 dec.decode(np.zeros(25, dtype=np.float32))
 

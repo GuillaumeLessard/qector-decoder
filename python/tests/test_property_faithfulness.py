@@ -8,9 +8,9 @@ older shape-only tests missed.
 
 import numpy as np
 import pytest
-from hypothesis import given, settings, strategies as st
-
 import qector_decoder_v3 as qd
+from hypothesis import given, settings
+from hypothesis import strategies as st
 from qector_decoder_v3 import codes
 
 

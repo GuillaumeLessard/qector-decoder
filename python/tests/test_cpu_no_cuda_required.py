@@ -5,7 +5,7 @@ This is proven two ways:
 
 1. A fresh subprocess imports the package, builds a CPU BlossomDecoder on a
    rotated surface code, decodes a reachable syndrome faithfully, and prints
-   ``OK`` — exercising the cold import path with no GPU dependency forced.
+   ``OK`` - exercising the cold import path with no GPU dependency forced.
 2. In-process, an ``AutoDecoder`` configured with ``allow_gpu=False`` is asserted
    to select a CPU backend for every batch size (never CUDA/OpenCL) and to
    produce syndrome-faithful batch corrections.
@@ -16,7 +16,6 @@ import sys
 import textwrap
 
 import numpy as np
-
 import qector_decoder_v3 as qd
 from qector_decoder_v3 import codes
 from qector_decoder_v3.backend import AutoDecoder, Backend, BackendConfig
@@ -46,6 +45,7 @@ def test_cpu_decode_in_fresh_subprocess():
         capture_output=True,
         text=True,
         timeout=120,
+        check=True,
     )
     assert proc.returncode == 0, f"subprocess failed:\nSTDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}"
     assert "OK" in proc.stdout, f"missing OK marker; stdout={proc.stdout!r}"

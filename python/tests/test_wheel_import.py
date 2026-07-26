@@ -15,7 +15,6 @@ import os
 import sysconfig
 
 import numpy as np
-
 import qector_decoder_v3
 import qector_decoder_v3.qector_decoder_v3 as core
 from qector_decoder_v3 import codes

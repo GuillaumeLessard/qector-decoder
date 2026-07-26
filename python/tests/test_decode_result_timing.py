@@ -7,7 +7,6 @@ of the rendered line.
 """
 
 import numpy as np
-
 from qector_decoder_v3 import codes, result
 
 

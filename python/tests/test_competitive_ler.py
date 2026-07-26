@@ -15,9 +15,9 @@ import pytest
 stim = pytest.importorskip("stim")
 pymatching = pytest.importorskip("pymatching")
 
-import qector_decoder_v3 as qd  # noqa: E402
-from qector_decoder_v3 import dem  # noqa: E402
-from qector_decoder_v3.pymatching_compat import Matching  # noqa: E402
+import qector_decoder_v3 as qd
+from qector_decoder_v3 import dem
+from qector_decoder_v3.pymatching_compat import Matching
 
 
 def _wilson(k, n, z=1.959963985):

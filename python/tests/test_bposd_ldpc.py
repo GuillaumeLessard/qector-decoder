@@ -6,7 +6,6 @@ BP-OSD logical error rate is cross-validated against the reference BP-OSD.
 
 import numpy as np
 import pytest
-
 from qector_decoder_v3 import codes
 from qector_decoder_v3.bposd import BpOsdDecoder
 

@@ -6,7 +6,6 @@ class name. ``metadata`` is always a dict.
 """
 
 import numpy as np
-
 import qector_decoder_v3 as qd
 from qector_decoder_v3 import codes, result
 
@@ -21,14 +20,14 @@ def _case():
 
 
 def test_backend_label_is_kind_string():
-    code, H, s = _case()
+    code, _H, s = _case()
     res = result.decode_with_diagnostics(code, s, kind="blossom")
     assert res.backend == "blossom"
     assert isinstance(res.metadata, dict)
 
 
 def test_backend_label_is_decoder_class_name():
-    code, H, s = _case()
+    code, _H, s = _case()
     dec = qd.BlossomDecoder(code.check_to_qubits, code.n_qubits)
     res = result.decode_with_diagnostics(code, s, decoder=dec)
     assert res.backend == type(dec).__name__ == "BlossomDecoder"

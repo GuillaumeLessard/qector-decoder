@@ -12,9 +12,9 @@ match the compiled core, so this test fails loudly if they disagree.
 """
 
 import os
-import tomllib
 
 import qector_decoder_v3
+import tomllib
 
 
 def _repo_root():

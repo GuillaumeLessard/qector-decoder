@@ -3,9 +3,8 @@
 import json
 
 import pytest
-
-from qector_decoder_v3 import codes
 from qector_decoder_v3 import benchmarking as bm
+from qector_decoder_v3 import codes
 
 
 def test_capture_environment_has_required_fields():

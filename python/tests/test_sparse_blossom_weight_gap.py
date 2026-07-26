@@ -14,7 +14,6 @@ SparseBlossom is never *lighter* than exact MWPM, so we also assert
 
 import numpy as np
 import pytest
-
 import qector_decoder_v3 as qd
 from qector_decoder_v3 import codes
 

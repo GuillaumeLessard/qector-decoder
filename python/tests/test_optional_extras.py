@@ -7,9 +7,9 @@ from the file at import time), not on an invented expectation.
 """
 
 import os
-import tomllib
 
 import pytest
+import tomllib
 
 
 def _repo_root():

@@ -3,7 +3,6 @@
 import json
 
 import numpy as np
-
 from qector_decoder_v3 import codes
 from qector_decoder_v3.result import DecodeResult, decode_with_diagnostics
 

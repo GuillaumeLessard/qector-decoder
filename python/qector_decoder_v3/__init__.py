@@ -1,5 +1,5 @@
 """
-QECTOR Decoder v3 — Source-available Rust/Python QEC decoders with reproducible, artifact-hashed benchmark evidence.
+QECTOR Decoder v3 - Source-available Rust/Python QEC decoders with reproducible, artifact-hashed benchmark evidence.
 Rust core + PyO3 bindings. Zero-copy NumPy. GIL-free decode.
 """
 
@@ -9,7 +9,10 @@ import importlib as _importlib
 
 
 def _load_native_module():
-    return _importlib.import_module(".qector_decoder_v3", __name__)  # pyright: ignore[reportMissingImports]
+    try:
+        return _importlib.import_module(".qector_decoder_v3", __name__)  # pyright: ignore[reportMissingImports]
+    except (ImportError, ModuleNotFoundError):
+        return _importlib.import_module("qector_decoder_v3.qector_decoder_v3")
 
 
 _native_module = _load_native_module()
@@ -58,6 +61,7 @@ py_generate_surface_code_checks = _native_module.py_generate_surface_code_checks
 py_generate_toy_code_checks = _native_module.py_generate_toy_code_checks
 py_generate_ring_code_checks = _native_module.py_generate_ring_code_checks
 py_generate_repetition_code_checks = _native_module.py_generate_repetition_code_checks
+py_generate_parity_check_matrix = _native_module.py_generate_parity_check_matrix
 try:
     run_mcp_server = _native_module.run_mcp_server
 except AttributeError:
@@ -97,10 +101,15 @@ except (AttributeError, ImportError):
     start_metrics_server = None  # type: ignore[assignment]
 
 try:
+    get_latency_quantiles = _native_module.get_latency_quantiles
+except (AttributeError, ImportError):
+    get_latency_quantiles = None  # type: ignore[assignment]
+
+try:
     import importlib.util as _importlib_util
 
     if _importlib_util.find_spec("torch") is not None:
-        import torch.nn.functional as F  # noqa: F401
+        import torch.nn.functional as F
     else:
         F = None  # type: ignore[assignment]
 except Exception:
@@ -114,21 +123,22 @@ import numpy as _np
 # The authoritative runtime version is whatever the compiled Rust core reports.
 # ``__fallback_version__`` is the Python-packaging version (pyproject/Cargo) and is
 # used ONLY when the compiled module does not expose ``__version__`` (e.g. an old
-# wheel). We never overwrite a real compiled ``__version__`` with it — doing so
-# would falsely claim a version the loaded binary is not — so after a version bump
+# wheel). We never overwrite a real compiled ``__version__`` with it - doing so
+# would falsely claim a version the loaded binary is not - so after a version bump
 # ``__version__`` keeps reporting the *built* value until the Rust wheel is rebuilt.
-__fallback_version__ = "0.6.8"
+__fallback_version__ = "0.6.9"
 
 try:
     __version__ = _native_module.__version__
 except (AttributeError, ImportError):
     __version__ = __fallback_version__
 
+import logging
 import os as _os_mod
 import sys as _sys_mod
-import logging
-from .license import verify_license_token
+
 from . import license
+from .license import verify_license_token
 
 __license__ = "LicenseRef-QECTOR-Source-Available"
 
@@ -148,22 +158,56 @@ def _is_license_active() -> bool:
 
 
 def _emit_startup_notice() -> None:
-    """Emits notice only in interactive environments when unlicensed."""
+    """Emit the licensing notice once per process when unlicensed.
+
+    Previously this fired only when `sys.ps1` existed or IPython was loaded --
+    i.e. only in a REPL or notebook. Commercial users run this library from
+    scripts, services and job schedulers, so the audience most likely to owe a
+    licence was the one audience that never saw the notice.
+
+    It now emits for non-interactive runs too. Deliberate boundaries:
+
+    * It is a single stderr message, written once at import. It never repeats,
+      never blocks, never delays, and never degrades or gates any functionality
+      -- the library behaves identically licensed or not.
+    * `QECTOR_SILENT=1` suppresses it, and a valid `QECTOR_LICENSE` removes it.
+    * CI is skipped: a build log is not a purchasing decision, and noise there
+      just trains people to filter the output.
+    * It goes to stderr, so it never contaminates piped stdout.
+    """
     if _os_mod.environ.get("QECTOR_SILENT") or _is_license_active():
         return
 
-    ci_vars = {"CI", "GITHUB_ACTIONS", "GITLAB_CI", "BUILDKITE", "CIRCLECI"}
+    ci_vars = {"CI", "GITHUB_ACTIONS", "GITLAB_CI", "BUILDKITE", "CIRCLECI", "JENKINS_URL", "TF_BUILD"}
     if any(var in _os_mod.environ for var in ci_vars):
         return
 
     is_interactive = hasattr(_sys_mod, "ps1") or "ipykernel" in _sys_mod.modules or "IPython" in _sys_mod.modules
 
-    if is_interactive:
-        _sys_mod.stderr.write(
-            f"[QECTOR v{__version__}] High-performance Rust/PyO3 QEC Decoder initialized.\n"
-            f"[QECTOR v{__version__}] Academic/Personal use is free. Institutional/Commercial licenses: https://qector.store/pricing\n"
+    lines = [
+        f"[QECTOR v{__version__}] Source-available QEC decoder - Rust/PyO3 core.",
+        f"[QECTOR v{__version__}] Free for academic, personal and non-commercial research.",
+        f"[QECTOR v{__version__}] Commercial use requires a licence: https://qector.store/pricing",
+    ]
+    if not is_interactive:
+        # A script or service is the commercial-use signal; point at the
+        # 60-day evaluation, which is creditable toward any annual licence.
+        lines.append(
+            f"[QECTOR v{__version__}] 60-day commercial evaluation (creditable): "
+            f"https://qector.store/pricing | Set QECTOR_SILENT=1 to hide this."
         )
+    else:
+        lines.append(f"[QECTOR v{__version__}] Set QECTOR_SILENT=1 to hide this notice.")
+
+    try:
+        _sys_mod.stderr.write("\n".join(lines) + "\n")
         _sys_mod.stderr.flush()
+    except (OSError, ValueError, UnicodeEncodeError):
+        # stderr can be closed, redirected to a dead pipe, or attached to a
+        # console whose encoding rejects a character. A licensing notice must
+        # never take down the import, but the catch is narrowed to those cases
+        # rather than swallowing everything.
+        pass
 
 
 _emit_startup_notice()
@@ -206,8 +250,7 @@ def _validate_check_to_qubits(check_to_qubits, n_qubits=None, *, reject_hyperedg
             continue
         cleaned, check_max_q = _clean_single_check(check, i)
         normalized.append(cleaned)
-        if check_max_q > max_q:
-            max_q = check_max_q
+        max_q = max(max_q, check_max_q)
 
     inferred_nq = max_q + 1 if max_q >= 0 else 0
     if n_qubits is not None:
@@ -251,8 +294,7 @@ def _clean_single_check(check, index):
             raise ValueError(f"Duplicate qubit {qi} in check {index}")
         seen.add(qi)
         cleaned.append(qi)
-        if qi > local_max_q:
-            local_max_q = qi
+        local_max_q = max(local_max_q, qi)
     return cleaned, local_max_q
 
 
@@ -315,6 +357,7 @@ def _opencl_health_check() -> bool:
     try:
         proc = _subprocess_local.run(
             [_sys_local.executable, "-c", code],
+            check=False,  # probe: a non-zero exit means "no OpenCL", not an error
             stdout=_subprocess_local.DEVNULL,
             stderr=_subprocess_local.DEVNULL,
             timeout=float(_os_local.environ.get("QECTOR_OPENCL_PROBE_TIMEOUT", "10")),
@@ -441,10 +484,16 @@ class BlossomDecoder:
 class SlidingWindowDecoder:
     """Sliding-window decoder with exponential decay weighting.
 
-    Maintains a window of the last W rounds. Each round's syndrome is weighted
-    by ``decay_factor ** age`` so that more recent rounds contribute more.
-    The weighted cumulative syndrome is thresholded at 0.5 and decoded with
-    the standard Union-Find decoder.
+    Maintains a window of the last ``window_size`` rounds. Each round's
+    syndrome is weighted by a per-check exponential decay factor so that more
+    recent rounds contribute more. The weighted cumulative syndrome is
+    binary-thresholded at 0.5 and decoded with the standard Union-Find
+    decoder.
+
+    **Important:** This decoder is **not** a fault-tolerant space-time temporal
+    decoder. Real QEC temporal decoding requires taking **XOR detector
+    differences** between consecutive rounds and matching on a 3D space-time
+    graph.
     """
 
     def __init__(self, check_to_qubits, n_qubits=None, window_size=10, decay_factor=0.8):
@@ -461,7 +510,11 @@ class SlidingWindowDecoder:
     def flush(self):
         self._inner.flush()
 
-    def decode(self, syndrome):
+    def decode(self, syndrome=None):
+        # No argument: finalize the current decay-weighted accumulated window
+        # (the temporal use case - call update() per round, then decode()).
+        if syndrome is None:
+            return self._inner.decode()
         if not isinstance(syndrome, _np.ndarray):
             syndrome = _np.array(syndrome, dtype=_np.uint8)
         if syndrome.dtype != _np.uint8:
@@ -493,6 +546,13 @@ class StreamingDecoder:
     """Streaming decoder that accumulates syndromes over multiple rounds.
 
     Rust core with circular history buffer and OR accumulation.
+
+    **Important:** This decoder is **not** a fault-tolerant space-time temporal
+    decoder. It accumulates syndromes with bitwise OR across the history
+    buffer and decodes the cumulative vector with the standard Union-Find
+    decoder. Real QEC temporal decoding requires taking **XOR detector
+    differences** between consecutive rounds and matching on a 3D space-time
+    graph.
     """
 
     def __init__(self, check_to_qubits, n_qubits=None, history_size=10):
@@ -607,7 +667,7 @@ try:
 except (ImportError, AttributeError):
 
     class CUDABatchDecoder:  # type: ignore[no-redef]
-        """CUDA batch decoder — build feature cuda, runtime needs NVIDIA driver.
+        """CUDA batch decoder - build feature cuda, runtime needs NVIDIA driver.
 
         Public wheels are built with --no-default-features --features cuda;
         this stub is used when the native module is absent.
@@ -623,7 +683,7 @@ except (ImportError, AttributeError):
             return False
 
         def __init__(self, *a, **k):
-            raise RuntimeError("CUDABatchDecoder not available — wheel built without CUDA or no driver.")
+            raise RuntimeError("CUDABatchDecoder not available - wheel built without CUDA or no driver.")
 
 
 try:
@@ -633,7 +693,7 @@ try:
 except (ImportError, AttributeError):
 
     class OpenCLBatchDecoder:  # type: ignore[no-redef]
-        """OpenCL batch decoder — requires source build with --features opencl.
+        """OpenCL batch decoder - requires source build with --features opencl.
 
         Public PyPI wheels are CUDA-only, so this returns False by design.
         """
@@ -719,12 +779,15 @@ class SparseBlossomDecoder:
 class BPOSDDecoder:
     """Belief Propagation + Ordered Statistics Decoding.
 
-    Min-sum BP with OSD stage for improved LER on complex codes.
+    Exact log-domain sum-product BP (default) with an OSD stage for improved
+    LER on complex codes. ``bp_method="min_sum"`` selects the classical
+    min-sum approximation; ``osd_order`` >= 1 enables the OSD-W combination
+    sweep (single/pair flips around the base solution, min-weight wins).
     """
 
-    def __init__(self, check_to_qubits, n_qubits=None, error_rate=0.1):
+    def __init__(self, check_to_qubits, n_qubits=None, error_rate=0.1, bp_method=None, osd_order=None):
         c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
-        self._inner = _RustBPOSDDecoder(c2q, nq, error_rate)
+        self._inner = _RustBPOSDDecoder(c2q, nq, error_rate, bp_method=bp_method, osd_order=osd_order)
 
     def decode(self, syndrome):
         if not isinstance(syndrome, _np.ndarray):
@@ -824,7 +887,7 @@ class HybridCascadeDecoder:
         return self._inner.decode_timed(syndrome, max_latency_ms)
 
     def batch_decode(self, syndromes):
-        """Batch cascade decode — the fast path for the pre-decoder strategy.
+        """Batch cascade decode - the fast path for the pre-decoder strategy.
 
         Runs the Union-Find pre-filter in parallel (Rayon) across the whole
         batch and escalates only the syndromes the pre-filter declines.
@@ -954,8 +1017,8 @@ class GNNPredecoder:
 
     def _sync_to_rust(self):
         if self.use_torch:
-            import tempfile
             import os
+            import tempfile
 
             with tempfile.NamedTemporaryFile(suffix=".safetensors", delete=False) as tmp:
                 tmp_path = tmp.name
@@ -968,8 +1031,8 @@ class GNNPredecoder:
 
     def _sync_to_torch(self):
         if self.use_torch:
-            import tempfile
             import os
+            import tempfile
 
             with tempfile.NamedTemporaryFile(suffix=".safetensors", delete=False) as tmp:
                 tmp_path = tmp.name
@@ -1039,7 +1102,7 @@ class GNNPredecoder:
             if F is None:
                 raise ImportError("PyTorch is required to train GNNPredecoder")
             import torch
-            import torch.optim as optim
+            from torch import optim
 
             optimizer = optim.SGD(self._torch_model.parameters(), lr=self.learning_rate, weight_decay=self.l2_lambda)
             self._torch_model.train()
@@ -1448,63 +1511,64 @@ class LERBenchmark:
 
 
 __all__ = [
-    "UnionFindDecoder",
-    "FastUnionFindDecoder",
-    "BlossomDecoder",
-    "SlidingWindowDecoder",
-    "StreamingDecoder",
-    "BatchDecoder",
-    "CPUBatchDecoder",
-    "OpenCLBatchDecoder",
-    "CUDABatchDecoder",
-    "SparseBlossomDecoder",
     "BPOSDDecoder",
-    "NeuralPredecoder",
+    "BatchDecoder",
+    "BenchmarkSuite",
+    "BlossomDecoder",
+    "CPUBatchDecoder",
+    "CUDABatchDecoder",
     "DetectorGraph",
+    "FastUnionFindDecoder",
     "GNNPredecoder",
     "GNNTrainer",
-    "HybridDecoder",
     "HybridCascadeDecoder",
-    "LookupTableDecoder",
-    "BenchmarkSuite",
+    "HybridDecoder",
     "LERBenchmark",
+    "LookupTableDecoder",
+    "NeuralPredecoder",
+    "OpenCLBatchDecoder",
+    "SlidingWindowDecoder",
+    "SparseBlossomDecoder",
+    "StreamingDecoder",
+    "UnionFindDecoder",
     "check_to_edges",
+    "cuda_is_available",
+    "generate_repetition_code_checks",
+    "generate_ring_code_checks",
     "generate_surface_code_checks",
     "generate_toy_code_checks",
-    "generate_ring_code_checks",
-    "generate_repetition_code_checks",
-    "start_metrics_server",
-    "run_mcp_server",
-    "cuda_is_available",
+    "get_latency_quantiles",
     "opencl_is_available",
     "run_grpc_server",
+    "run_mcp_server",
+    "start_metrics_server",
 ]
 
 
 # Ecosystem / tooling layer (pure-Python, built on the compiled core)
 from . import (
+    backend,
+    belief_matching,
+    benchmarking,
+    bposd,
     codes,
     dem,
-    result,
-    backend,
-    pymatching_compat,
-    benchmarking,
-    belief_matching,
-    bposd,
     predecoder,
+    pymatching_compat,
+    result,
+    workbench,
 )
-from . import workbench
-from .backend import AutoDecoder, BackendConfig, Backend
-from .result import DecodeResult, decode_with_diagnostics
-from .belief_matching import BeliefMatching
+from .backend import AutoDecoder, Backend, BackendConfig
+from .belief_matching import BeliefMatching, GNNBeliefMatcher, decode_with_gnn
 from .bposd import BpOsdDecoder
-from .predecoder import PredecodedDecoder
-from .workbench import Workbench
+from .decode_mmap import decode_mmap
+from .decoder_cache import clear_decoder_cache, get_decoder, get_decoder_pool
 
 # New v0.6.4 features: DecoderPool, get_decoder, decode_mmap
 from .decoder_pool import DecoderPool
-from .decoder_cache import get_decoder, clear_decoder_cache, get_decoder_pool
-from .decode_mmap import decode_mmap
+from .predecoder import PredecodedDecoder
+from .result import DecodeResult, decode_with_diagnostics
+from .workbench import Workbench
 
 # sinter_compat imports `sinter` lazily; tolerate its absence.
 try:
@@ -1513,31 +1577,33 @@ except Exception:  # pragma: no cover
     sinter_compat = None  # type: ignore[assignment]
 
 __all__ += [
-    "codes",
-    "dem",
-    "result",
-    "backend",
-    "pymatching_compat",
-    "benchmarking",
-    "belief_matching",
-    "bposd",
-    "predecoder",
-    "sinter_compat",
     "AutoDecoder",
-    "BackendConfig",
     "Backend",
-    "DecodeResult",
-    "decode_with_diagnostics",
+    "BackendConfig",
     "BeliefMatching",
     "BpOsdDecoder",
-    "PredecodedDecoder",
-    "workbench",
-    "Workbench",
+    "DecodeResult",
     "DecoderPool",
-    "get_decoder",
+    "GNNBeliefMatcher",
+    "PredecodedDecoder",
+    "Workbench",
+    "backend",
+    "belief_matching",
+    "benchmarking",
+    "bposd",
     "clear_decoder_cache",
-    "get_decoder_pool",
+    "codes",
     "decode_mmap",
+    "decode_with_diagnostics",
+    "decode_with_gnn",
+    "dem",
+    "get_decoder",
+    "get_decoder_pool",
+    "predecoder",
+    "pymatching_compat",
+    "result",
+    "sinter_compat",
+    "workbench",
 ]
 
 # Optional ecosystem integrations (tolerate missing third-party deps)
@@ -1562,13 +1628,13 @@ except Exception:  # pragma: no cover
     stripe_integration = None  # type: ignore[assignment]
 
 __all__ += [
-    "qiskit_plugin",
-    "stim_compat",
-    "rest_api",
-    "stripe_integration",
     "MAX_WORKERS",
-    "verify_license_token",
     "license",
+    "qiskit_plugin",
+    "rest_api",
+    "stim_compat",
+    "stripe_integration",
+    "verify_license_token",
 ]
 
 # ---------------------------------------------------------------------------
@@ -1577,7 +1643,7 @@ __all__ += [
 # ``gpu_backend`` only needs NumPy + stdlib to import (CuPy is probed lazily and
 # guarded internally), and ``bp_cupy`` builds purely on in-tree pure-Python
 # modules, so neither requires CuPy to be installed. They are still wrapped in a
-# tolerant guard so that — per the package contract — a missing optional path can
+# tolerant guard so that - per the package contract - a missing optional path can
 # never break ``import qector_decoder_v3``. The selected detection helpers
 # (``has_cupy`` / ``has_cuda_rust`` / ``gpu_available`` / ``get_backend``) and the
 # batched-BP entry points are re-exported at top level for convenience; the full
@@ -1594,11 +1660,11 @@ try:
 
     __all__.extend(
         [
-            "gpu_backend",
-            "has_cupy",
-            "has_cuda_rust",
-            "gpu_available",
             "get_backend",
+            "gpu_available",
+            "gpu_backend",
+            "has_cuda_rust",
+            "has_cupy",
         ]
     )
 except Exception:  # pragma: no cover - defensive; gpu_backend has no hard deps
@@ -1609,11 +1675,11 @@ except Exception:  # pragma: no cover - defensive; gpu_backend has no hard deps
     get_backend = None  # type: ignore[assignment]
     __all__.extend(
         [
-            "gpu_backend",
-            "has_cupy",
-            "has_cuda_rust",
-            "gpu_available",
             "get_backend",
+            "gpu_available",
+            "gpu_backend",
+            "has_cuda_rust",
+            "has_cupy",
         ]
     )
 
@@ -1626,9 +1692,9 @@ try:
 
     __all__.extend(
         [
-            "bp_cupy",
             "BatchedBpDecoder",
             "batched_bp_decode",
+            "bp_cupy",
         ]
     )
 except Exception:  # pragma: no cover - defensive; bp_cupy has no hard deps
@@ -1637,9 +1703,9 @@ except Exception:  # pragma: no cover - defensive; bp_cupy has no hard deps
     batched_bp_decode = None  # type: ignore[assignment]
     __all__.extend(
         [
-            "bp_cupy",
             "BatchedBpDecoder",
             "batched_bp_decode",
+            "bp_cupy",
         ]
     )
 
@@ -1669,14 +1735,14 @@ try:
 
     __all__.extend(
         [
-            "routing",
-            "recommend_decoder",
-            "recommend",
             "AutoRouter",
-            "Recommendation",
             "DecoderName",
             "HardwareProfile",
+            "Recommendation",
             "detect_hardware",
+            "recommend",
+            "recommend_decoder",
+            "routing",
         ]
     )
 except Exception:  # pragma: no cover - defensive; routing has no hard deps
@@ -1690,14 +1756,14 @@ except Exception:  # pragma: no cover - defensive; routing has no hard deps
     detect_hardware = None  # type: ignore[assignment]
     __all__.extend(
         [
-            "routing",
-            "recommend_decoder",
-            "recommend",
             "AutoRouter",
-            "Recommendation",
             "DecoderName",
             "HardwareProfile",
+            "Recommendation",
             "detect_hardware",
+            "recommend",
+            "recommend_decoder",
+            "routing",
         ]
     )
 
@@ -1712,11 +1778,11 @@ try:
 
     __all__.extend(
         [
-            "streaming",
-            "StreamingSession",
-            "sliding_window_decode",
             "StreamingResult",
+            "StreamingSession",
             "StreamingTelemetry",
+            "sliding_window_decode",
+            "streaming",
         ]
     )
 except Exception:  # pragma: no cover - defensive; streaming has no hard deps
@@ -1727,11 +1793,11 @@ except Exception:  # pragma: no cover - defensive; streaming has no hard deps
     StreamingTelemetry = None
     __all__.extend(
         [
-            "streaming",
-            "StreamingSession",
-            "sliding_window_decode",
             "StreamingResult",
+            "StreamingSession",
             "StreamingTelemetry",
+            "sliding_window_decode",
+            "streaming",
         ]
     )
 
@@ -1743,46 +1809,74 @@ for _name in ("os", "sys", "subprocess"):
 
 
 # ===========================================================================
-# v0.6.8 release notes (public)
+# v0.6.9 release notes (public)
 # ===========================================================================
 __changelog__ = {
+    "0.6.9": [
+        "Feature: Single-precision f32 neural predecoders for 2x SIMD vectorization density.",
+        "Feature: Deterministic seeded GNN initialization (new_with_seed) for reproducible training.",
+        "Feature: Per-check noise decay vectors in SlidingWindowDecoder.",
+        "Feature: Non-blocking gRPC launch handle (start_grpc_server) with explicit stop().",
+        "Feature: Threaded async MCP stdio server processing with atomic stdout writing.",
+        "Feature: CUDA explicit device_id selection (CUDABatchDecoder::new_with_device) & QECTOR_CUDA_DEVICE_ID.",
+        "Feature: cuMemGetInfo_v2 VRAM pre-check and Unified Memory fallback for d >= 17.",
+        "Feature: Unrotated surface code & Color code topology generators.",
+    ],
     "0.6.8": [
-        "Hotfix: v0.6.7 wheel was completely unimportable - "
-        "_native_module.HybridCascadeDecoder does not exist in the compiled .so. "
-        "All 18 native-module lookups now guarded via _guard() helper.",
+        (
+            "Hotfix: v0.6.7 wheel was completely unimportable - "
+            "_native_module.HybridCascadeDecoder does not exist in the compiled .so. "
+            "All 18 native-module lookups now guarded via _guard() helper."
+        ),
         "CI: smoke test before publish catches unimportable wheels.",
         "CI: fixed YAML syntax error in release-build.yml smoke-test run step.",
     ],
     "0.6.7": [
-        "Bugfix: SparseBlossomDecoder::grow_regions no longer collapses the "
-        "compressed edge set — the previous version drained edges through a "
-        "RadixHeap and back, which silently zeroed the `source_defect` field. "
-        "All decoded syndromes are now bit-identical to the Blossom decoder.",
-        "Bugfix: BPOSDDecoder.bp_decode_timed now initializes the wall-clock "
-        "deadline before the iteration loop, not inside it, so the latency "
-        "budget is honored on the first iteration.",
-        "Bugfix: LER benchmark's rotated-surface generator now emits a proper "
-        "two-half (X + Z) graphlike code, so the logical operator and weight "
-        "gap statistics are meaningful.",
-        "Feature: SparseBlossomDecoder.k_nearest_via_radix — public event-driven "
-        "candidate-edge discovery backed by a new RadixHeap<u32, HeapEvent> "
-        "structure exposed to downstream callers that need fine control over "
-        "the candidate set.",
-        "Feature: MCP server (mcp_server) now exposes 5 new tools: "
-        "decode_syndrome_blossom, batch_decode_blossom, run_ler_benchmark, "
-        "plus expanded get_decoder_info listing all 11 decoder families.",
-        "Quality: cross-decoder syndrome-validity test suite "
-        "src/cross_decoder_tests.rs covers UF / FastUF / LookupTable / "
-        "SparseBlossom / BP-OSD / SlidingWindow / Streaming / Hybrid.",
-        "Quality: SafeTensors loader now has a full round-trip test suite "
-        "covering generic + runtime dispatch, dtype mismatch, missing tensors, "
-        "and shape round-trip.",
+        (
+            "Bugfix: SparseBlossomDecoder::grow_regions no longer collapses the "
+            "compressed edge set - the previous version drained edges through a "
+            "RadixHeap and back, which silently zeroed the `source_defect` field. "
+            "All decoded syndromes are now bit-identical to the Blossom decoder."
+        ),
+        (
+            "Bugfix: BPOSDDecoder.bp_decode_timed now initializes the wall-clock "
+            "deadline before the iteration loop, not inside it, so the latency "
+            "budget is honored on the first iteration."
+        ),
+        (
+            "Bugfix: LER benchmark's rotated-surface generator now emits a proper "
+            "two-half (X + Z) graphlike code, so the logical operator and weight "
+            "gap statistics are meaningful."
+        ),
+        (
+            "Feature: SparseBlossomDecoder.k_nearest_via_radix - public event-driven "
+            "candidate-edge discovery backed by a new RadixHeap<u32, HeapEvent> "
+            "structure exposed to downstream callers that need fine control over "
+            "the candidate set."
+        ),
+        (
+            "Feature: MCP server (mcp_server) now exposes 5 new tools: "
+            "decode_syndrome_blossom, batch_decode_blossom, run_ler_benchmark, "
+            "plus expanded get_decoder_info listing all 11 decoder families."
+        ),
+        (
+            "Quality: cross-decoder syndrome-validity test suite "
+            "src/cross_decoder_tests.rs covers UF / FastUF / LookupTable / "
+            "SparseBlossom / BP-OSD / SlidingWindow / Streaming / Hybrid."
+        ),
+        (
+            "Quality: SafeTensors loader now has a full round-trip test suite "
+            "covering generic + runtime dispatch, dtype mismatch, missing tensors, "
+            "and shape round-trip."
+        ),
         "Quality: dead-code warnings eliminated across the crate (8 → 0).",
     ],
     "0.6.6": [
-        "Rust core upgraded with cluster-growth memory reuse and Sparse Blossom "
-        "shattering. Python 3.9-3.13 wheel support, smarter numpy cap in the "
-        "[all] extra.",
+        (
+            "Rust core upgraded with cluster-growth memory reuse and Sparse Blossom "
+            "shattering. Python 3.9-3.13 wheel support, smarter numpy cap in the "
+            "[all] extra."
+        ),
     ],
 }
 
@@ -1822,3 +1916,13 @@ def sparse_blossom_radix_neighbors(decoder, defects, k=8):
         sorted by ascending distance.
     """
     return list(decoder.k_nearest_via_radix(list(defects), int(k)))
+
+
+# PyMatching-compatible migration shim
+from . import pymatching_compat as pymatching
+from .pymatching_compat import Matching
+
+__all__ += [
+    "Matching",
+    "pymatching",
+]

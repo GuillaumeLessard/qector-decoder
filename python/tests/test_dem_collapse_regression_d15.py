@@ -8,7 +8,7 @@ import pytest
 
 stim = pytest.importorskip("stim")
 
-from qector_decoder_v3 import dem  # noqa: E402
+from qector_decoder_v3 import dem
 
 
 def _model(basis):

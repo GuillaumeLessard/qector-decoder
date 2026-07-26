@@ -7,7 +7,6 @@ syndromes from random data errors (p~0.1) and assert the core invariant
 
 import numpy as np
 import pytest
-
 import qector_decoder_v3 as qd
 from qector_decoder_v3 import codes
 

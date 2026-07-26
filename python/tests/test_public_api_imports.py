@@ -5,11 +5,10 @@ kind (class / function / submodule), is present in ``__all__`` where applicable,
 and that ``__version__`` is a non-empty string.
 """
 
-import types
 import inspect
+import types
 
 import qector_decoder_v3 as qd
-
 
 EXPECTED_CLASSES = [
     "BlossomDecoder",

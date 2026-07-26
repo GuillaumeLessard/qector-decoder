@@ -10,9 +10,9 @@ steady-state decode cost. No wall-clock thresholds are asserted.
 import numbers
 
 import pytest
-
 import qector_decoder_v3 as qd
-from qector_decoder_v3 import benchmarking as bm, codes
+from qector_decoder_v3 import benchmarking as bm
+from qector_decoder_v3 import codes
 
 SUMMARY_KEYS = ("mean", "median", "p50", "p99")
 

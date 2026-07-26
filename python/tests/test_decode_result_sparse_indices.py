@@ -6,7 +6,6 @@ equal ``hamming_weight``.
 
 import numpy as np
 import pytest
-
 from qector_decoder_v3 import codes, result
 
 

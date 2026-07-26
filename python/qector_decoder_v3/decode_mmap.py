@@ -1,5 +1,5 @@
 """
-qector_decoder_v3.decode_mmap — Out-of-core batch decoding via memory-mapped arrays.
+qector_decoder_v3.decode_mmap - Out-of-core batch decoding via memory-mapped arrays.
 
 Decode datasets larger than RAM by streaming syndromes from a memory-mapped
 file and writing corrections incrementally. Each chunk is flushed to disk
@@ -21,11 +21,15 @@ Example
 from __future__ import annotations
 
 import os as _os
-from typing import Optional, Union
 
 import numpy as _np
 
 __all__ = ["decode_mmap"]
+
+# Module-level singleton: np.dtype(np.uint8) as an argument default would call
+# the constructor at import time (B008); a shared immutable dtype is equivalent
+# and import-cost-free.
+_UINT8_DTYPE = _np.dtype(_np.uint8)
 
 
 def decode_mmap(
@@ -35,8 +39,8 @@ def decode_mmap(
     n_qubits: int,
     decoder_type: str = "cpu_batch",
     batch_size: int = 65536,
-    n_shots: Optional[int] = None,
-    dtype: _np.dtype = _np.dtype(_np.uint8),
+    n_shots: int | None = None,
+    dtype: _np.dtype = _UINT8_DTYPE,
     verbose: bool = False,
 ):
     """Out-of-core batch decoding via memory-mapped arrays.
@@ -72,7 +76,7 @@ def decode_mmap(
 
     from . import CPUBatchDecoder, UnionFindDecoder
 
-    decoder: Union[CPUBatchDecoder, UnionFindDecoder]
+    decoder: CPUBatchDecoder | UnionFindDecoder
     if decoder_type == "cpu_batch":
         decoder = CPUBatchDecoder(c2q, n_qubits)
         batch_fn = decoder.batch_decode

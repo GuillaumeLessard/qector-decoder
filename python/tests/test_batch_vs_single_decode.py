@@ -17,7 +17,6 @@ state is order-dependent, so they are intentionally not asserted here.
 
 import numpy as np
 import pytest
-
 import qector_decoder_v3 as qd
 from qector_decoder_v3 import codes
 

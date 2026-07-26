@@ -8,7 +8,6 @@ weight is monotonically non-increasing in the order.
 
 import numpy as np
 import pytest
-
 from qector_decoder_v3 import codes
 from qector_decoder_v3.bposd import BpOsdDecoder
 
@@ -22,7 +21,7 @@ def test_bposd_osd_orders_faithful_and_weight_monotone():
     H = cx.parity_check_matrix().astype(np.uint8)
     nq = H.shape[1]
     p = 0.05
-    orders = (0, 1, 2, 4)
+    orders = (0, 1, 2, 3, 5)
     decs = {k: BpOsdDecoder(H, error_rate=p, max_iter=30, osd_order=k) for k in orders}
 
     rng = np.random.default_rng(41)
@@ -40,7 +39,7 @@ def test_bposd_osd_orders_faithful_and_weight_monotone():
             weights[k] = int(c.sum())
 
         w0 = weights[0]
-        for k in (1, 2, 4):
+        for k in (1, 2, 3, 5):
             # Higher OSD order never yields a heavier correction than OSD-0.
             assert weights[k] <= w0, (k, weights[k], w0)
         if w0 > 0:

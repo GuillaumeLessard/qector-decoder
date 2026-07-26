@@ -2,9 +2,9 @@
 
 import numpy as np
 import pytest
-from hypothesis import given, strategies as st
-
 import qector_decoder_v3 as qd
+from hypothesis import given
+from hypothesis import strategies as st
 
 
 @pytest.fixture
@@ -60,13 +60,13 @@ class TestUnionFindDecoder:
     def test_invalid_shape(self, simple_checks):
         checks, n_qubits = simple_checks
         dec = qd.UnionFindDecoder(checks, n_qubits)
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, ValueError, RuntimeError)):
             dec.decode(np.zeros(5, dtype=np.uint8))
 
     def test_invalid_dtype(self, simple_checks):
         checks, n_qubits = simple_checks
         dec = qd.UnionFindDecoder(checks, n_qubits)
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, ValueError, RuntimeError)):
             dec.decode(np.zeros(len(checks), dtype=np.float32))
 
     def test_n_qubits_property(self, simple_checks):
@@ -98,7 +98,7 @@ class TestUnionFindDecoder:
 
         A weight-4 check with syndrome [1] must receive an ODD-parity correction
         so that H @ correction == syndrome. The previous assertion (`corr == 1`)
-        encoded an over-flip bug — flipping all four qubits gives even parity (0),
+        encoded an over-flip bug - flipping all four qubits gives even parity (0),
         which does NOT reproduce syndrome [1].
         """
         checks = [[0, 1, 2, 3]]
@@ -145,7 +145,7 @@ class TestUnionFindDecoder:
 
     def test_zero_checks(self):
         checks = []
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, ValueError, RuntimeError)):
             qd.UnionFindDecoder(checks, 4)
 
 

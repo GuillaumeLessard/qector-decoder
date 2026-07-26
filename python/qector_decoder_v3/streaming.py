@@ -1,5 +1,5 @@
 """
-qector_decoder_v3.streaming — a higher-level Python streaming / multi-round
+qector_decoder_v3.streaming - a higher-level Python streaming / multi-round
 decode *orchestration* layer.
 
 The compiled Rust core already exports two low-level streaming primitives,
@@ -8,15 +8,15 @@ The compiled Rust core already exports two low-level streaming primitives,
 **not** shadow or reuse those names.  Instead it provides a thin, dependency-free
 Python orchestration built *on top of* the ordinary single-shot decoders:
 
-* :class:`StreamingSession` — feed syndrome rounds in one at a time; each round is
+* :class:`StreamingSession` - feed syndrome rounds in one at a time; each round is
   decoded immediately by an inner decoder and held in a sliding *commit buffer* of
   ``window_size`` rounds.  Once a round ages out of the window it is **committed**
   (released, in order).  :meth:`StreamingSession.flush` commits whatever remains.
-* :func:`sliding_window_decode` — a batched convenience that decodes an entire
+* :func:`sliding_window_decode` - a batched convenience that decodes an entire
   multi-round stream (single shot *or* many shots) window-by-window and returns a
   :class:`StreamingResult`.
 
-Decoding model (read this — it is an honest, deliberately simple model)
+Decoding model (read this - it is an honest, deliberately simple model)
 ----------------------------------------------------------------------
 Each *round* carries one spatial syndrome ``s_t`` over the code's ``n_checks``
 checks, and is decoded **independently** by the inner decoder:
@@ -29,9 +29,9 @@ of that round's syndrome.  Two consequences this layer guarantees and tests:
   correction (``H @ c == s (mod 2)``), every *committed* correction is valid by
   construction.  This layer never weakens that bar.
 * **Window-invariance / full-decode equivalence (stateless decoders).**  For a
-  *stateless* inner decoder — i.e. ``decode``/``batch_decode`` is a pure function of
+  *stateless* inner decoder - i.e. ``decode``/``batch_decode`` is a pure function of
   the syndrome, true of the package's Union-Find family and exact
-  ``BlossomDecoder`` — the committed correction for round ``t`` is ``inner.decode(s_t)``
+  ``BlossomDecoder`` - the committed correction for round ``t`` is ``inner.decode(s_t)``
   regardless of ``window_size`` or whether the rounds were decoded one-at-a-time
   (:class:`StreamingSession`) or in batched windows (:func:`sliding_window_decode`).
   So streaming reproduces a single full per-round decode bit-for-bit; the window
@@ -43,7 +43,7 @@ of that round's syndrome.  Two consequences this layer guarantees and tests:
   bit-for-bit window-invariance is forfeit, and the layer never claims otherwise.
 
 This layer does **not** claim to implement full space-time (circuit-level)
-matching with time-like edges — that would be a different, heavier construction.
+matching with time-like edges - that would be a different, heavier construction.
 
 Telemetry is **real**: per-window wall time is measured with
 :func:`time.perf_counter` around the inner-decoder call only, and the GPU helpers
@@ -70,17 +70,18 @@ from __future__ import annotations
 
 import time
 from collections import deque
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Any, Optional, Sequence
+from typing import Any
 
 import numpy as np
 
 from . import gpu_backend as _gb
 
 __all__ = [
-    "StreamingTelemetry",
     "StreamingResult",
     "StreamingSession",
+    "StreamingTelemetry",
     "sliding_window_decode",
 ]
 
@@ -97,10 +98,10 @@ def _resolve_default_decoder(check_to_qubits: list[list[int]], n_qubits: int) ->
     the *name* of a decoder class, which is instantiated as
     ``Cls(check_to_qubits, n_qubits)`` and sanity-checked with a trivial decode.
     Any failure (routing absent, odd signature, non-graphlike-only decoder, bad
-    instance) degrades cleanly to ``FastUnionFindDecoder`` — the routing module is
+    instance) degrades cleanly to ``FastUnionFindDecoder`` - the routing module is
     an optional convenience, never a hard dependency.
     """
-    try:  # optional routing hook — guard the import + call + instantiation fully
+    try:  # optional routing hook - guard the import + call + instantiation fully
         from . import routing as _routing  # type: ignore[attr-defined]
 
         rec = getattr(_routing, "recommend_decoder", None)
@@ -109,7 +110,7 @@ def _resolve_default_decoder(check_to_qubits: list[list[int]], n_qubits: int) ->
             inst = _coerce_decoder(choice, check_to_qubits, n_qubits)
             if inst is not None and _decoder_works(inst, len(check_to_qubits), n_qubits):
                 return inst
-    except Exception:  # pragma: no cover - routing API is sibling-owned / may churn
+    except RuntimeError:  # pragma: no cover - routing API is sibling-owned / may churn
         pass
 
     from . import FastUnionFindDecoder
@@ -122,11 +123,11 @@ def _decoder_works(inst: Any, n_checks: int, n_qubits: int) -> bool:
     try:
         out = np.asarray(inst.decode(np.zeros(n_checks, dtype=np.uint8)))
         return out.shape == (n_qubits,)
-    except Exception:  # pragma: no cover - defensive
+    except RuntimeError:  # pragma: no cover - defensive
         return False
 
 
-def _coerce_decoder(choice: Any, check_to_qubits: list[list[int]], n_qubits: int) -> Optional[Any]:
+def _coerce_decoder(choice: Any, check_to_qubits: list[list[int]], n_qubits: int) -> Any | None:
     """Turn a ``recommend_decoder`` return value into a decoder instance, or ``None``.
 
     Accepts an already-built instance (has ``.decode``), a class/factory callable
@@ -152,16 +153,14 @@ def _coerce_decoder(choice: Any, check_to_qubits: list[list[int]], n_qubits: int
 # ---------------------------------------------------------------------------
 # Input normalisation
 # ---------------------------------------------------------------------------
-def _checks_and_qubits(
-    code_or_checks: Any, n_qubits: Optional[int]
-) -> tuple[list[list[int]], int, Optional[np.ndarray]]:
+def _checks_and_qubits(code_or_checks: Any, n_qubits: int | None) -> tuple[list[list[int]], int, np.ndarray | None]:
     """Normalise the code argument to ``(check_to_qubits, n_qubits, logicals_matrix)``.
 
     Accepts a :class:`qector_decoder_v3.codes.Code`-like object (has
     ``check_to_qubits`` / ``n_qubits``) or a raw ``check_to_qubits`` list with an
     explicit ``n_qubits``.
     """
-    logicals_mat: Optional[np.ndarray] = None
+    logicals_mat: np.ndarray | None = None
     if hasattr(code_or_checks, "check_to_qubits") and hasattr(code_or_checks, "n_qubits"):
         c2q = [list(map(int, c)) for c in code_or_checks.check_to_qubits]
         nq = int(code_or_checks.n_qubits)
@@ -187,7 +186,7 @@ def _to_host_u8(a: Any) -> np.ndarray:
     return np.ascontiguousarray(host).astype(np.uint8, copy=False)
 
 
-def _logicals_from(logicals: Any, n_qubits: int) -> Optional[np.ndarray]:
+def _logicals_from(logicals: Any, n_qubits: int) -> np.ndarray | None:
     """Coerce a logicals spec to a ``(n_logicals, n_qubits)`` uint8 matrix or ``None``."""
     if logicals is None:
         return None
@@ -243,6 +242,7 @@ class StreamingTelemetry:
     per_window_seconds: list[float] = field(default_factory=list)
     gpu: dict[str, int] = field(default_factory=dict)
     backend: dict[str, Any] = field(default_factory=dict)
+    rounds_valid: int | None = None
 
     @property
     def mean_window_seconds(self) -> float:
@@ -267,6 +267,7 @@ class StreamingTelemetry:
             "per_window_seconds": list(self.per_window_seconds),
             "gpu": dict(self.gpu),
             "backend": dict(self.backend),
+            "rounds_valid": self.rounds_valid,
         }
 
 
@@ -281,7 +282,7 @@ class StreamingResult:
         ``(n_shots, n_rounds, n_qubits)`` for a batch.  ``uint8``.
     syndromes:
         The syndrome rounds that were decoded, same leading shape as
-        ``corrections`` but with ``n_checks`` trailing — used for validity checks.
+        ``corrections`` but with ``n_checks`` trailing - used for validity checks.
     telemetry:
         The :class:`StreamingTelemetry` for the run.
     logical_flips:
@@ -292,7 +293,7 @@ class StreamingResult:
     corrections: np.ndarray
     syndromes: np.ndarray
     telemetry: StreamingTelemetry
-    logical_flips: Optional[np.ndarray] = None
+    logical_flips: np.ndarray | None = None
 
     def is_valid(self, H: Any, *, prefer_gpu: bool = True) -> bool:
         """Return ``True`` iff every committed round satisfies ``H @ c == s (mod 2)``.
@@ -305,20 +306,23 @@ class StreamingResult:
         corr = self.corrections.reshape(-1, self.corrections.shape[-1])
         syn = self.syndromes.reshape(-1, self.syndromes.shape[-1])
         if corr.shape[0] == 0:
+            self.telemetry.rounds_valid = 0
             return True
         xp = _gb.get_array_module(prefer_gpu=prefer_gpu)
         Hx = xp.asarray(H)
         cx = xp.asarray(corr)
         sx = xp.asarray(syn)
         recon = (cx @ Hx.T) & 1
-        ok = bool((recon == sx).all())
+        valid_mask = (recon == sx).all(axis=1)
+        ok = bool(valid_mask.all())
+        self.telemetry.rounds_valid = int(valid_mask.sum())
         if xp is not np:  # pragma: no cover - GPU-only path
             _gb.note_gpu_call()
         return ok
 
 
 # ---------------------------------------------------------------------------
-# StreamingSession — incremental window + commit
+# StreamingSession - incremental window + commit
 # ---------------------------------------------------------------------------
 class StreamingSession:
     """Incremental multi-round decode with a sliding commit buffer.
@@ -343,8 +347,8 @@ class StreamingSession:
         Inner decoder instance (anything with ``.decode``).  Defaults to
         ``routing.recommend_decoder(...)`` if available, else ``FastUnionFindDecoder``.
     logicals:
-        Optional logical observables — a ``(n_logicals, n_qubits)`` matrix or a
-        list of qubit-index sets — used to compute logical flips on committed rounds.
+        Optional logical observables - a ``(n_logicals, n_qubits)`` matrix or a
+        list of qubit-index sets - used to compute logical flips on committed rounds.
     prefer_gpu:
         If not ``None``, sets the global GPU preference for the duration of the
         session's vectorised math (logical flips / validity).  Detection still
@@ -354,12 +358,12 @@ class StreamingSession:
     def __init__(
         self,
         code_or_checks: Any,
-        n_qubits: Optional[int] = None,
+        n_qubits: int | None = None,
         *,
         window_size: int = 8,
-        decoder: Optional[Any] = None,
+        decoder: Any | None = None,
         logicals: Any = None,
-        prefer_gpu: Optional[bool] = None,
+        prefer_gpu: bool | None = None,
     ) -> None:
         if int(window_size) < 1:
             raise ValueError("window_size must be >= 1")
@@ -509,8 +513,8 @@ class StreamingSession:
 # Logical-flip helper (GPU-aware)
 # ---------------------------------------------------------------------------
 def _compute_logical_flips(
-    corrections: np.ndarray, logicals: Optional[np.ndarray], prefer_gpu: Optional[bool]
-) -> Optional[np.ndarray]:
+    corrections: np.ndarray, logicals: np.ndarray | None, prefer_gpu: bool | None
+) -> np.ndarray | None:
     """Parity of each correction against the logical observables (or ``None``).
 
     ``corrections`` may be ``(..., n_qubits)``; result is ``(..., n_logicals)``.
@@ -537,12 +541,12 @@ def sliding_window_decode(
     syndrome_rounds: Any,
     code: Any = None,
     *,
-    check_to_qubits: Optional[Sequence[Sequence[int]]] = None,
-    n_qubits: Optional[int] = None,
+    check_to_qubits: Sequence[Sequence[int]] | None = None,
+    n_qubits: int | None = None,
     window_size: int = 8,
-    decoder: Optional[Any] = None,
+    decoder: Any | None = None,
     logicals: Any = None,
-    prefer_gpu: Optional[bool] = None,
+    prefer_gpu: bool | None = None,
 ) -> StreamingResult:
     """Decode a whole multi-round syndrome stream window-by-window.
 

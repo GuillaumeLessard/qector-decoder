@@ -17,7 +17,7 @@ import pytest
 stim = pytest.importorskip("stim")
 pymatching = pytest.importorskip("pymatching")
 
-from qector_decoder_v3 import pymatching_compat  # noqa: E402
+from qector_decoder_v3 import pymatching_compat
 
 
 def wilson(k, n, z=1.959963985):
@@ -59,7 +59,7 @@ def _assert_parity(d, shots, seed, basis, noise):
     pl, ph = wilson(p_err, shots)
     overlap = not (qh < pl or ph < ql)
     assert overlap, (
-        f"d={d} p={noise}: Wilson intervals disjoint — "
+        f"d={d} p={noise}: Wilson intervals disjoint - "
         f"QECTOR {q_err}/{shots} {ql:.4f}-{qh:.4f} vs "
         f"PyMatching {p_err}/{shots} {pl:.4f}-{ph:.4f}"
     )
@@ -73,5 +73,5 @@ def _assert_parity(d, shots, seed, basis, noise):
 @pytest.mark.parametrize("d", [5, 7])
 def test_pymatching_parity_p_sweep(d, noise):
     """QECTOR/PyMatching LER parity at each physical error rate."""
-    seed = 20260625 + int(round(noise * 1000)) + d
+    seed = 20260625 + round(noise * 1000) + d
     _assert_parity(d, shots=3000, seed=seed, basis="x", noise=noise)

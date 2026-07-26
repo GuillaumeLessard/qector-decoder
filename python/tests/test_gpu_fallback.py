@@ -14,7 +14,6 @@ The invariant under test: the fallback must never diverge from CPU.
 
 import numpy as np
 import pytest
-
 import qector_decoder_v3 as qd
 from qector_decoder_v3 import codes
 from qector_decoder_v3.backend import AutoDecoder, Backend, BackendConfig

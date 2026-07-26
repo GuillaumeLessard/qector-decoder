@@ -17,7 +17,7 @@ import pytest
 stim = pytest.importorskip("stim")
 pymatching = pytest.importorskip("pymatching")
 
-from qector_decoder_v3 import pymatching_compat  # noqa: E402
+from qector_decoder_v3 import pymatching_compat
 
 
 def _logical_errors(d, shots, seed, basis="x", noise=0.005):

@@ -8,9 +8,7 @@ must contain the documented diagnostic keys and be fully JSON-serializable
 import json
 
 import numpy as np
-
 from qector_decoder_v3 import codes, result
-
 
 EXPECTED_KEYS = {
     "n_qubits",

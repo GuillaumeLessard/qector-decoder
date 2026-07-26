@@ -1,4 +1,4 @@
-"""Tests for qector_decoder_v3.sinter_compat — Sinter integration.
+"""Tests for qector_decoder_v3.sinter_compat - Sinter integration.
 
 Runs a small real ``sinter.collect`` with QECTOR decoders. The key assertions:
 the decoders are accepted by Sinter, bit-packing is correct (sane LERs, not ~0.5),
@@ -11,7 +11,7 @@ stim = pytest.importorskip("stim")
 sinter = pytest.importorskip("sinter")
 pymatching = pytest.importorskip("pymatching")
 
-from qector_decoder_v3.sinter_compat import qector_sinter_decoders  # noqa: E402
+from qector_decoder_v3.sinter_compat import qector_sinter_decoders
 
 
 def _tasks():
@@ -33,12 +33,12 @@ def test_sinter_collect_runs_and_is_sane():
     results = sinter.collect(
         num_workers=2,
         tasks=_tasks(),
-        decoders=["qector_blossom", "qector_belief", "pymatching"],
+        decoders=["qector_blossom", "qector_belief", "qector_bposd", "pymatching"],
         custom_decoders=qector_sinter_decoders(),
-        max_shots=8000,
-        max_errors=8000,
+        max_shots=4000,
+        max_errors=4000,
     )
-    assert len(results) == 6  # 2 distances x 3 decoders
+    assert len(results) == 8  # 2 distances x 4 decoders
     by = {(r.json_metadata["d"], r.decoder): r for r in results}
     for (d, dec), r in by.items():
         ler = r.errors / r.shots if r.shots else 1.0

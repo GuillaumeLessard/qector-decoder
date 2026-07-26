@@ -28,7 +28,7 @@ def _repo_root():
 
 # Scripts referenced by docs/REPRODUCE.md that expose an argparse CLI.
 # (run_scaling_benchmark.py is intentionally excluded: it is not an argparse CLI
-# — it runs a full benchmark immediately and ignores --help, so a `--help` smoke
+# - it runs a full benchmark immediately and ignores --help, so a `--help` smoke
 # test would execute the whole sweep rather than just parsing arguments.)
 _REPRODUCE_SCRIPTS = [
     "run_competitive_benchmark.py",
@@ -67,6 +67,7 @@ def test_script_help_parses(script):
         capture_output=True,
         text=True,
         timeout=60,
+        check=True,
     )
     assert proc.returncode == 0, (
         f"`{script} --help` exited {proc.returncode}\nSTDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}"

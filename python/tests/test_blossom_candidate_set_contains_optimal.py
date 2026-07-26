@@ -13,7 +13,7 @@ import pytest
 stim = pytest.importorskip("stim")
 pymatching = pytest.importorskip("pymatching")
 
-from qector_decoder_v3 import dem, pymatching_compat  # noqa: E402
+from qector_decoder_v3 import dem, pymatching_compat
 
 # Tolerance absorbing float summation-order noise (~1e-7); a real sub-optimal
 # matching differs by ~1.0 in weight, far above this.

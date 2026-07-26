@@ -7,7 +7,6 @@ asserting the core invariant ``(H @ corr) & 1 == s``.
 
 import numpy as np
 import pytest
-
 import qector_decoder_v3 as qd
 from qector_decoder_v3 import codes
 

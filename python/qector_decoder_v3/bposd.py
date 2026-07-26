@@ -1,5 +1,5 @@
 """
-qector_decoder_v3.bposd — belief propagation + ordered-statistics decoding.
+qector_decoder_v3.bposd - belief propagation + ordered-statistics decoding.
 
 A self-contained Python BP-OSD for general (LDPC / non-graphlike) CSS codes,
 built on the shared vectorised min-sum BP. When BP alone explains the syndrome it
@@ -7,7 +7,7 @@ returns immediately; otherwise an **exact GF(2) ordered-statistics** post-proces
 (OSD-0, with an optional small combination sweep OSD-w) produces a guaranteed
 syndrome-consistent correction using BP's reliabilities.
 
-This is the path for codes matching cannot handle — bivariate-bicycle,
+This is the path for codes matching cannot handle - bivariate-bicycle,
 hypergraph-product, bicycle. It is cross-validated against the reference ``ldpc``
 package's BP-OSD in the test suite.
 
@@ -22,7 +22,7 @@ Example
 
 from __future__ import annotations
 
-from typing import Any, List, Optional, Tuple, cast
+from typing import Any, cast
 
 import numpy as np
 
@@ -46,7 +46,7 @@ class BpOsdDecoder:
         osd_order: int = 0,
         bp_method: str = "sum_product",
         use_gpu: Any = None,
-        max_latency_ms: Optional[float] = None,
+        max_latency_ms: float | None = None,
     ):
         self.H = _to_dense_binary(H)
         if self.H.ndim != 2:
@@ -127,7 +127,7 @@ class BpOsdDecoder:
         When a CUDA device is usable (and ``use_gpu`` is not ``False``), the BP stage
         for the whole batch is run **once** on the GPU via
         :class:`qector_decoder_v3.bp_cupy.BatchedBpDecoder`. Shots that BP already
-        explains (``H @ c == s``) are returned directly (the OSD-0 fast path — no
+        explains (``H @ c == s``) are returned directly (the OSD-0 fast path - no
         ordered-statistics work); only the residual non-converged shots are sent
         through the exact GF(2) OSD post-process, seeded with that shot's GPU BP
         reliabilities. The result is bit-for-bit a valid BP-OSD output and matches
@@ -143,7 +143,7 @@ class BpOsdDecoder:
         if self._gpu_enabled():
             try:
                 return self._gpu_batch_decode(arr)
-            except Exception:  # pragma: no cover - defensive GPU fallback
+            except RuntimeError:  # pragma: no cover - defensive GPU fallback
                 _gb.note_fallback()
         return np.stack([self.decode(arr[i]) for i in range(arr.shape[0])]).astype(np.uint8)
 
@@ -197,13 +197,13 @@ class BpOsdDecoder:
         # the bits BP is least sure about, so the syndrome's residual errors land
         # there; the most-reliable bits are "free" and kept at BP's hard decision.
         order = np.argsort(rel)
-        x0, pivots = _gf2_osd_solve(self.H, s, order, hard)
+        x0, _pivots = _gf2_osd_solve(self.H, s, order, hard)
         if self.osd_order <= 0:
             return x0
         # OSD-w (greedy combination sweep over the least-reliable bits): force
         # small combinations on and re-solve, keeping the lowest-weight result.
         best, best_w = x0, int(x0.sum())
-        cand = order[: min(len(order), max(self.osd_order * 2, 6))]
+        cand = order[: min(len(order), max(self.osd_order * 3, 10))]
         depth = min(self.osd_order, 8)
         import itertools
 
@@ -228,7 +228,7 @@ class BpOsdDecoder:
 # ---------------------------------------------------------------------------
 # GF(2) ordered-statistics solve
 # ---------------------------------------------------------------------------
-def _gf2_osd_solve(H: np.ndarray, s: np.ndarray, order: np.ndarray, hard: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+def _gf2_osd_solve(H: np.ndarray, s: np.ndarray, order: np.ndarray, hard: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """OSD-0 solve. ``order`` lists columns least-reliable first; the first
     rank(H) independent of them form the basis, the rest (free) take their BP hard
     decision, and the basis is solved so ``H x == s (mod 2)``.
@@ -237,7 +237,7 @@ def _gf2_osd_solve(H: np.ndarray, s: np.ndarray, order: np.ndarray, hard: np.nda
     """
     r, ncol = H.shape
     M = H[:, order].copy().astype(np.uint8) % 2
-    pivots_perm: List[int] = []
+    pivots_perm: list[int] = []
     rr = 0
     for c in range(ncol):
         nz = np.nonzero(M[rr:, c])[0]
@@ -269,7 +269,7 @@ def _gf2_osd_solve(H: np.ndarray, s: np.ndarray, order: np.ndarray, hard: np.nda
     M2 = H[:, order].copy().astype(np.uint8) % 2
     rhs = s_eff.copy().astype(np.uint8) % 2
     rr = 0
-    pivot_rows: List[tuple] = []
+    pivot_rows: list[tuple] = []
     for c in pivots_perm:
         nz = np.nonzero(M2[rr:, c])[0]
         if nz.size == 0:

@@ -18,7 +18,6 @@ logical-flipping class; the rotated surface code exhibits both classes.
 
 import numpy as np
 import pytest
-
 from qector_decoder_v3 import codes
 
 

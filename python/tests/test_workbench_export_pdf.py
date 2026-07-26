@@ -3,7 +3,6 @@
 import os
 
 import pytest
-
 from qector_decoder_v3.workbench import Workbench
 
 pytest.importorskip("matplotlib")

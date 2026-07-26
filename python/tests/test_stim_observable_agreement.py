@@ -33,8 +33,8 @@ def _wilson(k, n, z=1.959963985):
 
 
 def _decode_failures(d, N, seed, basis="x", p=0.006):
-    import stim
     import pymatching
+    import stim
     from qector_decoder_v3 import pymatching_compat
 
     circ = stim.Circuit.generated(

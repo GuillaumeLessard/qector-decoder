@@ -7,7 +7,6 @@ reflected in ``to_dict()`` and rendered by ``explain()`` (which surfaces a
 """
 
 import numpy as np
-
 from qector_decoder_v3 import result
 
 

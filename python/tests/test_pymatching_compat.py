@@ -8,7 +8,6 @@ minimum-weight matching; ties may pick different representatives).
 
 import numpy as np
 import pytest
-
 from qector_decoder_v3 import codes
 from qector_decoder_v3.pymatching_compat import Matching
 

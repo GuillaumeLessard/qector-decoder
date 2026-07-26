@@ -1,8 +1,8 @@
 """Tests for the benchmark suite."""
 
 import json
-import pytest
 
+import pytest
 import qector_decoder_v3 as qd
 
 

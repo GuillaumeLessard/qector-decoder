@@ -6,7 +6,6 @@ syndrome-faithful corrections over many random errors at p=0.05.
 
 import numpy as np
 import pytest
-
 from qector_decoder_v3 import codes
 from qector_decoder_v3.bposd import BpOsdDecoder
 

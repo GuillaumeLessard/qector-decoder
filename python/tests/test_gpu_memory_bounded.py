@@ -57,5 +57,5 @@ def test_gpu_memory_bounded():
     growth = rss_after_call[-1] - rss_after_call[1]
     assert growth < MAX_GROWTH_MIB, (
         f"GPU RSS grew {growth:.1f} MiB from call 2 to last "
-        f"(limit {MAX_GROWTH_MIB} MiB); samples={['%.1f' % s for s in rss_after_call]}"
+        f"(limit {MAX_GROWTH_MIB} MiB); samples={[f'{s:.1f}' for s in rss_after_call]}"
     )

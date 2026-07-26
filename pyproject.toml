@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "qector-decoder-v3"
-version = "0.6.8"
+version = "0.6.9"
 description = "Production-grade Rust/Python quantum error correction decoder. 25+ decoder families: MWPM Blossom, Union-Find, BP-OSD, LDPC/qLDPC, belief-matching, CUDA/GPU batch decoding, 7-tier AutoDecoder fallback. PyMatching/Stim/Sinter compatible. Ed25519 license verification."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -47,6 +47,7 @@ dev = [
     "mypy>=1.0.0",
     "ruff>=0.1.0",
     "pytest-cov>=4.0.0",
+    "stripe>=5.0",
 ]
 # Stim ecosystem: DEM loading, syndrome sampling, Sinter harness, and
 # PyMatching / belief-matching / BP-OSD cross-checks.
@@ -64,6 +65,10 @@ bench = [
     "tabulate>=0.9",
     "scipy>=1.10",
 ]
+# Stripe license fulfillment: checkout sessions, webhook signature verification.
+stripe = [
+    "stripe>=5.0",
+]
 cuda = []
 opencl = []
 cupy = ["cupy"]
@@ -79,6 +84,7 @@ all = [
     "tabulate>=0.9",
     "scipy>=1.10",
     "cupy-cuda12x>=13",
+    "stripe>=5.0",
 ]
 
 [project.urls]
@@ -145,7 +151,18 @@ ignore = ["E702", "E731", "E741"]
 
 [tool.ruff.lint.per-file-ignores]
 # __init__: late imports (E402) are intentional (runtime optional deps).
-"python/qector_decoder_v3/__init__.py" = ["E402"]
+#
+# BLE001: the broad `except Exception` guards around optional imports (torch,
+# sinter, routing, the GPU probes) are deliberate. Narrowing them to ImportError
+# would be wrong -- a third-party package with a broken __init__ can raise
+# anything at import time, and an optional dependency must never take down
+# `import qector_decoder_v3`. Each site degrades to None and is marked
+# `# pragma: no cover - defensive`.
+#
+# FA100: adding `from __future__ import annotations` here would make every
+# annotation lazy, changing runtime introspection for the re-exported PyO3
+# classes -- not worth it to satisfy a style rule on a py39 target.
+"python/qector_decoder_v3/__init__.py" = ["E402", "BLE001", "FA100"]
 # workbench.py: json imported for optional serialization path, Tuple aliased for py3.8 compat.
 "python/qector_decoder_v3/workbench.py" = ["F401"]
 # qiskit_plugin.py: Tuple re-exported for downstream type annotations.

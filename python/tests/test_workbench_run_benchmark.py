@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from qector_decoder_v3.workbench import Workbench, WorkbenchError
 
 

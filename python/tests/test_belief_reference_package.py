@@ -16,7 +16,6 @@ pymatching = pytest.importorskip("pymatching")
 beliefmatching = pytest.importorskip("beliefmatching")
 
 from beliefmatching import BeliefMatching as RefBM
-
 from qector_decoder_v3.belief_matching import BeliefMatching as QBM
 
 

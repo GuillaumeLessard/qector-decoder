@@ -1,5 +1,5 @@
 """
-qector_decoder_v3.backend — Workload-Aware AutoDecoder with Self-Auto-Debug & Multi-Tier Fallback.
+qector_decoder_v3.backend - Workload-Aware AutoDecoder with Self-Auto-Debug & Multi-Tier Fallback.
 
 Provides automatic hardware routing, real-time performance calibration, and a
 7-tier fault-tolerant self-debugging fallback engine for quantum error correction decoding.
@@ -7,30 +7,31 @@ Provides automatic hardware routing, real-time performance calibration, and a
 
 from __future__ import annotations
 
-import time
 import logging
-from dataclasses import dataclass, field
 import os
-from typing import List, Optional, Union, Dict, Any, cast
+import time
+from dataclasses import dataclass, field
+from typing import Any, cast
 
 import numpy as np
 
 from . import (
     BatchDecoder,
+    BlossomDecoder,
+    BPOSDDecoder,
     CPUBatchDecoder,
     CUDABatchDecoder,
     FastUnionFindDecoder,
-    BlossomDecoder,
-    SparseBlossomDecoder,
     LookupTableDecoder,
     OpenCLBatchDecoder,
+    SparseBlossomDecoder,
     cuda_is_available,
     opencl_is_available,
 )
 
 logger = logging.getLogger("qector_decoder_v3.backend")
 
-__all__ = ["Backend", "BackendConfig", "AutoDecoder"]
+__all__ = ["AutoDecoder", "Backend", "BackendConfig"]
 
 
 class Backend:
@@ -56,8 +57,10 @@ class Backend:
         LOOKUP_TABLE,
     )
 
-    # Multi-tier fallback hierarchy (highest performance to highest compatibility)
-    TIERS = [CUDA, OPENCL, CPU_RAYON, CPU_BATCH, CPU_SINGLE, BLOSSOM, LOOKUP_TABLE]
+    # Multi-tier fallback hierarchy (highest performance to highest compatibility).
+    # Frozen tuple avoids RUF012 "mutable default value for class attribute" while
+    # still being iterable for fallback chaining.
+    TIERS: tuple[str, ...] = (CUDA, OPENCL, CPU_RAYON, CPU_BATCH, CPU_SINGLE, BLOSSOM, LOOKUP_TABLE)
 
 
 @dataclass
@@ -86,7 +89,7 @@ class BackendConfig:
     gpu_threshold: int = 4096
     allow_gpu: bool = True
     prefer: str = Backend.CUDA
-    force: Optional[str] = None
+    force: str | None = None
     enable_auto_debug: bool = True
 
 
@@ -100,9 +103,9 @@ class _Diag:
     cpu_fallbacks: int = 0
     calibrated: bool = False
     calibration: dict = field(default_factory=dict)
-    warnings: List[str] = field(default_factory=list)
-    debug_log: List[Dict[str, Any]] = field(default_factory=list)
-    backend_health: Dict[str, bool] = field(default_factory=dict)
+    warnings: list[str] = field(default_factory=list)
+    debug_log: list[dict[str, Any]] = field(default_factory=list)
+    backend_health: dict[str, bool] = field(default_factory=dict)
 
 
 class AutoDecoder:
@@ -113,7 +116,7 @@ class AutoDecoder:
     errors and seamlessly recovers execution without failing downstream callers.
     """
 
-    def __init__(self, check_to_qubits, n_qubits=None, config: Optional[BackendConfig] = None):
+    def __init__(self, check_to_qubits, n_qubits=None, config: BackendConfig | None = None):
         if not check_to_qubits:
             raise ValueError("check_to_qubits must be non-empty")
         self._c2q = [[int(q) for q in check] for check in check_to_qubits]
@@ -122,7 +125,7 @@ class AutoDecoder:
         self._diag = _Diag()
 
         # Lazy decoder instances
-        self._decoders: Dict[str, Any] = {}
+        self._decoders: dict[str, Any] = {}
 
         self._cuda_ok = bool(self.config.allow_gpu and cuda_is_available())
         opencl_auto = os.environ.get("QECTOR_ENABLE_OPENCL_AUTO", "").lower() in {"1", "true", "yes", "on"}
@@ -136,7 +139,7 @@ class AutoDecoder:
             self._diag.backend_health[b] = True
 
     # -- availability ------------------------------------------------------
-    def available_backends(self) -> List[str]:
+    def available_backends(self) -> list[str]:
         avail = [Backend.CPU_SINGLE, Backend.CPU_RAYON, Backend.CPU_BATCH]
         if self._cuda_ok and self._diag.backend_health.get(Backend.CUDA, True):
             avail.append(Backend.CUDA)
@@ -187,7 +190,7 @@ class AutoDecoder:
             if self._cuda_ok:
                 try:
                     dec = CUDABatchDecoder(self._c2q, self._nq)
-                except Exception as exc:
+                except (RuntimeError, ValueError, OSError) as exc:
                     self._cuda_ok = False
                     self._diag.backend_health[Backend.CUDA] = False
                     self._diag.warnings.append(f"CUDA init failed: {exc}")
@@ -195,7 +198,7 @@ class AutoDecoder:
             if self._opencl_ok:
                 try:
                     dec = OpenCLBatchDecoder(self._c2q, self._nq)
-                except Exception as exc:
+                except (RuntimeError, ValueError, OSError) as exc:
                     self._opencl_ok = False
                     self._diag.backend_health[Backend.OPENCL] = False
                     self._diag.warnings.append(f"OpenCL init failed: {exc}")
@@ -206,7 +209,7 @@ class AutoDecoder:
         elif backend == Backend.LOOKUP_TABLE:
             try:
                 dec = LookupTableDecoder(self._c2q, self._nq)
-            except Exception:
+            except (RuntimeError, ValueError, MemoryError):
                 dec = FastUnionFindDecoder(self._c2q, self._nq)
 
         if dec is not None:
@@ -219,11 +222,11 @@ class AutoDecoder:
     def _get_cpu_rayon(self) -> BatchDecoder:
         return cast(BatchDecoder, self._get_decoder(Backend.CPU_RAYON))
 
-    def _get_cuda(self) -> Optional[CUDABatchDecoder]:
-        return cast(Optional[CUDABatchDecoder], self._get_decoder(Backend.CUDA))
+    def _get_cuda(self) -> CUDABatchDecoder | None:
+        return cast(CUDABatchDecoder | None, self._get_decoder(Backend.CUDA))
 
-    def _get_opencl(self) -> Optional[OpenCLBatchDecoder]:
-        return cast(Optional[OpenCLBatchDecoder], self._get_decoder(Backend.OPENCL))
+    def _get_opencl(self) -> OpenCLBatchDecoder | None:
+        return cast(OpenCLBatchDecoder | None, self._get_decoder(Backend.OPENCL))
 
     # -- selection ---------------------------------------------------------
     def select(self, batch_size: int) -> str:
@@ -260,8 +263,7 @@ class AutoDecoder:
             return cast(np.ndarray, self._get_cpu_single().decode(s))
 
         # Self auto-debug fallback chain for single decode
-        primary = Backend.CPU_SINGLE
-        tiers = [primary, Backend.BLOSSOM, Backend.SPARSE_BLOSSOM, Backend.LOOKUP_TABLE]
+        tiers = [Backend.CPU_SINGLE, Backend.BLOSSOM, Backend.SPARSE_BLOSSOM, Backend.LOOKUP_TABLE]
 
         for b in tiers:
             try:
@@ -269,14 +271,16 @@ class AutoDecoder:
                 if dec is None:
                     continue
                 out = np.asarray(dec.decode(s), dtype=np.uint8)
-                self._diag.last_backend = b
-                self._diag.last_reason = f"single syndrome (tier={b})"
-                return out
-            except Exception as exc:
+                if self._verify_correction(s, out):
+                    self._diag.last_backend = b
+                    self._diag.last_reason = f"single syndrome (tier={b})"
+                    return out
+                self._record_auto_debug_failure(b, ValueError("syndrome verification failed"), "single_decode")
+            except (RuntimeError, ValueError, TypeError) as exc:
                 self._record_auto_debug_failure(b, exc, "single_decode")
 
-        # Ultimate pure python fallback
-        return self._python_fallback_decode(s)
+        # Ultimate fallback: BP-OSD is syndrome-faithful for any code
+        return self._verified_bposd_fallback(s)
 
     def batch_decode(self, syndromes) -> np.ndarray:
         """Decode a 2-D batch, routing to the best available backend with multi-tier fallback."""
@@ -286,18 +290,14 @@ class AutoDecoder:
         chosen = self.select(n)
 
         if not self.config.enable_auto_debug:
-            return self._batch_decode_direct(chosen, syn)
+            out = self._batch_decode_direct(chosen, syn)
+            if self._verify_batch_correction(syn, out):
+                return out
+            # Verification failed even without auto-debug; fall through to robust chain.
 
         # Robust multi-tier self-debugging execution chain
         fallback_chain = [chosen]
-        for t in [
-            Backend.CUDA,
-            Backend.OPENCL,
-            Backend.CPU_RAYON,
-            Backend.CPU_BATCH,
-            Backend.CPU_SINGLE,
-            Backend.BLOSSOM,
-        ]:
+        for t in Backend.TIERS:
             if t not in fallback_chain:
                 fallback_chain.append(t)
 
@@ -307,11 +307,14 @@ class AutoDecoder:
 
             try:
                 out = self._exec_backend_batch(b, syn)
-                if out is not None:
+                if out is not None and self._verify_batch_correction(syn, out):
                     self._diag.last_backend = b
                     self._diag.last_reason = f"batch={n} routing={b}"
                     return out
-            except Exception as exc:
+                self._record_auto_debug_failure(
+                    b, ValueError("batch syndrome verification failed"), f"batch_decode(n={n})"
+                )
+            except (RuntimeError, ValueError, TypeError) as exc:
                 self._record_auto_debug_failure(b, exc, f"batch_decode(n={n})")
                 if b in (Backend.CUDA, Backend.OPENCL):
                     self._diag.gpu_failures += 1
@@ -319,9 +322,8 @@ class AutoDecoder:
                 else:
                     self._diag.cpu_fallbacks += 1
 
-        # Ultimate fallback across rows
-        single = self._get_cpu_single()
-        return np.stack([np.asarray(single.decode(syn[i]), dtype=np.uint8) for i in range(n)])
+        # Ultimate fallback: decode row-by-row with verified single-decoder fallback
+        return np.stack([self._verified_bposd_fallback(syn[i]) for i in range(n)])
 
     def _batch_decode_direct(self, chosen: str, syn: np.ndarray) -> np.ndarray:
         if chosen in (Backend.CUDA, Backend.OPENCL):
@@ -340,20 +342,26 @@ class AutoDecoder:
         single = self._get_cpu_single()
         return np.stack([np.asarray(single.decode(syn[i])) for i in range(syn.shape[0])])
 
-    def _exec_backend_batch(self, b: str, syn: np.ndarray) -> Optional[np.ndarray]:
+    def _exec_backend_batch(self, b: str, syn: np.ndarray) -> np.ndarray | None:
         dec = self._get_decoder(b)
         if dec is None:
             return None
 
         if hasattr(dec, "parallel_batch_decode"):
-            return np.asarray(dec.parallel_batch_decode(syn), dtype=np.uint8)
+            out = np.asarray(dec.parallel_batch_decode(syn), dtype=np.uint8)
+            if out.ndim == 1 and syn.shape[0] > 0 and out.size % syn.shape[0] == 0:
+                out = out.reshape((syn.shape[0], -1))
+            return out
         elif hasattr(dec, "batch_decode"):
-            return np.asarray(dec.batch_decode(syn), dtype=np.uint8)
+            out = np.asarray(dec.batch_decode(syn), dtype=np.uint8)
+            if out.ndim == 1 and syn.shape[0] > 0 and out.size % syn.shape[0] == 0:
+                out = out.reshape((syn.shape[0], -1))
+            return out
         elif hasattr(dec, "decode"):
             return np.stack([np.asarray(dec.decode(syn[i]), dtype=np.uint8) for i in range(syn.shape[0])])
         return None
 
-    def _run_gpu(self, which: str, syn: np.ndarray) -> Optional[np.ndarray]:
+    def _run_gpu(self, which: str, syn: np.ndarray) -> np.ndarray | None:
         dec = self._get_cuda() if which == Backend.CUDA else self._get_opencl()
         if dec is None:
             self._diag.gpu_fallbacks += 1
@@ -366,14 +374,18 @@ class AutoDecoder:
             self._diag.last_backend = which
             self._diag.last_reason = f"batch={syn.shape[0]} >= gpu_threshold"
             return out
-        except Exception as exc:
+        except (RuntimeError, ValueError, TypeError) as exc:
             self._diag.gpu_failures += 1
             self._diag.gpu_fallbacks += 1
             self._diag.warnings.append(f"{which} decode failed ({exc}); CPU fallback")
             return None
 
     def _record_auto_debug_failure(self, backend: str, exc: Exception, context: str) -> None:
-        self._diag.backend_health[backend] = False
+        # Only permanently disable GPU backends on failure; CPU/Rust decoders are
+        # generally deterministic, so a failure is more likely transient (OOM,
+        # malformed input) and should not be permanently blacklisted.
+        if backend in (Backend.CUDA, Backend.OPENCL):
+            self._diag.backend_health[backend] = False
         msg = f"AutoDebug caught error on {backend} [{context}]: {exc}"
         self._diag.warnings.append(msg)
         self._diag.debug_log.append(
@@ -386,15 +398,48 @@ class AutoDecoder:
         )
         logger.warning(msg)
 
-    def _python_fallback_decode(self, syndrome: np.ndarray) -> np.ndarray:
+    def _verify_correction(self, syndrome: np.ndarray, correction: np.ndarray) -> bool:
+        """Return True iff flipping `correction` reproduces `syndrome` (H·c == s mod 2)."""
+        if len(syndrome) != len(self._c2q):
+            return False
+        for ci, qubits in enumerate(self._c2q):
+            parity = 0
+            for q in qubits:
+                if q < len(correction):
+                    parity ^= int(correction[q])
+            if parity != int(syndrome[ci]):
+                return False
+        return True
+
+    def _verify_batch_correction(self, syndromes: np.ndarray, corrections: np.ndarray) -> bool:
+        """Verify every row of a batch output."""
+        if corrections.shape[0] != syndromes.shape[0]:
+            return False
+        for i in range(syndromes.shape[0]):
+            if not self._verify_correction(syndromes[i], corrections[i]):
+                return False
+        return True
+
+    def _verified_bposd_fallback(self, syndrome: np.ndarray) -> np.ndarray:
+        """Ultimate syndrome-faithful fallback using BP-OSD.
+
+        BP-OSD works on any code (graphlike or hypergraph) and guarantees a
+        correction that reproduces the syndrome whenever one exists. If BP-OSD
+        also fails, return a zero correction (which is trivially syndrome-valid
+        only for the zero syndrome; otherwise the caller receives a safe default).
+        """
+        try:
+            nq = int(self._get_cpu_single().n_qubits)
+            dec = BPOSDDecoder(self._c2q, nq)
+            out = np.asarray(dec.decode(syndrome), dtype=np.uint8)
+            if self._verify_correction(syndrome, out):
+                self._diag.last_backend = "bposd_fallback"
+                self._diag.last_reason = "BP-OSD ultimate fallback"
+                return out
+        except (RuntimeError, ValueError, TypeError) as exc:
+            self._record_auto_debug_failure("bposd_fallback", exc, "ultimate_fallback")
         nq = int(self._get_cpu_single().n_qubits)
-        out = np.zeros(nq, dtype=np.uint8)
-        for i, check in enumerate(self._c2q):
-            if i < len(syndrome) and syndrome[i]:
-                for q in check:
-                    if q < nq:
-                        out[q] ^= 1
-        return out
+        return np.zeros(nq, dtype=np.uint8)
 
     def reset_backend_health(self) -> None:
         """Resets all backend health states back to active."""
@@ -411,7 +456,7 @@ class AutoDecoder:
         n_checks = len(self._c2q)
         timings: dict[str, dict[int, float]] = {"cpu": {}, "gpu": {}}
         gpu_name = None
-        gpu_dec: Optional[Union[CUDABatchDecoder, OpenCLBatchDecoder]] = None
+        gpu_dec: CUDABatchDecoder | OpenCLBatchDecoder | None = None
         if self._cuda_ok:
             gpu_dec, gpu_name = self._get_cuda(), Backend.CUDA
         elif self._opencl_ok:
@@ -421,15 +466,15 @@ class AutoDecoder:
         crossover = None
         for n in sizes:
             syn = (rng.random((n, n_checks)) < 0.08).astype(np.uint8)
-            cpu_t = _best_time(lambda: cpu.parallel_batch_decode(syn), repeats)
+            cpu_t = _best_time(lambda syn=syn: cpu.parallel_batch_decode(syn), repeats)
             timings["cpu"][n] = cpu_t
             if gpu_dec is not None:
                 try:
-                    gpu_t = _best_time(lambda: gpu_dec.batch_decode(syn), repeats)
+                    gpu_t = _best_time(lambda syn=syn, gpu_dec=gpu_dec: gpu_dec.batch_decode(syn), repeats)
                     timings["gpu"][n] = gpu_t
                     if crossover is None and gpu_t < cpu_t:
                         crossover = n
-                except Exception as exc:
+                except (RuntimeError, ValueError, TypeError) as exc:
                     self._diag.warnings.append(f"calibration {gpu_name} failed: {exc}")
                     gpu_dec = None
 

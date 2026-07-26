@@ -6,7 +6,6 @@ PyMatching sur des cas difficiles pour detecter les regressions.
 
 import numpy as np
 import pytest
-
 import qector_decoder_v3 as qd
 
 

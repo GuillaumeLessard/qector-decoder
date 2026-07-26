@@ -1,20 +1,20 @@
 """
-qector_decoder_v3.gpu_backend — the CuPy GPU backend abstraction.
+qector_decoder_v3.gpu_backend - the CuPy GPU backend abstraction.
 
 This is the single, policy-aware foundation that every other GPU-aware module in
 the package builds on. It answers three questions uniformly:
 
-* *Is a GPU usable here?* — :func:`has_cupy`, :func:`has_cuda_rust`,
+* *Is a GPU usable here?* - :func:`has_cupy`, :func:`has_cuda_rust`,
   :func:`gpu_available`.
-* *Which array library should I compute with right now?* —
+* *Which array library should I compute with right now?* -
   :func:`get_array_module` / :func:`xp` (NumPy-or-CuPy, honouring both a global
   preference and the location of the data you pass in).
 * *How do I move data across the host/device boundary, and how much am I moving?*
-  — :func:`to_device`, :func:`to_host` / :func:`asnumpy`, :func:`is_on_gpu`, and
+  - :func:`to_device`, :func:`to_host` / :func:`asnumpy`, :func:`is_on_gpu`, and
   the module-level :data:`TELEMETRY` counters.
 
 CuPy is **optional**. If it is not installed, or no usable CUDA device is present,
-every function degrades to NumPy on the host with no exceptions raised — so code
+every function degrades to NumPy on the host with no exceptions raised - so code
 written against this module runs unchanged on a CPU-only box. When CuPy *is*
 present and a device is usable (e.g. cupy 14.x on this machine's GTX 1660 Ti),
 the GPU path is taken by default.
@@ -38,28 +38,28 @@ from __future__ import annotations
 import functools
 from dataclasses import dataclass
 from types import ModuleType
-from typing import Any, Optional, cast
+from typing import Any, cast
 
 import numpy as np
 
 __all__ = [
-    "has_cupy",
-    "has_cuda_rust",
-    "gpu_available",
+    "TELEMETRY",
+    "GpuBackend",
+    "asnumpy",
     "get_array_module",
-    "xp",
+    "get_backend",
+    "get_prefer_gpu",
+    "gpu_available",
+    "has_cuda_rust",
+    "has_cupy",
+    "is_on_gpu",
+    "note_fallback",
+    "note_gpu_call",
+    "reset_telemetry",
+    "set_prefer_gpu",
     "to_device",
     "to_host",
-    "asnumpy",
-    "is_on_gpu",
-    "GpuBackend",
-    "get_backend",
-    "set_prefer_gpu",
-    "get_prefer_gpu",
-    "note_gpu_call",
-    "note_fallback",
-    "TELEMETRY",
-    "reset_telemetry",
+    "xp",
 ]
 
 
@@ -68,44 +68,44 @@ __all__ = [
 # ---------------------------------------------------------------------------
 #: Global preference for using the GPU when one is available. Toggle with
 #: :func:`set_prefer_gpu`. Detection (:func:`gpu_available`) is unaffected by
-#: this flag — it reports hardware, not policy.
+#: this flag - it reports hardware, not policy.
 _PREFER_GPU: bool = True
 
 #: Cached :class:`GpuBackend` capability snapshot (built lazily, hardware is
 #: assumed stable for the life of the process). Reset is not normally needed.
-_BACKEND: Optional["GpuBackend"] = None
+_BACKEND: GpuBackend | None = None
 
 #: Cross-module transfer/usage counters. Other modules read and mutate this in
 #: place; it is reset (never rebound) so external references stay valid.
 #:
-#: * ``h2d``       — host -> device array transfers performed by :func:`to_device`.
-#: * ``d2h``       — device -> host transfers performed by :func:`to_host`.
-#: * ``gpu_calls`` — GPU compute operations, recorded by callers via
+#: * ``h2d``       - host -> device array transfers performed by :func:`to_device`.
+#: * ``d2h``       - device -> host transfers performed by :func:`to_host`.
+#: * ``gpu_calls`` - GPU compute operations, recorded by callers via
 #:   :func:`note_gpu_call`.
-#: * ``fallbacks`` — times a requested GPU action degraded to the CPU/host path.
+#: * ``fallbacks`` - times a requested GPU action degraded to the CPU/host path.
 TELEMETRY: dict[str, int] = {"h2d": 0, "d2h": 0, "gpu_calls": 0, "fallbacks": 0}
 
 
 # ---------------------------------------------------------------------------
-# CuPy / device probing (cached — hardware does not change mid-process)
+# CuPy / device probing (cached - hardware does not change mid-process)
 # ---------------------------------------------------------------------------
 @functools.lru_cache(maxsize=1)
-def _cupy() -> Optional[ModuleType]:
+def _cupy() -> ModuleType | None:
     """Return the imported ``cupy`` module, or ``None`` if it is unavailable."""
     try:
         import cupy  # type: ignore[import-not-found]
 
         return cast(ModuleType, cupy)
-    except Exception:  # pragma: no cover - import failure path is env-dependent
+    except (ImportError, RuntimeError):  # cupy absent, or its own CUDA stack broken
         return None
 
 
 @functools.lru_cache(maxsize=1)
-def _probe() -> tuple[bool, Optional[str], Optional[int]]:
+def _probe() -> tuple[bool, str | None, int | None]:
     """Probe device 0 once. Returns ``(usable, device_name, total_mem_bytes)``.
 
     "Usable" means CuPy imported, a CUDA device is enumerated, and a tiny
-    allocation on it succeeds — so a present-but-broken driver reports unusable
+    allocation on it succeeds - so a present-but-broken driver reports unusable
     rather than crashing later inside a hot loop.
     """
     cp = _cupy()
@@ -125,7 +125,10 @@ def _probe() -> tuple[bool, Optional[str], Optional[int]]:
         _scratch = cp.zeros(8, dtype=cp.uint8)
         del _scratch
         return (True, name, total)
-    except Exception:  # pragma: no cover - driver/hardware dependent
+    except (RuntimeError, OSError, ValueError, AttributeError):  # pragma: no cover
+        # A probe must degrade to "unusable", never crash the caller — these
+        # cover driver/runtime failures from cupy (CUDARuntimeError is a
+        # RuntimeError), missing device libs (OSError), and API drift.
         return (False, None, None)
 
 
@@ -146,18 +149,18 @@ def has_cuda_rust() -> bool:
     """
     try:
         from . import CUDABatchDecoder
-    except Exception:  # pragma: no cover - import wiring
+    except RuntimeError:  # pragma: no cover - import wiring
         return False
     try:
         return bool(CUDABatchDecoder.is_available())
-    except Exception:  # pragma: no cover - hardware dependent
+    except RuntimeError:  # pragma: no cover - hardware dependent
         return False
 
 
 def gpu_available() -> bool:
     """Return ``True`` iff CuPy is importable **and** a CUDA device is usable.
 
-    Independent of the :func:`set_prefer_gpu` policy flag — it reports hardware
+    Independent of the :func:`set_prefer_gpu` policy flag - it reports hardware
     capability only.
     """
     return _probe()[0]
@@ -181,7 +184,7 @@ def get_array_module(*arrays: Any, prefer_gpu: bool = True) -> ModuleType:
     Policy-aware analogue of ``cupy.get_array_module``:
 
     * If **any** input array already lives on the GPU, ``cupy`` is returned
-      regardless of ``prefer_gpu`` — you cannot operate on device arrays with
+      regardless of ``prefer_gpu`` - you cannot operate on device arrays with
       NumPy, so the data location wins.
     * Otherwise ``cupy`` is returned only when ``prefer_gpu`` is true, the global
       preference (:func:`set_prefer_gpu`) is on, and a device is usable; else
@@ -260,7 +263,7 @@ def to_host(a: Any) -> np.ndarray:
 
 
 def asnumpy(a: Any) -> np.ndarray:
-    """Alias for :func:`to_host` — mirrors ``cupy.asnumpy``."""
+    """Alias for :func:`to_host` - mirrors ``cupy.asnumpy``."""
     return to_host(a)
 
 
@@ -306,8 +309,8 @@ class GpuBackend:
 
     cupy_available: bool
     cuda_rust_available: bool
-    device_name: Optional[str]
-    total_mem_bytes: Optional[int]
+    device_name: str | None
+    total_mem_bytes: int | None
     prefer_gpu: bool = True
 
     def module(self) -> ModuleType:
@@ -351,7 +354,7 @@ def set_prefer_gpu(flag: bool) -> None:
 
     Setting ``False`` forces every policy-driven path (:func:`get_array_module`,
     :func:`xp`, :func:`to_device`, :meth:`GpuBackend.module`) onto NumPy/host,
-    even when a device is available — useful for benchmarking or reproducibility.
+    even when a device is available - useful for benchmarking or reproducibility.
     """
     global _PREFER_GPU
     _PREFER_GPU = bool(flag)

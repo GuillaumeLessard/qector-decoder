@@ -6,7 +6,6 @@ correction, and a manual dense->packed->dense round-trip must be lossless.
 
 import numpy as np
 import pytest
-
 from qector_decoder_v3 import codes, result
 
 

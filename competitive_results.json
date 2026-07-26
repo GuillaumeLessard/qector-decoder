@@ -1,0 +1,2856 @@
+[
+  {
+    "distance": 3,
+    "shots": 1000,
+    "decoder": "QECTOR BP-OSD (Rust CPU)",
+    "status": "failed",
+    "error": "BPOSDDecoder.__init__() got an unexpected keyword argument 'max_p'"
+  },
+  {
+    "distance": 3,
+    "n_qubits": 9,
+    "shots": 1000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 6,
+    "ler": 0.006,
+    "ci95": [
+      0.002753,
+      0.013028
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 4.4e-05,
+    "dt_mean": 4.5e-05,
+    "dt_std": 4e-06,
+    "dec_per_s": 22624440.9,
+    "latency_us": 0.04,
+    "status": "success"
+  },
+  {
+    "distance": 3,
+    "n_qubits": 9,
+    "shots": 1000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 6,
+    "ler": 0.006,
+    "ci95": [
+      0.002753,
+      0.013028
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000231,
+    "dt_mean": 0.00023,
+    "dt_std": 6e-06,
+    "dec_per_s": 4321521.2,
+    "latency_us": 0.23,
+    "status": "success"
+  },
+  {
+    "distance": 3,
+    "n_qubits": 9,
+    "shots": 1000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 6,
+    "ler": 0.006,
+    "ci95": [
+      0.002753,
+      0.013028
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000229,
+    "dt_mean": 0.000257,
+    "dt_std": 5.9e-05,
+    "dec_per_s": 4364905.9,
+    "latency_us": 0.23,
+    "status": "success"
+  },
+  {
+    "distance": 3,
+    "n_qubits": 9,
+    "shots": 1000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 6,
+    "ler": 0.006,
+    "ci95": [
+      0.002753,
+      0.013028
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000173,
+    "dt_mean": 0.000163,
+    "dt_std": 4.2e-05,
+    "dec_per_s": 5797101.3,
+    "latency_us": 0.17,
+    "status": "success"
+  },
+  {
+    "distance": 3,
+    "n_qubits": 9,
+    "shots": 1000,
+    "decoder": "ldpc BP-OSD (C++)",
+    "fails": 6,
+    "ler": 0.006,
+    "ci95": [
+      0.002753,
+      0.013028
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.001383,
+    "dt_mean": 0.001388,
+    "dt_std": 2.8e-05,
+    "dec_per_s": 723222.7,
+    "latency_us": 1.38,
+    "status": "success"
+  },
+  {
+    "distance": 3,
+    "n_qubits": 9,
+    "shots": 20000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 112,
+    "ler": 0.0056,
+    "ci95": [
+      0.004656,
+      0.006733
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000721,
+    "dt_mean": 0.000739,
+    "dt_std": 4.9e-05,
+    "dec_per_s": 27750797.8,
+    "latency_us": 0.04,
+    "status": "success"
+  },
+  {
+    "distance": 3,
+    "n_qubits": 9,
+    "shots": 20000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 116,
+    "ler": 0.0058,
+    "ci95": [
+      0.004838,
+      0.006951
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000973,
+    "dt_mean": 0.00103,
+    "dt_std": 0.000154,
+    "dec_per_s": 20544427.5,
+    "latency_us": 0.05,
+    "status": "success"
+  },
+  {
+    "distance": 3,
+    "n_qubits": 9,
+    "shots": 20000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 111,
+    "ler": 0.00555,
+    "ci95": [
+      0.004611,
+      0.006679
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.001016,
+    "dt_mean": 0.001017,
+    "dt_std": 2e-05,
+    "dec_per_s": 19692792.6,
+    "latency_us": 0.05,
+    "status": "success"
+  },
+  {
+    "distance": 3,
+    "n_qubits": 9,
+    "shots": 20000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 116,
+    "ler": 0.0058,
+    "ci95": [
+      0.004838,
+      0.006951
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000715,
+    "dt_mean": 0.000728,
+    "dt_std": 1.8e-05,
+    "dec_per_s": 27956388.4,
+    "latency_us": 0.04,
+    "status": "success"
+  },
+  {
+    "distance": 3,
+    "n_qubits": 9,
+    "shots": 50000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 272,
+    "ler": 0.00544,
+    "ci95": [
+      0.004832,
+      0.006124
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.002224,
+    "dt_mean": 0.00234,
+    "dt_std": 0.000379,
+    "dec_per_s": 22482014.4,
+    "latency_us": 0.04,
+    "status": "success"
+  },
+  {
+    "distance": 3,
+    "n_qubits": 9,
+    "shots": 50000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 279,
+    "ler": 0.00558,
+    "ci95": [
+      0.004964,
+      0.006272
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.002139,
+    "dt_mean": 0.002168,
+    "dt_std": 6.6e-05,
+    "dec_per_s": 23374316.3,
+    "latency_us": 0.04,
+    "status": "success"
+  },
+  {
+    "distance": 3,
+    "n_qubits": 9,
+    "shots": 50000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 271,
+    "ler": 0.00542,
+    "ci95": [
+      0.004813,
+      0.006103
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.003455,
+    "dt_mean": 0.003218,
+    "dt_std": 0.000401,
+    "dec_per_s": 14470942.3,
+    "latency_us": 0.07,
+    "status": "success"
+  },
+  {
+    "distance": 3,
+    "n_qubits": 9,
+    "shots": 50000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 279,
+    "ler": 0.00558,
+    "ci95": [
+      0.004964,
+      0.006272
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.001389,
+    "dt_mean": 0.001797,
+    "dt_std": 0.000612,
+    "dec_per_s": 35989347.2,
+    "latency_us": 0.03,
+    "status": "success"
+  },
+  {
+    "distance": 3,
+    "n_qubits": 9,
+    "shots": 100000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 531,
+    "ler": 0.00531,
+    "ci95": [
+      0.004878,
+      0.00578
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.004854,
+    "dt_mean": 0.004633,
+    "dt_std": 0.000867,
+    "dec_per_s": 20602414.6,
+    "latency_us": 0.05,
+    "status": "success"
+  },
+  {
+    "distance": 3,
+    "n_qubits": 9,
+    "shots": 100000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 545,
+    "ler": 0.00545,
+    "ci95": [
+      0.005012,
+      0.005926
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.00336,
+    "dt_mean": 0.003348,
+    "dt_std": 0.000111,
+    "dec_per_s": 29761019.0,
+    "latency_us": 0.03,
+    "status": "success"
+  },
+  {
+    "distance": 3,
+    "n_qubits": 9,
+    "shots": 100000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 526,
+    "ler": 0.00526,
+    "ci95": [
+      0.00483,
+      0.005728
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.004823,
+    "dt_mean": 0.00484,
+    "dt_std": 9.1e-05,
+    "dec_per_s": 20733983.0,
+    "latency_us": 0.05,
+    "status": "success"
+  },
+  {
+    "distance": 3,
+    "n_qubits": 9,
+    "shots": 100000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 545,
+    "ler": 0.00545,
+    "ci95": [
+      0.005012,
+      0.005926
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.002376,
+    "dt_mean": 0.003257,
+    "dt_std": 0.001276,
+    "dec_per_s": 42094628.7,
+    "latency_us": 0.02,
+    "status": "success"
+  },
+  {
+    "distance": 5,
+    "shots": 1000,
+    "decoder": "QECTOR BP-OSD (Rust CPU)",
+    "status": "failed",
+    "error": "BPOSDDecoder.__init__() got an unexpected keyword argument 'max_p'"
+  },
+  {
+    "distance": 5,
+    "n_qubits": 25,
+    "shots": 1000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 8,
+    "ler": 0.008,
+    "ci95": [
+      0.004059,
+      0.015706
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 8.8e-05,
+    "dt_mean": 8.6e-05,
+    "dt_std": 7e-06,
+    "dec_per_s": 11363636.3,
+    "latency_us": 0.09,
+    "status": "success"
+  },
+  {
+    "distance": 5,
+    "n_qubits": 25,
+    "shots": 1000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 8,
+    "ler": 0.008,
+    "ci95": [
+      0.004059,
+      0.015706
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000398,
+    "dt_mean": 0.000733,
+    "dt_std": 0.000542,
+    "dec_per_s": 2514458.1,
+    "latency_us": 0.4,
+    "status": "success"
+  },
+  {
+    "distance": 5,
+    "n_qubits": 25,
+    "shots": 1000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 8,
+    "ler": 0.008,
+    "ci95": [
+      0.004059,
+      0.015706
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000245,
+    "dt_mean": 0.00029,
+    "dt_std": 6.8e-05,
+    "dec_per_s": 4086636.7,
+    "latency_us": 0.24,
+    "status": "success"
+  },
+  {
+    "distance": 5,
+    "n_qubits": 25,
+    "shots": 1000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 8,
+    "ler": 0.008,
+    "ci95": [
+      0.004059,
+      0.015706
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000162,
+    "dt_mean": 0.000178,
+    "dt_std": 4e-05,
+    "dec_per_s": 6157635.5,
+    "latency_us": 0.16,
+    "status": "success"
+  },
+  {
+    "distance": 5,
+    "n_qubits": 25,
+    "shots": 1000,
+    "decoder": "ldpc BP-OSD (C++)",
+    "fails": 7,
+    "ler": 0.007,
+    "ci95": [
+      0.003395,
+      0.014378
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.002763,
+    "dt_mean": 0.002763,
+    "dt_std": 1.9e-05,
+    "dec_per_s": 361873.1,
+    "latency_us": 2.76,
+    "status": "success"
+  },
+  {
+    "distance": 5,
+    "n_qubits": 25,
+    "shots": 20000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 98,
+    "ler": 0.0049,
+    "ci95": [
+      0.004023,
+      0.005967
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.00152,
+    "dt_mean": 0.001531,
+    "dt_std": 7e-05,
+    "dec_per_s": 13155298.2,
+    "latency_us": 0.08,
+    "status": "success"
+  },
+  {
+    "distance": 5,
+    "n_qubits": 25,
+    "shots": 20000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 103,
+    "ler": 0.00515,
+    "ci95": [
+      0.004249,
+      0.006241
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.002016,
+    "dt_mean": 0.001967,
+    "dt_std": 0.000148,
+    "dec_per_s": 9921619.2,
+    "latency_us": 0.1,
+    "status": "success"
+  },
+  {
+    "distance": 5,
+    "n_qubits": 25,
+    "shots": 20000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 98,
+    "ler": 0.0049,
+    "ci95": [
+      0.004023,
+      0.005967
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.00172,
+    "dt_mean": 0.001685,
+    "dt_std": 0.00012,
+    "dec_per_s": 11627907.0,
+    "latency_us": 0.09,
+    "status": "success"
+  },
+  {
+    "distance": 5,
+    "n_qubits": 25,
+    "shots": 20000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 103,
+    "ler": 0.00515,
+    "ci95": [
+      0.004249,
+      0.006241
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.002257,
+    "dt_mean": 0.002697,
+    "dt_std": 0.000699,
+    "dec_per_s": 8860927.7,
+    "latency_us": 0.11,
+    "status": "success"
+  },
+  {
+    "distance": 5,
+    "n_qubits": 25,
+    "shots": 50000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 245,
+    "ler": 0.0049,
+    "ci95": [
+      0.004325,
+      0.005551
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.003754,
+    "dt_mean": 0.004258,
+    "dt_std": 0.000745,
+    "dec_per_s": 13317352.5,
+    "latency_us": 0.08,
+    "status": "success"
+  },
+  {
+    "distance": 5,
+    "n_qubits": 25,
+    "shots": 50000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 268,
+    "ler": 0.00536,
+    "ci95": [
+      0.004757,
+      0.006039
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.002926,
+    "dt_mean": 0.002899,
+    "dt_std": 0.000119,
+    "dec_per_s": 17088175.1,
+    "latency_us": 0.06,
+    "status": "success"
+  },
+  {
+    "distance": 5,
+    "n_qubits": 25,
+    "shots": 50000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 241,
+    "ler": 0.00482,
+    "ci95": [
+      0.00425,
+      0.005466
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.004514,
+    "dt_mean": 0.004408,
+    "dt_std": 0.000234,
+    "dec_per_s": 11076895.8,
+    "latency_us": 0.09,
+    "status": "success"
+  },
+  {
+    "distance": 5,
+    "n_qubits": 25,
+    "shots": 50000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 268,
+    "ler": 0.00536,
+    "ci95": [
+      0.004757,
+      0.006039
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.00582,
+    "dt_mean": 0.006536,
+    "dt_std": 0.001048,
+    "dec_per_s": 8591212.9,
+    "latency_us": 0.12,
+    "status": "success"
+  },
+  {
+    "distance": 5,
+    "n_qubits": 25,
+    "shots": 100000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 472,
+    "ler": 0.00472,
+    "ci95": [
+      0.004314,
+      0.005164
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.00746,
+    "dt_mean": 0.007453,
+    "dt_std": 0.000174,
+    "dec_per_s": 13405005.4,
+    "latency_us": 0.07,
+    "status": "success"
+  },
+  {
+    "distance": 5,
+    "n_qubits": 25,
+    "shots": 100000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 523,
+    "ler": 0.00523,
+    "ci95": [
+      0.004802,
+      0.005696
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.005507,
+    "dt_mean": 0.005367,
+    "dt_std": 0.000294,
+    "dec_per_s": 18158707.1,
+    "latency_us": 0.06,
+    "status": "success"
+  },
+  {
+    "distance": 5,
+    "n_qubits": 25,
+    "shots": 100000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 468,
+    "ler": 0.00468,
+    "ci95": [
+      0.004276,
+      0.005122
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.007789,
+    "dt_mean": 0.007701,
+    "dt_std": 0.000339,
+    "dec_per_s": 12838453.7,
+    "latency_us": 0.08,
+    "status": "success"
+  },
+  {
+    "distance": 5,
+    "n_qubits": 25,
+    "shots": 100000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 523,
+    "ler": 0.00523,
+    "ci95": [
+      0.004802,
+      0.005696
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.012641,
+    "dt_mean": 0.012339,
+    "dt_std": 0.001412,
+    "dec_per_s": 7910954.3,
+    "latency_us": 0.13,
+    "status": "success"
+  },
+  {
+    "distance": 7,
+    "shots": 1000,
+    "decoder": "QECTOR BP-OSD (Rust CPU)",
+    "status": "failed",
+    "error": "BPOSDDecoder.__init__() got an unexpected keyword argument 'max_p'"
+  },
+  {
+    "distance": 7,
+    "n_qubits": 49,
+    "shots": 1000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 4,
+    "ler": 0.004,
+    "ci95": [
+      0.001557,
+      0.01024
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000167,
+    "dt_mean": 0.000173,
+    "dt_std": 1.7e-05,
+    "dec_per_s": 5980861.5,
+    "latency_us": 0.17,
+    "status": "success"
+  },
+  {
+    "distance": 7,
+    "n_qubits": 49,
+    "shots": 1000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 4,
+    "ler": 0.004,
+    "ci95": [
+      0.001557,
+      0.01024
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000313,
+    "dt_mean": 0.000331,
+    "dt_std": 2.9e-05,
+    "dec_per_s": 3193867.8,
+    "latency_us": 0.31,
+    "status": "success"
+  },
+  {
+    "distance": 7,
+    "n_qubits": 49,
+    "shots": 1000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 4,
+    "ler": 0.004,
+    "ci95": [
+      0.001557,
+      0.01024
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000406,
+    "dt_mean": 0.000362,
+    "dt_std": 6.9e-05,
+    "dec_per_s": 2461841.5,
+    "latency_us": 0.41,
+    "status": "success"
+  },
+  {
+    "distance": 7,
+    "n_qubits": 49,
+    "shots": 1000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 4,
+    "ler": 0.004,
+    "ci95": [
+      0.001557,
+      0.01024
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000346,
+    "dt_mean": 0.000353,
+    "dt_std": 2.8e-05,
+    "dec_per_s": 2886836.0,
+    "latency_us": 0.35,
+    "status": "success"
+  },
+  {
+    "distance": 7,
+    "n_qubits": 49,
+    "shots": 1000,
+    "decoder": "ldpc BP-OSD (C++)",
+    "fails": 7,
+    "ler": 0.007,
+    "ci95": [
+      0.003395,
+      0.014378
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.007342,
+    "dt_mean": 0.006871,
+    "dt_std": 0.000781,
+    "dec_per_s": 136206.4,
+    "latency_us": 7.34,
+    "status": "success"
+  },
+  {
+    "distance": 7,
+    "n_qubits": 49,
+    "shots": 20000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 112,
+    "ler": 0.0056,
+    "ci95": [
+      0.004656,
+      0.006733
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.00281,
+    "dt_mean": 0.002831,
+    "dt_std": 3.1e-05,
+    "dec_per_s": 7118197.7,
+    "latency_us": 0.14,
+    "status": "success"
+  },
+  {
+    "distance": 7,
+    "n_qubits": 49,
+    "shots": 20000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 114,
+    "ler": 0.0057,
+    "ci95": [
+      0.004747,
+      0.006842
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.002578,
+    "dt_mean": 0.002552,
+    "dt_std": 0.000114,
+    "dec_per_s": 7758854.8,
+    "latency_us": 0.13,
+    "status": "success"
+  },
+  {
+    "distance": 7,
+    "n_qubits": 49,
+    "shots": 20000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 113,
+    "ler": 0.00565,
+    "ci95": [
+      0.004702,
+      0.006788
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.002559,
+    "dt_mean": 0.002674,
+    "dt_std": 0.000169,
+    "dec_per_s": 7814942.2,
+    "latency_us": 0.13,
+    "status": "success"
+  },
+  {
+    "distance": 7,
+    "n_qubits": 49,
+    "shots": 20000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 114,
+    "ler": 0.0057,
+    "ci95": [
+      0.004747,
+      0.006842
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.008175,
+    "dt_mean": 0.008067,
+    "dt_std": 0.001419,
+    "dec_per_s": 2446483.2,
+    "latency_us": 0.41,
+    "status": "success"
+  },
+  {
+    "distance": 7,
+    "n_qubits": 49,
+    "shots": 50000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 260,
+    "ler": 0.0052,
+    "ci95": [
+      0.004606,
+      0.00587
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.007312,
+    "dt_mean": 0.007542,
+    "dt_std": 0.000601,
+    "dec_per_s": 6838261.4,
+    "latency_us": 0.15,
+    "status": "success"
+  },
+  {
+    "distance": 7,
+    "n_qubits": 49,
+    "shots": 50000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 262,
+    "ler": 0.00524,
+    "ci95": [
+      0.004644,
+      0.005912
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.005267,
+    "dt_mean": 0.005131,
+    "dt_std": 0.000471,
+    "dec_per_s": 9493250.3,
+    "latency_us": 0.11,
+    "status": "success"
+  },
+  {
+    "distance": 7,
+    "n_qubits": 49,
+    "shots": 50000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 261,
+    "ler": 0.00522,
+    "ci95": [
+      0.004625,
+      0.005891
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.006568,
+    "dt_mean": 0.006646,
+    "dt_std": 0.000431,
+    "dec_per_s": 7613131.1,
+    "latency_us": 0.13,
+    "status": "success"
+  },
+  {
+    "distance": 7,
+    "n_qubits": 49,
+    "shots": 50000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 262,
+    "ler": 0.00524,
+    "ci95": [
+      0.004644,
+      0.005912
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.015107,
+    "dt_mean": 0.016302,
+    "dt_std": 0.001731,
+    "dec_per_s": 3309636.3,
+    "latency_us": 0.3,
+    "status": "success"
+  },
+  {
+    "distance": 7,
+    "n_qubits": 49,
+    "shots": 100000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 530,
+    "ler": 0.0053,
+    "ci95": [
+      0.004869,
+      0.005769
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.014268,
+    "dt_mean": 0.015031,
+    "dt_std": 0.001571,
+    "dec_per_s": 7008838.1,
+    "latency_us": 0.14,
+    "status": "success"
+  },
+  {
+    "distance": 7,
+    "n_qubits": 49,
+    "shots": 100000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 536,
+    "ler": 0.00536,
+    "ci95": [
+      0.004926,
+      0.005832
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.008901,
+    "dt_mean": 0.008909,
+    "dt_std": 9.6e-05,
+    "dec_per_s": 11235323.9,
+    "latency_us": 0.09,
+    "status": "success"
+  },
+  {
+    "distance": 7,
+    "n_qubits": 49,
+    "shots": 100000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 538,
+    "ler": 0.00538,
+    "ci95": [
+      0.004945,
+      0.005853
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.012401,
+    "dt_mean": 0.012898,
+    "dt_std": 0.001542,
+    "dec_per_s": 8064125.9,
+    "latency_us": 0.12,
+    "status": "success"
+  },
+  {
+    "distance": 7,
+    "n_qubits": 49,
+    "shots": 100000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 536,
+    "ler": 0.00536,
+    "ci95": [
+      0.004926,
+      0.005832
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.029828,
+    "dt_mean": 0.030805,
+    "dt_std": 0.001493,
+    "dec_per_s": 3352599.6,
+    "latency_us": 0.3,
+    "status": "success"
+  },
+  {
+    "distance": 9,
+    "shots": 1000,
+    "decoder": "QECTOR BP-OSD (Rust CPU)",
+    "status": "failed",
+    "error": "BPOSDDecoder.__init__() got an unexpected keyword argument 'max_p'"
+  },
+  {
+    "distance": 9,
+    "n_qubits": 81,
+    "shots": 1000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 10,
+    "ler": 0.01,
+    "ci95": [
+      0.005441,
+      0.018309
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000241,
+    "dt_mean": 0.000236,
+    "dt_std": 1.4e-05,
+    "dec_per_s": 4149377.6,
+    "latency_us": 0.24,
+    "status": "success"
+  },
+  {
+    "distance": 9,
+    "n_qubits": 81,
+    "shots": 1000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 10,
+    "ler": 0.01,
+    "ci95": [
+      0.005441,
+      0.018309
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000383,
+    "dt_mean": 0.000361,
+    "dt_std": 4e-05,
+    "dec_per_s": 2611647.9,
+    "latency_us": 0.38,
+    "status": "success"
+  },
+  {
+    "distance": 9,
+    "n_qubits": 81,
+    "shots": 1000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 10,
+    "ler": 0.01,
+    "ci95": [
+      0.005441,
+      0.018309
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000528,
+    "dt_mean": 0.000529,
+    "dt_std": 1.7e-05,
+    "dec_per_s": 1892147.6,
+    "latency_us": 0.53,
+    "status": "success"
+  },
+  {
+    "distance": 9,
+    "n_qubits": 81,
+    "shots": 1000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 10,
+    "ler": 0.01,
+    "ci95": [
+      0.005441,
+      0.018309
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000546,
+    "dt_mean": 0.000722,
+    "dt_std": 0.00037,
+    "dec_per_s": 1832508.7,
+    "latency_us": 0.55,
+    "status": "success"
+  },
+  {
+    "distance": 9,
+    "n_qubits": 81,
+    "shots": 1000,
+    "decoder": "ldpc BP-OSD (C++)",
+    "fails": 10,
+    "ler": 0.01,
+    "ci95": [
+      0.005441,
+      0.018309
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.010292,
+    "dt_mean": 0.010547,
+    "dt_std": 0.000472,
+    "dec_per_s": 97166.6,
+    "latency_us": 10.29,
+    "status": "success"
+  },
+  {
+    "distance": 9,
+    "n_qubits": 81,
+    "shots": 20000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 133,
+    "ler": 0.00665,
+    "ci95": [
+      0.005614,
+      0.007875
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.005158,
+    "dt_mean": 0.005152,
+    "dt_std": 6.5e-05,
+    "dec_per_s": 3877246.4,
+    "latency_us": 0.26,
+    "status": "success"
+  },
+  {
+    "distance": 9,
+    "n_qubits": 81,
+    "shots": 20000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 134,
+    "ler": 0.0067,
+    "ci95": [
+      0.00566,
+      0.007929
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.003085,
+    "dt_mean": 0.003066,
+    "dt_std": 9.6e-05,
+    "dec_per_s": 6482351.8,
+    "latency_us": 0.15,
+    "status": "success"
+  },
+  {
+    "distance": 9,
+    "n_qubits": 81,
+    "shots": 20000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 133,
+    "ler": 0.00665,
+    "ci95": [
+      0.005614,
+      0.007875
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.005198,
+    "dt_mean": 0.005277,
+    "dt_std": 0.000376,
+    "dec_per_s": 3847559.7,
+    "latency_us": 0.26,
+    "status": "success"
+  },
+  {
+    "distance": 9,
+    "n_qubits": 81,
+    "shots": 20000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 134,
+    "ler": 0.0067,
+    "ci95": [
+      0.00566,
+      0.007929
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.011371,
+    "dt_mean": 0.012052,
+    "dt_std": 0.001105,
+    "dec_per_s": 1758860.3,
+    "latency_us": 0.57,
+    "status": "success"
+  },
+  {
+    "distance": 9,
+    "n_qubits": 81,
+    "shots": 50000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 264,
+    "ler": 0.00528,
+    "ci95": [
+      0.004682,
+      0.005954
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.013275,
+    "dt_mean": 0.013144,
+    "dt_std": 0.000327,
+    "dec_per_s": 3766563.5,
+    "latency_us": 0.27,
+    "status": "success"
+  },
+  {
+    "distance": 9,
+    "n_qubits": 81,
+    "shots": 50000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 269,
+    "ler": 0.00538,
+    "ci95": [
+      0.004776,
+      0.00606
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.00629,
+    "dt_mean": 0.006452,
+    "dt_std": 0.000412,
+    "dec_per_s": 7949757.5,
+    "latency_us": 0.13,
+    "status": "success"
+  },
+  {
+    "distance": 9,
+    "n_qubits": 81,
+    "shots": 50000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 267,
+    "ler": 0.00534,
+    "ci95": [
+      0.004738,
+      0.006018
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.011254,
+    "dt_mean": 0.01105,
+    "dt_std": 0.000416,
+    "dec_per_s": 4443022.7,
+    "latency_us": 0.23,
+    "status": "success"
+  },
+  {
+    "distance": 9,
+    "n_qubits": 81,
+    "shots": 50000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 269,
+    "ler": 0.00538,
+    "ci95": [
+      0.004776,
+      0.00606
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.032393,
+    "dt_mean": 0.031954,
+    "dt_std": 0.002049,
+    "dec_per_s": 1543562.4,
+    "latency_us": 0.65,
+    "status": "success"
+  },
+  {
+    "distance": 9,
+    "n_qubits": 81,
+    "shots": 100000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 521,
+    "ler": 0.00521,
+    "ci95": [
+      0.004782,
+      0.005676
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.023602,
+    "dt_mean": 0.024397,
+    "dt_std": 0.001934,
+    "dec_per_s": 4236893.2,
+    "latency_us": 0.24,
+    "status": "success"
+  },
+  {
+    "distance": 9,
+    "n_qubits": 81,
+    "shots": 100000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 529,
+    "ler": 0.00529,
+    "ci95": [
+      0.004859,
+      0.005759
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.011854,
+    "dt_mean": 0.011783,
+    "dt_std": 0.000145,
+    "dec_per_s": 8435757.5,
+    "latency_us": 0.12,
+    "status": "success"
+  },
+  {
+    "distance": 9,
+    "n_qubits": 81,
+    "shots": 100000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 521,
+    "ler": 0.00521,
+    "ci95": [
+      0.004782,
+      0.005676
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.02071,
+    "dt_mean": 0.021644,
+    "dt_std": 0.002304,
+    "dec_per_s": 4828701.8,
+    "latency_us": 0.21,
+    "status": "success"
+  },
+  {
+    "distance": 9,
+    "n_qubits": 81,
+    "shots": 100000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 529,
+    "ler": 0.00529,
+    "ci95": [
+      0.004859,
+      0.005759
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.06068,
+    "dt_mean": 0.060251,
+    "dt_std": 0.001847,
+    "dec_per_s": 1647981.3,
+    "latency_us": 0.61,
+    "status": "success"
+  },
+  {
+    "distance": 11,
+    "shots": 1000,
+    "decoder": "QECTOR BP-OSD (Rust CPU)",
+    "status": "failed",
+    "error": "BPOSDDecoder.__init__() got an unexpected keyword argument 'max_p'"
+  },
+  {
+    "distance": 11,
+    "n_qubits": 121,
+    "shots": 1000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 7,
+    "ler": 0.007,
+    "ci95": [
+      0.003395,
+      0.014378
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000384,
+    "dt_mean": 0.000369,
+    "dt_std": 2.2e-05,
+    "dec_per_s": 2605523.7,
+    "latency_us": 0.38,
+    "status": "success"
+  },
+  {
+    "distance": 11,
+    "n_qubits": 121,
+    "shots": 1000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 7,
+    "ler": 0.007,
+    "ci95": [
+      0.003395,
+      0.014378
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000563,
+    "dt_mean": 0.000537,
+    "dt_std": 4.7e-05,
+    "dec_per_s": 1777145.9,
+    "latency_us": 0.56,
+    "status": "success"
+  },
+  {
+    "distance": 11,
+    "n_qubits": 121,
+    "shots": 1000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 7,
+    "ler": 0.007,
+    "ci95": [
+      0.003395,
+      0.014378
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000647,
+    "dt_mean": 0.000655,
+    "dt_std": 2.6e-05,
+    "dec_per_s": 1546073.0,
+    "latency_us": 0.65,
+    "status": "success"
+  },
+  {
+    "distance": 11,
+    "n_qubits": 121,
+    "shots": 1000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 7,
+    "ler": 0.007,
+    "ci95": [
+      0.003395,
+      0.014378
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000422,
+    "dt_mean": 0.000402,
+    "dt_std": 3.2e-05,
+    "dec_per_s": 2369668.3,
+    "latency_us": 0.42,
+    "status": "success"
+  },
+  {
+    "distance": 11,
+    "n_qubits": 121,
+    "shots": 20000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 98,
+    "ler": 0.0049,
+    "ci95": [
+      0.004023,
+      0.005967
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.007094,
+    "dt_mean": 0.007158,
+    "dt_std": 0.000367,
+    "dec_per_s": 2819164.7,
+    "latency_us": 0.35,
+    "status": "success"
+  },
+  {
+    "distance": 11,
+    "n_qubits": 121,
+    "shots": 20000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 101,
+    "ler": 0.00505,
+    "ci95": [
+      0.004158,
+      0.006132
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.004059,
+    "dt_mean": 0.004366,
+    "dt_std": 0.000471,
+    "dec_per_s": 4926836.5,
+    "latency_us": 0.2,
+    "status": "success"
+  },
+  {
+    "distance": 11,
+    "n_qubits": 121,
+    "shots": 20000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 102,
+    "ler": 0.0051,
+    "ci95": [
+      0.004203,
+      0.006187
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.00736,
+    "dt_mean": 0.007339,
+    "dt_std": 3.3e-05,
+    "dec_per_s": 2717354.4,
+    "latency_us": 0.37,
+    "status": "success"
+  },
+  {
+    "distance": 11,
+    "n_qubits": 121,
+    "shots": 20000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 101,
+    "ler": 0.00505,
+    "ci95": [
+      0.004158,
+      0.006132
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.019329,
+    "dt_mean": 0.020934,
+    "dt_std": 0.002713,
+    "dec_per_s": 1034704.0,
+    "latency_us": 0.97,
+    "status": "success"
+  },
+  {
+    "distance": 11,
+    "n_qubits": 121,
+    "shots": 50000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 250,
+    "ler": 0.005,
+    "ci95": [
+      0.004419,
+      0.005657
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.017615,
+    "dt_mean": 0.017648,
+    "dt_std": 0.000494,
+    "dec_per_s": 2838522.2,
+    "latency_us": 0.35,
+    "status": "success"
+  },
+  {
+    "distance": 11,
+    "n_qubits": 121,
+    "shots": 50000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 253,
+    "ler": 0.00506,
+    "ci95": [
+      0.004475,
+      0.005721
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.009951,
+    "dt_mean": 0.009873,
+    "dt_std": 0.000304,
+    "dec_per_s": 5024519.7,
+    "latency_us": 0.2,
+    "status": "success"
+  },
+  {
+    "distance": 11,
+    "n_qubits": 121,
+    "shots": 50000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 250,
+    "ler": 0.005,
+    "ci95": [
+      0.004419,
+      0.005657
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.017483,
+    "dt_mean": 0.017478,
+    "dt_std": 0.000314,
+    "dec_per_s": 2859855.6,
+    "latency_us": 0.35,
+    "status": "success"
+  },
+  {
+    "distance": 11,
+    "n_qubits": 121,
+    "shots": 50000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 253,
+    "ler": 0.00506,
+    "ci95": [
+      0.004475,
+      0.005721
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.049812,
+    "dt_mean": 0.052585,
+    "dt_std": 0.004392,
+    "dec_per_s": 1003772.2,
+    "latency_us": 1.0,
+    "status": "success"
+  },
+  {
+    "distance": 11,
+    "n_qubits": 121,
+    "shots": 100000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 500,
+    "ler": 0.005,
+    "ci95": [
+      0.004581,
+      0.005457
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.039112,
+    "dt_mean": 0.038624,
+    "dt_std": 0.00083,
+    "dec_per_s": 2556779.7,
+    "latency_us": 0.39,
+    "status": "success"
+  },
+  {
+    "distance": 11,
+    "n_qubits": 121,
+    "shots": 100000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 503,
+    "ler": 0.00503,
+    "ci95": [
+      0.00461,
+      0.005488
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.01761,
+    "dt_mean": 0.017856,
+    "dt_std": 0.000736,
+    "dec_per_s": 5678591.7,
+    "latency_us": 0.18,
+    "status": "success"
+  },
+  {
+    "distance": 11,
+    "n_qubits": 121,
+    "shots": 100000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 501,
+    "ler": 0.00501,
+    "ci95": [
+      0.004591,
+      0.005467
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.036353,
+    "dt_mean": 0.036347,
+    "dt_std": 0.000507,
+    "dec_per_s": 2750797.0,
+    "latency_us": 0.36,
+    "status": "success"
+  },
+  {
+    "distance": 11,
+    "n_qubits": 121,
+    "shots": 100000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 503,
+    "ler": 0.00503,
+    "ci95": [
+      0.00461,
+      0.005488
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.09592,
+    "dt_mean": 0.099998,
+    "dt_std": 0.006194,
+    "dec_per_s": 1042540.9,
+    "latency_us": 0.96,
+    "status": "success"
+  },
+  {
+    "distance": 13,
+    "shots": 1000,
+    "decoder": "QECTOR BP-OSD (Rust CPU)",
+    "status": "failed",
+    "error": "BPOSDDecoder.__init__() got an unexpected keyword argument 'max_p'"
+  },
+  {
+    "distance": 13,
+    "n_qubits": 169,
+    "shots": 1000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 4,
+    "ler": 0.004,
+    "ci95": [
+      0.001557,
+      0.01024
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000498,
+    "dt_mean": 0.00049,
+    "dt_std": 2e-05,
+    "dec_per_s": 2008435.5,
+    "latency_us": 0.5,
+    "status": "success"
+  },
+  {
+    "distance": 13,
+    "n_qubits": 169,
+    "shots": 1000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 4,
+    "ler": 0.004,
+    "ci95": [
+      0.001557,
+      0.01024
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000473,
+    "dt_mean": 0.000535,
+    "dt_std": 0.0001,
+    "dec_per_s": 2112378.6,
+    "latency_us": 0.47,
+    "status": "success"
+  },
+  {
+    "distance": 13,
+    "n_qubits": 169,
+    "shots": 1000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 4,
+    "ler": 0.004,
+    "ci95": [
+      0.001557,
+      0.01024
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000973,
+    "dt_mean": 0.000964,
+    "dt_std": 6e-05,
+    "dec_per_s": 1027538.0,
+    "latency_us": 0.97,
+    "status": "success"
+  },
+  {
+    "distance": 13,
+    "n_qubits": 169,
+    "shots": 1000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 4,
+    "ler": 0.004,
+    "ci95": [
+      0.001557,
+      0.01024
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000443,
+    "dt_mean": 0.000501,
+    "dt_std": 8.7e-05,
+    "dec_per_s": 2258355.9,
+    "latency_us": 0.44,
+    "status": "success"
+  },
+  {
+    "distance": 13,
+    "n_qubits": 169,
+    "shots": 20000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 100,
+    "ler": 0.005,
+    "ci95": [
+      0.004113,
+      0.006077
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.010159,
+    "dt_mean": 0.011575,
+    "dt_std": 0.002116,
+    "dec_per_s": 1968678.3,
+    "latency_us": 0.51,
+    "status": "success"
+  },
+  {
+    "distance": 13,
+    "n_qubits": 169,
+    "shots": 20000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 102,
+    "ler": 0.0051,
+    "ci95": [
+      0.004203,
+      0.006187
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.005494,
+    "dt_mean": 0.005677,
+    "dt_std": 0.000261,
+    "dec_per_s": 3640268.7,
+    "latency_us": 0.27,
+    "status": "success"
+  },
+  {
+    "distance": 13,
+    "n_qubits": 169,
+    "shots": 20000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 100,
+    "ler": 0.005,
+    "ci95": [
+      0.004113,
+      0.006077
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.01328,
+    "dt_mean": 0.01325,
+    "dt_std": 0.000397,
+    "dec_per_s": 1505990.1,
+    "latency_us": 0.66,
+    "status": "success"
+  },
+  {
+    "distance": 13,
+    "n_qubits": 169,
+    "shots": 20000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 102,
+    "ler": 0.0051,
+    "ci95": [
+      0.004203,
+      0.006187
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.027758,
+    "dt_mean": 0.029543,
+    "dt_std": 0.002537,
+    "dec_per_s": 720515.6,
+    "latency_us": 1.39,
+    "status": "success"
+  },
+  {
+    "distance": 13,
+    "n_qubits": 169,
+    "shots": 50000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 246,
+    "ler": 0.00492,
+    "ci95": [
+      0.004344,
+      0.005572
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.026323,
+    "dt_mean": 0.025594,
+    "dt_std": 0.001392,
+    "dec_per_s": 1899515.6,
+    "latency_us": 0.53,
+    "status": "success"
+  },
+  {
+    "distance": 13,
+    "n_qubits": 169,
+    "shots": 50000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 249,
+    "ler": 0.00498,
+    "ci95": [
+      0.0044,
+      0.005636
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.013584,
+    "dt_mean": 0.013901,
+    "dt_std": 0.000925,
+    "dec_per_s": 3680746.7,
+    "latency_us": 0.27,
+    "status": "success"
+  },
+  {
+    "distance": 13,
+    "n_qubits": 169,
+    "shots": 50000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 250,
+    "ler": 0.005,
+    "ci95": [
+      0.004419,
+      0.005657
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.031637,
+    "dt_mean": 0.03222,
+    "dt_std": 0.001172,
+    "dec_per_s": 1580418.0,
+    "latency_us": 0.63,
+    "status": "success"
+  },
+  {
+    "distance": 13,
+    "n_qubits": 169,
+    "shots": 50000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 249,
+    "ler": 0.00498,
+    "ci95": [
+      0.0044,
+      0.005636
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.076047,
+    "dt_mean": 0.078841,
+    "dt_std": 0.004537,
+    "dec_per_s": 657486.4,
+    "latency_us": 1.52,
+    "status": "success"
+  },
+  {
+    "distance": 13,
+    "n_qubits": 169,
+    "shots": 100000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 462,
+    "ler": 0.00462,
+    "ci95": [
+      0.004218,
+      0.00506
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.050294,
+    "dt_mean": 0.050364,
+    "dt_std": 0.001882,
+    "dec_per_s": 1988328.5,
+    "latency_us": 0.5,
+    "status": "success"
+  },
+  {
+    "distance": 13,
+    "n_qubits": 169,
+    "shots": 100000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 469,
+    "ler": 0.00469,
+    "ci95": [
+      0.004285,
+      0.005133
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.025322,
+    "dt_mean": 0.025504,
+    "dt_std": 0.000767,
+    "dec_per_s": 3949088.4,
+    "latency_us": 0.25,
+    "status": "success"
+  },
+  {
+    "distance": 13,
+    "n_qubits": 169,
+    "shots": 100000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 471,
+    "ler": 0.00471,
+    "ci95": [
+      0.004304,
+      0.005154
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.065176,
+    "dt_mean": 0.06375,
+    "dt_std": 0.003037,
+    "dec_per_s": 1534302.4,
+    "latency_us": 0.65,
+    "status": "success"
+  },
+  {
+    "distance": 13,
+    "n_qubits": 169,
+    "shots": 100000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 469,
+    "ler": 0.00469,
+    "ci95": [
+      0.004285,
+      0.005133
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.147753,
+    "dt_mean": 0.224057,
+    "dt_std": 0.108008,
+    "dec_per_s": 676807.0,
+    "latency_us": 1.48,
+    "status": "success"
+  },
+  {
+    "distance": 15,
+    "n_qubits": 225,
+    "shots": 1000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 5,
+    "ler": 0.005,
+    "ci95": [
+      0.002138,
+      0.011651
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000636,
+    "dt_mean": 0.000629,
+    "dt_std": 2.3e-05,
+    "dec_per_s": 1571832.8,
+    "latency_us": 0.64,
+    "status": "success"
+  },
+  {
+    "distance": 15,
+    "n_qubits": 225,
+    "shots": 1000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 4,
+    "ler": 0.004,
+    "ci95": [
+      0.001557,
+      0.01024
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000635,
+    "dt_mean": 0.000641,
+    "dt_std": 3.7e-05,
+    "dec_per_s": 1574307.3,
+    "latency_us": 0.64,
+    "status": "success"
+  },
+  {
+    "distance": 15,
+    "n_qubits": 225,
+    "shots": 1000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 4,
+    "ler": 0.004,
+    "ci95": [
+      0.001557,
+      0.01024
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.001381,
+    "dt_mean": 0.001427,
+    "dt_std": 0.000102,
+    "dec_per_s": 724217.8,
+    "latency_us": 1.38,
+    "status": "success"
+  },
+  {
+    "distance": 15,
+    "n_qubits": 225,
+    "shots": 1000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 4,
+    "ler": 0.004,
+    "ci95": [
+      0.001557,
+      0.01024
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.00174,
+    "dt_mean": 0.001749,
+    "dt_std": 2.2e-05,
+    "dec_per_s": 574646.6,
+    "latency_us": 1.74,
+    "status": "success"
+  },
+  {
+    "distance": 15,
+    "n_qubits": 225,
+    "shots": 20000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 107,
+    "ler": 0.00535,
+    "ci95": [
+      0.00443,
+      0.00646
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.01276,
+    "dt_mean": 0.012978,
+    "dt_std": 0.000456,
+    "dec_per_s": 1567373.6,
+    "latency_us": 0.64,
+    "status": "success"
+  },
+  {
+    "distance": 15,
+    "n_qubits": 225,
+    "shots": 20000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 107,
+    "ler": 0.00535,
+    "ci95": [
+      0.00443,
+      0.00646
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.007439,
+    "dt_mean": 0.007631,
+    "dt_std": 0.000459,
+    "dec_per_s": 2688605.7,
+    "latency_us": 0.37,
+    "status": "success"
+  },
+  {
+    "distance": 15,
+    "n_qubits": 225,
+    "shots": 20000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 107,
+    "ler": 0.00535,
+    "ci95": [
+      0.00443,
+      0.00646
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.022509,
+    "dt_mean": 0.023302,
+    "dt_std": 0.001713,
+    "dec_per_s": 888525.6,
+    "latency_us": 1.13,
+    "status": "success"
+  },
+  {
+    "distance": 15,
+    "n_qubits": 225,
+    "shots": 20000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 107,
+    "ler": 0.00535,
+    "ci95": [
+      0.00443,
+      0.00646
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.040572,
+    "dt_mean": 0.04313,
+    "dt_std": 0.003777,
+    "dec_per_s": 492947.2,
+    "latency_us": 2.03,
+    "status": "success"
+  },
+  {
+    "distance": 15,
+    "n_qubits": 225,
+    "shots": 50000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 253,
+    "ler": 0.00506,
+    "ci95": [
+      0.004475,
+      0.005721
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.030674,
+    "dt_mean": 0.030731,
+    "dt_std": 0.000215,
+    "dec_per_s": 1630060.9,
+    "latency_us": 0.61,
+    "status": "success"
+  },
+  {
+    "distance": 15,
+    "n_qubits": 225,
+    "shots": 50000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 254,
+    "ler": 0.00508,
+    "ci95": [
+      0.004494,
+      0.005742
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.017033,
+    "dt_mean": 0.018674,
+    "dt_std": 0.00243,
+    "dec_per_s": 2935426.5,
+    "latency_us": 0.34,
+    "status": "success"
+  },
+  {
+    "distance": 15,
+    "n_qubits": 225,
+    "shots": 50000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 253,
+    "ler": 0.00506,
+    "ci95": [
+      0.004475,
+      0.005721
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.062349,
+    "dt_mean": 0.062024,
+    "dt_std": 0.003127,
+    "dec_per_s": 801932.3,
+    "latency_us": 1.25,
+    "status": "success"
+  },
+  {
+    "distance": 15,
+    "n_qubits": 225,
+    "shots": 50000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 254,
+    "ler": 0.00508,
+    "ci95": [
+      0.004494,
+      0.005742
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.141547,
+    "dt_mean": 0.188416,
+    "dt_std": 0.06729,
+    "dec_per_s": 353238.8,
+    "latency_us": 2.83,
+    "status": "success"
+  },
+  {
+    "distance": 15,
+    "n_qubits": 225,
+    "shots": 100000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 487,
+    "ler": 0.00487,
+    "ci95": [
+      0.004457,
+      0.005321
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.068986,
+    "dt_mean": 0.068781,
+    "dt_std": 0.001328,
+    "dec_per_s": 1449563.2,
+    "latency_us": 0.69,
+    "status": "success"
+  },
+  {
+    "distance": 15,
+    "n_qubits": 225,
+    "shots": 100000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 489,
+    "ler": 0.00489,
+    "ci95": [
+      0.004476,
+      0.005342
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.034734,
+    "dt_mean": 0.035264,
+    "dt_std": 0.000923,
+    "dec_per_s": 2879040.0,
+    "latency_us": 0.35,
+    "status": "success"
+  },
+  {
+    "distance": 15,
+    "n_qubits": 225,
+    "shots": 100000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 487,
+    "ler": 0.00487,
+    "ci95": [
+      0.004457,
+      0.005321
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.123447,
+    "dt_mean": 0.123691,
+    "dt_std": 0.003608,
+    "dec_per_s": 810063.6,
+    "latency_us": 1.23,
+    "status": "success"
+  },
+  {
+    "distance": 15,
+    "n_qubits": 225,
+    "shots": 100000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 489,
+    "ler": 0.00489,
+    "ci95": [
+      0.004476,
+      0.005342
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.63779,
+    "dt_mean": 0.644973,
+    "dt_std": 0.030761,
+    "dec_per_s": 156791.4,
+    "latency_us": 6.38,
+    "status": "success"
+  },
+  {
+    "distance": 17,
+    "n_qubits": 289,
+    "shots": 1000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 7,
+    "ler": 0.007,
+    "ci95": [
+      0.003395,
+      0.014378
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000784,
+    "dt_mean": 0.000821,
+    "dt_std": 6.6e-05,
+    "dec_per_s": 1275835.7,
+    "latency_us": 0.78,
+    "status": "success"
+  },
+  {
+    "distance": 17,
+    "n_qubits": 289,
+    "shots": 1000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 7,
+    "ler": 0.007,
+    "ci95": [
+      0.003395,
+      0.014378
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000806,
+    "dt_mean": 0.000784,
+    "dt_std": 3.9e-05,
+    "dec_per_s": 1240079.4,
+    "latency_us": 0.81,
+    "status": "success"
+  },
+  {
+    "distance": 17,
+    "n_qubits": 289,
+    "shots": 1000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 7,
+    "ler": 0.007,
+    "ci95": [
+      0.003395,
+      0.014378
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.002263,
+    "dt_mean": 0.00231,
+    "dt_std": 0.000123,
+    "dec_per_s": 441813.2,
+    "latency_us": 2.26,
+    "status": "success"
+  },
+  {
+    "distance": 17,
+    "n_qubits": 289,
+    "shots": 1000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 7,
+    "ler": 0.007,
+    "ci95": [
+      0.003395,
+      0.014378
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.002582,
+    "dt_mean": 0.002595,
+    "dt_std": 8.6e-05,
+    "dec_per_s": 387296.7,
+    "latency_us": 2.58,
+    "status": "success"
+  },
+  {
+    "distance": 17,
+    "n_qubits": 289,
+    "shots": 20000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 103,
+    "ler": 0.00515,
+    "ci95": [
+      0.004249,
+      0.006241
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.016096,
+    "dt_mean": 0.016107,
+    "dt_std": 0.000243,
+    "dec_per_s": 1242529.3,
+    "latency_us": 0.8,
+    "status": "success"
+  },
+  {
+    "distance": 17,
+    "n_qubits": 289,
+    "shots": 20000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 103,
+    "ler": 0.00515,
+    "ci95": [
+      0.004249,
+      0.006241
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.009756,
+    "dt_mean": 0.009678,
+    "dt_std": 0.000279,
+    "dec_per_s": 2049999.5,
+    "latency_us": 0.49,
+    "status": "success"
+  },
+  {
+    "distance": 17,
+    "n_qubits": 289,
+    "shots": 20000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 103,
+    "ler": 0.00515,
+    "ci95": [
+      0.004249,
+      0.006241
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.036385,
+    "dt_mean": 0.037294,
+    "dt_std": 0.00234,
+    "dec_per_s": 549671.0,
+    "latency_us": 1.82,
+    "status": "success"
+  },
+  {
+    "distance": 17,
+    "n_qubits": 289,
+    "shots": 20000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 103,
+    "ler": 0.00515,
+    "ci95": [
+      0.004249,
+      0.006241
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.058047,
+    "dt_mean": 0.057053,
+    "dt_std": 0.004828,
+    "dec_per_s": 344550.8,
+    "latency_us": 2.9,
+    "status": "success"
+  },
+  {
+    "distance": 17,
+    "n_qubits": 289,
+    "shots": 50000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 257,
+    "ler": 0.00514,
+    "ci95": [
+      0.00455,
+      0.005806
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.041459,
+    "dt_mean": 0.042875,
+    "dt_std": 0.002949,
+    "dec_per_s": 1206002.0,
+    "latency_us": 0.83,
+    "status": "success"
+  },
+  {
+    "distance": 17,
+    "n_qubits": 289,
+    "shots": 50000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 262,
+    "ler": 0.00524,
+    "ci95": [
+      0.004644,
+      0.005912
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.022919,
+    "dt_mean": 0.022974,
+    "dt_std": 0.000138,
+    "dec_per_s": 2181567.5,
+    "latency_us": 0.46,
+    "status": "success"
+  },
+  {
+    "distance": 17,
+    "n_qubits": 289,
+    "shots": 50000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 259,
+    "ler": 0.00518,
+    "ci95": [
+      0.004588,
+      0.005848
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.095636,
+    "dt_mean": 0.096956,
+    "dt_std": 0.003572,
+    "dec_per_s": 522813.5,
+    "latency_us": 1.91,
+    "status": "success"
+  },
+  {
+    "distance": 17,
+    "n_qubits": 289,
+    "shots": 50000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 262,
+    "ler": 0.00524,
+    "ci95": [
+      0.004644,
+      0.005912
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.15439,
+    "dt_mean": 0.154094,
+    "dt_std": 0.006028,
+    "dec_per_s": 323854.8,
+    "latency_us": 3.09,
+    "status": "success"
+  },
+  {
+    "distance": 17,
+    "n_qubits": 289,
+    "shots": 100000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 515,
+    "ler": 0.00515,
+    "ci95": [
+      0.004725,
+      0.005613
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.087981,
+    "dt_mean": 0.087609,
+    "dt_std": 0.004773,
+    "dec_per_s": 1136614.2,
+    "latency_us": 0.88,
+    "status": "success"
+  },
+  {
+    "distance": 17,
+    "n_qubits": 289,
+    "shots": 100000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 528,
+    "ler": 0.00528,
+    "ci95": [
+      0.004849,
+      0.005749
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.045261,
+    "dt_mean": 0.044996,
+    "dt_std": 0.001247,
+    "dec_per_s": 2209417.4,
+    "latency_us": 0.45,
+    "status": "success"
+  },
+  {
+    "distance": 17,
+    "n_qubits": 289,
+    "shots": 100000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 521,
+    "ler": 0.00521,
+    "ci95": [
+      0.004782,
+      0.005676
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.583921,
+    "dt_mean": 0.579886,
+    "dt_std": 0.039006,
+    "dec_per_s": 171255.9,
+    "latency_us": 5.84,
+    "status": "success"
+  },
+  {
+    "distance": 17,
+    "n_qubits": 289,
+    "shots": 100000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 528,
+    "ler": 0.00528,
+    "ci95": [
+      0.004849,
+      0.005749
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.283025,
+    "dt_mean": 0.357983,
+    "dt_std": 0.112573,
+    "dec_per_s": 353325.6,
+    "latency_us": 2.83,
+    "status": "success"
+  },
+  {
+    "distance": 19,
+    "n_qubits": 361,
+    "shots": 1000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 4,
+    "ler": 0.004,
+    "ci95": [
+      0.001557,
+      0.01024
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.001011,
+    "dt_mean": 0.001054,
+    "dt_std": 6.8e-05,
+    "dec_per_s": 989315.4,
+    "latency_us": 1.01,
+    "status": "success"
+  },
+  {
+    "distance": 19,
+    "n_qubits": 361,
+    "shots": 1000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 4,
+    "ler": 0.004,
+    "ci95": [
+      0.001557,
+      0.01024
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.000985,
+    "dt_mean": 0.001009,
+    "dt_std": 3.6e-05,
+    "dec_per_s": 1014919.3,
+    "latency_us": 0.99,
+    "status": "success"
+  },
+  {
+    "distance": 19,
+    "n_qubits": 361,
+    "shots": 1000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 4,
+    "ler": 0.004,
+    "ci95": [
+      0.001557,
+      0.01024
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.003452,
+    "dt_mean": 0.003517,
+    "dt_std": 0.000193,
+    "dec_per_s": 289695.5,
+    "latency_us": 3.45,
+    "status": "success"
+  },
+  {
+    "distance": 19,
+    "n_qubits": 361,
+    "shots": 1000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 4,
+    "ler": 0.004,
+    "ci95": [
+      0.001557,
+      0.01024
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.003125,
+    "dt_mean": 0.003126,
+    "dt_std": 4e-05,
+    "dec_per_s": 320041.0,
+    "latency_us": 3.12,
+    "status": "success"
+  },
+  {
+    "distance": 19,
+    "n_qubits": 361,
+    "shots": 20000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 89,
+    "ler": 0.00445,
+    "ci95": [
+      0.003618,
+      0.005472
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.022552,
+    "dt_mean": 0.022575,
+    "dt_std": 0.000932,
+    "dec_per_s": 886855.0,
+    "latency_us": 1.13,
+    "status": "success"
+  },
+  {
+    "distance": 19,
+    "n_qubits": 361,
+    "shots": 20000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 92,
+    "ler": 0.0046,
+    "ci95": [
+      0.003753,
+      0.005638
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.0121,
+    "dt_mean": 0.011803,
+    "dt_std": 0.000462,
+    "dec_per_s": 1652851.6,
+    "latency_us": 0.61,
+    "status": "success"
+  },
+  {
+    "distance": 19,
+    "n_qubits": 361,
+    "shots": 20000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 94,
+    "ler": 0.0047,
+    "ci95": [
+      0.003843,
+      0.005748
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.059597,
+    "dt_mean": 0.058167,
+    "dt_std": 0.00262,
+    "dec_per_s": 335589.1,
+    "latency_us": 2.98,
+    "status": "success"
+  },
+  {
+    "distance": 19,
+    "n_qubits": 361,
+    "shots": 20000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 92,
+    "ler": 0.0046,
+    "ci95": [
+      0.003753,
+      0.005638
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.076556,
+    "dt_mean": 0.162783,
+    "dt_std": 0.124357,
+    "dec_per_s": 261247.0,
+    "latency_us": 3.83,
+    "status": "success"
+  },
+  {
+    "distance": 19,
+    "n_qubits": 361,
+    "shots": 50000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 239,
+    "ler": 0.00478,
+    "ci95": [
+      0.004212,
+      0.005424
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.049294,
+    "dt_mean": 0.049263,
+    "dt_std": 5.7e-05,
+    "dec_per_s": 1014324.3,
+    "latency_us": 0.99,
+    "status": "success"
+  },
+  {
+    "distance": 19,
+    "n_qubits": 361,
+    "shots": 50000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 243,
+    "ler": 0.00486,
+    "ci95": [
+      0.004287,
+      0.005509
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.030508,
+    "dt_mean": 0.030043,
+    "dt_std": 0.001078,
+    "dec_per_s": 1638930.5,
+    "latency_us": 0.61,
+    "status": "success"
+  },
+  {
+    "distance": 19,
+    "n_qubits": 361,
+    "shots": 50000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 243,
+    "ler": 0.00486,
+    "ci95": [
+      0.004287,
+      0.005509
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.156823,
+    "dt_mean": 0.157507,
+    "dt_std": 0.003408,
+    "dec_per_s": 318830.2,
+    "latency_us": 3.14,
+    "status": "success"
+  },
+  {
+    "distance": 19,
+    "n_qubits": 361,
+    "shots": 50000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 243,
+    "ler": 0.00486,
+    "ci95": [
+      0.004287,
+      0.005509
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.210145,
+    "dt_mean": 0.313899,
+    "dt_std": 0.147404,
+    "dec_per_s": 237930.6,
+    "latency_us": 4.2,
+    "status": "success"
+  },
+  {
+    "distance": 19,
+    "n_qubits": 361,
+    "shots": 100000,
+    "decoder": "PyMatching v2.4 (C++)",
+    "fails": 474,
+    "ler": 0.00474,
+    "ci95": [
+      0.004333,
+      0.005185
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.124105,
+    "dt_mean": 0.122079,
+    "dt_std": 0.004163,
+    "dec_per_s": 805768.0,
+    "latency_us": 1.24,
+    "status": "success"
+  },
+  {
+    "distance": 19,
+    "n_qubits": 361,
+    "shots": 100000,
+    "decoder": "QECTOR Fast Union-Find (CPU)",
+    "fails": 478,
+    "ler": 0.00478,
+    "ci95": [
+      0.004371,
+      0.005227
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.063063,
+    "dt_mean": 0.062867,
+    "dt_std": 0.000615,
+    "dec_per_s": 1585723.4,
+    "latency_us": 0.63,
+    "status": "success"
+  },
+  {
+    "distance": 19,
+    "n_qubits": 361,
+    "shots": 100000,
+    "decoder": "QECTOR Sparse Blossom (CPU)",
+    "fails": 478,
+    "ler": 0.00478,
+    "ci95": [
+      0.004371,
+      0.005227
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.306347,
+    "dt_mean": 0.304536,
+    "dt_std": 0.003815,
+    "dec_per_s": 326427.1,
+    "latency_us": 3.06,
+    "status": "success"
+  },
+  {
+    "distance": 19,
+    "n_qubits": 361,
+    "shots": 100000,
+    "decoder": "QECTOR CUDA Batch (GPU)",
+    "fails": 478,
+    "ler": 0.00478,
+    "ci95": [
+      0.004371,
+      0.005227
+    ],
+    "faith_pct": 100.0,
+    "dt_median": 0.400949,
+    "dt_mean": 0.461895,
+    "dt_std": 0.093653,
+    "dec_per_s": 249408.5,
+    "latency_us": 4.01,
+    "status": "success"
+  }
+]

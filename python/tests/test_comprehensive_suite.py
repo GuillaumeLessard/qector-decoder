@@ -6,29 +6,30 @@ DecoderPool, BP-OSD, sliding window, hybrid decoder, type stability, boundary co
 Run with:  pytest python/tests/test_comprehensive_suite.py -v
 """
 
-import sys
-import os
 import gc
+import os
+import sys
 import time
+
 import numpy as np
 import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from qector_decoder_v3 import (
-    codes,
-    UnionFindDecoder,
-    FastUnionFindDecoder,
+    AutoDecoder,
+    BeliefMatching,
     BlossomDecoder,
-    SparseBlossomDecoder,
-    CPUBatchDecoder,
     BPOSDDecoder,
+    CPUBatchDecoder,
     DecoderPool,
-    get_decoder,
+    FastUnionFindDecoder,
     HybridDecoder,
     PredecodedDecoder,
-    BeliefMatching,
-    AutoDecoder,
+    SparseBlossomDecoder,
+    UnionFindDecoder,
+    codes,
+    get_decoder,
 )
 
 np.random.seed(42)
@@ -99,7 +100,7 @@ def test_syndrome_faithfulness_multi_seed(seed):
 
 
 # =====================================================================
-# 2. ZERO SYNDROME (no errors) — should return zero correction
+# 2. ZERO SYNDROME (no errors) - should return zero correction
 # =====================================================================
 @pytest.mark.parametrize("dist", [3, 5, 7, 9])
 def test_zero_syndrome_returns_zero(dist):
@@ -119,7 +120,7 @@ def test_zero_syndrome_returns_zero(dist):
 
 
 # =====================================================================
-# 3. FULL SYNDROME (all 1s) — should decode without error
+# 3. FULL SYNDROME (all 1s) - should decode without error
 # =====================================================================
 @pytest.mark.parametrize("dist", [3, 5, 7])
 def test_full_syndrome_does_not_crash(dist):
@@ -136,7 +137,7 @@ def test_full_syndrome_does_not_crash(dist):
 # 4. DECODER CONSTRUCTION EDGE CASES
 # =====================================================================
 def test_decoder_checks_empty():
-    with pytest.raises(Exception):
+    with pytest.raises((TypeError, ValueError, RuntimeError)):
         UnionFindDecoder([], 5)
 
 
@@ -146,14 +147,14 @@ def test_decoder_checks_invalid_type():
 
 
 def test_decoder_nqubits_zero():
-    with pytest.raises(Exception):
+    with pytest.raises((TypeError, ValueError, RuntimeError)):
         SparseBlossomDecoder([[0]], 0)
 
 
 def test_decoder_checks_mismatch():
     # check references qubit beyond n_qubits
     c2q = [[0, 1], [100]]
-    with pytest.raises(Exception):
+    with pytest.raises((TypeError, ValueError, RuntimeError)):
         UnionFindDecoder(c2q, 5)
 
 
@@ -219,7 +220,7 @@ def test_bposd_surface(dist):
 
 
 def test_bposd_batch_decode():
-    """BP-OSD does not have batch_decode — should not have the attribute."""
+    """BP-OSD does not have batch_decode - should not have the attribute."""
     code = codes.repetition_code(5)
     c2q, nq = code.check_to_qubits, code.n_qubits
     dec = BPOSDDecoder(c2q, nq, 0.08)
@@ -246,12 +247,17 @@ def _run_pool_test(module_guard=False):
     c2q, nq = code.check_to_qubits, code.n_qubits
     H = code.parity_check_matrix()
     pool = DecoderPool(c2q, nq, "union_find", n_workers=2)
-    syndromes, errors, _ = make_syndrome(code, n_shots=100)
+    syndromes, _, _ = make_syndrome(code, n_shots=100)
     corrections = pool.decode(syndromes)
     pool.close()
     assert len(corrections) == 100
     for i in range(100):
         assert np.array_equal((H @ corrections[i]) & 1, syndromes[i]), f"DecoderPool shot {i} failed faithfulness"
+
+
+def _probe_spawn_task():
+    """Picklable no-op used to probe spawn availability."""
+    return 42
 
 
 def test_decoderpool_basic():
@@ -263,14 +269,20 @@ def test_decoderpool_basic():
     """
     import multiprocessing as _mp
 
+    # The probe task must be a module-level function. A lambda can never be
+    # pickled for the spawn start method, so the old `apply_async(lambda: 42)`
+    # raised AttributeError -- which `except RuntimeError` did not catch, so this
+    # capability probe could neither succeed nor skip; it always errored.
     try:
         ctx = _mp.get_context("spawn")
         pool = ctx.Pool(processes=1)
-        pool.apply_async(lambda: 42).get(timeout=5)
-        pool.close()
-        pool.join()
-    except Exception:
-        pytest.skip("multiprocessing spawn not available in this environment")
+        try:
+            assert pool.apply_async(_probe_spawn_task).get(timeout=30) == 42
+        finally:
+            pool.close()
+            pool.join()
+    except (RuntimeError, OSError, ImportError, AttributeError) as exc:
+        pytest.skip(f"multiprocessing spawn unavailable here: {exc}")
     _run_pool_test()
 
 
@@ -386,7 +398,7 @@ def test_belief_matching_decode():
     try:
         corr = bm.decode(syndrome)
         assert len(corr) == 3
-    except Exception as e:
+    except RuntimeError as e:
         pytest.skip(f"BeliefMatching decode raised: {e}")
 
 
@@ -412,7 +424,7 @@ def test_auto_decoder_decode():
 
 
 # =====================================================================
-# 13. REPRODUCIBILITY — same syndrome should give same correction
+# 13. REPRODUCIBILITY - same syndrome should give same correction
 # =====================================================================
 def test_deterministic_decode():
     code = codes.repetition_code(9)
@@ -452,7 +464,7 @@ def test_surface_code_all_decoders(dist):
 
 
 # =====================================================================
-# 15. EDGE CASE — SYNDROME VECTOR LENGTH MISMATCH
+# 15. EDGE CASE - SYNDROME VECTOR LENGTH MISMATCH
 # =====================================================================
 def test_wrong_syndrome_length():
     code = codes.repetition_code(5)
@@ -464,7 +476,7 @@ def test_wrong_syndrome_length():
 
 
 # =====================================================================
-# 16. EDGE CASE — NUMBER OF QUBITS MISMATCH
+# 16. EDGE CASE - NUMBER OF QUBITS MISMATCH
 # =====================================================================
 def test_wrong_correction_length():
     """decode should always return n_qubits-length array."""
@@ -505,7 +517,7 @@ def test_cold_path_construction():
 
 
 # =====================================================================
-# 19. MEMORY TEST — NO LEAKS ON REPEATED CONSTRUCTIONS
+# 19. MEMORY TEST - NO LEAKS ON REPEATED CONSTRUCTIONS
 # =====================================================================
 def test_no_memory_leak_on_repeated_decode():
     code = codes.repetition_code(7)
@@ -520,7 +532,7 @@ def test_no_memory_leak_on_repeated_decode():
         syndrome, _, _ = make_syndrome(code, seed=_)
         dec.decode(syndrome)
     gc.collect()
-    current, peak = tracemalloc.get_traced_memory()
+    current, _ = tracemalloc.get_traced_memory()
     tracemalloc.stop()
     assert current < 10 * 1024 * 1024, f"Memory leak suspected: {current} bytes after 1000 decodes"
 
@@ -569,7 +581,7 @@ def test_sparse_blossom_same_as_blossom():
         syn = (errors @ H.T) & 1
         c1 = bloom.decode(syn)
         c2 = sparse.decode(syn)
-        # Both are MWPM — should give same correction
+        # Both are MWPM - should give same correction
         assert np.array_equal(c1, c2), f"Blossom variants differ at seed={seed}"
 
 

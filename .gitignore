@@ -37,6 +37,12 @@ pip-wheel-metadata/
 share/python-wheels/
 MANIFEST
 
+# --- Secrets (never commit live keys) ---
+.env
+.env.local
+.env.*.local
+licenses_issued.json
+
 # --- Virtual environments ---
 .venv/
 venv/
@@ -68,8 +74,8 @@ artifacts/
 Thumbs.db
 desktop.ini
 
-# --- Benchmark outputs (tracked selectively) ---
-# benchmark_results/ is tracked intentionally for reproducibility evidence
+# --- Benchmark outputs (canonical archive on Zenodo: doi.org/10.5281/zenodo.21339300) ---
+benchmark_results/
 
 # --- Testing ---
 .pytest_cache/
@@ -95,6 +101,8 @@ _pytest_*.log
 _pytest_v*.log
 test_full_v*.py
 test_v0*.py
+_smoke_test.py
+_scratch*.py
 
 # kimi probe/fix helpers
 _kimi_fix_probe.py
@@ -147,6 +155,11 @@ gem.md
 todo2.md
 topplan.md
 QECTOR_v0.6.3_Development_Plan.md
+dev.md
+finaltodo.md
+Kimi.md
+todo_claude*.md
+test_market_leadership_suite.py
 *.tex
 *.pdf
 perf_chart_*.png
@@ -156,6 +169,13 @@ benchmark_*.py
 make_*.py
 generate_pdf_report.py
 cpu_benchmark_report.py
+
+# --- Local-only archives / scratch artifacts ---
+*.zip
+node_modules/
+package*.json
+proto.zip
+qector-build-rc-0.6.2.zip
 
 # --- IDE / editor config (never push) ---
 cspell.json
@@ -174,3 +194,9 @@ PYPI_README.md
 # --- Local-only docs (contain secret names / infra details, never push) ---
 RELEASE_PROCEDURE.md
 
+
+# --- Internal implementation tracker (infra IDs, never publish) ---
+K3dev.md
+
+# Test result logs are captured deliberately; the global *.txt rule would hide them
+!test-results/*.txt

@@ -4,17 +4,17 @@ Test suite for Stripe API & License Fulfillment Integration
 
 import json
 import time
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-import stripe
+import pytest
 import qector_decoder_v3 as qd
+import stripe
+from qector_decoder_v3.license import verify_license_token
 from qector_decoder_v3.stripe_integration import (
-    get_stripe_keys,
     create_checkout_session,
+    get_stripe_keys,
     handle_stripe_webhook_payload,
 )
-from qector_decoder_v3.license import verify_license_token
 
 
 def test_stripe_keys_loaded():

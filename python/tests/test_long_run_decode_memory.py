@@ -62,5 +62,5 @@ def test_long_run_decode_memory():
     spread = max(samples) - min(samples)
     assert spread < MAX_GROWTH_MIB, (
         f"RSS spread {spread:.1f} MiB over the soak (limit {MAX_GROWTH_MIB} MiB); "
-        f"samples={['%.1f' % s for s in samples]}"
+        f"samples={[f'{s:.1f}' for s in samples]}"
     )

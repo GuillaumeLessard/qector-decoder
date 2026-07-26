@@ -7,9 +7,8 @@ syndrome-faithful.
 
 import numpy as np
 import pytest
-
 import qector_decoder_v3 as qd
-from qector_decoder_v3 import codes, bposd, pymatching_compat
+from qector_decoder_v3 import bposd, codes, pymatching_compat
 
 
 def test_matching_decode_batch_rejects_1d_and_3d():

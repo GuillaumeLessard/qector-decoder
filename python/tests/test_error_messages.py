@@ -7,8 +7,7 @@ the list of valid choices.
 
 import numpy as np
 import pytest
-
-from qector_decoder_v3 import codes, dem, result, benchmarking
+from qector_decoder_v3 import benchmarking, codes, dem, result
 
 
 def _small_dem():

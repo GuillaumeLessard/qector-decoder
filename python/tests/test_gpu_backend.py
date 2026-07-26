@@ -11,7 +11,6 @@ from types import ModuleType
 
 import numpy as np
 import pytest
-
 from qector_decoder_v3 import gpu_backend as gb
 
 GPU = gb.gpu_available()

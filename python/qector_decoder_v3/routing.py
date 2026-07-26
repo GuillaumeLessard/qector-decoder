@@ -1,8 +1,8 @@
 """
-qector_decoder_v3.routing — intelligent decoder router / auto-selection.
+qector_decoder_v3.routing - intelligent decoder router / auto-selection.
 
 QECTOR ships a zoo of decoders with very different correctness domains and cost
-profiles.  Picking the wrong one is not merely slow — it can be *invalid*: sending
+profiles.  Picking the wrong one is not merely slow - it can be *invalid*: sending
 a non-graphlike (qLDPC / hypergraph-product / color-code) problem to a pure
 matching decoder (Union-Find / Blossom) cannot in general satisfy ``H·c == s``.
 This module encodes a documented policy that maps a *decoding problem* (code
@@ -13,16 +13,16 @@ It complements :mod:`qector_decoder_v3.backend`.  ``backend.AutoDecoder`` answer
 "given a fixed graphlike decoder, which *execution backend* (single-thread CPU,
 Rayon, CUDA, OpenCL) should run this batch?".  This module answers the question
 one level up: "which *decoder family* is even appropriate here, and is it
-correct?".  The two compose — the router can hand a graphlike batch problem to a
+correct?".  The two compose - the router can hand a graphlike batch problem to a
 backend-aware path, and always routes hyperedge problems to BP-OSD.
 
 Two entry points:
 
-* :func:`recommend_decoder` — pure, side-effect-free policy. Returns the name of
+* :func:`recommend_decoder` - pure, side-effect-free policy. Returns the name of
   the recommended decoder class as a string.  :func:`recommend` returns the same
   decision as a rich :class:`Recommendation` (decoder + human-readable reason +
   classified family + resolved hardware + flags).
-* :class:`AutoRouter` — stateful, *constructs and caches* the chosen decoder and
+* :class:`AutoRouter` - stateful, *constructs and caches* the chosen decoder and
   dispatches :meth:`AutoRouter.decode`.  Crucially it inspects the **actual**
   check structure, so even if the caller mislabels a hyperedge code as
   ``"surface"`` the router detects ``max qubit degree > 2`` and forces BP-OSD,
@@ -53,8 +53,9 @@ Examples
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass, replace
-from typing import Any, Mapping, Optional, Sequence, Union, cast
+from typing import Any, Union, cast
 
 import numpy as np
 
@@ -62,13 +63,13 @@ from . import gpu_backend as _gb
 from .backend import BackendConfig
 
 __all__ = [
+    "AutoRouter",
     "DecoderName",
     "HardwareProfile",
-    "detect_hardware",
     "Recommendation",
+    "detect_hardware",
     "recommend",
     "recommend_decoder",
-    "AutoRouter",
 ]
 
 
@@ -101,7 +102,7 @@ class DecoderName:
         BP_OSD,
     )
 
-    #: Decoders that assume a graphlike (matching) problem — every qubit in at
+    #: Decoders that assume a graphlike (matching) problem - every qubit in at
     #: most two checks.  Routing one of these to a hyperedge / qLDPC problem is
     #: *invalid* (cannot guarantee ``H·c == s``); :class:`AutoRouter` guards
     #: against it by forcing :data:`BP_OSD`.
@@ -175,7 +176,7 @@ class HardwareProfile:
     gpu: bool = False
 
     @classmethod
-    def detect(cls) -> "HardwareProfile":
+    def detect(cls) -> HardwareProfile:
         """Probe the live machine through :mod:`gpu_backend` (CPU-safe)."""
         return cls(cuda_rust=bool(_gb.has_cuda_rust()), gpu=bool(_gb.gpu_available()))
 
@@ -195,10 +196,10 @@ HardwareLike = Union[None, HardwareProfile, Mapping[str, Any], str]
 def _resolve_hardware(hardware: HardwareLike) -> HardwareProfile:
     """Normalise the many accepted ``hardware`` forms to a :class:`HardwareProfile`.
 
-    * ``None`` — probe the live machine via :mod:`gpu_backend`.
-    * :class:`HardwareProfile` — used as-is.
-    * mapping — keys ``cuda_rust``/``cuda`` and ``gpu``/``gpu_available``/``cupy``.
-    * string — ``"cpu"``/``"none"`` (no GPU), ``"cuda"``/``"cuda_rust"`` (Rust CUDA +
+    * ``None`` - probe the live machine via :mod:`gpu_backend`.
+    * :class:`HardwareProfile` - used as-is.
+    * mapping - keys ``cuda_rust``/``cuda`` and ``gpu``/``gpu_available``/``cupy``.
+    * string - ``"cpu"``/``"none"`` (no GPU), ``"cuda"``/``"cuda_rust"`` (Rust CUDA +
       device), ``"gpu"``/``"cupy"`` (CuPy device only), ``"all"`` (everything).
     """
     if hardware is None:
@@ -227,7 +228,7 @@ def _resolve_hardware(hardware: HardwareLike) -> HardwareProfile:
 # ---------------------------------------------------------------------------
 # Family classification
 # ---------------------------------------------------------------------------
-def _classify_family(code_family: Any, graphlike: Optional[bool]) -> str:
+def _classify_family(code_family: Any, graphlike: bool | None) -> str:
     """Classify a code as ``"matching"``, ``"ldpc"``, or ``"unknown"``.
 
     A definitive structural signal (``graphlike``) always wins: a problem that is
@@ -243,7 +244,7 @@ def _classify_family(code_family: Any, graphlike: Optional[bool]) -> str:
     if callable(is_matching):
         try:
             return "matching" if is_matching() else "ldpc"
-        except Exception:  # pragma: no cover - defensive
+        except RuntimeError:  # pragma: no cover - defensive
             pass
 
     if code_family is None:
@@ -257,13 +258,11 @@ def _classify_family(code_family: Any, graphlike: Optional[bool]) -> str:
     return "unknown"
 
 
-def _is_large(distance: Optional[int], n_qubits: Optional[int]) -> bool:
+def _is_large(distance: int | None, n_qubits: int | None) -> bool:
     """True when exact Blossom is likely too expensive vs. region-growing."""
     if distance is not None and int(distance) >= _LARGE_DISTANCE:
         return True
-    if n_qubits is not None and int(n_qubits) >= _LARGE_NQUBITS:
-        return True
-    return False
+    return bool(n_qubits is not None and int(n_qubits) >= _LARGE_NQUBITS)
 
 
 # ---------------------------------------------------------------------------
@@ -281,9 +280,9 @@ class Recommendation:
     hardware: dict[str, bool]
     gpu_batched_bp: bool = False
     forced: bool = False
-    graphlike: Optional[bool] = None
-    distance: Optional[int] = None
-    n_qubits: Optional[int] = None
+    graphlike: bool | None = None
+    distance: int | None = None
+    n_qubits: int | None = None
 
     def as_dict(self) -> dict[str, Any]:
         """JSON-friendly view (for logs / diagnostics / ``explain``)."""
@@ -295,8 +294,8 @@ class Recommendation:
 # ---------------------------------------------------------------------------
 def _select(
     family: str,
-    distance: Optional[int],
-    n_qubits: Optional[int],
+    distance: int | None,
+    n_qubits: int | None,
     batch_size: int,
     priority: str,
     hw: HardwareProfile,
@@ -345,8 +344,10 @@ def _select(
         if large:
             return (
                 DecoderName.SPARSE_BLOSSOM,
-                "accuracy + large code -> region-growing SparseBlossom "
-                f"(near-optimal MWPM that scales where exact Blossom is O(n^3)); {size_note}",
+                (
+                    "accuracy + large code -> region-growing SparseBlossom "
+                    f"(near-optimal MWPM that scales where exact Blossom is O(n^3)); {size_note}"
+                ),
                 False,
             )
         return (
@@ -360,8 +361,10 @@ def _select(
         if hw.cuda_rust:
             return (
                 DecoderName.CUDA_BATCH,
-                f"balanced + huge batch ({batch_size} >= {_GPU_BATCH}) with Rust CUDA "
-                "-> GPU-batched Union-Find for throughput",
+                (
+                    f"balanced + huge batch ({batch_size} >= {_GPU_BATCH}) with Rust CUDA "
+                    "-> GPU-batched Union-Find for throughput"
+                ),
                 False,
             )
         return (
@@ -392,13 +395,13 @@ def _select(
 
 def recommend(
     code_family: Any = None,
-    distance: Optional[int] = None,
-    n_qubits: Optional[int] = None,
+    distance: int | None = None,
+    n_qubits: int | None = None,
     batch_size: int = 1,
     priority: str = "balanced",
     hardware: HardwareLike = None,
     *,
-    graphlike: Optional[bool] = None,
+    graphlike: bool | None = None,
 ) -> Recommendation:
     """Return a rich :class:`Recommendation` for a decoding problem.
 
@@ -407,7 +410,7 @@ def recommend(
     code_family:
         Code family label (``"surface"``, ``"toric"``, ``"repetition"``,
         ``"qldpc"``, ``"bivariate_bicycle"``, ``"hypergraph_product"``,
-        ``"color"``, …) or a :class:`qector_decoder_v3.codes.Code` instance, whose
+        ``"color"``, ...) or a :class:`qector_decoder_v3.codes.Code` instance, whose
         structure is used directly.  ``None`` leaves the family unknown.
     distance, n_qubits:
         Code metadata steering the small-vs-large accuracy trade-off.
@@ -417,7 +420,7 @@ def recommend(
         ``"accuracy"`` (exact / near-optimal MWPM), ``"speed"`` (lowest-overhead
         Union-Find / GPU batch), or ``"balanced"`` (default heuristic).
     hardware:
-        ``None`` to probe the live machine, or an explicit override — a
+        ``None`` to probe the live machine, or an explicit override - a
         :class:`HardwareProfile`, a mapping, or a string (see
         :func:`_resolve_hardware`).
     graphlike:
@@ -462,8 +465,8 @@ def recommend(
 
 def recommend_decoder(
     code_family: Any = None,
-    distance: Optional[int] = None,
-    n_qubits: Optional[int] = None,
+    distance: int | None = None,
+    n_qubits: int | None = None,
     batch_size: int = 1,
     priority: str = "balanced",
     hardware: HardwareLike = None,
@@ -568,13 +571,13 @@ class AutoRouter:
         self.error_rate = float(error_rate)
         self.default_family = code_family
 
-        self._sig: Optional[tuple] = None
+        self._sig: tuple | None = None
         self._cache: dict[tuple, Any] = {}
-        self._last: Optional[Recommendation] = None
+        self._last: Recommendation | None = None
 
     # -- public ------------------------------------------------------------
     @property
-    def last_recommendation(self) -> Optional[Recommendation]:
+    def last_recommendation(self) -> Recommendation | None:
         """The :class:`Recommendation` from the most recent call, or ``None``."""
         return self._last
 
@@ -603,7 +606,7 @@ class AutoRouter:
             ``(batch, n_qubits)`` correction.
         **ctx:
             ``code_family``, ``distance``, ``priority``, ``hardware``,
-            ``n_qubits`` — per-call overrides.
+            ``n_qubits`` - per-call overrides.
 
         Returns
         -------
@@ -611,7 +614,7 @@ class AutoRouter:
             The correction(s); every row satisfies ``H·c == s (mod 2)`` for the
             graphlike (UF/Blossom) and BP-OSD paths.
         """
-        H, c2q, n_qubits, n_checks = self._normalize_problem(checks_or_H, ctx.get("n_qubits"))
+        H, c2q, n_qubits, _n_checks = self._normalize_problem(checks_or_H, ctx.get("n_qubits"))
         self._refresh_cache_for(c2q, n_qubits)
 
         syn = np.asarray(syndromes, dtype=np.uint8)
@@ -625,7 +628,7 @@ class AutoRouter:
     def _recommend(self, checks_or_H: Any, syndromes: Any, ctx: Mapping[str, Any]) -> Recommendation:
         """Recommendation for ``explain`` (problem optional)."""
         if checks_or_H is not None:
-            H, c2q, n_qubits, _ = self._normalize_problem(checks_or_H, ctx.get("n_qubits"))
+            _H, c2q, n_qubits, _ = self._normalize_problem(checks_or_H, ctx.get("n_qubits"))
             batch_size = ctx.get("batch_size", _infer_batch(syndromes))
             return self._recommend_for_problem(c2q, n_qubits, int(batch_size), ctx)
         # Pure-metadata path.
@@ -729,7 +732,7 @@ class AutoRouter:
             raise ValueError(f"unknown decoder name {name!r}")
         try:
             return builder()
-        except Exception:
+        except RuntimeError:
             return None
 
     # -- dispatch ----------------------------------------------------------
@@ -765,7 +768,7 @@ class AutoRouter:
         return None
 
     # -- problem normalisation ---------------------------------------------
-    def _normalize_problem(self, obj: Any, n_qubits: Optional[int]):
+    def _normalize_problem(self, obj: Any, n_qubits: int | None):
         """Return ``(H, check_to_qubits, n_qubits, n_checks)`` from any problem form."""
         # A codes.Code (or anything exposing the same surface).
         if hasattr(obj, "parity_check_matrix") and hasattr(obj, "check_to_qubits"):

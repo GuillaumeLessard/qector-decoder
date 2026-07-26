@@ -1,7 +1,6 @@
 """Workbench: loading a Stim DEM (file path, text, and stim object)."""
 
 import pytest
-
 from qector_decoder_v3.workbench import Workbench, WorkbenchError
 
 DEM_TEXT = """

@@ -8,7 +8,6 @@ that every returned correction has length ``n_qubits``, and that the single-shot
 
 import numpy as np
 import pytest
-
 import qector_decoder_v3 as qd
 from qector_decoder_v3 import codes
 

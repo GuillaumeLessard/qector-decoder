@@ -14,9 +14,7 @@ convention down two ways:
 
 import numpy as np
 import pytest
-
 from qector_decoder_v3 import dem, pymatching_compat
-
 
 HAND_DEM = """
 error(0.1) D0 L0

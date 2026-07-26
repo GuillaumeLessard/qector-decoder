@@ -11,11 +11,10 @@ Tests push each decoder to its practical limits:
 """
 
 import time
+
 import numpy as np
 import pytest
-
 import qector_decoder_v3 as qd
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -58,12 +57,12 @@ def random_batch(n_checks, batch_size, defect_prob=0.1, seed=None):
 
 
 # ---------------------------------------------------------------------------
-# UnionFindDecoder — large distance surface codes
+# UnionFindDecoder - large distance surface codes
 # ---------------------------------------------------------------------------
 
 
 class TestUnionFindLargeCodes:
-    """UnionFind scales O(E·α(N)) — should handle very large codes.
+    """UnionFind scales O(E·α(N)) - should handle very large codes.
     Uses repetition codes (qubit deg<=2) which are supported.
     """
 
@@ -93,7 +92,7 @@ class TestUnionFindLargeCodes:
 
 
 # ---------------------------------------------------------------------------
-# FastUnionFindDecoder — same tests via the fast path
+# FastUnionFindDecoder - same tests via the fast path
 # ---------------------------------------------------------------------------
 
 
@@ -132,7 +131,7 @@ class TestFastUnionFindLargeCodes:
 
 
 # ---------------------------------------------------------------------------
-# BlossomDecoder — 20-defect boundary
+# BlossomDecoder - 20-defect boundary
 # ---------------------------------------------------------------------------
 
 
@@ -151,7 +150,7 @@ class TestBlossomDefectBoundary:
         assert corr.shape == (nq,)
 
     def test_21_defects_fallback(self):
-        """21 defects: should fall back to UnionFind — no crash."""
+        """21 defects: should fall back to UnionFind - no crash."""
         checks, nq = surface_code(11)
         dec = qd.BlossomDecoder(checks, nq)
         syn = np.zeros(len(checks), dtype=np.uint8)
@@ -178,7 +177,7 @@ class TestBlossomDefectBoundary:
 
 
 # ---------------------------------------------------------------------------
-# SparseBlossomDecoder — same 20-defect boundary, region growing
+# SparseBlossomDecoder - same 20-defect boundary, region growing
 # ---------------------------------------------------------------------------
 
 
@@ -208,7 +207,7 @@ class TestSparseBlossomDefectBoundary:
 
 
 # ---------------------------------------------------------------------------
-# LookupTableDecoder — exhaustive enumeration up to n=24
+# LookupTableDecoder - exhaustive enumeration up to n=24
 # ---------------------------------------------------------------------------
 
 
@@ -225,7 +224,7 @@ class TestLookupTableCapacity:
         """16 qubits via ring code: 2^16=65536 entries."""
         checks, nq = qd.generate_ring_code_checks(16)
         dec = qd.LookupTableDecoder(checks, nq)
-        # Full enumeration — every possible syndrome should be in table
+        # Full enumeration - every possible syndrome should be in table
         for i in range(min(100, 1 << nq)):
             syn = np.array([(i >> j) & 1 for j in range(len(checks))], dtype=np.uint8)
             corr = dec.decode(syn)
@@ -243,14 +242,14 @@ class TestLookupTableCapacity:
         """max_entries limits table growth."""
         checks, nq = repetition_code(20)
         dec = qd.LookupTableDecoder(checks, nq)
-        # Should succeed — max_entries is handled internally
+        # Should succeed - max_entries is handled internally
         syn = random_syndrome(len(checks), seed=42)
         corr = dec.decode(syn)
         assert corr.shape == (nq,)
 
 
 # ---------------------------------------------------------------------------
-# BPOSD — larger codes
+# BPOSD - larger codes
 # ---------------------------------------------------------------------------
 
 
@@ -273,7 +272,7 @@ class TestBPOSDLargeCodes:
 
 
 # ---------------------------------------------------------------------------
-# CPUBatchDecoder — large batches
+# CPUBatchDecoder - large batches
 # ---------------------------------------------------------------------------
 
 
@@ -286,7 +285,7 @@ class TestCPUBatchDecoderCapacity:
         assert results.shape == (10_000, nq)
 
     def test_batch_65k(self):
-        """65K syndromes — tests large batch throughput."""
+        """65K syndromes - tests large batch throughput."""
         checks, nq = repetition_code(30)
         dec = qd.CPUBatchDecoder(checks, nq)
         batch = random_batch(len(checks), 65_536, seed=42)
@@ -325,7 +324,7 @@ class TestCPUBatchDecoderCapacity:
 
 
 # ---------------------------------------------------------------------------
-# BatchDecoder (Rayon parallel) — large batches
+# BatchDecoder (Rayon parallel) - large batches
 # ---------------------------------------------------------------------------
 
 
@@ -348,7 +347,7 @@ class TestBatchDecoderCapacity:
 
 
 # ---------------------------------------------------------------------------
-# HybridDecoder — large code
+# HybridDecoder - large code
 # ---------------------------------------------------------------------------
 
 
@@ -400,7 +399,7 @@ class TestCrossDecoderConsistencyLarge:
 
 
 # ---------------------------------------------------------------------------
-# GPU backends — availability + graceful degradation
+# GPU backends - availability + graceful degradation
 # ---------------------------------------------------------------------------
 
 
@@ -413,34 +412,46 @@ class TestGPUCapacity:
     def test_cuda_is_available_bool(self):
         assert isinstance(qd.CUDABatchDecoder.is_available(), bool)
 
+    # GPU batch decoders run Union-Find kernels: graphlike codes only
+    # (weight<=2 checks). surface_code() is weight-4 and correctly rejected;
+    # ring codes (weight-2, d^2 qubits) are the graphlike equivalent and span
+    # the full d=3..21 range (9..441 qubits, all inside the 512-qubit
+    # local-memory path).
     @pytest.mark.skipif(not qd.OpenCLBatchDecoder.is_available(), reason="OpenCL not available")
-    def test_opencl_large_batch(self):
-        checks, nq = surface_code(7)
+    @pytest.mark.parametrize("d", list(range(3, 22)))
+    def test_opencl_large_batch(self, d):
+        checks, nq = qd.generate_ring_code_checks(d)
         dec = qd.OpenCLBatchDecoder(checks, nq)
-        batch = random_batch(len(checks), 10_000, seed=42)
+        shots = 10_000 if d <= 9 else (2_000 if d <= 15 else 500)
+        batch = random_batch(len(checks), shots, seed=42)
         results = dec.batch_decode(batch)
-        assert results.shape == (10_000, nq)
+        assert results.shape == (shots, nq)
 
     @pytest.mark.skipif(not qd.CUDABatchDecoder.is_available(), reason="CUDA not available")
-    def test_cuda_large_batch(self):
-        checks, nq = surface_code(7)
+    @pytest.mark.parametrize("d", list(range(3, 22)))
+    def test_cuda_large_batch(self, d):
+        checks, nq = qd.generate_ring_code_checks(d)
         dec = qd.CUDABatchDecoder(checks, nq)
-        batch = random_batch(len(checks), 10_000, seed=42)
+        shots = 10_000 if d <= 9 else (2_000 if d <= 15 else 500)
+        batch = random_batch(len(checks), shots, seed=42)
         results = dec.batch_decode(batch)
-        assert results.shape == (10_000, nq)
+        assert results.shape == (shots, nq)
 
     @pytest.mark.skipif(not qd.OpenCLBatchDecoder.is_available(), reason="OpenCL not available")
-    def test_opencl_512_qubit_code(self):
-        """Test the extended 512-qubit local-memory path."""
-        checks, nq = surface_code(21)  # 441 qubits
+    @pytest.mark.parametrize("d", list(range(3, 22)))
+    def test_opencl_512_qubit_code(self, d):
+        """Extended 512-qubit local-memory path across the full distance range."""
+        checks, nq = qd.generate_ring_code_checks(d)
+        assert nq <= 512  # the path under test
         dec = qd.OpenCLBatchDecoder(checks, nq)
-        batch = random_batch(len(checks), 1000, seed=42)
+        shots = 1000 if d <= 15 else 200
+        batch = random_batch(len(checks), shots, seed=42)
         results = dec.batch_decode(batch)
-        assert results.shape == (1000, nq)
+        assert results.shape == (shots, nq)
 
 
 # ---------------------------------------------------------------------------
-# Boundary validation — reject bad inputs at scale
+# Boundary validation - reject bad inputs at scale
 # ---------------------------------------------------------------------------
 
 
@@ -456,7 +467,7 @@ class TestBoundaryValidationLarge:
         checks, nq = repetition_code(20)
         dec = qd.UnionFindDecoder(checks, nq)
         syn = np.zeros(len(checks) + 1, dtype=np.uint8)
-        with pytest.raises(Exception):
+        with pytest.raises((ValueError, TypeError, RuntimeError)):
             dec.decode(syn)
 
     def test_empty_checks_rejected(self):
@@ -472,7 +483,7 @@ class TestBoundaryValidationLarge:
 
 
 # ---------------------------------------------------------------------------
-# Memory stress — ensure no unbounded growth
+# Memory stress - ensure no unbounded growth
 # ---------------------------------------------------------------------------
 
 

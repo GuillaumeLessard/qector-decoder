@@ -7,10 +7,8 @@ is checked for the CSS commutation condition ``Hx Hz^T = 0 (mod 2)``.
 
 import numpy as np
 import pytest
-
 import qector_decoder_v3 as qd
 from qector_decoder_v3 import codes
-
 
 MATCHING_CODES = [
     codes.repetition_code(7),

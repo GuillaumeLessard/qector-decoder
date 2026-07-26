@@ -1,5 +1,5 @@
 """
-qector_decoder_v3.result — Rich decode results, diagnostics and debug output.
+qector_decoder_v3.result - Rich decode results, diagnostics and debug output.
 
 The bare decoders return a correction vector.  Research and engineering use often
 needs more: the correction in several encodings, the implied logical-observable
@@ -25,8 +25,9 @@ from __future__ import annotations
 
 import json
 import time
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Any, Optional, Sequence
+from typing import Any
 
 import numpy as np
 
@@ -41,13 +42,13 @@ class DecodeResult:
     syndrome: np.ndarray
     n_qubits: int
     n_checks: int
-    weight: Optional[float] = None
-    logical_flips: Optional[np.ndarray] = None
-    decode_seconds: Optional[float] = None
+    weight: float | None = None
+    logical_flips: np.ndarray | None = None
+    decode_seconds: float | None = None
     backend: str = "cpu"
     fallback: bool = False
     fallback_reason: str = ""
-    syndrome_valid: Optional[bool] = None
+    syndrome_valid: bool | None = None
     metadata: dict = field(default_factory=dict)
 
     # -- alternative encodings --------------------------------------------
@@ -141,7 +142,7 @@ def decode_with_diagnostics(
     syndrome: Sequence[int],
     kind: str = "blossom",
     decoder: Any = None,
-    logicals: Optional[np.ndarray] = None,
+    logicals: np.ndarray | None = None,
 ) -> DecodeResult:
     """Decode one syndrome and return a fully-populated :class:`DecodeResult`.
 
@@ -155,7 +156,7 @@ def decode_with_diagnostics(
     kind : str
         Decoder family to instantiate when ``decoder`` is not given.
     decoder : object, optional
-        A pre-built decoder exposing ``decode(syndrome)`` — reuse this for the
+        A pre-built decoder exposing ``decode(syndrome)`` - reuse this for the
         hot path instead of rebuilding.
     logicals : numpy.ndarray, optional
         ``(n_logicals, n_qubits)`` observable matrix; defaults to

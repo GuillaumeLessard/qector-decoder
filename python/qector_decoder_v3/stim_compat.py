@@ -1,5 +1,5 @@
 """
-Compatibilité Stim — Conversion et wrappers pour l'écosystème Stim.
+Compatibilité Stim - Conversion et wrappers pour l'écosystème Stim.
 
 .. deprecated::
     This module is deprecated since v0.6.4. Use ``qector_decoder_v3.dem`` instead.
@@ -32,11 +32,11 @@ New API (preferred)::
 from __future__ import annotations
 
 import warnings
-from typing import Any, List, Optional, Tuple, cast
+from typing import Any, cast
 
 import numpy as np
 
-from . import UnionFindDecoder, BatchDecoder
+from . import BatchDecoder, UnionFindDecoder
 
 _DEPRECATION_MSG = (
     "stim_compat is deprecated since v0.6.4. "
@@ -44,7 +44,7 @@ _DEPRECATION_MSG = (
     "See the migration guide at https://qector.store/docs/migration-v0.6.4"
 )
 
-# Import optionnel de stim — le module reste importable sans Stim
+# Import optionnel de stim - le module reste importable sans Stim
 # ----------------------------------------------------------------
 try:
     import stim as _stim
@@ -55,7 +55,7 @@ except ImportError:  # pragma: no cover
     _HAS_STIM = False
 
 
-def from_stim_detector_error_model(dem: Any) -> Tuple[List[List[int]], int]:
+def from_stim_detector_error_model(dem: Any) -> tuple[list[list[int]], int]:
     """
     .. deprecated::
         Use ``qector_decoder_v3.dem.from_stim()`` instead.
@@ -84,8 +84,8 @@ def from_stim_detector_error_model(dem: Any) -> Tuple[List[List[int]], int]:
 
 
 def to_stim_decoder(
-    check_to_qubits: List[List[int]],
-    n_qubits: Optional[int] = None,
+    check_to_qubits: list[list[int]],
+    n_qubits: int | None = None,
     use_batch: bool = False,
 ):
     """

@@ -24,12 +24,11 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-
 import qector_decoder_v3 as qd
 from qector_decoder_v3 import codes
 from qector_decoder_v3.streaming import (
-    StreamingSession,
     StreamingResult,
+    StreamingSession,
     StreamingTelemetry,
     sliding_window_decode,
 )

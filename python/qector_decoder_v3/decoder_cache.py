@@ -1,5 +1,5 @@
 """
-qector_decoder_v3.decoder_cache — LRU-decoder cache and factory functions.
+qector_decoder_v3.decoder_cache - LRU-decoder cache and factory functions.
 
 Caches decoder instances by ``(checks_tuple, n_qubits, decoder_type)`` so
 repeated construction of identical decoders is free after the first call.
@@ -19,11 +19,10 @@ import functools as _functools
 import hashlib as _hashlib
 import json as _json
 import os as _os
-from typing import Optional, Tuple
 
 import numpy as _np
 
-__all__ = ["get_decoder", "clear_decoder_cache", "get_decoder_pool"]
+__all__ = ["clear_decoder_cache", "get_decoder", "get_decoder_pool"]
 
 
 def _normalize_decoder_name(name: str) -> str:
@@ -42,7 +41,7 @@ def _normalize_decoder_name(name: str) -> str:
 
 
 @_functools.lru_cache(maxsize=256)
-def _build_decoder(checks_tuple: Tuple[Tuple[int, ...]], n_qubits: int, decoder_type: str):
+def _build_decoder(checks_tuple: tuple[tuple[int, ...]], n_qubits: int, decoder_type: str):
     """Internal LRU-cached decoder factory."""
     checks = [list(c) for c in checks_tuple]
     from . import BlossomDecoder, CPUBatchDecoder, FastUnionFindDecoder, SparseBlossomDecoder, UnionFindDecoder
@@ -61,7 +60,7 @@ def _build_decoder(checks_tuple: Tuple[Tuple[int, ...]], n_qubits: int, decoder_
 
 
 def get_decoder(
-    checks_tuple: Tuple[Tuple[int, ...]],
+    checks_tuple: tuple[tuple[int, ...]],
     n_qubits: int,
     decoder_type: str = "union_find",
 ):
@@ -70,7 +69,7 @@ def get_decoder(
     Args:
         checks_tuple: Ideally ``tuple(tuple(c) for c in check_to_qubits)``,
             but a plain list of lists (the format returned directly by
-            ``generate_repetition_code_checks`` etc.) is also accepted — it
+            ``generate_repetition_code_checks`` etc.) is also accepted - it
             is normalized to a canonical hashable tuple here before the
             cache lookup, so the LRU cache still hits on repeated calls with
             equal values either way. Passing a tuple directly on a hot path
@@ -87,10 +86,10 @@ def get_decoder(
 
 @_functools.lru_cache(maxsize=32)
 def _build_decoder_pool(
-    checks_tuple: Tuple[Tuple[int, ...]],
+    checks_tuple: tuple[tuple[int, ...]],
     n_qubits: int,
     decoder_type: str,
-    n_workers: Optional[int],
+    n_workers: int | None,
 ):
     from .decoder_pool import DecoderPool
 
@@ -104,15 +103,15 @@ def _build_decoder_pool(
 
 
 def get_decoder_pool(
-    checks_tuple: Tuple[Tuple[int, ...]],
+    checks_tuple: tuple[tuple[int, ...]],
     n_qubits: int,
     decoder_type: str = "union_find",
-    n_workers: Optional[int] = None,
+    n_workers: int | None = None,
 ):
     """Get a multi-process :class:`DecoderPool`, constructed once and cached.
 
     Args:
-        checks_tuple: ``tuple(tuple(c) for c in check_to_qubits)`` — hashable.
+        checks_tuple: ``tuple(tuple(c) for c in check_to_qubits)`` - hashable.
         n_qubits: Number of data qubits.
         decoder_type: Which decoder to use in each worker.
         n_workers: Number of worker processes (default: ``os.cpu_count()``).

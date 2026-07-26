@@ -8,7 +8,7 @@ def test_detect_backends_reports_cpu():
     wb = Workbench()
     info = wb.detect_backends()
     assert info["cpu"] is True
-    assert set(["cpu", "cuda", "opencl"]).issubset(info.keys())
+    assert {"cpu", "cuda", "opencl"}.issubset(info.keys())
 
 
 def test_detect_backends_matches_core_availability():

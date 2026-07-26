@@ -8,9 +8,9 @@ NO wall-clock thresholds -- only invariants that hold by construction.
 """
 
 import pytest
-
 import qector_decoder_v3 as qd
-from qector_decoder_v3 import benchmarking as bm, codes
+from qector_decoder_v3 import benchmarking as bm
+from qector_decoder_v3 import codes
 
 KINDS = ["blossom", "union_find", "sparse_blossom"]
 DISTANCES = [3, 5]
