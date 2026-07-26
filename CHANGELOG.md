@@ -7,6 +7,34 @@ environment so report figures trace back to a specific build.
 
 ## [Unreleased]
 
+### Fixed
+- **`verify_license_token` raised instead of rejecting malformed input.** The
+  `except RuntimeError` clauses caught neither `binascii.Error` nor
+  `UnicodeDecodeError` (both `ValueError` subclasses), so a garbage token
+  propagated an exception to the caller rather than returning `False`. Any
+  caller passing attacker-influenced input crashed. Now catches
+  `(InvalidSignature, ValueError, TypeError)`; nine adversarial inputs are
+  locked by tests.
+- **Checkout no longer pins `payment_method_types=["card"]`.** Pinning it
+  disables Stripe dynamic payment methods, so Link, Apple/Google Pay and local
+  methods never render and every buyer must type a card number. Omitting the
+  parameter lets Stripe show the highest-converting eligible methods per
+  customer, configured from the Dashboard.
+
+### Added
+- **v2 licence tokens carrying `tier` and `exp`.** Legacy tokens sign only
+  `receipt_id:email`, so a 60-day evaluation was cryptographically identical to
+  a perpetual licence. Format `v2.{claims_b64}.{sig}` over
+  `{rid, email, tier, exp}`; the signature covers the encoded claims segment
+  verbatim and is verified *before* the claims are parsed. `license_claims()`
+  returns verified, unexpired claims so callers can gate on tier.
+  Legacy 2- and 3-part tokens continue to verify unchanged, and a v2 token fails
+  **closed** on installs predating v2 support.
+- **Tuning environment variables documented** in the README: `QECTOR_BLOSSOM_K_MULT`,
+  `QECTOR_BLOSSOM_INTRA_PAR`, `QECTOR_BLOSSOM_INTRA_THREADS`,
+  `QECTOR_CUDA_DEVICE_ID`, `QECTOR_OPENCL_DEVICE_ALLOW` — with which of them can
+  change results rather than only throughput.
+
 ### Notes
 - v0.6.8 hotfix published to PyPI, superseding the broken v0.6.7.
 

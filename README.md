@@ -203,6 +203,24 @@ QECTOR uses **offline Ed25519 signature verification** for license tokens. No ne
 
 **Override tokens**: `academic` and `commercial` accepted for development and testing.
 
+## Tuning environment variables
+
+These change decoder behaviour at construction time. Two of them affect
+**matching quality**, and therefore logical error rate — set them deliberately,
+and record them alongside any benchmark you publish.
+
+| Variable | Default | Effect |
+| --- | --- | --- |
+| `QECTOR_BLOSSOM_K_MULT` | `2.0` | Candidate-neighbour multiplier for sparse MWPM: `k = max(12, ceil(mult · sqrt(n_defects)))`. **Affects accuracy.** Lowering it reduces latency but can exclude the optimal partner on dense instances, producing a heavier (sub-optimal) matching. `2.0` is the tuned minimum that preserved exact-MWPM parity at d ≥ 15. |
+| `QECTOR_BLOSSOM_INTRA_PAR` | auto | Force intra-decode parallelism for candidate discovery. `0` disables, `1` forces. Unset selects automatically when the graph has ≥ 64 nodes (roughly d ≥ 9 for rotated surface codes). Performance only — output is bit-identical either way. |
+| `QECTOR_BLOSSOM_INTRA_THREADS` | unset | Size a dedicated Rayon pool for candidate discovery, independent of the global batch pool. Unset or `< 1` uses the global pool. Performance only. |
+| `QECTOR_CUDA_DEVICE_ID` | `0` | Which CUDA device the native batch/BP-OSD decoders bind to. |
+| `QECTOR_OPENCL_DEVICE_ALLOW` | unset | Comma-separated substrings matched case-insensitively against OpenCL device names, e.g. `nvidia,geforce`. Unset accepts any device. Use it to avoid selecting an integrated GPU on multi-device hosts. |
+
+Only `QECTOR_BLOSSOM_K_MULT` and `QECTOR_OPENCL_DEVICE_ALLOW` can change results
+(matching quality and device selection respectively); the rest are purely
+throughput knobs.
+
 ### Stripe Integration
 
 Commercial licenses are issued automatically via Stripe Checkout:

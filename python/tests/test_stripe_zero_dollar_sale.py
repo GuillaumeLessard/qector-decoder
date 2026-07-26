@@ -56,7 +56,7 @@ def test_zero_dollar_webhook_issues_valid_token():
     payload_bytes = json.dumps(payload_dict).encode("utf-8")
 
     # 1. Process Stripe Webhook payload - token issuance
-    webhook_result = handle_stripe_webhook_payload(payload=payload_bytes, sig_header="")
+    webhook_result = handle_stripe_webhook_payload(payload=payload_bytes, sig_header="", webhook_secret="")
     assert webhook_result["issued"] is True
     assert webhook_result["receipt_id"] == receipt_id
     assert webhook_result["customer_email"] == test_email
@@ -98,7 +98,7 @@ def test_license_activates_via_environment(monkeypatch):
     }
     payload_bytes = json.dumps(payload_dict).encode("utf-8")
 
-    result = handle_stripe_webhook_payload(payload=payload_bytes, sig_header="")
+    result = handle_stripe_webhook_payload(payload=payload_bytes, sig_header="", webhook_secret="")
     issued_token = result["license_token"]
 
     # Set environment variable and verify activation

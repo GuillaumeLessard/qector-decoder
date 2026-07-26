@@ -158,22 +158,56 @@ def _is_license_active() -> bool:
 
 
 def _emit_startup_notice() -> None:
-    """Emits notice only in interactive environments when unlicensed."""
+    """Emit the licensing notice once per process when unlicensed.
+
+    Previously this fired only when `sys.ps1` existed or IPython was loaded --
+    i.e. only in a REPL or notebook. Commercial users run this library from
+    scripts, services and job schedulers, so the audience most likely to owe a
+    licence was the one audience that never saw the notice.
+
+    It now emits for non-interactive runs too. Deliberate boundaries:
+
+    * It is a single stderr message, written once at import. It never repeats,
+      never blocks, never delays, and never degrades or gates any functionality
+      -- the library behaves identically licensed or not.
+    * `QECTOR_SILENT=1` suppresses it, and a valid `QECTOR_LICENSE` removes it.
+    * CI is skipped: a build log is not a purchasing decision, and noise there
+      just trains people to filter the output.
+    * It goes to stderr, so it never contaminates piped stdout.
+    """
     if _os_mod.environ.get("QECTOR_SILENT") or _is_license_active():
         return
 
-    ci_vars = {"CI", "GITHUB_ACTIONS", "GITLAB_CI", "BUILDKITE", "CIRCLECI"}
+    ci_vars = {"CI", "GITHUB_ACTIONS", "GITLAB_CI", "BUILDKITE", "CIRCLECI", "JENKINS_URL", "TF_BUILD"}
     if any(var in _os_mod.environ for var in ci_vars):
         return
 
-    is_interactive = hasattr(_sys_mod, "ps1") or "ipykernel" in _sys_mod.modules or "IPython" in _sys_mod.modules
+    is_interactive = (
+        hasattr(_sys_mod, "ps1") or "ipykernel" in _sys_mod.modules or "IPython" in _sys_mod.modules
+    )
 
-    if is_interactive:
-        _sys_mod.stderr.write(
-            f"[QECTOR v{__version__}] High-performance Rust/PyO3 QEC Decoder initialized.\n"
-            f"[QECTOR v{__version__}] Academic/Personal use is free. Institutional/Commercial licenses: https://qector.store/pricing\n"
+    lines = [
+        f"[QECTOR v{__version__}] Source-available QEC decoder - Rust/PyO3 core.",
+        f"[QECTOR v{__version__}] Free for academic, personal and non-commercial research.",
+        f"[QECTOR v{__version__}] Commercial use requires a licence: https://qector.store/pricing",
+    ]
+    if not is_interactive:
+        # A script or service is the commercial-use signal; point at the
+        # 60-day evaluation, which is creditable toward any annual licence.
+        lines.append(
+            f"[QECTOR v{__version__}] 60-day commercial evaluation (creditable): "
+            f"https://qector.store/pricing | Set QECTOR_SILENT=1 to hide this."
         )
+    else:
+        lines.append(f"[QECTOR v{__version__}] Set QECTOR_SILENT=1 to hide this notice.")
+
+    try:
+        _sys_mod.stderr.write("\n".join(lines) + "\n")
         _sys_mod.stderr.flush()
+    except Exception:
+        # stderr can be closed or redirected to a dead pipe in daemonised
+        # processes. A licensing notice must never take down the import.
+        pass
 
 
 _emit_startup_notice()
@@ -449,10 +483,16 @@ class BlossomDecoder:
 class SlidingWindowDecoder:
     """Sliding-window decoder with exponential decay weighting.
 
-    Maintains a window of the last W rounds. Each round's syndrome is weighted
-    by ``decay_factor ** age`` so that more recent rounds contribute more.
-    The weighted cumulative syndrome is thresholded at 0.5 and decoded with
-    the standard Union-Find decoder.
+    Maintains a window of the last ``window_size`` rounds. Each round's
+    syndrome is weighted by a per-check exponential decay factor so that more
+    recent rounds contribute more. The weighted cumulative syndrome is
+    binary-thresholded at 0.5 and decoded with the standard Union-Find
+    decoder.
+
+    **Important:** This decoder is **not** a fault-tolerant space-time temporal
+    decoder. Real QEC temporal decoding requires taking **XOR detector
+    differences** between consecutive rounds and matching on a 3D space-time
+    graph.
     """
 
     def __init__(self, check_to_qubits, n_qubits=None, window_size=10, decay_factor=0.8):
@@ -505,6 +545,13 @@ class StreamingDecoder:
     """Streaming decoder that accumulates syndromes over multiple rounds.
 
     Rust core with circular history buffer and OR accumulation.
+
+    **Important:** This decoder is **not** a fault-tolerant space-time temporal
+    decoder. It accumulates syndromes with bitwise OR across the history
+    buffer and decodes the cumulative vector with the standard Union-Find
+    decoder. Real QEC temporal decoding requires taking **XOR detector
+    differences** between consecutive rounds and matching on a 3D space-time
+    graph.
     """
 
     def __init__(self, check_to_qubits, n_qubits=None, history_size=10):

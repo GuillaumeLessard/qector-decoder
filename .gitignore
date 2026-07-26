@@ -74,8 +74,8 @@ artifacts/
 Thumbs.db
 desktop.ini
 
-# --- Benchmark outputs (tracked selectively) ---
-# benchmark_results/ is tracked intentionally for reproducibility evidence
+# --- Benchmark outputs (canonical archive on Zenodo: doi.org/10.5281/zenodo.21339300) ---
+benchmark_results/
 
 # --- Testing ---
 .pytest_cache/
@@ -194,3 +194,9 @@ PYPI_README.md
 # --- Local-only docs (contain secret names / infra details, never push) ---
 RELEASE_PROCEDURE.md
 
+
+# --- Internal implementation tracker (infra IDs, never publish) ---
+K3dev.md
+
+# Test result logs are captured deliberately; the global *.txt rule would hide them
+!test-results/*.txt

@@ -34,7 +34,7 @@ Example
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, FrozenSet, List, Set, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -61,7 +61,7 @@ class _Matrices:
     num_observables: int
 
 
-def _iter_xor(sets: List[List[int]]) -> FrozenSet[int]:
+def _iter_xor(sets: list[list[int]]) -> frozenset[int]:
     out: set = set()
     for x in sets:
         s = set(x)
@@ -80,14 +80,14 @@ def build_matching_matrices(dem: Any) -> _Matrices:
     if isinstance(dem, str):
         dem = stim.DetectorErrorModel(dem)
 
-    hyper_ids: Dict[FrozenSet[int], int] = {}
-    edge_ids: Dict[FrozenSet[int], int] = {}
-    hyper_obs: Dict[int, FrozenSet[int]] = {}
-    edge_obs: Dict[int, FrozenSet[int]] = {}
-    priors: Dict[int, float] = {}
-    hyper_to_edges: Dict[int, set] = {}
+    hyper_ids: dict[frozenset[int], int] = {}
+    edge_ids: dict[frozenset[int], int] = {}
+    hyper_obs: dict[int, frozenset[int]] = {}
+    edge_obs: dict[int, frozenset[int]] = {}
+    priors: dict[int, float] = {}
+    hyper_to_edges: dict[int, set] = {}
 
-    def handle(prob: float, dets: List[List[int]], frames: List[List[int]]):
+    def handle(prob: float, dets: list[list[int]], frames: list[list[int]]):
         hdets = _iter_xor(dets)
         hobs = _iter_xor(frames)
         if hdets not in hyper_ids:
@@ -111,8 +111,8 @@ def build_matching_matrices(dem: Any) -> _Matrices:
     for inst in dem.flattened():
         if inst.type != "error":
             continue
-        dets: List[List[int]] = [[]]
-        frames: List[List[int]] = [[]]
+        dets: list[list[int]] = [[]]
+        frames: list[list[int]] = [[]]
         p = inst.args_copy()[0]
         for t in inst.targets_copy():
             if t.is_relative_detector_id():
@@ -179,7 +179,7 @@ class BeliefMatching:
 
         # Matching graph = edge check matrix.
         self._n_edges = matrices.edge_check.shape[1]
-        self._edge_c2q: List[List[int]] = [
+        self._edge_c2q: list[list[int]] = [
             sorted(int(e) for e in np.nonzero(matrices.edge_check[c])[0]) for c in range(self.n_checks)
         ]
 
@@ -213,10 +213,10 @@ class BeliefMatching:
             raise ValueError(f"H must be 2D, got {H.shape}")
         nD, nQ = H.shape
 
-        hyper_ids: Dict[Tuple[int, ...], int] = {}
-        edge_ids: Dict[Tuple[int, ...], int] = {}
-        hyper_to_edges: Dict[int, Set[int]] = {}
-        priors: Dict[int, float] = {}
+        hyper_ids: dict[tuple[int, ...], int] = {}
+        edge_ids: dict[tuple[int, ...], int] = {}
+        hyper_to_edges: dict[int, set[int]] = {}
+        priors: dict[int, float] = {}
 
         for q in range(nQ):
             dets = tuple(sorted(np.nonzero(H[:, q])[0].tolist()))
@@ -238,12 +238,42 @@ class BeliefMatching:
         for dets, hid in hyper_ids.items():
             for d in dets:
                 hyper_check[d, hid] ^= 1
-        hyper_obs_m = np.zeros((0, nH), dtype=np.uint8)
+        # Observables map hyperedge flips back to something the caller can use.
+        # A raw H carries no observable definition, so the previous
+        # `np.zeros((0, nH))` left ZERO rows -- `decode` returns
+        # `hyper_obs @ hard`, so every syndrome produced an empty array and the
+        # decoder was silently useless when built this way.
+        #
+        # For a bare parity-check matrix the useful contract is a per-QUBIT
+        # correction, so observables are the qubit->hyperedge incidence: row q
+        # is set for the hyperedge that column q collapsed into. `decode` then
+        # returns a length-`nQ` correction satisfying H @ corr == syndrome.
+        #
+        # Columns with identical detector support share a hyperedge and are
+        # therefore flipped together -- an inherent degeneracy of collapsing
+        # duplicate columns, not a defect. Such columns are indistinguishable
+        # from the syndrome alone.
+        hyper_obs_m = np.zeros((nQ, nH), dtype=np.uint8)
+        for q in range(nQ):
+            dets = tuple(sorted(np.nonzero(H[:, q])[0].tolist()))
+            if dets:
+                hyper_obs_m[q, hyper_ids[dets]] = 1
+
         edge_check = np.zeros((nD, nE), dtype=np.uint8)
         for dets, eid in edge_ids.items():
             for d in dets:
                 edge_check[d, eid] ^= 1
-        edge_obs_m = np.zeros((0, nE), dtype=np.uint8)
+        # Same fix for the matching stage. BP only short-circuits when its hard
+        # decision already reproduces the syndrome; otherwise decode falls
+        # through to matching and returns `edge_obs @ ...`, which with zero rows
+        # produced an empty array for exactly the syndromes BP found hardest.
+        # Row q is set for the edge that column q collapsed into (weight-<=2
+        # columns only -- a genuine hyperedge has no edge representation).
+        edge_obs_m = np.zeros((nQ, nE), dtype=np.uint8)
+        for q in range(nQ):
+            dets = tuple(sorted(np.nonzero(H[:, q])[0].tolist()))
+            if dets and len(dets) <= 2:
+                edge_obs_m[q, edge_ids[dets]] = 1
         hyper_to_edge = np.zeros((nE, nH), dtype=np.uint8)
         for hid, eids in hyper_to_edges.items():
             for eid in eids:
