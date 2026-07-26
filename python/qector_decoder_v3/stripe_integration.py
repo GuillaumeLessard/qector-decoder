@@ -194,8 +194,14 @@ def create_checkout_session(
             "[QECTOR-Stripe] The `stripe` package is not installed. Install it to create checkout sessions."
         )
 
+    # NOTE: `payment_method_types` is deliberately NOT passed. Pinning it to
+    # ["card"] disables Stripe's dynamic payment methods, so Link, wallets
+    # (Apple/Google Pay) and local methods never render -- every buyer is forced
+    # to type a card number. Omitting it lets Stripe show the highest-converting
+    # eligible methods per customer, configured from the Dashboard instead of in
+    # code. To restrict methods, use `payment_method_configuration` or
+    # `excluded_payment_method_types`, never `payment_method_types`.
     session = stripe.checkout.Session.create(
-        payment_method_types=["card"],
         customer_email=customer_email,
         line_items=[
             {

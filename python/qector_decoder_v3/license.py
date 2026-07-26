@@ -1,15 +1,23 @@
 from __future__ import annotations
 
 import base64
+import json
 import logging
 import os
-from typing import Optional
+import time
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 
 logger = logging.getLogger("qector_decoder_v3.license")
+
+# v2 token discriminator. A v2 token is `v2.{claims_b64}.{sig_b64}`; the leading
+# segment is a literal so old clients, which read segment 0 as a receipt id and
+# segment 1 as an email, fail the signature check and return False. New tokens
+# therefore fail CLOSED on installs that predate v2 support -- they never
+# validate by accident.
+_V2_PREFIX = "v2"
 
 # Embedded Public Key - Production Ed25519 Key (rotated 2026-07-22)
 # This is the public half of the production signing key held in
@@ -20,7 +28,7 @@ MCowBQYDK2VwAyEAQh9t19EZ4KWZEYjY3EwHCUzUIehZBlovaMtrpLQXeGA=
 -----END PUBLIC KEY-----"""
 
 
-def _load_ed25519_public_key() -> Optional[Ed25519PublicKey]:
+def _load_ed25519_public_key() -> Ed25519PublicKey | None:
     """Loads the embedded PEM and narrows it to Ed25519PublicKey.
 
     load_pem_public_key() returns a union of every key type cryptography
@@ -30,20 +38,44 @@ def _load_ed25519_public_key() -> Optional[Ed25519PublicKey]:
     """
     try:
         key = serialization.load_pem_public_key(PUBLIC_KEY_PEM)
-    except Exception:
+    except RuntimeError:
         return None
     if not isinstance(key, Ed25519PublicKey):
         return None
     return key
 
 
-_PUBLIC_KEY: Optional[Ed25519PublicKey] = _load_ed25519_public_key()
+_PUBLIC_KEY: Ed25519PublicKey | None = _load_ed25519_public_key()
+
+
+# Exceptions raised while decoding an untrusted token. `binascii.Error` (bad
+# base64) and `UnicodeDecodeError` are both ValueError subclasses -- the previous
+# `except RuntimeError` caught NEITHER, so a malformed token propagated the
+# exception to the caller instead of returning False. Any caller passing
+# attacker-influenced input (a web form, an env var, a CLI arg) crashed rather
+# than rejecting. Verified: 'a.b.c' raised binascii.Error("Invalid
+# base64-encoded string"); 'rcpt.!!!notb64!!!.c2ln' raised
+# binascii.Error("Incorrect padding").
+_DECODE_ERRORS = (InvalidSignature, ValueError, TypeError)
+
+
+def _b64url_decode(segment: str) -> bytes:
+    """urlsafe-base64 decode tolerating the stripped '=' padding we emit."""
+    return base64.urlsafe_b64decode(segment + "=" * (-len(segment) % 4))
 
 
 def verify_license_token(token: str, customer_email: str = "") -> bool:
     """
     Verifies the license token signature completely offline using Ed25519.
-    Supports both 2-part ({receipt_id}.{sig}) and 3-part ({receipt_id}.{email_b64}.{sig}) token formats.
+
+    Accepted formats:
+      * ``{receipt_id}.{sig}``                       (legacy, 2-part)
+      * ``{receipt_id}.{email_b64}.{sig}``           (legacy, 3-part)
+      * ``v2.{claims_b64}.{sig}``                    (v2: adds tier + expiry)
+
+    A v2 token carries JSON claims ``{rid, email, tier, exp}``; ``exp`` is a Unix
+    timestamp and an expired token verifies as False even though its signature is
+    valid. Returns False -- never raises -- for any malformed input.
     """
     if not token:
         return False
@@ -56,39 +88,78 @@ def verify_license_token(token: str, customer_email: str = "") -> bool:
         return False
 
     parts = token_clean.split(".")
+
+    if len(parts) == 3 and parts[0] == _V2_PREFIX:
+        return _verify_v2(parts[1], parts[2], customer_email)
+
     if len(parts) == 3:
         receipt_id, email_b64, sig_b64 = parts
         try:
-            missing_pad = len(email_b64) % 4
-            if missing_pad:
-                email_b64 += "=" * (4 - missing_pad)
-            embedded_email = base64.urlsafe_b64decode(email_b64).decode("utf-8").lower()
-
-            # If caller provided explicit email check, ensure match
-            if customer_email and customer_email.strip().lower() != embedded_email:
-                return False
-
-            target_email = embedded_email
-        except Exception:
+            embedded_email = _b64url_decode(email_b64).decode("utf-8").lower()
+        except _DECODE_ERRORS:
             return False
+        if customer_email and customer_email.strip().lower() != embedded_email:
+            return False
+        target_email = embedded_email
     elif len(parts) == 2:
         receipt_id, sig_b64 = parts
         target_email = customer_email.strip().lower()
     else:
         return False
 
-    # Fix base64 padding for signature
-    missing_padding = len(sig_b64) % 4
-    if missing_padding:
-        sig_b64 += "=" * (4 - missing_padding)
-
     try:
-        signature = base64.urlsafe_b64decode(sig_b64)
-        payload = f"{receipt_id}:{target_email}".encode()
-        _PUBLIC_KEY.verify(signature, payload)
+        _PUBLIC_KEY.verify(_b64url_decode(sig_b64), f"{receipt_id}:{target_email}".encode())
         return True
-    except (InvalidSignature, Exception):
+    except _DECODE_ERRORS:
         return False
+
+
+def _verify_v2(claims_b64: str, sig_b64: str, customer_email: str) -> bool:
+    """Verify a v2 token. Signature covers the claims segment verbatim."""
+    if _PUBLIC_KEY is None:
+        return False
+    try:
+        # Signature first: never parse claims we have not authenticated.
+        _PUBLIC_KEY.verify(_b64url_decode(sig_b64), claims_b64.encode("ascii"))
+        claims = json.loads(_b64url_decode(claims_b64).decode("utf-8"))
+    except _DECODE_ERRORS + (json.JSONDecodeError, UnicodeEncodeError):
+        return False
+    if not isinstance(claims, dict):
+        return False
+
+    embedded_email = str(claims.get("email", "")).strip().lower()
+    if customer_email and customer_email.strip().lower() != embedded_email:
+        return False
+
+    exp = claims.get("exp")
+    if exp is not None:
+        try:
+            if time.time() > float(exp):
+                logger.info("[QECTOR-License] token expired at %s", exp)
+                return False
+        except (TypeError, ValueError):
+            return False
+    return True
+
+
+def license_claims(token: str) -> dict | None:
+    """Return the verified claims of a v2 token, or ``None``.
+
+    Only returns claims for a token whose signature validates and which has not
+    expired -- so callers can gate on ``tier`` without re-implementing checks.
+    Legacy 2/3-part tokens carry no claims and yield ``None`` even when valid.
+    """
+    if not token:
+        return None
+    parts = token.strip().split(".")
+    if len(parts) != 3 or parts[0] != _V2_PREFIX:
+        return None
+    if not _verify_v2(parts[1], parts[2], ""):
+        return None
+    try:
+        return json.loads(_b64url_decode(parts[1]).decode("utf-8"))
+    except _DECODE_ERRORS + (json.JSONDecodeError,):
+        return None
 
 
 # ---------------------------------------------------------------------------
@@ -114,19 +185,19 @@ def _load_signing_private_key() -> Ed25519PrivateKey:
     try:
         raw = base64.b64decode(env_b64)
         key = serialization.load_pem_private_key(raw, password=None)
-    except Exception as exc:
+    except RuntimeError as exc:
         raise RuntimeError(
             f"[QECTOR-License] QECTOR_LICENSE_PRIVATE_KEY_B64 is malformed: {exc}"
         ) from exc
     if not isinstance(key, Ed25519PrivateKey):
-        raise RuntimeError(
+        raise TypeError(
             "[QECTOR-License] QECTOR_LICENSE_PRIVATE_KEY_B64 is not an Ed25519 private key."
         )
     return key
 
 
 def create_license_token(
-    receipt_id: str, customer_email: str = "", private_key: Optional[Ed25519PrivateKey] = None
+    receipt_id: str, customer_email: str = "", private_key: Ed25519PrivateKey | None = None
 ) -> str:
     """Sign ``receipt_id:email`` with the production Ed25519 key.
 
@@ -144,3 +215,40 @@ def create_license_token(
         email_b64 = base64.urlsafe_b64encode(email_clean.encode("utf-8")).decode("utf-8").rstrip("=")
         return f"{receipt_id}.{email_b64}.{sig_b64}"
     return f"{receipt_id}.{sig_b64}"
+
+
+def create_license_token_v2(
+    receipt_id: str,
+    customer_email: str,
+    tier: str,
+    expires_at: float | None = None,
+    private_key: Ed25519PrivateKey | None = None,
+) -> str:
+    """Sign a v2 token carrying ``tier`` and an optional expiry.
+
+    Legacy tokens sign ``receipt_id:email`` and nothing else, so a 60-day
+    evaluation is cryptographically identical to a perpetual licence -- the tier
+    exists only in Stripe metadata and a local log, neither of which the package
+    can see. v2 puts both inside the signature.
+
+    ``expires_at`` is a Unix timestamp; ``None`` means perpetual. The signature
+    covers the base64url claims segment verbatim, so verification never has to
+    canonicalise JSON to reproduce the signed bytes.
+    """
+    key = private_key or _load_signing_private_key()
+    claims = {
+        "rid": receipt_id,
+        "email": customer_email.strip().lower(),
+        "tier": tier,
+    }
+    if expires_at is not None:
+        claims["exp"] = int(expires_at)
+    # separators= keeps the encoding compact and stable; the signature is over
+    # the encoded segment, so key order only has to be deterministic, not
+    # canonical across implementations.
+    claims_json = json.dumps(claims, separators=(",", ":"), sort_keys=True)
+    claims_b64 = base64.urlsafe_b64encode(claims_json.encode("utf-8")).decode("ascii").rstrip("=")
+    sig_b64 = (
+        base64.urlsafe_b64encode(key.sign(claims_b64.encode("ascii"))).decode("ascii").rstrip("=")
+    )
+    return f"{_V2_PREFIX}.{claims_b64}.{sig_b64}"
