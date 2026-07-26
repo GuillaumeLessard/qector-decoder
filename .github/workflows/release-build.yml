@@ -231,7 +231,16 @@ jobs:
           "
           rm -rf /tmp/smoke_venv
 
+      # Build provenance requires a public repository or GitHub Advanced Security.
+      # On this private org repo the API returns "Feature not available for the
+      # GuillaumeLessard organization", which failed the whole publish job AFTER
+      # all 15 wheels had built and passed the smoke test. Attestation is a
+      # supply-chain nicety; it must not gate shipping. Conditioned on visibility
+      # so it resumes automatically if the repo is ever made public, and
+      # continue-on-error so a plan change can never block a release again.
       - name: Generate artifact attestations
+        if: ${{ github.event.repository.private == false }}
+        continue-on-error: true
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: "dist/*"
