@@ -56,12 +56,106 @@ _RustLERBenchmark = _guard("LERBenchmark")
 _RustSparseBlossomDecoder = _guard("SparseBlossomDecoder")
 _RustHybridDecoder = _guard("HybridDecoder")
 _RustHybridCascadeDecoder = _guard("HybridCascadeDecoder")
-py_check_to_edges = _native_module.py_check_to_edges
-py_generate_surface_code_checks = _native_module.py_generate_surface_code_checks
-py_generate_toy_code_checks = _native_module.py_generate_toy_code_checks
-py_generate_ring_code_checks = _native_module.py_generate_ring_code_checks
-py_generate_repetition_code_checks = _native_module.py_generate_repetition_code_checks
-py_generate_parity_check_matrix = _native_module.py_generate_parity_check_matrix
+# ---------------------------------------------------------------------------
+# Utility functions: native when available, exact pure-Python fallback when not.
+#
+# Release wheels compile the Rust core from the RUST_SRC_B64_* secrets bundle,
+# which can lag the Python layer in this repo. v0.6.9's first tag build died at
+# import because `py_generate_parity_check_matrix` was registered in the repo's
+# lib.rs but absent from the bundle's older core -- the same failure mode that
+# made every v0.6.7 wheel unimportable. Import must never depend on the native
+# module's exact symbol set.
+#
+# Unlike the class guards above (which stub and raise on use), these six have
+# exact pure-Python equivalents, so a wheel with an older core keeps FULL
+# functionality. Each fallback mirrors src/utils.rs one-to-one, including edge
+# cases (out-of-range qubits dropped, n_qubits inferred as max+1, surface
+# distance >= 2, repetition distance == 0 -> empty). Equivalence against the
+# native implementations is locked by python/tests/test_native_fallbacks.py.
+# ---------------------------------------------------------------------------
+
+
+def _py_check_to_edges(check_to_qubits):
+    edges = []
+    for qubits in check_to_qubits:
+        if len(qubits) < 2:
+            continue
+        for i in range(len(qubits) - 1):
+            edges.append((int(qubits[i]), int(qubits[i + 1])))
+    return edges
+
+
+def _py_generate_ring_code_checks(distance):
+    n_qubits = distance * distance
+    return [[i, (i + 1) % n_qubits] for i in range(n_qubits)], n_qubits
+
+
+def _py_generate_surface_code_checks(distance):
+    if distance < 2:
+        raise ValueError("distance must be >= 2")
+    d = distance
+
+    def q(row, col):
+        return (row % d) * d + (col % d)
+
+    checks = []
+    for row in range(d):
+        for col in range(d):
+            checks.append([q(row, col), q(row, col + 1), q(row + 1, col), q(row + 1, col + 1)])
+    for row in range(d):
+        for col in range(d):
+            checks.append([q(row, col), q(row, col + d - 1), q(row + d - 1, col), q(row + d - 1, col + d - 1)])
+    return checks, d * d
+
+
+def _py_generate_toy_code_checks(distance):
+    n = distance
+    checks = []
+    for _ in range(2):
+        for row in range(n):
+            for col in range(n):
+                q0 = row * n + col
+                q1 = row * n + ((col + 1) % n)
+                q2 = ((row + 1) % n) * n + col
+                q3 = ((row + 1) % n) * n + ((col + 1) % n)
+                checks.append([q0, q1, q2, q3])
+    return checks, n * n
+
+
+def _py_generate_repetition_code_checks(distance):
+    if distance == 0:
+        return [], 0
+    return [[i, i + 1] for i in range(distance - 1)], distance
+
+
+def _py_generate_parity_check_matrix(check_to_qubits, n_qubits=None):
+    import numpy as np
+
+    n_checks = len(check_to_qubits)
+    max_q = max((int(q) for qs in check_to_qubits for q in qs), default=0)
+    if n_qubits is None:
+        n_qubits = max_q + 1
+    h = np.zeros((n_checks, n_qubits), dtype=np.uint8)
+    for ci, qs in enumerate(check_to_qubits):
+        for q in qs:
+            if int(q) < n_qubits:
+                h[ci, int(q)] = 1
+    return h
+
+
+def _native_or(name, fallback):
+    """Prefer the compiled implementation; fall back without losing function."""
+    return getattr(_native_module, name, fallback)
+
+
+py_check_to_edges = _native_or("py_check_to_edges", _py_check_to_edges)
+py_generate_surface_code_checks = _native_or("py_generate_surface_code_checks", _py_generate_surface_code_checks)
+py_generate_toy_code_checks = _native_or("py_generate_toy_code_checks", _py_generate_toy_code_checks)
+py_generate_ring_code_checks = _native_or("py_generate_ring_code_checks", _py_generate_ring_code_checks)
+py_generate_repetition_code_checks = _native_or(
+    "py_generate_repetition_code_checks", _py_generate_repetition_code_checks
+)
+py_generate_parity_check_matrix = _native_or("py_generate_parity_check_matrix", _py_generate_parity_check_matrix)
 try:
     run_mcp_server = _native_module.run_mcp_server
 except AttributeError:
