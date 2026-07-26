@@ -27,7 +27,7 @@ import json
 import time
 from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 
@@ -42,13 +42,13 @@ class DecodeResult:
     syndrome: np.ndarray
     n_qubits: int
     n_checks: int
-    weight: Optional[float] = None
-    logical_flips: Optional[np.ndarray] = None
-    decode_seconds: Optional[float] = None
+    weight: float | None = None
+    logical_flips: np.ndarray | None = None
+    decode_seconds: float | None = None
     backend: str = "cpu"
     fallback: bool = False
     fallback_reason: str = ""
-    syndrome_valid: Optional[bool] = None
+    syndrome_valid: bool | None = None
     metadata: dict = field(default_factory=dict)
 
     # -- alternative encodings --------------------------------------------
@@ -142,7 +142,7 @@ def decode_with_diagnostics(
     syndrome: Sequence[int],
     kind: str = "blossom",
     decoder: Any = None,
-    logicals: Optional[np.ndarray] = None,
+    logicals: np.ndarray | None = None,
 ) -> DecodeResult:
     """Decode one syndrome and return a fully-populated :class:`DecodeResult`.
 

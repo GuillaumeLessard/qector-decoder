@@ -38,7 +38,7 @@ from __future__ import annotations
 import functools
 from dataclasses import dataclass
 from types import ModuleType
-from typing import Any, Optional, cast
+from typing import Any, cast
 
 import numpy as np
 
@@ -73,7 +73,7 @@ _PREFER_GPU: bool = True
 
 #: Cached :class:`GpuBackend` capability snapshot (built lazily, hardware is
 #: assumed stable for the life of the process). Reset is not normally needed.
-_BACKEND: Optional[GpuBackend] = None
+_BACKEND: GpuBackend | None = None
 
 #: Cross-module transfer/usage counters. Other modules read and mutate this in
 #: place; it is reset (never rebound) so external references stay valid.
@@ -90,18 +90,18 @@ TELEMETRY: dict[str, int] = {"h2d": 0, "d2h": 0, "gpu_calls": 0, "fallbacks": 0}
 # CuPy / device probing (cached - hardware does not change mid-process)
 # ---------------------------------------------------------------------------
 @functools.lru_cache(maxsize=1)
-def _cupy() -> Optional[ModuleType]:
+def _cupy() -> ModuleType | None:
     """Return the imported ``cupy`` module, or ``None`` if it is unavailable."""
     try:
         import cupy  # type: ignore[import-not-found]
 
         return cast(ModuleType, cupy)
-    except Exception:  # pragma: no cover - import failure path is env-dependent
+    except (ImportError, RuntimeError):  # cupy absent, or its own CUDA stack broken
         return None
 
 
 @functools.lru_cache(maxsize=1)
-def _probe() -> tuple[bool, Optional[str], Optional[int]]:
+def _probe() -> tuple[bool, str | None, int | None]:
     """Probe device 0 once. Returns ``(usable, device_name, total_mem_bytes)``.
 
     "Usable" means CuPy imported, a CUDA device is enumerated, and a tiny
@@ -125,7 +125,10 @@ def _probe() -> tuple[bool, Optional[str], Optional[int]]:
         _scratch = cp.zeros(8, dtype=cp.uint8)
         del _scratch
         return (True, name, total)
-    except Exception:  # pragma: no cover - driver/hardware dependent
+    except (RuntimeError, OSError, ValueError, AttributeError):  # pragma: no cover
+        # A probe must degrade to "unusable", never crash the caller — these
+        # cover driver/runtime failures from cupy (CUDARuntimeError is a
+        # RuntimeError), missing device libs (OSError), and API drift.
         return (False, None, None)
 
 
@@ -146,11 +149,11 @@ def has_cuda_rust() -> bool:
     """
     try:
         from . import CUDABatchDecoder
-    except Exception:  # pragma: no cover - import wiring
+    except RuntimeError:  # pragma: no cover - import wiring
         return False
     try:
         return bool(CUDABatchDecoder.is_available())
-    except Exception:  # pragma: no cover - hardware dependent
+    except RuntimeError:  # pragma: no cover - hardware dependent
         return False
 
 
@@ -306,8 +309,8 @@ class GpuBackend:
 
     cupy_available: bool
     cuda_rust_available: bool
-    device_name: Optional[str]
-    total_mem_bytes: Optional[int]
+    device_name: str | None
+    total_mem_bytes: int | None
     prefer_gpu: bool = True
 
     def module(self) -> ModuleType:

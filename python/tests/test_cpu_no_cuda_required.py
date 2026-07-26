@@ -45,6 +45,7 @@ def test_cpu_decode_in_fresh_subprocess():
         capture_output=True,
         text=True,
         timeout=120,
+        check=True,
     )
     assert proc.returncode == 0, f"subprocess failed:\nSTDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}"
     assert "OK" in proc.stdout, f"missing OK marker; stdout={proc.stdout!r}"

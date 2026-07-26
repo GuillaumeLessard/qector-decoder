@@ -10,16 +10,7 @@ from qector_decoder_v3 import dem
 
 
 def test_parallel_edges_collapse_to_one_per_signature():
-    text = "\n".join(
-        [
-            "error(0.1) D0 D1",
-            "error(0.1) D0 D1",
-            "error(0.1) D0 D1",
-            "error(0.1) D1 D2",
-            "error(0.1) D1 D2",
-            "error(0.1) D2 D3",
-        ]
-    )
+    text = "error(0.1) D0 D1\nerror(0.1) D0 D1\nerror(0.1) D0 D1\nerror(0.1) D1 D2\nerror(0.1) D1 D2\nerror(0.1) D2 D3"
     m = dem.parse_dem(text)
     assert m.num_errors == 6
     c = m.collapse_to_graph()

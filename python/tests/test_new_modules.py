@@ -50,7 +50,7 @@ class TestFastUnionFindDecoder:
     def test_invalid_shape(self):
         checks, n_qubits = qd.generate_ring_code_checks(5)
         dec = qd.FastUnionFindDecoder(checks, n_qubits)
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, ValueError, RuntimeError)):
             dec.decode(np.zeros(5, dtype=np.uint8))
 
     def test_surface_code(self):
@@ -115,7 +115,7 @@ class TestBlossomDecoder:
     def test_invalid_shape(self):
         checks = [[0, 1], [1, 2], [2, 3]]
         dec = qd.BlossomDecoder(checks, 4)
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, ValueError, RuntimeError)):
             dec.decode(np.zeros(5, dtype=np.uint8))
 
 
@@ -157,12 +157,12 @@ class TestSlidingWindowDecoder:
 
     def test_invalid_decay_factor(self):
         checks, n_qubits = qd.generate_repetition_code_checks(5)
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, ValueError, RuntimeError)):
             qd.SlidingWindowDecoder(checks, n_qubits, window_size=3, decay_factor=1.5)
 
     def test_invalid_window_size(self):
         checks, n_qubits = qd.generate_repetition_code_checks(5)
-        with pytest.raises(Exception):
+        with pytest.raises((TypeError, ValueError, RuntimeError)):
             qd.SlidingWindowDecoder(checks, n_qubits, window_size=0, decay_factor=0.8)
 
     def test_surface_code_window(self):

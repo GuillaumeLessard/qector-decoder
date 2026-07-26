@@ -23,7 +23,7 @@ Usage (sans Qiskit - mode dict brut) ::
 from __future__ import annotations
 
 import warnings
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -40,7 +40,7 @@ except ImportError:  # pragma: no cover
     _HAS_QISKIT = False
 
 
-def _normalize_counts(result: Any) -> Dict[str, int]:
+def _normalize_counts(result: Any) -> dict[str, int]:
     """Extraire les comptes bruts depuis un Result Qiskit ou un dict."""
     if isinstance(result, dict):
         counts = result.get("counts")
@@ -55,7 +55,7 @@ def _normalize_counts(result: Any) -> Dict[str, int]:
     raise TypeError(f"result must be a dict or qiskit.result.Result, got {type(result).__name__}")
 
 
-def _bitstring_to_syndrome(bitstring: str, n_checks: int) -> List[int]:
+def _bitstring_to_syndrome(bitstring: str, n_checks: int) -> list[int]:
     """Convertir une chaîne Qiskit (binaire ou hex) en liste de bits syndrome."""
     if bitstring.startswith("0x"):
         val = int(bitstring, 16)
@@ -71,10 +71,10 @@ def _bitstring_to_syndrome(bitstring: str, n_checks: int) -> List[int]:
 def decode_qiskit_result(
     result: Any,
     code_distance: int,
-    shots: Optional[int] = None,
+    shots: int | None = None,
     *,
-    n_qubits: Optional[int] = None,
-) -> Dict[str, Any]:
+    n_qubits: int | None = None,
+) -> dict[str, Any]:
     """
     Décoder un résultat Qiskit (ou dictionnaire brut) avec QECTOR.
 
@@ -126,7 +126,7 @@ def decode_qiskit_result(
     decoder = BlossomDecoder(check_to_qubits, n_qubits=n_qubits)
 
     # Extraction des syndromes à partir des comptes
-    syndrome_list: List[np.ndarray] = []
+    syndrome_list: list[np.ndarray] = []
     for bitstring, count in counts.items():
         bits = _bitstring_to_syndrome(bitstring, n_checks)
         syndrome = np.array(bits, dtype=np.uint8)
@@ -166,7 +166,7 @@ def decode_qiskit_result(
 
 def create_qiskit_decoder(
     code_distance: int,
-    n_qubits: Optional[int] = None,
+    n_qubits: int | None = None,
 ) -> Any:
     """
     Factory retournant un callable compatible avec l'API Qiskit.
@@ -201,7 +201,7 @@ def create_qiskit_decoder(
 
     inner_decoder = BlossomDecoder(check_to_qubits, n_qubits=n_qubits)
 
-    def _decode(result: Any) -> Dict[str, Any]:
+    def _decode(result: Any) -> dict[str, Any]:
         return decode_qiskit_result(
             result,
             code_distance=code_distance,

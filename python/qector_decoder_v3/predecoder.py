@@ -24,7 +24,7 @@ Example
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Tuple, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -69,14 +69,14 @@ class PredecodedDecoder:
 
         if not check_to_qubits:
             raise ValueError("check_to_qubits must be non-empty")
-        self._c2q: List[List[int]] = [[int(q) for q in c] for c in check_to_qubits]
+        self._c2q: list[list[int]] = [[int(q) for q in c] for c in check_to_qubits]
         self.n_checks = len(self._c2q)
         if n_qubits is None:
             n_qubits = max((max(c) for c in self._c2q if c), default=-1) + 1
         self.n_qubits = int(n_qubits)
 
         # qubit -> the checks it touches (graph edges have exactly 2)
-        self._qubit_checks: List[List[int]] = [[] for _ in range(self.n_qubits)]
+        self._qubit_checks: list[list[int]] = [[] for _ in range(self.n_qubits)]
         for ci, qs in enumerate(self._c2q):
             for q in qs:
                 self._qubit_checks[q].append(ci)
@@ -104,7 +104,7 @@ class PredecodedDecoder:
         if backend not in _valid_backends:
             raise ValueError("backend must be one of ['blossom', 'union_find', 'sparse_blossom', 'fast_union_find']")
         self.backend = backend
-        residual: Union[BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder, FastUnionFindDecoder]
+        residual: BlossomDecoder | UnionFindDecoder | SparseBlossomDecoder | FastUnionFindDecoder
         if backend == "blossom":
             residual = BlossomDecoder(self._c2q, self.n_qubits)
         elif backend == "union_find":
@@ -113,10 +113,10 @@ class PredecodedDecoder:
             residual = FastUnionFindDecoder(self._c2q, self.n_qubits)
         else:
             residual = SparseBlossomDecoder(self._c2q, self.n_qubits)
-        self._residual: Union[BlossomDecoder, UnionFindDecoder, SparseBlossomDecoder, FastUnionFindDecoder] = residual
+        self._residual: BlossomDecoder | UnionFindDecoder | SparseBlossomDecoder | FastUnionFindDecoder = residual
         self.last_predecoded = 0  # number of defects resolved by the predecoder
 
-    def _predecode(self, syndrome: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def _predecode(self, syndrome: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """Greedily commit adjacent defect-pair edges. Returns (committed, residual_syndrome)."""
         s = syndrome.copy()
         committed = np.zeros(self.n_qubits, dtype=np.uint8)

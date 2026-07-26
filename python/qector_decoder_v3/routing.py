@@ -55,7 +55,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass, replace
-from typing import Any, Optional, Union, cast
+from typing import Any, Union, cast
 
 import numpy as np
 
@@ -228,7 +228,7 @@ def _resolve_hardware(hardware: HardwareLike) -> HardwareProfile:
 # ---------------------------------------------------------------------------
 # Family classification
 # ---------------------------------------------------------------------------
-def _classify_family(code_family: Any, graphlike: Optional[bool]) -> str:
+def _classify_family(code_family: Any, graphlike: bool | None) -> str:
     """Classify a code as ``"matching"``, ``"ldpc"``, or ``"unknown"``.
 
     A definitive structural signal (``graphlike``) always wins: a problem that is
@@ -244,7 +244,7 @@ def _classify_family(code_family: Any, graphlike: Optional[bool]) -> str:
     if callable(is_matching):
         try:
             return "matching" if is_matching() else "ldpc"
-        except Exception:  # pragma: no cover - defensive
+        except RuntimeError:  # pragma: no cover - defensive
             pass
 
     if code_family is None:
@@ -258,13 +258,11 @@ def _classify_family(code_family: Any, graphlike: Optional[bool]) -> str:
     return "unknown"
 
 
-def _is_large(distance: Optional[int], n_qubits: Optional[int]) -> bool:
+def _is_large(distance: int | None, n_qubits: int | None) -> bool:
     """True when exact Blossom is likely too expensive vs. region-growing."""
     if distance is not None and int(distance) >= _LARGE_DISTANCE:
         return True
-    if n_qubits is not None and int(n_qubits) >= _LARGE_NQUBITS:
-        return True
-    return False
+    return bool(n_qubits is not None and int(n_qubits) >= _LARGE_NQUBITS)
 
 
 # ---------------------------------------------------------------------------
@@ -282,9 +280,9 @@ class Recommendation:
     hardware: dict[str, bool]
     gpu_batched_bp: bool = False
     forced: bool = False
-    graphlike: Optional[bool] = None
-    distance: Optional[int] = None
-    n_qubits: Optional[int] = None
+    graphlike: bool | None = None
+    distance: int | None = None
+    n_qubits: int | None = None
 
     def as_dict(self) -> dict[str, Any]:
         """JSON-friendly view (for logs / diagnostics / ``explain``)."""
@@ -296,8 +294,8 @@ class Recommendation:
 # ---------------------------------------------------------------------------
 def _select(
     family: str,
-    distance: Optional[int],
-    n_qubits: Optional[int],
+    distance: int | None,
+    n_qubits: int | None,
     batch_size: int,
     priority: str,
     hw: HardwareProfile,
@@ -346,8 +344,8 @@ def _select(
         if large:
             return (
                 DecoderName.SPARSE_BLOSSOM,
-                "accuracy + large code -> region-growing SparseBlossom "
-                f"(near-optimal MWPM that scales where exact Blossom is O(n^3)); {size_note}",
+                ("accuracy + large code -> region-growing SparseBlossom "
+                f"(near-optimal MWPM that scales where exact Blossom is O(n^3)); {size_note}"),
                 False,
             )
         return (
@@ -361,8 +359,8 @@ def _select(
         if hw.cuda_rust:
             return (
                 DecoderName.CUDA_BATCH,
-                f"balanced + huge batch ({batch_size} >= {_GPU_BATCH}) with Rust CUDA "
-                "-> GPU-batched Union-Find for throughput",
+                (f"balanced + huge batch ({batch_size} >= {_GPU_BATCH}) with Rust CUDA "
+                "-> GPU-batched Union-Find for throughput"),
                 False,
             )
         return (
@@ -393,13 +391,13 @@ def _select(
 
 def recommend(
     code_family: Any = None,
-    distance: Optional[int] = None,
-    n_qubits: Optional[int] = None,
+    distance: int | None = None,
+    n_qubits: int | None = None,
     batch_size: int = 1,
     priority: str = "balanced",
     hardware: HardwareLike = None,
     *,
-    graphlike: Optional[bool] = None,
+    graphlike: bool | None = None,
 ) -> Recommendation:
     """Return a rich :class:`Recommendation` for a decoding problem.
 
@@ -463,8 +461,8 @@ def recommend(
 
 def recommend_decoder(
     code_family: Any = None,
-    distance: Optional[int] = None,
-    n_qubits: Optional[int] = None,
+    distance: int | None = None,
+    n_qubits: int | None = None,
     batch_size: int = 1,
     priority: str = "balanced",
     hardware: HardwareLike = None,
@@ -569,13 +567,13 @@ class AutoRouter:
         self.error_rate = float(error_rate)
         self.default_family = code_family
 
-        self._sig: Optional[tuple] = None
+        self._sig: tuple | None = None
         self._cache: dict[tuple, Any] = {}
-        self._last: Optional[Recommendation] = None
+        self._last: Recommendation | None = None
 
     # -- public ------------------------------------------------------------
     @property
-    def last_recommendation(self) -> Optional[Recommendation]:
+    def last_recommendation(self) -> Recommendation | None:
         """The :class:`Recommendation` from the most recent call, or ``None``."""
         return self._last
 
@@ -612,7 +610,7 @@ class AutoRouter:
             The correction(s); every row satisfies ``H·c == s (mod 2)`` for the
             graphlike (UF/Blossom) and BP-OSD paths.
         """
-        H, c2q, n_qubits, n_checks = self._normalize_problem(checks_or_H, ctx.get("n_qubits"))
+        H, c2q, n_qubits, _n_checks = self._normalize_problem(checks_or_H, ctx.get("n_qubits"))
         self._refresh_cache_for(c2q, n_qubits)
 
         syn = np.asarray(syndromes, dtype=np.uint8)
@@ -626,7 +624,7 @@ class AutoRouter:
     def _recommend(self, checks_or_H: Any, syndromes: Any, ctx: Mapping[str, Any]) -> Recommendation:
         """Recommendation for ``explain`` (problem optional)."""
         if checks_or_H is not None:
-            H, c2q, n_qubits, _ = self._normalize_problem(checks_or_H, ctx.get("n_qubits"))
+            _H, c2q, n_qubits, _ = self._normalize_problem(checks_or_H, ctx.get("n_qubits"))
             batch_size = ctx.get("batch_size", _infer_batch(syndromes))
             return self._recommend_for_problem(c2q, n_qubits, int(batch_size), ctx)
         # Pure-metadata path.
@@ -730,7 +728,7 @@ class AutoRouter:
             raise ValueError(f"unknown decoder name {name!r}")
         try:
             return builder()
-        except Exception:
+        except RuntimeError:
             return None
 
     # -- dispatch ----------------------------------------------------------
@@ -766,7 +764,7 @@ class AutoRouter:
         return None
 
     # -- problem normalisation ---------------------------------------------
-    def _normalize_problem(self, obj: Any, n_qubits: Optional[int]):
+    def _normalize_problem(self, obj: Any, n_qubits: int | None):
         """Return ``(H, check_to_qubits, n_qubits, n_checks)`` from any problem form."""
         # A codes.Code (or anything exposing the same surface).
         if hasattr(obj, "parity_check_matrix") and hasattr(obj, "check_to_qubits"):

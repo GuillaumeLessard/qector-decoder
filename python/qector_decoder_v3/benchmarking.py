@@ -37,7 +37,7 @@ import sys
 import time
 import tracemalloc
 from collections.abc import Sequence
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable
 
 import numpy as np
 
@@ -56,9 +56,9 @@ __all__ = [
 # ---------------------------------------------------------------------------
 # Environment capture
 # ---------------------------------------------------------------------------
-def capture_environment() -> Dict[str, Any]:
+def capture_environment() -> dict[str, Any]:
     """Capture hardware/software details needed to reproduce a benchmark."""
-    env: Dict[str, Any] = {
+    env: dict[str, Any] = {
         "timestamp_unix": None,  # caller stamps this (Date.now is non-deterministic in some runtimes)
         "python_version": sys.version.split()[0],
         "python_implementation": platform.python_implementation(),
@@ -70,7 +70,7 @@ def capture_environment() -> Dict[str, Any]:
     }
     try:
         env["numpy_version"] = np.__version__
-    except Exception:  # pragma: no cover
+    except RuntimeError:  # pragma: no cover
         env["numpy_version"] = None
 
     env["rust_version"] = _safe_cmd(["rustc", "--version"])
@@ -90,7 +90,7 @@ def capture_environment() -> Dict[str, Any]:
 
         env["cuda_available"] = bool(qd.cuda_is_available())
         env["opencl_available"] = bool(qd.opencl_is_available())
-    except Exception:  # pragma: no cover
+    except RuntimeError:  # pragma: no cover
         env["cuda_available"] = None
         env["opencl_available"] = None
 
@@ -109,15 +109,15 @@ def git_commit() -> str:
     return out if out else "unknown"
 
 
-def _safe_cmd(cmd: Sequence[str]) -> Optional[str]:
+def _safe_cmd(cmd: Sequence[str]) -> str | None:
     try:
         out = subprocess.run(list(cmd), capture_output=True, text=True, timeout=10, check=False)
         return out.stdout.strip() or None
-    except Exception:  # pragma: no cover
+    except RuntimeError:  # pragma: no cover
         return None
 
 
-def _pkg_version(name: str) -> Optional[str]:
+def _pkg_version(name: str) -> str | None:
     try:
         import importlib.metadata as md
 
@@ -125,23 +125,23 @@ def _pkg_version(name: str) -> Optional[str]:
             return md.version(name.replace("_", "-"))
         except md.PackageNotFoundError:
             return md.version(name)
-    except Exception:
+    except RuntimeError:
         try:
             mod = __import__(name)
             return getattr(mod, "__version__", None)
-        except Exception:
+        except RuntimeError:
             return None
 
 
-def _memory_info() -> Dict[str, Any]:
-    info: Dict[str, Any] = {"ram_total_gb": None, "ram_available_gb": None}
+def _memory_info() -> dict[str, Any]:
+    info: dict[str, Any] = {"ram_total_gb": None, "ram_available_gb": None}
     try:
         import psutil  # type: ignore
 
         vm = psutil.virtual_memory()
         info["ram_total_gb"] = round(vm.total / 1e9, 2)
         info["ram_available_gb"] = round(vm.available / 1e9, 2)
-    except Exception:
+    except RuntimeError:
         pass
     return info
 
@@ -149,16 +149,16 @@ def _memory_info() -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Statistics
 # ---------------------------------------------------------------------------
-def percentiles(samples: Sequence[float], ps=(50, 90, 95, 99)) -> Dict[str, float]:
+def percentiles(samples: Sequence[float], ps=(50, 90, 95, 99)) -> dict[str, float]:
     """Percentiles (linear interpolation) keyed as ``pXX``."""
     arr = np.asarray(samples, dtype=np.float64)
-    out: Dict[str, float] = {}
+    out: dict[str, float] = {}
     for p in ps:
         out[f"p{p}"] = float(np.percentile(arr, p))
     return out
 
 
-def summarize(samples_seconds: Sequence[float]) -> Dict[str, float]:
+def summarize(samples_seconds: Sequence[float]) -> dict[str, float]:
     """Full latency summary (in microseconds) from per-iteration seconds."""
     us = np.asarray(samples_seconds, dtype=np.float64) * 1e6
     n = us.size
@@ -183,11 +183,11 @@ def summarize(samples_seconds: Sequence[float]) -> Dict[str, float]:
 # ---------------------------------------------------------------------------
 # Timing primitives
 # ---------------------------------------------------------------------------
-def time_iterations(fn: Callable[[], Any], n_trials: int, warmup: int = 0) -> List[float]:
+def time_iterations(fn: Callable[[], Any], n_trials: int, warmup: int = 0) -> list[float]:
     """Time ``fn`` per-call ``n_trials`` times after ``warmup`` untimed calls."""
     for _ in range(max(0, warmup)):
         fn()
-    samples: List[float] = []
+    samples: list[float] = []
     perf = time.perf_counter
     for _ in range(n_trials):
         t0 = perf()
@@ -231,7 +231,7 @@ def benchmark_decoder(
     p: float = 0.08,
     seed: int = 1234,
     measure_memory: bool = True,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Benchmark a decoder on a code with full hot/cold and tail-latency stats.
 
     Returns a structured ``dict`` (also wrappable in :class:`BenchmarkReport`).
@@ -305,11 +305,11 @@ def benchmark_decoder(
 class BenchmarkReport:
     """A set of decoder benchmarks plus the environment they ran in."""
 
-    def __init__(self, results: List[Dict[str, Any]], environment: Optional[dict] = None):
+    def __init__(self, results: list[dict[str, Any]], environment: dict | None = None):
         self.results = results
         self.environment = environment or capture_environment()
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {"environment": self.environment, "results": self.results}
 
     def to_json(self, indent: int = 2) -> str:
@@ -318,7 +318,7 @@ class BenchmarkReport:
     def to_csv(self) -> str:
         return _results_to_csv(self.results)
 
-    def save(self, json_path: str, csv_path: Optional[str] = None) -> None:
+    def save(self, json_path: str, csv_path: str | None = None) -> None:
         write_json(json_path, self.to_dict())
         if csv_path:
             with open(csv_path, "w", encoding="utf-8", newline="") as fh:
@@ -330,12 +330,12 @@ def write_json(path: str, obj: Any) -> None:
         json.dump(obj, fh, indent=2, default=_json_default)
 
 
-def write_csv(path: str, results: List[Dict[str, Any]]) -> None:
+def write_csv(path: str, results: list[dict[str, Any]]) -> None:
     with open(path, "w", encoding="utf-8", newline="") as fh:
         fh.write(_results_to_csv(results))
 
 
-def _results_to_csv(results: List[Dict[str, Any]]) -> str:
+def _results_to_csv(results: list[dict[str, Any]]) -> str:
     cols = [
         "decoder",
         "code",

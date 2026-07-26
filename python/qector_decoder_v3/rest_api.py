@@ -23,14 +23,14 @@ Ou avec uvicorn directement (FastAPI) ::
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 import numpy as np
 
 from . import BatchDecoder, UnionFindDecoder, __version__
 
 # --- Essai d'import FastAPI, fallback Flask -------------------------------
-_FRAMEWORK: Optional[str] = None
+_FRAMEWORK: str | None = None
 try:
     from fastapi import FastAPI, HTTPException
     from pydantic import BaseModel
@@ -49,13 +49,13 @@ except ImportError:  # pragma: no cover
 if _FRAMEWORK == "fastapi":
 
     class DecodeRequest(BaseModel):
-        check_to_qubits: List[List[int]]
-        syndrome: List[int]
-        n_qubits: Optional[int] = None
+        check_to_qubits: list[list[int]]
+        syndrome: list[int]
+        n_qubits: int | None = None
         use_batch: bool = False
 
     class DecodeResponse(BaseModel):
-        correction: List[int]
+        correction: list[int]
         n_qubits: int
         n_checks: int
         version: str
@@ -80,12 +80,12 @@ def _create_fastapi_app() -> FastAPI:
     )
 
     @app.post("/decode", response_model=DecodeResponse)
-    async def decode_endpoint(req: DecodeRequest) -> Dict[str, Any]:  # type: ignore[valid-type]
+    async def decode_endpoint(req: DecodeRequest) -> dict[str, Any]:  # type: ignore[valid-type]
         if not req.check_to_qubits:
             raise HTTPException(status_code=400, detail="check_to_qubits must be non-empty")
 
         try:
-            dec_any: Union[BatchDecoder, UnionFindDecoder]
+            dec_any: BatchDecoder | UnionFindDecoder
             if req.use_batch:
                 dec_any = BatchDecoder(req.check_to_qubits, req.n_qubits)
                 syndrome_arr = np.array([req.syndrome], dtype=np.uint8)
@@ -95,7 +95,7 @@ def _create_fastapi_app() -> FastAPI:
                 dec_any = uf_dec
                 syndrome_arr = np.array(req.syndrome, dtype=np.uint8)
                 correction = uf_dec.decode(syndrome_arr)
-        except Exception as exc:
+        except RuntimeError as exc:
             raise HTTPException(status_code=500, detail=f"Decode error: {exc}")
 
         return {
@@ -106,7 +106,7 @@ def _create_fastapi_app() -> FastAPI:
         }
 
     @app.get("/health", response_model=HealthResponse)
-    async def health() -> Dict[str, Any]:  # type: ignore[valid-type]
+    async def health() -> dict[str, Any]:  # type: ignore[valid-type]
         return {
             "status": "ok",
             "decoder": "QECTOR UnionFind",
@@ -114,7 +114,7 @@ def _create_fastapi_app() -> FastAPI:
         }
 
     @app.get("/version", response_model=VersionResponse)
-    async def version() -> Dict[str, Any]:  # type: ignore[valid-type]
+    async def version() -> dict[str, Any]:  # type: ignore[valid-type]
         return {
             "version": __version__,
             "framework": "fastapi",
@@ -140,7 +140,6 @@ def _create_flask_app() -> Flask:
             return jsonify({"error": "check_to_qubits must be non-empty"}), 400
 
         try:
-            dec_any: Union[BatchDecoder, UnionFindDecoder]
             if use_batch:
                 dec_any = BatchDecoder(c2q, n_qubits)
                 syndrome_arr = np.array([syndrome], dtype=np.uint8)
@@ -150,7 +149,7 @@ def _create_flask_app() -> Flask:
                 dec_any = uf_dec
                 syndrome_arr = np.array(syndrome, dtype=np.uint8)
                 correction = uf_dec.decode(syndrome_arr)
-        except Exception as exc:
+        except RuntimeError as exc:
             return jsonify({"error": f"Decode error: {exc}"}), 500
 
         return jsonify(

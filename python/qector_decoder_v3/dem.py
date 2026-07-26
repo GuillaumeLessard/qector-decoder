@@ -36,7 +36,7 @@ import math
 import re
 from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Any, List, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -54,8 +54,8 @@ class DemError:
     """One fault mechanism (a DEM ``error`` component, i.e. a column of H)."""
 
     probability: float
-    detectors: Tuple[int, ...]
-    observables: Tuple[int, ...]
+    detectors: tuple[int, ...]
+    observables: tuple[int, ...]
 
     @property
     def weight(self) -> float:
@@ -84,7 +84,7 @@ class DemModel:
         Optional detector coordinates (for visualisation / diagnostics).
     """
 
-    errors: List[DemError]
+    errors: list[DemError]
     num_detectors: int
     num_observables: int
     detector_coords: dict = field(default_factory=dict)
@@ -120,7 +120,7 @@ class DemModel:
         Hyperedges (>2 detectors) are passed through unchanged.
         """
         groups: dict = {}
-        order: List[tuple] = []
+        order: list[tuple] = []
         for e in self.errors:
             sig = e.detectors
             if sig not in groups:
@@ -128,7 +128,7 @@ class DemModel:
                 order.append(sig)
             groups[sig].append(e)
 
-        merged: List[DemError] = []
+        merged: list[DemError] = []
         for sig in order:
             members = groups[sig]
             if len(members) == 1:
@@ -175,9 +175,9 @@ class DemModel:
         """Per-mechanism matching weights ``log((1-p)/p)``, shape ``(num_errors,)``."""
         return np.array([e.weight for e in self.errors], dtype=np.float64)
 
-    def check_to_qubits(self) -> List[List[int]]:
+    def check_to_qubits(self) -> list[list[int]]:
         """``check_to_qubits`` (per detector, the mechanism indices flipping it)."""
-        c2q: List[List[int]] = [[] for _ in range(self.num_detectors)]
+        c2q: list[list[int]] = [[] for _ in range(self.num_detectors)]
         for j, e in enumerate(self.errors):
             for d in e.detectors:
                 if 0 <= d < self.num_detectors:
@@ -262,7 +262,7 @@ def parse_dem(text: str) -> DemModel:
     the running ``shift_detectors`` offset, matching Stim semantics.
     """
     tokens = _tokenize(text)
-    errors: List[DemError] = []
+    errors: list[DemError] = []
     coords: dict = {}
     state = {"det_offset": 0, "coord_offset": None, "max_det": -1, "max_obs": -1}
     _exec_block(tokens, 0, len(tokens), state, errors, coords)
@@ -276,9 +276,9 @@ def parse_dem(text: str) -> DemModel:
     )
 
 
-def _tokenize(text: str) -> List[str]:
+def _tokenize(text: str) -> list[str]:
     """Split DEM text into instructions, with ``{`` and ``}`` as standalone tokens."""
-    out: List[str] = []
+    out: list[str] = []
     for raw in text.splitlines():
         line = raw.split("#", 1)[0].strip()
         if not line:
@@ -298,11 +298,11 @@ def _tokenize(text: str) -> List[str]:
 
 
 def _exec_block(
-    tokens: List[str],
+    tokens: list[str],
     start: int,
     end: int,
     state: dict,
-    errors: List[DemError],
+    errors: list[DemError],
     coords: dict,
 ) -> int:
     i = start
@@ -332,7 +332,7 @@ def _exec_block(
     return end
 
 
-def _matching_brace(tokens: List[str], open_idx: int, end: int) -> int:
+def _matching_brace(tokens: list[str], open_idx: int, end: int) -> int:
     """Index of the ``}`` matching the ``{`` at ``open_idx``."""
     depth = 0
     i = open_idx
@@ -351,7 +351,7 @@ class DemParseError(ValueError):
     """Raised when DEM text cannot be parsed."""
 
 
-def _exec_instruction(tok: str, state: dict, errors: List[DemError], coords: dict) -> None:
+def _exec_instruction(tok: str, state: dict, errors: list[DemError], coords: dict) -> None:
     if tok.startswith("error("):
         m = _ERROR_RE.match(tok)
         if not m:
@@ -407,9 +407,9 @@ def _exec_instruction(tok: str, state: dict, errors: List[DemError], coords: dic
     # detector_coords / tick / unknown directives are ignored safely.
 
 
-def _parse_targets(text: str, det_offset: int) -> Tuple[List[int], List[int]]:
-    dets: List[int] = []
-    obs: List[int] = []
+def _parse_targets(text: str, det_offset: int) -> tuple[list[int], list[int]]:
+    dets: list[int] = []
+    obs: list[int] = []
     for part in text.replace(",", " ").split():
         part = part.strip()
         if not part:
@@ -440,7 +440,11 @@ def from_stim(dem: Any) -> DemModel:
     """Build a :class:`DemModel` from a ``stim.DetectorErrorModel`` object.
 
     The model is flattened first (expanding ``repeat`` and ``shift_detectors``)
-    for an exact column-for-column correspondence with Stim.
+    for an exact column-for-column correspondence with Stim, then parsed from
+    its text form.  (A native instruction-iteration path was benchmarked and
+    measured at 0.60x the speed of the text+regex path — Stim's per-instruction
+    ``args_copy``/``targets_copy`` allocations dominate — so the text path is
+    kept deliberately.  See K3dev.md S1.)
     """
     if isinstance(dem, str):
         return parse_dem(dem)
@@ -448,7 +452,7 @@ def from_stim(dem: Any) -> DemModel:
         raise TypeError(f"expected a stim.DetectorErrorModel (or DEM text), got {type(dem).__name__}")
     try:
         flat = dem.flattened()
-    except Exception:  # pragma: no cover - older Stim
+    except RuntimeError:  # pragma: no cover - older Stim
         flat = dem
     model = parse_dem(str(flat))
     # Trust Stim's declared counts when available.

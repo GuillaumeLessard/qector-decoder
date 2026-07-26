@@ -12,12 +12,12 @@ def _ver():
         from importlib.metadata import version
 
         return version("qector-decoder-v3")
-    except Exception:
+    except RuntimeError:
         try:
             from . import __version__ as v
 
             return v
-        except Exception:
+        except RuntimeError:
             return "0.6.9-unknown"
 
 
@@ -27,15 +27,16 @@ def _detect_avx2():
 
         flags = cpuinfo.get_cpu_info().get("flags", [])
         return "avx2" in flags
-    except Exception:
+    except RuntimeError:
         pass
     try:
         import os
 
         if os.path.exists("/proc/cpuinfo"):
-            txt = open("/proc/cpuinfo").read().lower()
+            with open("/proc/cpuinfo") as fh:
+                txt = fh.read().lower()
             return "avx2" in txt
-    except Exception:
+    except RuntimeError:
         pass
     return "unknown"
 
@@ -49,7 +50,7 @@ def main():
         print(
             f"CUDA available: {CUDABatchDecoder.is_available() if hasattr(CUDABatchDecoder, 'is_available') else False}"
         )
-    except Exception as e:
+    except RuntimeError as e:
         print(f"CUDA: False ({e})")
 
     try:
@@ -58,7 +59,7 @@ def main():
         print(
             f"OpenCL available: {OpenCLBatchDecoder.is_available() if hasattr(OpenCLBatchDecoder, 'is_available') else False}"
         )
-    except Exception as e:
+    except RuntimeError as e:
         print(f"OpenCL: False ({e})")
 
     print(f"AVX2: {_detect_avx2()}")
@@ -84,7 +85,7 @@ def main():
         r2 = bl.decode(syn)
         t1 = time.perf_counter()
         print(f"Blossom decode ok {r2} {(t1 - t0) * 1e6:.1f} us")
-    except Exception as e:
+    except RuntimeError as e:
         print(f"Quick decode failed: {e}")
         return 1
 

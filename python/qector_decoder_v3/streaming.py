@@ -72,7 +72,7 @@ import time
 from collections import deque
 from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 
@@ -110,7 +110,7 @@ def _resolve_default_decoder(check_to_qubits: list[list[int]], n_qubits: int) ->
             inst = _coerce_decoder(choice, check_to_qubits, n_qubits)
             if inst is not None and _decoder_works(inst, len(check_to_qubits), n_qubits):
                 return inst
-    except Exception:  # pragma: no cover - routing API is sibling-owned / may churn
+    except RuntimeError:  # pragma: no cover - routing API is sibling-owned / may churn
         pass
 
     from . import FastUnionFindDecoder
@@ -123,11 +123,11 @@ def _decoder_works(inst: Any, n_checks: int, n_qubits: int) -> bool:
     try:
         out = np.asarray(inst.decode(np.zeros(n_checks, dtype=np.uint8)))
         return out.shape == (n_qubits,)
-    except Exception:  # pragma: no cover - defensive
+    except RuntimeError:  # pragma: no cover - defensive
         return False
 
 
-def _coerce_decoder(choice: Any, check_to_qubits: list[list[int]], n_qubits: int) -> Optional[Any]:
+def _coerce_decoder(choice: Any, check_to_qubits: list[list[int]], n_qubits: int) -> Any | None:
     """Turn a ``recommend_decoder`` return value into a decoder instance, or ``None``.
 
     Accepts an already-built instance (has ``.decode``), a class/factory callable
@@ -154,15 +154,15 @@ def _coerce_decoder(choice: Any, check_to_qubits: list[list[int]], n_qubits: int
 # Input normalisation
 # ---------------------------------------------------------------------------
 def _checks_and_qubits(
-    code_or_checks: Any, n_qubits: Optional[int]
-) -> tuple[list[list[int]], int, Optional[np.ndarray]]:
+    code_or_checks: Any, n_qubits: int | None
+) -> tuple[list[list[int]], int, np.ndarray | None]:
     """Normalise the code argument to ``(check_to_qubits, n_qubits, logicals_matrix)``.
 
     Accepts a :class:`qector_decoder_v3.codes.Code`-like object (has
     ``check_to_qubits`` / ``n_qubits``) or a raw ``check_to_qubits`` list with an
     explicit ``n_qubits``.
     """
-    logicals_mat: Optional[np.ndarray] = None
+    logicals_mat: np.ndarray | None = None
     if hasattr(code_or_checks, "check_to_qubits") and hasattr(code_or_checks, "n_qubits"):
         c2q = [list(map(int, c)) for c in code_or_checks.check_to_qubits]
         nq = int(code_or_checks.n_qubits)
@@ -188,7 +188,7 @@ def _to_host_u8(a: Any) -> np.ndarray:
     return np.ascontiguousarray(host).astype(np.uint8, copy=False)
 
 
-def _logicals_from(logicals: Any, n_qubits: int) -> Optional[np.ndarray]:
+def _logicals_from(logicals: Any, n_qubits: int) -> np.ndarray | None:
     """Coerce a logicals spec to a ``(n_logicals, n_qubits)`` uint8 matrix or ``None``."""
     if logicals is None:
         return None
@@ -244,6 +244,7 @@ class StreamingTelemetry:
     per_window_seconds: list[float] = field(default_factory=list)
     gpu: dict[str, int] = field(default_factory=dict)
     backend: dict[str, Any] = field(default_factory=dict)
+    rounds_valid: int | None = None
 
     @property
     def mean_window_seconds(self) -> float:
@@ -268,6 +269,7 @@ class StreamingTelemetry:
             "per_window_seconds": list(self.per_window_seconds),
             "gpu": dict(self.gpu),
             "backend": dict(self.backend),
+            "rounds_valid": self.rounds_valid,
         }
 
 
@@ -293,7 +295,7 @@ class StreamingResult:
     corrections: np.ndarray
     syndromes: np.ndarray
     telemetry: StreamingTelemetry
-    logical_flips: Optional[np.ndarray] = None
+    logical_flips: np.ndarray | None = None
 
     def is_valid(self, H: Any, *, prefer_gpu: bool = True) -> bool:
         """Return ``True`` iff every committed round satisfies ``H @ c == s (mod 2)``.
@@ -306,13 +308,16 @@ class StreamingResult:
         corr = self.corrections.reshape(-1, self.corrections.shape[-1])
         syn = self.syndromes.reshape(-1, self.syndromes.shape[-1])
         if corr.shape[0] == 0:
+            self.telemetry.rounds_valid = 0
             return True
         xp = _gb.get_array_module(prefer_gpu=prefer_gpu)
         Hx = xp.asarray(H)
         cx = xp.asarray(corr)
         sx = xp.asarray(syn)
         recon = (cx @ Hx.T) & 1
-        ok = bool((recon == sx).all())
+        valid_mask = (recon == sx).all(axis=1)
+        ok = bool(valid_mask.all())
+        self.telemetry.rounds_valid = int(valid_mask.sum())
         if xp is not np:  # pragma: no cover - GPU-only path
             _gb.note_gpu_call()
         return ok
@@ -355,12 +360,12 @@ class StreamingSession:
     def __init__(
         self,
         code_or_checks: Any,
-        n_qubits: Optional[int] = None,
+        n_qubits: int | None = None,
         *,
         window_size: int = 8,
-        decoder: Optional[Any] = None,
+        decoder: Any | None = None,
         logicals: Any = None,
-        prefer_gpu: Optional[bool] = None,
+        prefer_gpu: bool | None = None,
     ) -> None:
         if int(window_size) < 1:
             raise ValueError("window_size must be >= 1")
@@ -510,8 +515,8 @@ class StreamingSession:
 # Logical-flip helper (GPU-aware)
 # ---------------------------------------------------------------------------
 def _compute_logical_flips(
-    corrections: np.ndarray, logicals: Optional[np.ndarray], prefer_gpu: Optional[bool]
-) -> Optional[np.ndarray]:
+    corrections: np.ndarray, logicals: np.ndarray | None, prefer_gpu: bool | None
+) -> np.ndarray | None:
     """Parity of each correction against the logical observables (or ``None``).
 
     ``corrections`` may be ``(..., n_qubits)``; result is ``(..., n_logicals)``.
@@ -538,12 +543,12 @@ def sliding_window_decode(
     syndrome_rounds: Any,
     code: Any = None,
     *,
-    check_to_qubits: Optional[Sequence[Sequence[int]]] = None,
-    n_qubits: Optional[int] = None,
+    check_to_qubits: Sequence[Sequence[int]] | None = None,
+    n_qubits: int | None = None,
     window_size: int = 8,
-    decoder: Optional[Any] = None,
+    decoder: Any | None = None,
     logicals: Any = None,
-    prefer_gpu: Optional[bool] = None,
+    prefer_gpu: bool | None = None,
 ) -> StreamingResult:
     """Decode a whole multi-round syndrome stream window-by-window.
 

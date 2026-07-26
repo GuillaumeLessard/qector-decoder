@@ -97,7 +97,7 @@ def test_gpu_evidence_device_and_cupy_arrays(capsys):
     assert isinstance(dec._prior_llr, cp.ndarray)
 
     _, syns = _random_syndromes(H, 64, 0.05, 0)
-    corr, converged = dec.decode_batch(syns)
+    corr, _ = dec.decode_batch(syns)
     assert isinstance(corr, np.ndarray)  # round-tripped back to host
     assert corr.dtype == np.uint8
 
@@ -273,7 +273,7 @@ def test_batched_bp_decode_shapes_and_return_llr():
 
     out3 = batched_bp_decode(H, syns, error_rate=0.05, max_iter=20, return_llr=True)
     assert len(out3) == 3
-    corr3, conv3, llr = out3
+    _, _, llr = out3
     assert llr.shape == (32, H.shape[1]) and llr.dtype == np.float64
 
 
@@ -281,7 +281,7 @@ def test_single_row_syndrome_is_accepted():
     cx, _ = _bb72()
     H = cx.parity_check_matrix().astype(np.uint8)
     _, syns = _random_syndromes(H, 1, 0.05, 1)
-    corr, conv = batched_bp_decode(H, syns[0], error_rate=0.05, max_iter=20)
+    corr, _conv = batched_bp_decode(H, syns[0], error_rate=0.05, max_iter=20)
     assert corr.shape == (1, H.shape[1])
 
 

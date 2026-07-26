@@ -29,7 +29,8 @@ def test_license_file_exists_and_non_empty():
     root = _repo_root()
     license_path = os.path.join(root, "LICENSE")
     assert os.path.isfile(license_path), f"LICENSE missing at {license_path}"
-    text = open(license_path, "r", encoding="utf-8").read()
+    with open(license_path, "r", encoding="utf-8") as fh:
+        text = fh.read()
     assert len(text) > 100, f"LICENSE is suspiciously short ({len(text)} chars)"
     # The QECTOR Decoder Source-Available License: proprietary, with a free
     # non-commercial grant and a paid commercial requirement.

@@ -32,7 +32,7 @@ New API (preferred)::
 from __future__ import annotations
 
 import warnings
-from typing import Any, List, Optional, Tuple, cast
+from typing import Any, cast
 
 import numpy as np
 
@@ -55,7 +55,7 @@ except ImportError:  # pragma: no cover
     _HAS_STIM = False
 
 
-def from_stim_detector_error_model(dem: Any) -> Tuple[List[List[int]], int]:
+def from_stim_detector_error_model(dem: Any) -> tuple[list[list[int]], int]:
     """
     .. deprecated::
         Use ``qector_decoder_v3.dem.from_stim()`` instead.
@@ -84,8 +84,8 @@ def from_stim_detector_error_model(dem: Any) -> Tuple[List[List[int]], int]:
 
 
 def to_stim_decoder(
-    check_to_qubits: List[List[int]],
-    n_qubits: Optional[int] = None,
+    check_to_qubits: list[list[int]],
+    n_qubits: int | None = None,
     use_batch: bool = False,
 ):
     """

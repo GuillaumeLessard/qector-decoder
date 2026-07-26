@@ -47,7 +47,7 @@ True
 
 from __future__ import annotations
 
-from typing import Any, Tuple, Union
+from typing import Any
 
 import numpy as np
 
@@ -147,7 +147,7 @@ class BatchedBpDecoder:
                 import cupy as _cp  # type: ignore[import-not-found]
 
                 self._xp = _cp
-            except Exception:  # pragma: no cover - import guarded
+            except RuntimeError:  # pragma: no cover - import guarded
                 self.on_gpu = False
                 self._xp = np
         else:
@@ -169,10 +169,7 @@ class BatchedBpDecoder:
         *,
         return_llr: bool = False,
         early_stop: bool = True,
-    ) -> Union[
-        Tuple[np.ndarray, np.ndarray],
-        Tuple[np.ndarray, np.ndarray, np.ndarray],
-    ]:
+    ) -> tuple[np.ndarray, np.ndarray] | tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Decode a stack of syndromes with batched BP.
 
         Parameters
@@ -364,10 +361,7 @@ def batched_bp_decode(
     prefer_gpu: bool = True,
     early_stop: bool = True,
     return_llr: bool = False,
-) -> Union[
-    Tuple[np.ndarray, np.ndarray],
-    Tuple[np.ndarray, np.ndarray, np.ndarray],
-]:
+) -> tuple[np.ndarray, np.ndarray] | tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Decode a stack of syndromes with batched belief propagation.
 
     Convenience wrapper that builds a one-shot :class:`BatchedBpDecoder` and decodes

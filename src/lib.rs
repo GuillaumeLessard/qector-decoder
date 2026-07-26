@@ -13,6 +13,7 @@ pub mod cpu_batch;
 pub mod cross_decoder_tests;
 pub mod decoder;
 pub mod fast_uf;
+pub mod fusion_mwpm;
 pub mod gf2;
 pub mod gnn_graph;
 pub mod gnn_layers;
@@ -33,8 +34,11 @@ pub mod utils;
 
 #[cfg(feature = "cuda")]
 pub mod cuda_batch;
-#[cfg(all(test, feature = "cuda"))]
-pub mod cuda_batch_tests;
+// NOTE: `cuda_batch_tests.rs` is included exactly once, by `cuda_batch.rs`
+// via `#[path] mod tests` — declaring it here too makes clippy's
+// `duplicate_mod` fire when the `cuda` feature is enabled.
+#[cfg(feature = "cuda")]
+pub mod cuda_bp_osd;
 #[cfg(feature = "cuda")]
 pub mod cuda_graph;
 #[cfg(feature = "cuda")]
@@ -123,6 +127,7 @@ fn qector_decoder_v3(m: &Bound<'_, PyModule>) -> PyResult<()> {
     #[cfg(feature = "cuda")]
     {
         m.add_class::<cuda_python::PyCUDABatchDecoder>()?;
+        m.add_class::<cuda_python::PyCUDABpOsdDecoder>()?;
         m.add_function(wrap_pyfunction!(cuda_python::py_cuda_is_available, m)?)?;
     }
 

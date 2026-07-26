@@ -1,0 +1,4137 @@
+{
+  "p": 0.005,
+  "seed": 42,
+  "results": [
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 1000,
+      "decoder": "blossom",
+      "logical_failures": 6,
+      "ler": 0.006,
+      "ci95": [
+        0.002753,
+        0.013028
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0221,
+      "decodes_per_s": 45225.7,
+      "latency_us": 22.11
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 1000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 6,
+      "ler": 0.006,
+      "ci95": [
+        0.002753,
+        0.013028
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0108,
+      "decodes_per_s": 92249.2,
+      "latency_us": 10.84
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 1000,
+      "decoder": "union_find",
+      "logical_failures": 6,
+      "ler": 0.006,
+      "ci95": [
+        0.002753,
+        0.013028
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0354,
+      "decodes_per_s": 28283.1,
+      "latency_us": 35.36
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 1000,
+      "decoder": "fast_union_find",
+      "logical_failures": 6,
+      "ler": 0.006,
+      "ci95": [
+        0.002753,
+        0.013028
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.006,
+      "decodes_per_s": 166251.0,
+      "latency_us": 6.02
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 1000,
+      "decoder": "bposd_rust",
+      "logical_failures": 6,
+      "ler": 0.006,
+      "ci95": [
+        0.002753,
+        0.013028
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0091,
+      "decodes_per_s": 109699.6,
+      "latency_us": 9.12
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 1000,
+      "decoder": "bposd_python",
+      "logical_failures": 6,
+      "ler": 0.006,
+      "ci95": [
+        0.002753,
+        0.013028
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 5.9141,
+      "decodes_per_s": 169.1,
+      "latency_us": 5914.1
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 1000,
+      "decoder": "cpu_batch",
+      "logical_failures": 6,
+      "ler": 0.006,
+      "ci95": [
+        0.002753,
+        0.013028
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0003,
+      "decodes_per_s": 3205128.2,
+      "latency_us": 0.31
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 1000,
+      "decoder": "cuda_batch",
+      "logical_failures": 6,
+      "ler": 0.006,
+      "ci95": [
+        0.002753,
+        0.013028
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1042,
+      "decodes_per_s": 9596.1,
+      "latency_us": 104.21
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 20000,
+      "decoder": "blossom",
+      "logical_failures": 111,
+      "ler": 0.00555,
+      "ci95": [
+        0.004611,
+        0.006679
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0617,
+      "decodes_per_s": 324221.6,
+      "latency_us": 3.08
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 20000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 111,
+      "ler": 0.00555,
+      "ci95": [
+        0.004611,
+        0.006679
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0749,
+      "decodes_per_s": 267176.1,
+      "latency_us": 3.74
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 20000,
+      "decoder": "union_find",
+      "logical_failures": 116,
+      "ler": 0.0058,
+      "ci95": [
+        0.004838,
+        0.006951
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1798,
+      "decodes_per_s": 111258.9,
+      "latency_us": 8.99
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 20000,
+      "decoder": "fast_union_find",
+      "logical_failures": 116,
+      "ler": 0.0058,
+      "ci95": [
+        0.004838,
+        0.006951
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1432,
+      "decodes_per_s": 139688.8,
+      "latency_us": 7.16
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 20000,
+      "decoder": "bposd_rust",
+      "logical_failures": 91,
+      "ler": 0.00455,
+      "ci95": [
+        0.003708,
+        0.005583
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1811,
+      "decodes_per_s": 110415.1,
+      "latency_us": 9.06
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 20000,
+      "decoder": "cpu_batch",
+      "logical_failures": 116,
+      "ler": 0.0058,
+      "ci95": [
+        0.004838,
+        0.006951
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0189,
+      "decodes_per_s": 1059737.4,
+      "latency_us": 0.94
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 20000,
+      "decoder": "cuda_batch",
+      "logical_failures": 116,
+      "ler": 0.0058,
+      "ci95": [
+        0.004838,
+        0.006951
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.2226,
+      "decodes_per_s": 89828.5,
+      "latency_us": 11.13
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 50000,
+      "decoder": "blossom",
+      "logical_failures": 271,
+      "ler": 0.00542,
+      "ci95": [
+        0.004813,
+        0.006103
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.059,
+      "decodes_per_s": 847454.8,
+      "latency_us": 1.18
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 50000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 271,
+      "ler": 0.00542,
+      "ci95": [
+        0.004813,
+        0.006103
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1241,
+      "decodes_per_s": 402943.1,
+      "latency_us": 2.48
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 50000,
+      "decoder": "union_find",
+      "logical_failures": 279,
+      "ler": 0.00558,
+      "ci95": [
+        0.004964,
+        0.006272
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1398,
+      "decodes_per_s": 357560.4,
+      "latency_us": 2.8
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 50000,
+      "decoder": "fast_union_find",
+      "logical_failures": 279,
+      "ler": 0.00558,
+      "ci95": [
+        0.004964,
+        0.006272
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0843,
+      "decodes_per_s": 593182.4,
+      "latency_us": 1.69
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 50000,
+      "decoder": "bposd_rust",
+      "logical_failures": 270,
+      "ler": 0.0054,
+      "ci95": [
+        0.004795,
+        0.006081
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.4576,
+      "decodes_per_s": 109259.5,
+      "latency_us": 9.15
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 50000,
+      "decoder": "cpu_batch",
+      "logical_failures": 279,
+      "ler": 0.00558,
+      "ci95": [
+        0.004964,
+        0.006272
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.028,
+      "decodes_per_s": 1788876.8,
+      "latency_us": 0.56
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 50000,
+      "decoder": "cuda_batch",
+      "logical_failures": 279,
+      "ler": 0.00558,
+      "ci95": [
+        0.004964,
+        0.006272
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0054,
+      "decodes_per_s": 9223220.4,
+      "latency_us": 0.11
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 100000,
+      "decoder": "blossom",
+      "logical_failures": 526,
+      "ler": 0.00526,
+      "ci95": [
+        0.00483,
+        0.005728
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.3336,
+      "decodes_per_s": 299756.9,
+      "latency_us": 3.34
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 100000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 526,
+      "ler": 0.00526,
+      "ci95": [
+        0.00483,
+        0.005728
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1661,
+      "decodes_per_s": 602032.5,
+      "latency_us": 1.66
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 100000,
+      "decoder": "union_find",
+      "logical_failures": 545,
+      "ler": 0.00545,
+      "ci95": [
+        0.005012,
+        0.005926
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0865,
+      "decodes_per_s": 1156057.3,
+      "latency_us": 0.87
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 100000,
+      "decoder": "fast_union_find",
+      "logical_failures": 545,
+      "ler": 0.00545,
+      "ci95": [
+        0.005012,
+        0.005926
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0954,
+      "decodes_per_s": 1048404.9,
+      "latency_us": 0.95
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 100000,
+      "decoder": "bposd_rust",
+      "logical_failures": 539,
+      "ler": 0.00539,
+      "ci95": [
+        0.004955,
+        0.005863
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.8819,
+      "decodes_per_s": 113393.5,
+      "latency_us": 8.82
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 100000,
+      "decoder": "cpu_batch",
+      "logical_failures": 545,
+      "ler": 0.00545,
+      "ci95": [
+        0.005012,
+        0.005926
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0272,
+      "decodes_per_s": 3676146.2,
+      "latency_us": 0.27
+    },
+    {
+      "distance": 3,
+      "n_qubits": 9,
+      "n_checks": 4,
+      "shots": 100000,
+      "decoder": "cuda_batch",
+      "logical_failures": 545,
+      "ler": 0.00545,
+      "ci95": [
+        0.005012,
+        0.005926
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0955,
+      "decodes_per_s": 1046890.2,
+      "latency_us": 0.96
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 1000,
+      "decoder": "blossom",
+      "logical_failures": 8,
+      "ler": 0.008,
+      "ci95": [
+        0.004059,
+        0.015706
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1034,
+      "decodes_per_s": 9667.1,
+      "latency_us": 103.44
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 1000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 8,
+      "ler": 0.008,
+      "ci95": [
+        0.004059,
+        0.015706
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0048,
+      "decodes_per_s": 208855.5,
+      "latency_us": 4.79
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 1000,
+      "decoder": "union_find",
+      "logical_failures": 8,
+      "ler": 0.008,
+      "ci95": [
+        0.004059,
+        0.015706
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0731,
+      "decodes_per_s": 13684.8,
+      "latency_us": 73.07
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 1000,
+      "decoder": "fast_union_find",
+      "logical_failures": 8,
+      "ler": 0.008,
+      "ci95": [
+        0.004059,
+        0.015706
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0008,
+      "decodes_per_s": 1240233.2,
+      "latency_us": 0.81
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 1000,
+      "decoder": "bposd_rust",
+      "logical_failures": 7,
+      "ler": 0.007,
+      "ci95": [
+        0.003395,
+        0.014378
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0285,
+      "decodes_per_s": 35133.1,
+      "latency_us": 28.46
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 1000,
+      "decoder": "bposd_python",
+      "logical_failures": 11,
+      "ler": 0.011,
+      "ci95": [
+        0.006153,
+        0.019589
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 3.104,
+      "decodes_per_s": 322.2,
+      "latency_us": 3104.04
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 1000,
+      "decoder": "cpu_batch",
+      "logical_failures": 8,
+      "ler": 0.008,
+      "ci95": [
+        0.004059,
+        0.015706
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0006,
+      "decodes_per_s": 1677008.2,
+      "latency_us": 0.6
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 1000,
+      "decoder": "cuda_batch",
+      "logical_failures": 8,
+      "ler": 0.008,
+      "ci95": [
+        0.004059,
+        0.015706
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.107,
+      "decodes_per_s": 9342.2,
+      "latency_us": 107.04
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 20000,
+      "decoder": "blossom",
+      "logical_failures": 98,
+      "ler": 0.0049,
+      "ci95": [
+        0.004023,
+        0.005967
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.122,
+      "decodes_per_s": 163940.2,
+      "latency_us": 6.1
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 20000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 98,
+      "ler": 0.0049,
+      "ci95": [
+        0.004023,
+        0.005967
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0931,
+      "decodes_per_s": 214888.3,
+      "latency_us": 4.65
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 20000,
+      "decoder": "union_find",
+      "logical_failures": 103,
+      "ler": 0.00515,
+      "ci95": [
+        0.004249,
+        0.006241
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0891,
+      "decodes_per_s": 224410.0,
+      "latency_us": 4.46
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 20000,
+      "decoder": "fast_union_find",
+      "logical_failures": 103,
+      "ler": 0.00515,
+      "ci95": [
+        0.004249,
+        0.006241
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1972,
+      "decodes_per_s": 101436.0,
+      "latency_us": 9.86
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 20000,
+      "decoder": "bposd_rust",
+      "logical_failures": 103,
+      "ler": 0.00515,
+      "ci95": [
+        0.004249,
+        0.006241
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.8477,
+      "decodes_per_s": 23593.5,
+      "latency_us": 42.38
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 20000,
+      "decoder": "cpu_batch",
+      "logical_failures": 103,
+      "ler": 0.00515,
+      "ci95": [
+        0.004249,
+        0.006241
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0093,
+      "decodes_per_s": 2161624.7,
+      "latency_us": 0.46
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 20000,
+      "decoder": "cuda_batch",
+      "logical_failures": 103,
+      "ler": 0.00515,
+      "ci95": [
+        0.004249,
+        0.006241
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.004,
+      "decodes_per_s": 4973887.1,
+      "latency_us": 0.2
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 50000,
+      "decoder": "blossom",
+      "logical_failures": 241,
+      "ler": 0.00482,
+      "ci95": [
+        0.00425,
+        0.005466
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1916,
+      "decodes_per_s": 260896.1,
+      "latency_us": 3.83
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 50000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 241,
+      "ler": 0.00482,
+      "ci95": [
+        0.00425,
+        0.005466
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1696,
+      "decodes_per_s": 294879.3,
+      "latency_us": 3.39
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 50000,
+      "decoder": "union_find",
+      "logical_failures": 268,
+      "ler": 0.00536,
+      "ci95": [
+        0.004757,
+        0.006039
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.2451,
+      "decodes_per_s": 203979.6,
+      "latency_us": 4.9
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 50000,
+      "decoder": "fast_union_find",
+      "logical_failures": 268,
+      "ler": 0.00536,
+      "ci95": [
+        0.004757,
+        0.006039
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1346,
+      "decodes_per_s": 371436.3,
+      "latency_us": 2.69
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 50000,
+      "decoder": "bposd_rust",
+      "logical_failures": 243,
+      "ler": 0.00486,
+      "ci95": [
+        0.004287,
+        0.005509
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 1.7453,
+      "decodes_per_s": 28648.8,
+      "latency_us": 34.91
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 50000,
+      "decoder": "cpu_batch",
+      "logical_failures": 268,
+      "ler": 0.00536,
+      "ci95": [
+        0.004757,
+        0.006039
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0261,
+      "decodes_per_s": 1915657.4,
+      "latency_us": 0.52
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 50000,
+      "decoder": "cuda_batch",
+      "logical_failures": 268,
+      "ler": 0.00536,
+      "ci95": [
+        0.004757,
+        0.006039
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1959,
+      "decodes_per_s": 255213.9,
+      "latency_us": 3.92
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 100000,
+      "decoder": "blossom",
+      "logical_failures": 468,
+      "ler": 0.00468,
+      "ci95": [
+        0.004276,
+        0.005122
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0064,
+      "decodes_per_s": 15695384.0,
+      "latency_us": 0.06
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 100000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 468,
+      "ler": 0.00468,
+      "ci95": [
+        0.004276,
+        0.005122
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0107,
+      "decodes_per_s": 9371895.6,
+      "latency_us": 0.11
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 100000,
+      "decoder": "union_find",
+      "logical_failures": 523,
+      "ler": 0.00523,
+      "ci95": [
+        0.004802,
+        0.005696
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0068,
+      "decodes_per_s": 14701558.4,
+      "latency_us": 0.07
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 100000,
+      "decoder": "fast_union_find",
+      "logical_failures": 523,
+      "ler": 0.00523,
+      "ci95": [
+        0.004802,
+        0.005696
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0075,
+      "decodes_per_s": 13361124.5,
+      "latency_us": 0.07
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 100000,
+      "decoder": "bposd_rust",
+      "logical_failures": 487,
+      "ler": 0.00487,
+      "ci95": [
+        0.004457,
+        0.005321
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 3.0873,
+      "decodes_per_s": 32391.3,
+      "latency_us": 30.87
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 100000,
+      "decoder": "cpu_batch",
+      "logical_failures": 523,
+      "ler": 0.00523,
+      "ci95": [
+        0.004802,
+        0.005696
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0558,
+      "decodes_per_s": 1790600.1,
+      "latency_us": 0.56
+    },
+    {
+      "distance": 5,
+      "n_qubits": 25,
+      "n_checks": 12,
+      "shots": 100000,
+      "decoder": "cuda_batch",
+      "logical_failures": 523,
+      "ler": 0.00523,
+      "ci95": [
+        0.004802,
+        0.005696
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0752,
+      "decodes_per_s": 1329877.4,
+      "latency_us": 0.75
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 1000,
+      "decoder": "blossom",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.112,
+      "decodes_per_s": 8931.7,
+      "latency_us": 111.96
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 1000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0166,
+      "decodes_per_s": 60132.3,
+      "latency_us": 16.63
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 1000,
+      "decoder": "union_find",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.007,
+      "decodes_per_s": 142170.7,
+      "latency_us": 7.03
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 1000,
+      "decoder": "fast_union_find",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0629,
+      "decodes_per_s": 15892.8,
+      "latency_us": 62.92
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 1000,
+      "decoder": "bposd_rust",
+      "logical_failures": 7,
+      "ler": 0.007,
+      "ci95": [
+        0.003395,
+        0.014378
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0726,
+      "decodes_per_s": 13771.8,
+      "latency_us": 72.61
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 1000,
+      "decoder": "bposd_python",
+      "logical_failures": 9,
+      "ler": 0.009,
+      "ci95": [
+        0.004742,
+        0.017016
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 2.6211,
+      "decodes_per_s": 381.5,
+      "latency_us": 2621.13
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 1000,
+      "decoder": "cpu_batch",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0012,
+      "decodes_per_s": 806776.9,
+      "latency_us": 1.24
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 1000,
+      "decoder": "cuda_batch",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.125,
+      "decodes_per_s": 7999.2,
+      "latency_us": 125.01
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 20000,
+      "decoder": "blossom",
+      "logical_failures": 113,
+      "ler": 0.00565,
+      "ci95": [
+        0.004702,
+        0.006788
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0497,
+      "decodes_per_s": 402531.1,
+      "latency_us": 2.48
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 20000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 113,
+      "ler": 0.00565,
+      "ci95": [
+        0.004702,
+        0.006788
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.063,
+      "decodes_per_s": 317455.3,
+      "latency_us": 3.15
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 20000,
+      "decoder": "union_find",
+      "logical_failures": 114,
+      "ler": 0.0057,
+      "ci95": [
+        0.004747,
+        0.006842
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.2394,
+      "decodes_per_s": 83526.0,
+      "latency_us": 11.97
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 20000,
+      "decoder": "fast_union_find",
+      "logical_failures": 114,
+      "ler": 0.0057,
+      "ci95": [
+        0.004747,
+        0.006842
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1096,
+      "decodes_per_s": 182464.9,
+      "latency_us": 5.48
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 20000,
+      "decoder": "bposd_rust",
+      "logical_failures": 102,
+      "ler": 0.0051,
+      "ci95": [
+        0.004203,
+        0.006187
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 2.7727,
+      "decodes_per_s": 7213.1,
+      "latency_us": 138.64
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 20000,
+      "decoder": "cpu_batch",
+      "logical_failures": 114,
+      "ler": 0.0057,
+      "ci95": [
+        0.004747,
+        0.006842
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0732,
+      "decodes_per_s": 273123.7,
+      "latency_us": 3.66
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 20000,
+      "decoder": "cuda_batch",
+      "logical_failures": 114,
+      "ler": 0.0057,
+      "ci95": [
+        0.004747,
+        0.006842
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0344,
+      "decodes_per_s": 581011.9,
+      "latency_us": 1.72
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 50000,
+      "decoder": "blossom",
+      "logical_failures": 261,
+      "ler": 0.00522,
+      "ci95": [
+        0.004625,
+        0.005891
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.2572,
+      "decodes_per_s": 194391.0,
+      "latency_us": 5.14
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 50000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 261,
+      "ler": 0.00522,
+      "ci95": [
+        0.004625,
+        0.005891
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.2444,
+      "decodes_per_s": 204600.9,
+      "latency_us": 4.89
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 50000,
+      "decoder": "union_find",
+      "logical_failures": 262,
+      "ler": 0.00524,
+      "ci95": [
+        0.004644,
+        0.005912
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.2803,
+      "decodes_per_s": 178405.5,
+      "latency_us": 5.61
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 50000,
+      "decoder": "fast_union_find",
+      "logical_failures": 262,
+      "ler": 0.00524,
+      "ci95": [
+        0.004644,
+        0.005912
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.2266,
+      "decodes_per_s": 220648.8,
+      "latency_us": 4.53
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 50000,
+      "decoder": "bposd_rust",
+      "logical_failures": 249,
+      "ler": 0.00498,
+      "ci95": [
+        0.0044,
+        0.005636
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 6.9535,
+      "decodes_per_s": 7190.7,
+      "latency_us": 139.07
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 50000,
+      "decoder": "cpu_batch",
+      "logical_failures": 262,
+      "ler": 0.00524,
+      "ci95": [
+        0.004644,
+        0.005912
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1121,
+      "decodes_per_s": 446133.8,
+      "latency_us": 2.24
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 50000,
+      "decoder": "cuda_batch",
+      "logical_failures": 262,
+      "ler": 0.00524,
+      "ci95": [
+        0.004644,
+        0.005912
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.2829,
+      "decodes_per_s": 176721.4,
+      "latency_us": 5.66
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 100000,
+      "decoder": "blossom",
+      "logical_failures": 538,
+      "ler": 0.00538,
+      "ci95": [
+        0.004945,
+        0.005853
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1699,
+      "decodes_per_s": 588491.1,
+      "latency_us": 1.7
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 100000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 538,
+      "ler": 0.00538,
+      "ci95": [
+        0.004945,
+        0.005853
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1135,
+      "decodes_per_s": 881371.0,
+      "latency_us": 1.13
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 100000,
+      "decoder": "union_find",
+      "logical_failures": 536,
+      "ler": 0.00536,
+      "ci95": [
+        0.004926,
+        0.005832
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1563,
+      "decodes_per_s": 639663.5,
+      "latency_us": 1.56
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 100000,
+      "decoder": "fast_union_find",
+      "logical_failures": 536,
+      "ler": 0.00536,
+      "ci95": [
+        0.004926,
+        0.005832
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.2246,
+      "decodes_per_s": 445213.6,
+      "latency_us": 2.25
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 100000,
+      "decoder": "bposd_rust",
+      "logical_failures": 466,
+      "ler": 0.00466,
+      "ci95": [
+        0.004256,
+        0.005102
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 11.4605,
+      "decodes_per_s": 8725.6,
+      "latency_us": 114.61
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 100000,
+      "decoder": "cpu_batch",
+      "logical_failures": 536,
+      "ler": 0.00536,
+      "ci95": [
+        0.004926,
+        0.005832
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1341,
+      "decodes_per_s": 745525.9,
+      "latency_us": 1.34
+    },
+    {
+      "distance": 7,
+      "n_qubits": 49,
+      "n_checks": 24,
+      "shots": 100000,
+      "decoder": "cuda_batch",
+      "logical_failures": 536,
+      "ler": 0.00536,
+      "ci95": [
+        0.004926,
+        0.005832
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.2332,
+      "decodes_per_s": 428790.4,
+      "latency_us": 2.33
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 1000,
+      "decoder": "blossom",
+      "logical_failures": 10,
+      "ler": 0.01,
+      "ci95": [
+        0.005441,
+        0.018309
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0713,
+      "decodes_per_s": 14033.5,
+      "latency_us": 71.26
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 1000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 10,
+      "ler": 0.01,
+      "ci95": [
+        0.005441,
+        0.018309
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0115,
+      "decodes_per_s": 87110.3,
+      "latency_us": 11.48
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 1000,
+      "decoder": "union_find",
+      "logical_failures": 10,
+      "ler": 0.01,
+      "ci95": [
+        0.005441,
+        0.018309
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0787,
+      "decodes_per_s": 12713.8,
+      "latency_us": 78.65
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 1000,
+      "decoder": "fast_union_find",
+      "logical_failures": 10,
+      "ler": 0.01,
+      "ci95": [
+        0.005441,
+        0.018309
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0666,
+      "decodes_per_s": 15025.3,
+      "latency_us": 66.55
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 1000,
+      "decoder": "bposd_rust",
+      "logical_failures": 9,
+      "ler": 0.009,
+      "ci95": [
+        0.004742,
+        0.017016
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1682,
+      "decodes_per_s": 5945.9,
+      "latency_us": 168.18
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 1000,
+      "decoder": "bposd_python",
+      "logical_failures": 18,
+      "ler": 0.018,
+      "ci95": [
+        0.011416,
+        0.028273
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 4.2,
+      "decodes_per_s": 238.1,
+      "latency_us": 4200.02
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 1000,
+      "decoder": "cpu_batch",
+      "logical_failures": 10,
+      "ler": 0.01,
+      "ci95": [
+        0.005441,
+        0.018309
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.02,
+      "decodes_per_s": 49955.8,
+      "latency_us": 20.02
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 1000,
+      "decoder": "cuda_batch",
+      "logical_failures": 10,
+      "ler": 0.01,
+      "ci95": [
+        0.005441,
+        0.018309
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1631,
+      "decodes_per_s": 6132.4,
+      "latency_us": 163.07
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 20000,
+      "decoder": "blossom",
+      "logical_failures": 133,
+      "ler": 0.00665,
+      "ci95": [
+        0.005614,
+        0.007875
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0757,
+      "decodes_per_s": 264246.2,
+      "latency_us": 3.78
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 20000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 133,
+      "ler": 0.00665,
+      "ci95": [
+        0.005614,
+        0.007875
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.074,
+      "decodes_per_s": 270268.4,
+      "latency_us": 3.7
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 20000,
+      "decoder": "union_find",
+      "logical_failures": 134,
+      "ler": 0.0067,
+      "ci95": [
+        0.00566,
+        0.007929
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1063,
+      "decodes_per_s": 188070.9,
+      "latency_us": 5.32
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 20000,
+      "decoder": "fast_union_find",
+      "logical_failures": 134,
+      "ler": 0.0067,
+      "ci95": [
+        0.00566,
+        0.007929
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.166,
+      "decodes_per_s": 120496.6,
+      "latency_us": 8.3
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 20000,
+      "decoder": "bposd_rust",
+      "logical_failures": 114,
+      "ler": 0.0057,
+      "ci95": [
+        0.004747,
+        0.006842
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 3.2852,
+      "decodes_per_s": 6088.0,
+      "latency_us": 164.26
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 20000,
+      "decoder": "cpu_batch",
+      "logical_failures": 134,
+      "ler": 0.0067,
+      "ci95": [
+        0.00566,
+        0.007929
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0492,
+      "decodes_per_s": 406430.5,
+      "latency_us": 2.46
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 20000,
+      "decoder": "cuda_batch",
+      "logical_failures": 134,
+      "ler": 0.0067,
+      "ci95": [
+        0.00566,
+        0.007929
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0155,
+      "decodes_per_s": 1287705.6,
+      "latency_us": 0.78
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 50000,
+      "decoder": "blossom",
+      "logical_failures": 267,
+      "ler": 0.00534,
+      "ci95": [
+        0.004738,
+        0.006018
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1752,
+      "decodes_per_s": 285455.9,
+      "latency_us": 3.5
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 50000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 267,
+      "ler": 0.00534,
+      "ci95": [
+        0.004738,
+        0.006018
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.152,
+      "decodes_per_s": 329003.4,
+      "latency_us": 3.04
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 50000,
+      "decoder": "union_find",
+      "logical_failures": 269,
+      "ler": 0.00538,
+      "ci95": [
+        0.004776,
+        0.00606
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1322,
+      "decodes_per_s": 378352.5,
+      "latency_us": 2.64
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 50000,
+      "decoder": "fast_union_find",
+      "logical_failures": 269,
+      "ler": 0.00538,
+      "ci95": [
+        0.004776,
+        0.00606
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1283,
+      "decodes_per_s": 389784.2,
+      "latency_us": 2.57
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 50000,
+      "decoder": "bposd_rust",
+      "logical_failures": 259,
+      "ler": 0.00518,
+      "ci95": [
+        0.004588,
+        0.005848
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 4.9214,
+      "decodes_per_s": 10159.8,
+      "latency_us": 98.43
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 50000,
+      "decoder": "cpu_batch",
+      "logical_failures": 269,
+      "ler": 0.00538,
+      "ci95": [
+        0.004776,
+        0.00606
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0617,
+      "decodes_per_s": 809771.7,
+      "latency_us": 1.23
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 50000,
+      "decoder": "cuda_batch",
+      "logical_failures": 269,
+      "ler": 0.00538,
+      "ci95": [
+        0.004776,
+        0.00606
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0438,
+      "decodes_per_s": 1141622.9,
+      "latency_us": 0.88
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 100000,
+      "decoder": "blossom",
+      "logical_failures": 521,
+      "ler": 0.00521,
+      "ci95": [
+        0.004782,
+        0.005676
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0137,
+      "decodes_per_s": 7324934.1,
+      "latency_us": 0.14
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 100000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 521,
+      "ler": 0.00521,
+      "ci95": [
+        0.004782,
+        0.005676
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0204,
+      "decodes_per_s": 4909686.3,
+      "latency_us": 0.2
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 100000,
+      "decoder": "union_find",
+      "logical_failures": 529,
+      "ler": 0.00529,
+      "ci95": [
+        0.004859,
+        0.005759
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0137,
+      "decodes_per_s": 7290808.5,
+      "latency_us": 0.14
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 100000,
+      "decoder": "fast_union_find",
+      "logical_failures": 529,
+      "ler": 0.00529,
+      "ci95": [
+        0.004859,
+        0.005759
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0161,
+      "decodes_per_s": 6226378.7,
+      "latency_us": 0.16
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 100000,
+      "decoder": "bposd_rust",
+      "logical_failures": 493,
+      "ler": 0.00493,
+      "ci95": [
+        0.004515,
+        0.005384
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 6.6691,
+      "decodes_per_s": 14994.4,
+      "latency_us": 66.69
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 100000,
+      "decoder": "cpu_batch",
+      "logical_failures": 529,
+      "ler": 0.00529,
+      "ci95": [
+        0.004859,
+        0.005759
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0873,
+      "decodes_per_s": 1144855.1,
+      "latency_us": 0.87
+    },
+    {
+      "distance": 9,
+      "n_qubits": 81,
+      "n_checks": 40,
+      "shots": 100000,
+      "decoder": "cuda_batch",
+      "logical_failures": 529,
+      "ler": 0.00529,
+      "ci95": [
+        0.004859,
+        0.005759
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0612,
+      "decodes_per_s": 1634262.0,
+      "latency_us": 0.61
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 1000,
+      "decoder": "blossom",
+      "logical_failures": 7,
+      "ler": 0.007,
+      "ci95": [
+        0.003395,
+        0.014378
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0011,
+      "decodes_per_s": 899199.7,
+      "latency_us": 1.11
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 1000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 7,
+      "ler": 0.007,
+      "ci95": [
+        0.003395,
+        0.014378
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0007,
+      "decodes_per_s": 1476450.6,
+      "latency_us": 0.68
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 1000,
+      "decoder": "union_find",
+      "logical_failures": 7,
+      "ler": 0.007,
+      "ci95": [
+        0.003395,
+        0.014378
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0004,
+      "decodes_per_s": 2474022.8,
+      "latency_us": 0.4
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 1000,
+      "decoder": "fast_union_find",
+      "logical_failures": 7,
+      "ler": 0.007,
+      "ci95": [
+        0.003395,
+        0.014378
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0004,
+      "decodes_per_s": 2560819.5,
+      "latency_us": 0.39
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 1000,
+      "decoder": "bposd_rust",
+      "logical_failures": 2,
+      "ler": 0.002,
+      "ci95": [
+        0.000549,
+        0.007263
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1058,
+      "decodes_per_s": 9449.7,
+      "latency_us": 105.82
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 1000,
+      "decoder": "bposd_python",
+      "logical_failures": 14,
+      "ler": 0.014,
+      "ci95": [
+        0.008358,
+        0.023362
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 1.8558,
+      "decodes_per_s": 538.8,
+      "latency_us": 1855.83
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 1000,
+      "decoder": "cpu_batch",
+      "logical_failures": 7,
+      "ler": 0.007,
+      "ci95": [
+        0.003395,
+        0.014378
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0015,
+      "decodes_per_s": 664231.2,
+      "latency_us": 1.51
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 1000,
+      "decoder": "cuda_batch",
+      "logical_failures": 7,
+      "ler": 0.007,
+      "ci95": [
+        0.003395,
+        0.014378
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0007,
+      "decodes_per_s": 1485222.0,
+      "latency_us": 0.67
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 20000,
+      "decoder": "blossom",
+      "logical_failures": 102,
+      "ler": 0.0051,
+      "ci95": [
+        0.004203,
+        0.006187
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.006,
+      "decodes_per_s": 3347728.6,
+      "latency_us": 0.3
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 20000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 102,
+      "ler": 0.0051,
+      "ci95": [
+        0.004203,
+        0.006187
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0086,
+      "decodes_per_s": 2318303.0,
+      "latency_us": 0.43
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 20000,
+      "decoder": "union_find",
+      "logical_failures": 101,
+      "ler": 0.00505,
+      "ci95": [
+        0.004158,
+        0.006132
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0055,
+      "decodes_per_s": 3649768.2,
+      "latency_us": 0.27
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 20000,
+      "decoder": "fast_union_find",
+      "logical_failures": 101,
+      "ler": 0.00505,
+      "ci95": [
+        0.004158,
+        0.006132
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0043,
+      "decodes_per_s": 4660375.2,
+      "latency_us": 0.21
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 20000,
+      "decoder": "bposd_rust",
+      "logical_failures": 102,
+      "ler": 0.0051,
+      "ci95": [
+        0.004203,
+        0.006187
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 2.0808,
+      "decodes_per_s": 9611.5,
+      "latency_us": 104.04
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 20000,
+      "decoder": "cpu_batch",
+      "logical_failures": 101,
+      "ler": 0.00505,
+      "ci95": [
+        0.004158,
+        0.006132
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0269,
+      "decodes_per_s": 744507.4,
+      "latency_us": 1.34
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 20000,
+      "decoder": "cuda_batch",
+      "logical_failures": 101,
+      "ler": 0.00505,
+      "ci95": [
+        0.004158,
+        0.006132
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0279,
+      "decodes_per_s": 716501.8,
+      "latency_us": 1.4
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 50000,
+      "decoder": "blossom",
+      "logical_failures": 250,
+      "ler": 0.005,
+      "ci95": [
+        0.004419,
+        0.005657
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0135,
+      "decodes_per_s": 3692162.3,
+      "latency_us": 0.27
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 50000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 250,
+      "ler": 0.005,
+      "ci95": [
+        0.004419,
+        0.005657
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0191,
+      "decodes_per_s": 2621754.3,
+      "latency_us": 0.38
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 50000,
+      "decoder": "union_find",
+      "logical_failures": 253,
+      "ler": 0.00506,
+      "ci95": [
+        0.004475,
+        0.005721
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0102,
+      "decodes_per_s": 4893948.1,
+      "latency_us": 0.2
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 50000,
+      "decoder": "fast_union_find",
+      "logical_failures": 253,
+      "ler": 0.00506,
+      "ci95": [
+        0.004475,
+        0.005721
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0101,
+      "decodes_per_s": 4956826.1,
+      "latency_us": 0.2
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 50000,
+      "decoder": "cpu_batch",
+      "logical_failures": 253,
+      "ler": 0.00506,
+      "ci95": [
+        0.004475,
+        0.005721
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0714,
+      "decodes_per_s": 700281.1,
+      "latency_us": 1.43
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 50000,
+      "decoder": "cuda_batch",
+      "logical_failures": 253,
+      "ler": 0.00506,
+      "ci95": [
+        0.004475,
+        0.005721
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0582,
+      "decodes_per_s": 859379.7,
+      "latency_us": 1.16
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 100000,
+      "decoder": "blossom",
+      "logical_failures": 501,
+      "ler": 0.00501,
+      "ci95": [
+        0.004591,
+        0.005467
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0274,
+      "decodes_per_s": 3649954.7,
+      "latency_us": 0.27
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 100000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 501,
+      "ler": 0.00501,
+      "ci95": [
+        0.004591,
+        0.005467
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0412,
+      "decodes_per_s": 2428675.9,
+      "latency_us": 0.41
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 100000,
+      "decoder": "union_find",
+      "logical_failures": 503,
+      "ler": 0.00503,
+      "ci95": [
+        0.00461,
+        0.005488
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0202,
+      "decodes_per_s": 4962532.9,
+      "latency_us": 0.2
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 100000,
+      "decoder": "fast_union_find",
+      "logical_failures": 503,
+      "ler": 0.00503,
+      "ci95": [
+        0.00461,
+        0.005488
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0196,
+      "decodes_per_s": 5096190.6,
+      "latency_us": 0.2
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 100000,
+      "decoder": "cpu_batch",
+      "logical_failures": 503,
+      "ler": 0.00503,
+      "ci95": [
+        0.00461,
+        0.005488
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1613,
+      "decodes_per_s": 619964.0,
+      "latency_us": 1.61
+    },
+    {
+      "distance": 11,
+      "n_qubits": 121,
+      "n_checks": 60,
+      "shots": 100000,
+      "decoder": "cuda_batch",
+      "logical_failures": 503,
+      "ler": 0.00503,
+      "ci95": [
+        0.00461,
+        0.005488
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1161,
+      "decodes_per_s": 860992.7,
+      "latency_us": 1.16
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 1000,
+      "decoder": "blossom",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0016,
+      "decodes_per_s": 630954.6,
+      "latency_us": 1.58
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 1000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0012,
+      "decodes_per_s": 805153.0,
+      "latency_us": 1.24
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 1000,
+      "decoder": "union_find",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0006,
+      "decodes_per_s": 1670006.7,
+      "latency_us": 0.6
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 1000,
+      "decoder": "fast_union_find",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0006,
+      "decodes_per_s": 1581027.7,
+      "latency_us": 0.63
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 1000,
+      "decoder": "bposd_rust",
+      "logical_failures": 5,
+      "ler": 0.005,
+      "ci95": [
+        0.002138,
+        0.011651
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.165,
+      "decodes_per_s": 6062.0,
+      "latency_us": 164.96
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 1000,
+      "decoder": "bposd_python",
+      "logical_failures": 8,
+      "ler": 0.008,
+      "ci95": [
+        0.004059,
+        0.015706
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 2.3473,
+      "decodes_per_s": 426.0,
+      "latency_us": 2347.27
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 1000,
+      "decoder": "cpu_batch",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0021,
+      "decodes_per_s": 482113.6,
+      "latency_us": 2.07
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 1000,
+      "decoder": "cuda_batch",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0006,
+      "decodes_per_s": 1746419.8,
+      "latency_us": 0.57
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 20000,
+      "decoder": "blossom",
+      "logical_failures": 100,
+      "ler": 0.005,
+      "ci95": [
+        0.004113,
+        0.006077
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0096,
+      "decodes_per_s": 2091918.9,
+      "latency_us": 0.48
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 20000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 100,
+      "ler": 0.005,
+      "ci95": [
+        0.004113,
+        0.006077
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0166,
+      "decodes_per_s": 1207583.6,
+      "latency_us": 0.83
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 20000,
+      "decoder": "union_find",
+      "logical_failures": 102,
+      "ler": 0.0051,
+      "ci95": [
+        0.004203,
+        0.006187
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0072,
+      "decodes_per_s": 2792360.1,
+      "latency_us": 0.36
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 20000,
+      "decoder": "fast_union_find",
+      "logical_failures": 102,
+      "ler": 0.0051,
+      "ci95": [
+        0.004203,
+        0.006187
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0072,
+      "decodes_per_s": 2774810.3,
+      "latency_us": 0.36
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 20000,
+      "decoder": "bposd_rust",
+      "logical_failures": 102,
+      "ler": 0.0051,
+      "ci95": [
+        0.004203,
+        0.006187
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 3.3999,
+      "decodes_per_s": 5882.5,
+      "latency_us": 170.0
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 20000,
+      "decoder": "cpu_batch",
+      "logical_failures": 102,
+      "ler": 0.0051,
+      "ci95": [
+        0.004203,
+        0.006187
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0417,
+      "decodes_per_s": 480181.7,
+      "latency_us": 2.08
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 20000,
+      "decoder": "cuda_batch",
+      "logical_failures": 102,
+      "ler": 0.0051,
+      "ci95": [
+        0.004203,
+        0.006187
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0326,
+      "decodes_per_s": 612870.9,
+      "latency_us": 1.63
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 50000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 250,
+      "ler": 0.005,
+      "ci95": [
+        0.004419,
+        0.005657
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0321,
+      "decodes_per_s": 1559220.8,
+      "latency_us": 0.64
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 50000,
+      "decoder": "union_find",
+      "logical_failures": 249,
+      "ler": 0.00498,
+      "ci95": [
+        0.0044,
+        0.005636
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0142,
+      "decodes_per_s": 3514098.6,
+      "latency_us": 0.28
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 50000,
+      "decoder": "fast_union_find",
+      "logical_failures": 249,
+      "ler": 0.00498,
+      "ci95": [
+        0.0044,
+        0.005636
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0157,
+      "decodes_per_s": 3189446.8,
+      "latency_us": 0.31
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 50000,
+      "decoder": "cpu_batch",
+      "logical_failures": 249,
+      "ler": 0.00498,
+      "ci95": [
+        0.0044,
+        0.005636
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1041,
+      "decodes_per_s": 480120.6,
+      "latency_us": 2.08
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 50000,
+      "decoder": "cuda_batch",
+      "logical_failures": 249,
+      "ler": 0.00498,
+      "ci95": [
+        0.0044,
+        0.005636
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.3818,
+      "decodes_per_s": 130967.3,
+      "latency_us": 7.64
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 100000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 471,
+      "ler": 0.00471,
+      "ci95": [
+        0.004304,
+        0.005154
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0694,
+      "decodes_per_s": 1439998.8,
+      "latency_us": 0.69
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 100000,
+      "decoder": "union_find",
+      "logical_failures": 469,
+      "ler": 0.00469,
+      "ci95": [
+        0.004285,
+        0.005133
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0283,
+      "decodes_per_s": 3535355.3,
+      "latency_us": 0.28
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 100000,
+      "decoder": "fast_union_find",
+      "logical_failures": 469,
+      "ler": 0.00469,
+      "ci95": [
+        0.004285,
+        0.005133
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0303,
+      "decodes_per_s": 3296489.6,
+      "latency_us": 0.3
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 100000,
+      "decoder": "cpu_batch",
+      "logical_failures": 469,
+      "ler": 0.00469,
+      "ci95": [
+        0.004285,
+        0.005133
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.2412,
+      "decodes_per_s": 414559.5,
+      "latency_us": 2.41
+    },
+    {
+      "distance": 13,
+      "n_qubits": 169,
+      "n_checks": 84,
+      "shots": 100000,
+      "decoder": "cuda_batch",
+      "logical_failures": 469,
+      "ler": 0.00469,
+      "ci95": [
+        0.004285,
+        0.005133
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.4317,
+      "decodes_per_s": 231616.3,
+      "latency_us": 4.32
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 1000,
+      "decoder": "blossom",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0021,
+      "decodes_per_s": 473641.8,
+      "latency_us": 2.11
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 1000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0015,
+      "decodes_per_s": 654535.9,
+      "latency_us": 1.53
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 1000,
+      "decoder": "union_find",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0008,
+      "decodes_per_s": 1301744.3,
+      "latency_us": 0.77
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 1000,
+      "decoder": "fast_union_find",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0006,
+      "decodes_per_s": 1643115.4,
+      "latency_us": 0.61
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 1000,
+      "decoder": "bposd_rust",
+      "logical_failures": 9,
+      "ler": 0.009,
+      "ci95": [
+        0.004742,
+        0.017016
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1995,
+      "decodes_per_s": 5012.8,
+      "latency_us": 199.49
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 1000,
+      "decoder": "bposd_python",
+      "logical_failures": 11,
+      "ler": 0.011,
+      "ci95": [
+        0.006153,
+        0.019589
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 2.5173,
+      "decodes_per_s": 397.2,
+      "latency_us": 2517.32
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 1000,
+      "decoder": "cpu_batch",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0032,
+      "decodes_per_s": 317208.6,
+      "latency_us": 3.15
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 1000,
+      "decoder": "cuda_batch",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0027,
+      "decodes_per_s": 366568.9,
+      "latency_us": 2.73
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 20000,
+      "decoder": "blossom",
+      "logical_failures": 107,
+      "ler": 0.00535,
+      "ci95": [
+        0.00443,
+        0.00646
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.015,
+      "decodes_per_s": 1335024.4,
+      "latency_us": 0.75
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 20000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 107,
+      "ler": 0.00535,
+      "ci95": [
+        0.00443,
+        0.00646
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.022,
+      "decodes_per_s": 910676.3,
+      "latency_us": 1.1
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 20000,
+      "decoder": "union_find",
+      "logical_failures": 107,
+      "ler": 0.00535,
+      "ci95": [
+        0.00443,
+        0.00646
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0108,
+      "decodes_per_s": 1851337.6,
+      "latency_us": 0.54
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 20000,
+      "decoder": "fast_union_find",
+      "logical_failures": 107,
+      "ler": 0.00535,
+      "ci95": [
+        0.00443,
+        0.00646
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0081,
+      "decodes_per_s": 2455192.7,
+      "latency_us": 0.41
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 20000,
+      "decoder": "bposd_rust",
+      "logical_failures": 98,
+      "ler": 0.0049,
+      "ci95": [
+        0.004023,
+        0.005967
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 3.8636,
+      "decodes_per_s": 5176.5,
+      "latency_us": 193.18
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 20000,
+      "decoder": "cpu_batch",
+      "logical_failures": 107,
+      "ler": 0.00535,
+      "ci95": [
+        0.00443,
+        0.00646
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0518,
+      "decodes_per_s": 385815.1,
+      "latency_us": 2.59
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 20000,
+      "decoder": "cuda_batch",
+      "logical_failures": 107,
+      "ler": 0.00535,
+      "ci95": [
+        0.00443,
+        0.00646
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.241,
+      "decodes_per_s": 82987.3,
+      "latency_us": 12.05
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 50000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 253,
+      "ler": 0.00506,
+      "ci95": [
+        0.004475,
+        0.005721
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0536,
+      "decodes_per_s": 932755.8,
+      "latency_us": 1.07
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 50000,
+      "decoder": "union_find",
+      "logical_failures": 254,
+      "ler": 0.00508,
+      "ci95": [
+        0.004494,
+        0.005742
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0183,
+      "decodes_per_s": 2737865.8,
+      "latency_us": 0.37
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 50000,
+      "decoder": "fast_union_find",
+      "logical_failures": 254,
+      "ler": 0.00508,
+      "ci95": [
+        0.004494,
+        0.005742
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.018,
+      "decodes_per_s": 2781548.3,
+      "latency_us": 0.36
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 50000,
+      "decoder": "cpu_batch",
+      "logical_failures": 254,
+      "ler": 0.00508,
+      "ci95": [
+        0.004494,
+        0.005742
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1399,
+      "decodes_per_s": 357459.2,
+      "latency_us": 2.8
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 50000,
+      "decoder": "cuda_batch",
+      "logical_failures": 254,
+      "ler": 0.00508,
+      "ci95": [
+        0.004494,
+        0.005742
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.3209,
+      "decodes_per_s": 155800.7,
+      "latency_us": 6.42
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 100000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 487,
+      "ler": 0.00487,
+      "ci95": [
+        0.004457,
+        0.005321
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1097,
+      "decodes_per_s": 911466.5,
+      "latency_us": 1.1
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 100000,
+      "decoder": "union_find",
+      "logical_failures": 489,
+      "ler": 0.00489,
+      "ci95": [
+        0.004476,
+        0.005342
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0336,
+      "decodes_per_s": 2974145.8,
+      "latency_us": 0.34
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 100000,
+      "decoder": "fast_union_find",
+      "logical_failures": 489,
+      "ler": 0.00489,
+      "ci95": [
+        0.004476,
+        0.005342
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0347,
+      "decodes_per_s": 2878642.2,
+      "latency_us": 0.35
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 100000,
+      "decoder": "cpu_batch",
+      "logical_failures": 489,
+      "ler": 0.00489,
+      "ci95": [
+        0.004476,
+        0.005342
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.289,
+      "decodes_per_s": 346059.4,
+      "latency_us": 2.89
+    },
+    {
+      "distance": 15,
+      "n_qubits": 225,
+      "n_checks": 112,
+      "shots": 100000,
+      "decoder": "cuda_batch",
+      "logical_failures": 489,
+      "ler": 0.00489,
+      "ci95": [
+        0.004476,
+        0.005342
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.3986,
+      "decodes_per_s": 250855.0,
+      "latency_us": 3.99
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 1000,
+      "decoder": "blossom",
+      "logical_failures": 7,
+      "ler": 0.007,
+      "ci95": [
+        0.003395,
+        0.014378
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0024,
+      "decodes_per_s": 414130.1,
+      "latency_us": 2.41
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 1000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 7,
+      "ler": 0.007,
+      "ci95": [
+        0.003395,
+        0.014378
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0029,
+      "decodes_per_s": 347862.4,
+      "latency_us": 2.87
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 1000,
+      "decoder": "union_find",
+      "logical_failures": 7,
+      "ler": 0.007,
+      "ci95": [
+        0.003395,
+        0.014378
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0009,
+      "decodes_per_s": 1062134.9,
+      "latency_us": 0.94
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 1000,
+      "decoder": "fast_union_find",
+      "logical_failures": 7,
+      "ler": 0.007,
+      "ci95": [
+        0.003395,
+        0.014378
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0013,
+      "decodes_per_s": 760977.1,
+      "latency_us": 1.31
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 1000,
+      "decoder": "bposd_rust",
+      "logical_failures": 3,
+      "ler": 0.003,
+      "ci95": [
+        0.001021,
+        0.008783
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.2815,
+      "decodes_per_s": 3551.8,
+      "latency_us": 281.55
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 1000,
+      "decoder": "bposd_python",
+      "logical_failures": 13,
+      "ler": 0.013,
+      "ci95": [
+        0.007613,
+        0.022114
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 3.4618,
+      "decodes_per_s": 288.9,
+      "latency_us": 3461.83
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 1000,
+      "decoder": "cpu_batch",
+      "logical_failures": 7,
+      "ler": 0.007,
+      "ci95": [
+        0.003395,
+        0.014378
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0056,
+      "decodes_per_s": 179372.2,
+      "latency_us": 5.57
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 1000,
+      "decoder": "cuda_batch",
+      "logical_failures": 7,
+      "ler": 0.007,
+      "ci95": [
+        0.003395,
+        0.014378
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0042,
+      "decodes_per_s": 239274.5,
+      "latency_us": 4.18
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 20000,
+      "decoder": "blossom",
+      "logical_failures": 103,
+      "ler": 0.00515,
+      "ci95": [
+        0.004249,
+        0.006241
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0269,
+      "decodes_per_s": 743430.9,
+      "latency_us": 1.35
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 20000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 103,
+      "ler": 0.00515,
+      "ci95": [
+        0.004249,
+        0.006241
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0472,
+      "decodes_per_s": 424010.0,
+      "latency_us": 2.36
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 20000,
+      "decoder": "union_find",
+      "logical_failures": 103,
+      "ler": 0.00515,
+      "ci95": [
+        0.004249,
+        0.006241
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.016,
+      "decodes_per_s": 1251666.3,
+      "latency_us": 0.8
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 20000,
+      "decoder": "fast_union_find",
+      "logical_failures": 103,
+      "ler": 0.00515,
+      "ci95": [
+        0.004249,
+        0.006241
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0095,
+      "decodes_per_s": 2096941.6,
+      "latency_us": 0.48
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 20000,
+      "decoder": "bposd_rust",
+      "logical_failures": 100,
+      "ler": 0.005,
+      "ci95": [
+        0.004113,
+        0.006077
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 5.7656,
+      "decodes_per_s": 3468.8,
+      "latency_us": 288.28
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 20000,
+      "decoder": "cpu_batch",
+      "logical_failures": 103,
+      "ler": 0.00515,
+      "ci95": [
+        0.004249,
+        0.006241
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0718,
+      "decodes_per_s": 278507.3,
+      "latency_us": 3.59
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 20000,
+      "decoder": "cuda_batch",
+      "logical_failures": 103,
+      "ler": 0.00515,
+      "ci95": [
+        0.004249,
+        0.006241
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.2292,
+      "decodes_per_s": 87253.3,
+      "latency_us": 11.46
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 50000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 259,
+      "ler": 0.00518,
+      "ci95": [
+        0.004588,
+        0.005848
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0998,
+      "decodes_per_s": 501158.2,
+      "latency_us": 2.0
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 50000,
+      "decoder": "union_find",
+      "logical_failures": 262,
+      "ler": 0.00524,
+      "ci95": [
+        0.004644,
+        0.005912
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0298,
+      "decodes_per_s": 1675378.6,
+      "latency_us": 0.6
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 50000,
+      "decoder": "fast_union_find",
+      "logical_failures": 262,
+      "ler": 0.00524,
+      "ci95": [
+        0.004644,
+        0.005912
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.023,
+      "decodes_per_s": 2176932.4,
+      "latency_us": 0.46
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 50000,
+      "decoder": "cpu_batch",
+      "logical_failures": 262,
+      "ler": 0.00524,
+      "ci95": [
+        0.004644,
+        0.005912
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1768,
+      "decodes_per_s": 282880.0,
+      "latency_us": 3.54
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 50000,
+      "decoder": "cuda_batch",
+      "logical_failures": 262,
+      "ler": 0.00524,
+      "ci95": [
+        0.004644,
+        0.005912
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.3239,
+      "decodes_per_s": 154390.7,
+      "latency_us": 6.48
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 100000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 521,
+      "ler": 0.00521,
+      "ci95": [
+        0.004782,
+        0.005676
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1758,
+      "decodes_per_s": 568832.4,
+      "latency_us": 1.76
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 100000,
+      "decoder": "union_find",
+      "logical_failures": 528,
+      "ler": 0.00528,
+      "ci95": [
+        0.004849,
+        0.005749
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0445,
+      "decodes_per_s": 2247994.2,
+      "latency_us": 0.44
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 100000,
+      "decoder": "fast_union_find",
+      "logical_failures": 528,
+      "ler": 0.00528,
+      "ci95": [
+        0.004849,
+        0.005749
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0438,
+      "decodes_per_s": 2280855.4,
+      "latency_us": 0.44
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 100000,
+      "decoder": "cpu_batch",
+      "logical_failures": 528,
+      "ler": 0.00528,
+      "ci95": [
+        0.004849,
+        0.005749
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.3622,
+      "decodes_per_s": 276070.3,
+      "latency_us": 3.62
+    },
+    {
+      "distance": 17,
+      "n_qubits": 289,
+      "n_checks": 144,
+      "shots": 100000,
+      "decoder": "cuda_batch",
+      "logical_failures": 528,
+      "ler": 0.00528,
+      "ci95": [
+        0.004849,
+        0.005749
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.4747,
+      "decodes_per_s": 210677.9,
+      "latency_us": 4.75
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 1000,
+      "decoder": "blossom",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0035,
+      "decodes_per_s": 287695.3,
+      "latency_us": 3.48
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 1000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0049,
+      "decodes_per_s": 205284.0,
+      "latency_us": 4.87
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 1000,
+      "decoder": "union_find",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0016,
+      "decodes_per_s": 630914.8,
+      "latency_us": 1.58
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 1000,
+      "decoder": "fast_union_find",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0011,
+      "decodes_per_s": 896057.3,
+      "latency_us": 1.12
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 1000,
+      "decoder": "bposd_rust",
+      "logical_failures": 6,
+      "ler": 0.006,
+      "ci95": [
+        0.002753,
+        0.013028
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.3342,
+      "decodes_per_s": 2992.3,
+      "latency_us": 334.19
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 1000,
+      "decoder": "bposd_python",
+      "logical_failures": 12,
+      "ler": 0.012,
+      "ci95": [
+        0.006878,
+        0.020857
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 3.9937,
+      "decodes_per_s": 250.4,
+      "latency_us": 3993.71
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 1000,
+      "decoder": "cpu_batch",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0045,
+      "decodes_per_s": 222064.3,
+      "latency_us": 4.5
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 1000,
+      "decoder": "cuda_batch",
+      "logical_failures": 4,
+      "ler": 0.004,
+      "ci95": [
+        0.001557,
+        0.01024
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0044,
+      "decodes_per_s": 229800.5,
+      "latency_us": 4.35
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 20000,
+      "decoder": "blossom",
+      "logical_failures": 94,
+      "ler": 0.0047,
+      "ci95": [
+        0.003843,
+        0.005748
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0343,
+      "decodes_per_s": 583665.5,
+      "latency_us": 1.71
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 20000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 94,
+      "ler": 0.0047,
+      "ci95": [
+        0.003843,
+        0.005748
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0546,
+      "decodes_per_s": 366370.8,
+      "latency_us": 2.73
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 20000,
+      "decoder": "union_find",
+      "logical_failures": 92,
+      "ler": 0.0046,
+      "ci95": [
+        0.003753,
+        0.005638
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0121,
+      "decodes_per_s": 1654437.6,
+      "latency_us": 0.6
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 20000,
+      "decoder": "fast_union_find",
+      "logical_failures": 92,
+      "ler": 0.0046,
+      "ci95": [
+        0.003753,
+        0.005638
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0122,
+      "decodes_per_s": 1644114.9,
+      "latency_us": 0.61
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 20000,
+      "decoder": "bposd_rust",
+      "logical_failures": 115,
+      "ler": 0.00575,
+      "ci95": [
+        0.004793,
+        0.006897
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 6.716,
+      "decodes_per_s": 2977.9,
+      "latency_us": 335.8
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 20000,
+      "decoder": "cpu_batch",
+      "logical_failures": 92,
+      "ler": 0.0046,
+      "ci95": [
+        0.003753,
+        0.005638
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0907,
+      "decodes_per_s": 220481.9,
+      "latency_us": 4.54
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 20000,
+      "decoder": "cuda_batch",
+      "logical_failures": 92,
+      "ler": 0.0046,
+      "ci95": [
+        0.003753,
+        0.005638
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.375,
+      "decodes_per_s": 53336.8,
+      "latency_us": 18.75
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 50000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 243,
+      "ler": 0.00486,
+      "ci95": [
+        0.004287,
+        0.005509
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.1331,
+      "decodes_per_s": 375524.5,
+      "latency_us": 2.66
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 50000,
+      "decoder": "union_find",
+      "logical_failures": 243,
+      "ler": 0.00486,
+      "ci95": [
+        0.004287,
+        0.005509
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0301,
+      "decodes_per_s": 1660021.0,
+      "latency_us": 0.6
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 50000,
+      "decoder": "fast_union_find",
+      "logical_failures": 243,
+      "ler": 0.00486,
+      "ci95": [
+        0.004287,
+        0.005509
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0295,
+      "decodes_per_s": 1693325.3,
+      "latency_us": 0.59
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 50000,
+      "decoder": "cpu_batch",
+      "logical_failures": 243,
+      "ler": 0.00486,
+      "ci95": [
+        0.004287,
+        0.005509
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.2452,
+      "decodes_per_s": 203939.9,
+      "latency_us": 4.9
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 50000,
+      "decoder": "cuda_batch",
+      "logical_failures": 243,
+      "ler": 0.00486,
+      "ci95": [
+        0.004287,
+        0.005509
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.4679,
+      "decodes_per_s": 106864.1,
+      "latency_us": 9.36
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 100000,
+      "decoder": "sparse_blossom",
+      "logical_failures": 478,
+      "ler": 0.00478,
+      "ci95": [
+        0.004371,
+        0.005227
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.2729,
+      "decodes_per_s": 366396.2,
+      "latency_us": 2.73
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 100000,
+      "decoder": "union_find",
+      "logical_failures": 478,
+      "ler": 0.00478,
+      "ci95": [
+        0.004371,
+        0.005227
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0586,
+      "decodes_per_s": 1706027.6,
+      "latency_us": 0.59
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 100000,
+      "decoder": "fast_union_find",
+      "logical_failures": 478,
+      "ler": 0.00478,
+      "ci95": [
+        0.004371,
+        0.005227
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.0589,
+      "decodes_per_s": 1699215.1,
+      "latency_us": 0.59
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 100000,
+      "decoder": "cpu_batch",
+      "logical_failures": 478,
+      "ler": 0.00478,
+      "ci95": [
+        0.004371,
+        0.005227
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.4678,
+      "decodes_per_s": 213772.7,
+      "latency_us": 4.68
+    },
+    {
+      "distance": 19,
+      "n_qubits": 361,
+      "n_checks": 180,
+      "shots": 100000,
+      "decoder": "cuda_batch",
+      "logical_failures": 478,
+      "ler": 0.00478,
+      "ci95": [
+        0.004371,
+        0.005227
+      ],
+      "faithful_pct": 100.0,
+      "seconds": 0.7363,
+      "decodes_per_s": 135816.5,
+      "latency_us": 7.36
+    }
+  ]
+}

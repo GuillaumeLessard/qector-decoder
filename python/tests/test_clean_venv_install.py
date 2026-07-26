@@ -32,6 +32,7 @@ def test_fresh_subprocess_import_version_parity():
         capture_output=True,
         text=True,
         timeout=120,
+        check=True,
     )
     assert proc.returncode == 0, f"import failed:\nSTDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}"
     printed = proc.stdout.strip().splitlines()[-1].strip()
@@ -72,6 +73,7 @@ def test_import_does_not_require_stim_ecosystem():
         capture_output=True,
         text=True,
         timeout=120,
+        check=True,
     )
     assert proc.returncode == 0, f"qd import requires stim/pymatching:\nSTDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}"
     out = proc.stdout

@@ -73,5 +73,5 @@ def _assert_parity(d, shots, seed, basis, noise):
 @pytest.mark.parametrize("d", [5, 7])
 def test_pymatching_parity_p_sweep(d, noise):
     """QECTOR/PyMatching LER parity at each physical error rate."""
-    seed = 20260625 + int(round(noise * 1000)) + d
+    seed = 20260625 + round(noise * 1000) + d
     _assert_parity(d, shots=3000, seed=seed, basis="x", noise=noise)

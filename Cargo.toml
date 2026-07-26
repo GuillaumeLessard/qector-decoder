@@ -41,11 +41,12 @@ rand = "0.8"
 nohash-hasher = "0.2"
 smallvec = "1.15"
 
-# OpenCL (GPU batch decoder)
+# opencl / cuda
 ocl = { version = "0.19", optional = true }
-
-# CUDA driver API loader for native CUDA batch decoding
 libloading = { version = "0.8", optional = true }
+
+# sparse MWPM (weight-optimal alternative to src/mwpm.rs for large graphs)
+fusion-blossom = "0.2"
 
 # Infrastructure gRPC + Prometheus + MCP
 tonic = { version = "0.14", optional = true }

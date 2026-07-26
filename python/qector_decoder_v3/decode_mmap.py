@@ -21,7 +21,6 @@ Example
 from __future__ import annotations
 
 import os as _os
-from typing import Optional, Union
 
 import numpy as _np
 
@@ -40,7 +39,7 @@ def decode_mmap(
     n_qubits: int,
     decoder_type: str = "cpu_batch",
     batch_size: int = 65536,
-    n_shots: Optional[int] = None,
+    n_shots: int | None = None,
     dtype: _np.dtype = _UINT8_DTYPE,
     verbose: bool = False,
 ):
@@ -77,7 +76,7 @@ def decode_mmap(
 
     from . import CPUBatchDecoder, UnionFindDecoder
 
-    decoder: Union[CPUBatchDecoder, UnionFindDecoder]
+    decoder: CPUBatchDecoder | UnionFindDecoder
     if decoder_type == "cpu_batch":
         decoder = CPUBatchDecoder(c2q, n_qubits)
         batch_fn = decoder.batch_decode

@@ -13,7 +13,7 @@ def test_run_examples():
     # __file__ is in python/tests/test_examples.py -> parent.parent.parent = repo root
     try:
         repo_root = Path(__file__).resolve().parent.parent.parent
-    except Exception:
+    except RuntimeError:
         # Fallback to CWD if path resolution fails
         repo_root = Path.cwd()
         for _ in range(4):
@@ -48,7 +48,12 @@ def test_run_examples():
         assert example_path.exists(), f"Example script {example} does not exist at {example_path}"
 
         res = subprocess.run(
-            [sys.executable, str(example_path)], capture_output=True, text=True, env=env, cwd=str(repo_root)
+            [sys.executable, str(example_path)],
+            capture_output=True,
+            text=True,
+            env=env,
+            cwd=str(repo_root),
+            check=True,
         )
         assert res.returncode == 0, (
             f"Example {example} failed with return code {res.returncode}.\nSTDOUT:\n{res.stdout}\nSTDERR:\n{res.stderr}"

@@ -67,6 +67,7 @@ def test_script_help_parses(script):
         capture_output=True,
         text=True,
         timeout=60,
+        check=True,
     )
     assert proc.returncode == 0, (
         f"`{script} --help` exited {proc.returncode}\nSTDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}"

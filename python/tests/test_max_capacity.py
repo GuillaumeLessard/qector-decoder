@@ -467,7 +467,7 @@ class TestBoundaryValidationLarge:
         checks, nq = repetition_code(20)
         dec = qd.UnionFindDecoder(checks, nq)
         syn = np.zeros(len(checks) + 1, dtype=np.uint8)
-        with pytest.raises(Exception):
+        with pytest.raises((ValueError, TypeError, RuntimeError)):
             dec.decode(syn)
 
     def test_empty_checks_rejected(self):

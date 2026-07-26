@@ -27,7 +27,7 @@ uniform-weight graphs and lands in the same logical coset otherwise).
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Any, List, Optional, Tuple, cast
+from typing import Any, cast
 
 import numpy as np
 
@@ -43,11 +43,11 @@ class Matching:
     """Minimum-weight perfect-matching decoder with a PyMatching-style API."""
 
     def __init__(self, H: Any = None, weights: Any = None, faults_matrix: Any = None):
-        self._edges: List[dict] = []  # each: {u, v, fault_ids:set, weight:float}
+        self._edges: list[dict] = []  # each: {u, v, fault_ids:set, weight:float}
         self._num_detectors = 0
-        self._faults_matrix: Optional[np.ndarray] = None
-        self._decoder: Optional[BlossomDecoder] = None
-        self._H_cache: Optional[np.ndarray] = None
+        self._faults_matrix: np.ndarray | None = None
+        self._decoder: BlossomDecoder | None = None
+        self._H_cache: np.ndarray | None = None
         if H is not None:
             self._init_from_check_matrix(H, weights, faults_matrix)
 
@@ -96,11 +96,14 @@ class Matching:
         w = None if weights is None else np.asarray(weights, dtype=np.float64).reshape(-1)
         fm = None if faults_matrix is None else _to_dense_binary(faults_matrix)
         self._faults_matrix = fm
+        # C-contiguous (n_edges, n_obs) copy for the batched observable map:
+        # ``corr @ fm.T`` avoids transposing the big (shots, n_edges) matrix.
+        self._faults_matrix_T = fm.T.copy() if fm is not None else None
         self._num_detectors = int(n_det)
         for j in range(n_edges):
             dets = np.nonzero(arr[:, j])[0].tolist()
             if fm is not None:
-                fault_ids = set(int(o) for o in np.nonzero(fm[:, j])[0])
+                fault_ids = {int(o) for o in np.nonzero(fm[:, j])[0]}
             else:
                 fault_ids = {j}
             edge = {
@@ -164,7 +167,7 @@ class Matching:
             ids |= e["fault_ids"]
         return (max(ids) + 1) if ids else 0
 
-    def edges(self) -> List[Tuple[Optional[int], Optional[int], dict]]:
+    def edges(self) -> list[tuple[int | None, int | None, dict]]:
         """PyMatching-style edge list: ``(u, v, {"fault_ids":..., "weight":...})``."""
         return [(e["u"], e["v"], {"fault_ids": set(e["fault_ids"]), "weight": e["weight"]}) for e in self._edges]
 
@@ -183,7 +186,7 @@ class Matching:
     # -- decoding ----------------------------------------------------------
     def _ensure_decoder(self) -> BlossomDecoder:
         if self._decoder is None:
-            c2q: List[List[int]] = [[] for _ in range(self._num_detectors)]
+            c2q: list[list[int]] = [[] for _ in range(self._num_detectors)]
             for j, e in enumerate(self._edges):
                 for node in (e["u"], e["v"]):
                     if node is not BOUNDARY:
@@ -193,7 +196,7 @@ class Matching:
             # Weighted exact MWPM (matches PyMatching's weighting). When all
             # weights are equal, pass None so the uniform-weight fast path runs.
             weights = [e["weight"] for e in self._edges]
-            uniform = len(set(round(w, 12) for w in weights)) <= 1
+            uniform = len({round(w, 12) for w in weights}) <= 1
             self._decoder = BlossomDecoder(c2q, len(self._edges), None if uniform else weights)
         return self._decoder
 
@@ -235,8 +238,8 @@ class Matching:
         arr = np.ascontiguousarray(arr, dtype=np.uint8)
         dec = self._ensure_decoder()
         corr = np.asarray(dec.batch_decode(arr), dtype=np.uint8)
-        if self._faults_matrix is not None:
-            return ((self._faults_matrix @ corr.T) & 1).T.astype(np.uint8)
+        if self._faults_matrix_T is not None:
+            return ((corr @ self._faults_matrix_T) & 1).astype(np.uint8)
         return corr
 
     def decode_to_edges_array(self, syndrome: Sequence[int]) -> np.ndarray:
@@ -258,4 +261,4 @@ def _as_id_set(fault_ids: Any) -> set:
         return set()
     if isinstance(fault_ids, (int, np.integer)):
         return {int(fault_ids)}
-    return set(int(x) for x in fault_ids)
+    return {int(x) for x in fault_ids}

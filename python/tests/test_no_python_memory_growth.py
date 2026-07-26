@@ -45,7 +45,7 @@ def test_no_python_memory_growth():
         for i in range(40000):
             dec.decode(pool[i % pool_size])
         gc.collect()
-        cur_end, peak_end = tracemalloc.get_traced_memory()
+        cur_end, _peak_end = tracemalloc.get_traced_memory()
     finally:
         tracemalloc.stop()
 

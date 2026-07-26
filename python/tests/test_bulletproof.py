@@ -217,6 +217,7 @@ class TestMCPServer:
                 capture_output=True,
                 text=True,
                 timeout=30,
+                check=True,
             )
         except subprocess.TimeoutExpired:
             pytest.skip("MCP server did not respond within 30s (may be built without grpc feature)")
@@ -431,7 +432,7 @@ class TestBoundaryValidation:
         }
 
     def test_all_reject_wrong_dtype(self, decoder_set):
-        for name, dec in decoder_set.items():
+        for dec in decoder_set.values():
             with pytest.raises((TypeError, ValueError)):
                 dec.decode(np.zeros(25, dtype=np.float32))
 
