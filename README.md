@@ -392,12 +392,6 @@ QECTOR Decoder v3 is **source-available**. Personal, academic, educational, and 
 - **Direct purchase**: [Buy via Stripe](https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00)
 - **Contact**: [admin@qector.store](mailto:admin@qector.store)
 
-### DOI references
-
-- Licensing terms & user manual: [10.5281/zenodo.21363016](https://doi.org/10.5281/zenodo.21363016)
-- Performance benchmarks (v0.6.6): [10.5281/zenodo.21339300](https://doi.org/10.5281/zenodo.21339300)
-- Architecture whitepaper: [10.5281/zenodo.21320543](https://doi.org/10.5281/zenodo.21320543)
-
 ```bibtex
 @software{lessard2026qector,
   author  = {Guillaume Lessard},

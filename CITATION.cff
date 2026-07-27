@@ -10,9 +10,6 @@ version: 0.6.9
 date-released: 2026-07-26
 url: https://www.qector.store
 repository-code: https://github.com/GuillaumeLessard/qector-decoder
-identifiers:
-  - type: doi
-    value: 10.5281/zenodo.20825980
 abstract: Source-available Rust and Python quantum error correction decoder package for QEC research, PyMatching-compatible validation, belief-matching, BP-OSD and qLDPC workflows, CPU/GPU batch decoding, and reproducible benchmark evidence.
 keywords:
   - quantum error correction

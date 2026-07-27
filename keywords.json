@@ -3,7 +3,6 @@
   "canonical": "https://qector.store",
   "repository": "https://github.com/GuillaumeLessard/qector-decoder",
   "pypi": "https://pypi.org/project/qector-decoder-v3/",
-  "doi": "https://doi.org/10.5281/zenodo.20825980",
   "keywords": [
     "quantum-error-correction",
     "qec",

@@ -150,7 +150,7 @@ QECTOR Decoder is released under the **QECTOR Source-Available License v1.0**.
 For licensing inquiries, source-review access, or enterprise deployment, please contact:
 - **Email**: [admin@qector.store](mailto:admin@qector.store)
 - **Web**: [https://qector.store/pricing](https://qector.store/pricing)
-- **Provenance**: Protected by timestamped archival (Zenodo DOI).
+- **Provenance**: Protected by timestamped archival.
 
 See `LICENSE` and `COMMERCIAL.md` for full terms.
 

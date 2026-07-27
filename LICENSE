@@ -28,7 +28,8 @@ Software.
    Subject to the terms of this License, the Author grants you a non-exclusive, 
    non-transferable, revocable license to use, copy, and modify the Software 
    strictly for Non-Commercial Use. Academic and educational users may cite 
-   the Software using the provided DOI references (e.g., via Zenodo).
+   the Software using the citation metadata provided in this repository 
+   (see CITATION.cff).
 
 3. COMMERCIAL USE RESTRICTION
    COMMERCIAL USE OF THE SOFTWARE IS STRICTLY PROHIBITED WITHOUT A VALID, 
@@ -43,9 +44,9 @@ Software.
    The Author retains all right, title, and interest in and to the Software, 
    including all intellectual property rights. The proprietary architecture 
    and performance benchmarks of the Software are formally archived and 
-   timestamped (e.g., via Zenodo) to establish clear chain of title and 
-   provenance. No rights are granted to the proprietary Rust core source code 
-   outside of the terms of a separate, executed commercial agreement or NDA.
+   timestamped to establish clear chain of title and provenance. No rights 
+   are granted to the proprietary Rust core source code outside of the terms 
+   of a separate, executed commercial agreement or NDA.
 
 5. REDISTRIBUTION RESTRICTIONS
    You may not distribute, sublicense, sell, or otherwise make the Software 
@@ -104,4 +105,3 @@ Software.
     
     Email: admin@qector.store
     Web: https://qector.store/pricing
-    Zenodo Archive: https://zenodo.org/communities/id01t/
