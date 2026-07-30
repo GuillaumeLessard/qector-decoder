@@ -8,6 +8,13 @@
 **Production-grade quantum error correction decoding library — Python + Rust.**  
 *Copyright © 2026 Guillaume Lessard / iD01t Productions. All Rights Reserved.*
 
+## 🚀 Support QECTOR Development
+
+[![Sponsor qectorlab](https://img.shields.io/badge/Sponsor-qectorlab-ea4aaa?style=for-the-badge&logo=github)](https://github.com/sponsors/qectorlab)
+
+[![Open Collective](https://img.shields.io/badge/Open%20Collective-qectorlab-3385FF?style=for-the-badge&logo=opencollective)](https://opencollective.com/qectorlab)
+
+
 PyMatching-compatible MWPM validation · Belief-matching accuracy mode · BP-OSD for LDPC/qLDPC · CPU/GPU batch decoding · 7-tier self-debugging fallback engine · Ed25519 cryptographic license verification · Artifact-backed benchmark evidence
 
 [Website](https://www.qector.store) · [PyPI](https://pypi.org/project/qector-decoder-v3/) · [Commercial licensing](mailto:admin@qector.store)
