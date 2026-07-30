@@ -95,6 +95,6 @@ python -m pip_audit
 
 **Security reporting, issue filing, source review, or contribution does not grant commercial use rights.** 
 
-QECTOR remains source-available proprietary software. All commercial, institutional, and lab use requires a paid license. See `LICENSE` and `COMMERCIAL.md` for full terms. Provenance and chain of title are protected via timestamped archival.
+QECTOR remains source-available proprietary software. All commercial, institutional, and lab use requires a paid license. See `LICENSE` and `COMMERCIAL.md` for full terms. Provenance and chain of title are protected via timestamped Zenodo archival.
 ```
 Save this as `SECURITY.md` in the root of your repository. GitHub will automatically detect it and display a "Security" tab on your repo, signaling to enterprise users that you take this seriously.

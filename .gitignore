@@ -74,7 +74,7 @@ artifacts/
 Thumbs.db
 desktop.ini
 
-# --- Benchmark outputs ---
+# --- Benchmark outputs (canonical archive on Zenodo: doi.org/10.5281/zenodo.21339300) ---
 benchmark_results/
 
 # --- Testing ---

@@ -6,6 +6,8 @@ QECTOR Decoder v3 (v0.6.6) is a high-performance, source-available Rust and Pyth
 - **Website & Pricing**: https://qector.store/pricing
 - **PyPI Package**: https://pypi.org/project/qector-decoder-v3/
 - **Source Repository**: https://github.com/GuillaumeLessard/qector-decoder
+- **DOI (Licensing & User Manual)**: https://doi.org/10.5281/zenodo.21363016
+- **DOI (Benchmark Artifacts)**: https://doi.org/10.5281/zenodo.21339300
 - **Code Artifacts**: https://github.com/GuillaumeLessard/qector-decoder/tree/main/benchmark_results
 - **Contact**: admin@qector.store
 
