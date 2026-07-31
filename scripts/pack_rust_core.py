@@ -71,6 +71,12 @@ ENV_PREFIX = "RUST_SRC_B64_"
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC_DIR = REPO_ROOT / "src"
 
+# Tracked digest of the packed core. `src/*` is gitignored, so this file is the
+# only record of the core's identity that actually travels with a commit - and
+# the only thing CI can compare the restored secrets against. See
+# cmd_check_manifest for why stale-secrets-check cannot do this on its own.
+MANIFEST = REPO_ROOT / "rust_core.sha256"
+
 # Deterministic archives: identical sources must produce an identical base64
 # string, so an unchanged core does not churn the secrets on every pack.
 FIXED_MTIME = 0
@@ -222,6 +228,45 @@ def cmd_pack(args) -> int:
             f"Add {ENV_PREFIX}{MIN_CHUNKS + 1}..{ENV_PREFIX}{n} in repository settings; "
             "the CI restore step reads chunks until the first gap, so it adapts automatically."
         )
+    MANIFEST.write_text(digest + "\n", encoding="ascii")
+    print(f"\nWrote {MANIFEST.name} - COMMIT IT in the same change as the secret refresh.")
+    return 0
+
+
+def cmd_check_manifest(args) -> int:
+    """Fail if src/ does not hash to the digest recorded in the tracked manifest.
+
+    Closes the hole `stale-secrets-check` cannot: that job runs on a fresh
+    checkout, where `src/*` is gitignored and absent, so `verify` compares the
+    unpacked secrets against themselves and is self-consistent by construction.
+    It therefore cannot see a maintainer who edited src/, re-packed, and never
+    ran `gh secret set` — the exact drift its docstring claims to catch, and the
+    one that silently kept a local fix out of CI and the wheels for hours.
+
+    Run this *after* `unpack --from-env` in CI: the restored tree hashes to what
+    the secrets actually hold, and the manifest records what the last `pack`
+    produced. A mismatch means the two have diverged.
+    """
+    if not MANIFEST.is_file():
+        print(f"{MANIFEST.name} is missing — run `pack_rust_core.py pack` and commit it.")
+        return 1
+    expected = MANIFEST.read_text(encoding="ascii").strip()
+    actual = hashlib.sha256(_build_archive()).hexdigest()
+    print(f"manifest sha256: {expected}")
+    print(f"src/     sha256: {actual}")
+    if expected != actual:
+        print(
+            "\nMISMATCH: the Rust core in src/ is not the one the manifest records.\n"
+            "In CI this means the RUST_SRC_B64_* secrets are stale: someone packed a\n"
+            "change and never uploaded it, so CI and every released wheel are built\n"
+            "from older source than the manifest claims. Re-run:\n"
+            "    python scripts/pack_rust_core.py pack\n"
+            "    for i in $(seq 1 12); do "
+            "gh secret set RUST_SRC_B64_$i < .secrets/RUST_SRC_B64_$i.txt; done\n"
+            "and commit the refreshed manifest."
+        )
+        return 1
+    print("OK - src/ matches the committed manifest.")
     return 0
 
 
@@ -270,6 +315,12 @@ def main(argv=None) -> int:
     p = sub.add_parser("pack", help="pack src/ into RUST_SRC_B64_* chunk files")
     p.add_argument("--out", default=".secrets", help="output directory (default: .secrets)")
     p.set_defaults(func=cmd_pack)
+
+    p = sub.add_parser(
+        "check-manifest",
+        help="fail if src/ does not hash to the committed rust_core.sha256",
+    )
+    p.set_defaults(func=cmd_check_manifest)
 
     p = sub.add_parser("verify", help="check packed chunks match the working tree")
     p.add_argument("--in", dest="inp", default=".secrets", help="directory holding the chunk files")
