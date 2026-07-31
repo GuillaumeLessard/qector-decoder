@@ -1,288 +1,170 @@
-# QECTOR v0.7.0 Comprehensive Benchmark Report (Full Data: d=3..31, Shots=1k..100k)
+# QECTOR v0.7.0 — circuit-level decoder comparison
 
-## Executive Summary
+Every row below is one `ler.estimate_ler_circuit_level` measurement: the same Stim rotated-surface-code circuit, the same decomposed DEM, the same detector/observable samples and the same `decode_batch` resolver for every decoder, scored against the circuit's own logical observables. `ler.assert_comparable` gated these rows before writing.
 
-This official benchmark evaluates **QECTOR v0.7.0** (CPU & CUDA GPU) against standard industry baselines (**PyMatching v2.4** and **ldpc v2.4.1**) across distances $d=3..31$ and shot volumes up to $100,000$.
+- **Noise model**: circuit-level, p = 0.005 (gate, reset and measurement noise over d rounds of syndrome extraction)
+- **Per-cell decode budget**: 25s. Cells projected to exceed it appear under *Not measured* — nothing is extrapolated.
+- **Git commit**: `b0f5456470` (tree dirty: True)
+- **Platform**: Windows-10-10.0.26100-SP0 · Python 3.11.9
+- **Versions**: qector 0.7.0, pymatching 2.4.0, ldpc ?, stim 1.16.0
 
-### Environment & Provenance Metadata
 
-- **Git Commit**: `3d60a96e44`
-- **Platform**: Windows-10-10.0.26100-SP0
-- **Python Version**: 3.11.9
-- **QECTOR Version**: 0.7.0
-- **PyMatching Version**: 2.4.0
-- **ldpc Version**: 2.4.1
-- **Stim Version**: 1.16.0
+## Measured results (77 cells)
 
-## Full Throughput & Latency Table (264 Total Benchmark Configurations)
+| Decoder | d | Shots | Errors | LER | 95% CI | Throughput (dec/s) | vs PyMatching |
+|:---|:---:|---:|---:|---:|:---:|---:|---:|
+| PyMatching v2 (C++) | 3 | 1,000 | 13 | 0.01300 | [0.00761, 0.02211] | 1,949,317.9 | 1.00x |
+| QECTOR Sparse Blossom (CPU) | 3 | 1,000 | 13 | 0.01300 | [0.00761, 0.02211] | 154,268.6 | 0.08x |
+| QECTOR Union-Find (CPU) | 3 | 1,000 | 16 | 0.01600 | [0.00987, 0.02583] | 222,321.0 | 0.11x |
+| ldpc BP-OSD | 3 | 1,000 | 12 | 0.01200 | [0.00688, 0.02086] | 2,266.7 | 0.00x |
+| PyMatching v2 (C++) | 3 | 5,000 | 84 | 0.01680 | [0.01359, 0.02075] | 1,865,810.9 | 1.00x |
+| QECTOR Sparse Blossom (CPU) | 3 | 5,000 | 84 | 0.01680 | [0.01359, 0.02075] | 236,337.3 | 0.13x |
+| QECTOR Union-Find (CPU) | 3 | 5,000 | 105 | 0.02100 | [0.01738, 0.02536] | 481,023.6 | 0.26x |
+| ldpc BP-OSD | 3 | 5,000 | 87 | 0.01740 | [0.01413, 0.02141] | 2,285.6 | 0.00x |
+| PyMatching v2 (C++) | 3 | 10,000 | 202 | 0.02020 | [0.01762, 0.02315] | 1,848,941.5 | 1.00x |
+| QECTOR Sparse Blossom (CPU) | 3 | 10,000 | 202 | 0.02020 | [0.01762, 0.02315] | 248,615.8 | 0.13x |
+| QECTOR Union-Find (CPU) | 3 | 10,000 | 233 | 0.02330 | [0.02052, 0.02644] | 571,931.9 | 0.31x |
+| ldpc BP-OSD | 3 | 10,000 | 199 | 0.01990 | [0.01734, 0.02283] | 2,329.7 | 0.00x |
+| PyMatching v2 (C++) | 3 | 50,000 | 960 | 0.01920 | [0.01803, 0.02044] | 2,234,836.6 | 1.00x |
+| QECTOR Sparse Blossom (CPU) | 3 | 50,000 | 960 | 0.01920 | [0.01803, 0.02044] | 250,396.0 | 0.11x |
+| QECTOR Union-Find (CPU) | 3 | 50,000 | 1128 | 0.02256 | [0.02129, 0.02390] | 812,805.9 | 0.36x |
+| ldpc BP-OSD | 3 | 50,000 | 969 | 0.01938 | [0.01821, 0.02063] | 2,259.1 | 0.00x |
+| PyMatching v2 (C++) | 3 | 100,000 | 1891 | 0.01891 | [0.01808, 0.01977] | 2,437,651.0 | 1.00x |
+| QECTOR Sparse Blossom (CPU) | 3 | 100,000 | 1891 | 0.01891 | [0.01808, 0.01977] | 245,628.9 | 0.10x |
+| QECTOR Union-Find (CPU) | 3 | 100,000 | 2210 | 0.02210 | [0.02121, 0.02303] | 825,725.6 | 0.34x |
+| PyMatching v2 (C++) | 5 | 1,000 | 19 | 0.01900 | [0.01220, 0.02948] | 266,410.9 | 1.00x |
+| QECTOR Sparse Blossom (CPU) | 5 | 1,000 | 19 | 0.01900 | [0.01220, 0.02948] | 8,690.2 | 0.03x |
+| QECTOR Union-Find (CPU) | 5 | 1,000 | 26 | 0.02600 | [0.01780, 0.03782] | 79,887.5 | 0.30x |
+| ldpc BP-OSD | 5 | 1,000 | 21 | 0.02100 | [0.01378, 0.03189] | 87.8 | — |
+| PyMatching v2 (C++) | 5 | 5,000 | 73 | 0.01460 | [0.01163, 0.01832] | 286,109.9 | 1.00x |
+| QECTOR Sparse Blossom (CPU) | 5 | 5,000 | 73 | 0.01460 | [0.01163, 0.01832] | 9,018.3 | 0.03x |
+| QECTOR Union-Find (CPU) | 5 | 5,000 | 148 | 0.02960 | [0.02525, 0.03467] | 91,362.6 | 0.32x |
+| PyMatching v2 (C++) | 5 | 10,000 | 166 | 0.01660 | [0.01428, 0.01930] | 234,845.4 | 1.00x |
+| QECTOR Sparse Blossom (CPU) | 5 | 10,000 | 166 | 0.01660 | [0.01428, 0.01930] | 9,204.4 | 0.04x |
+| QECTOR Union-Find (CPU) | 5 | 10,000 | 268 | 0.02680 | [0.02381, 0.03015] | 97,208.1 | 0.41x |
+| PyMatching v2 (C++) | 5 | 50,000 | 809 | 0.01618 | [0.01511, 0.01732] | 225,455.0 | 1.00x |
+| QECTOR Sparse Blossom (CPU) | 5 | 50,000 | 810 | 0.01620 | [0.01513, 0.01734] | 8,990.2 | 0.04x |
+| QECTOR Union-Find (CPU) | 5 | 50,000 | 1356 | 0.02712 | [0.02573, 0.02858] | 113,116.3 | 0.50x |
+| PyMatching v2 (C++) | 5 | 100,000 | 1596 | 0.01596 | [0.01520, 0.01676] | 249,064.6 | 1.00x |
+| QECTOR Sparse Blossom (CPU) | 5 | 100,000 | 1596 | 0.01596 | [0.01520, 0.01676] | 9,121.1 | 0.04x |
+| QECTOR Union-Find (CPU) | 5 | 100,000 | 2645 | 0.02645 | [0.02547, 0.02746] | 112,796.6 | 0.45x |
+| PyMatching v2 (C++) | 7 | 1,000 | 11 | 0.01100 | [0.00615, 0.01959] | 54,523.2 | 1.00x |
+| QECTOR Sparse Blossom (CPU) | 7 | 1,000 | 11 | 0.01100 | [0.00615, 0.01959] | 1,631.4 | 0.03x |
+| QECTOR Union-Find (CPU) | 7 | 1,000 | 18 | 0.01800 | [0.01142, 0.02827] | 9,141.5 | 0.17x |
+| PyMatching v2 (C++) | 7 | 5,000 | 74 | 0.01480 | [0.01181, 0.01854] | 62,572.1 | 1.00x |
+| QECTOR Sparse Blossom (CPU) | 7 | 5,000 | 75 | 0.01500 | [0.01198, 0.01876] | 1,565.3 | 0.03x |
+| QECTOR Union-Find (CPU) | 7 | 5,000 | 107 | 0.02140 | [0.01774, 0.02579] | 20,730.9 | 0.33x |
+| PyMatching v2 (C++) | 7 | 10,000 | 130 | 0.01300 | [0.01096, 0.01541] | 89,104.5 | 1.00x |
+| QECTOR Sparse Blossom (CPU) | 7 | 10,000 | 133 | 0.01330 | [0.01123, 0.01574] | 1,650.7 | 0.02x |
+| QECTOR Union-Find (CPU) | 7 | 10,000 | 209 | 0.02090 | [0.01827, 0.02389] | 22,427.5 | 0.25x |
+| PyMatching v2 (C++) | 7 | 50,000 | 619 | 0.01238 | [0.01145, 0.01339] | 69,244.3 | 1.00x |
+| QECTOR Union-Find (CPU) | 7 | 50,000 | 1055 | 0.02110 | [0.01988, 0.02240] | 21,552.3 | 0.31x |
+| PyMatching v2 (C++) | 7 | 100,000 | 1220 | 0.01220 | [0.01154, 0.01290] | 75,767.0 | 1.00x |
+| QECTOR Union-Find (CPU) | 7 | 100,000 | 2042 | 0.02042 | [0.01956, 0.02132] | 22,642.8 | 0.30x |
+| PyMatching v2 (C++) | 9 | 1,000 | 7 | 0.00700 | [0.00339, 0.01438] | 16,121.6 | 1.00x |
+| QECTOR Sparse Blossom (CPU) | 9 | 1,000 | 7 | 0.00700 | [0.00339, 0.01438] | 206.8 | 0.01x |
+| QECTOR Union-Find (CPU) | 9 | 1,000 | 14 | 0.01400 | [0.00836, 0.02336] | 1,404.2 | 0.09x |
+| PyMatching v2 (C++) | 9 | 5,000 | 36 | 0.00720 | [0.00521, 0.00995] | 28,259.0 | 1.00x |
+| QECTOR Union-Find (CPU) | 9 | 5,000 | 85 | 0.01700 | [0.01377, 0.02097] | 4,691.5 | 0.17x |
+| PyMatching v2 (C++) | 9 | 10,000 | 78 | 0.00780 | [0.00625, 0.00972] | 27,629.9 | 1.00x |
+| QECTOR Union-Find (CPU) | 9 | 10,000 | 156 | 0.01560 | [0.01335, 0.01822] | 3,812.1 | 0.14x |
+| PyMatching v2 (C++) | 9 | 50,000 | 450 | 0.00900 | [0.00821, 0.00987] | 29,152.0 | 1.00x |
+| QECTOR Union-Find (CPU) | 9 | 50,000 | 827 | 0.01654 | [0.01546, 0.01770] | 4,599.5 | 0.16x |
+| PyMatching v2 (C++) | 9 | 100,000 | 878 | 0.00878 | [0.00822, 0.00938] | 29,244.1 | 1.00x |
+| QECTOR Union-Find (CPU) | 9 | 100,000 | 1732 | 0.01732 | [0.01653, 0.01815] | 4,606.0 | 0.16x |
+| PyMatching v2 (C++) | 11 | 1,000 | 7 | 0.00700 | [0.00339, 0.01438] | 11,490.2 | 1.00x |
+| QECTOR Sparse Blossom (CPU) | 11 | 1,000 | 7 | 0.00700 | [0.00339, 0.01438] | 84.2 | 0.01x |
+| QECTOR Union-Find (CPU) | 11 | 1,000 | 13 | 0.01300 | [0.00761, 0.02211] | 367.3 | 0.03x |
+| PyMatching v2 (C++) | 11 | 5,000 | 24 | 0.00480 | [0.00323, 0.00713] | 12,516.9 | 1.00x |
+| PyMatching v2 (C++) | 11 | 10,000 | 77 | 0.00770 | [0.00617, 0.00961] | 13,693.2 | 1.00x |
+| PyMatching v2 (C++) | 11 | 50,000 | 334 | 0.00668 | [0.00600, 0.00743] | 14,040.2 | 1.00x |
+| PyMatching v2 (C++) | 11 | 100,000 | 647 | 0.00647 | [0.00599, 0.00699] | 13,815.7 | 1.00x |
+| PyMatching v2 (C++) | 13 | 1,000 | 3 | 0.00300 | [0.00102, 0.00878] | 7,384.5 | 1.00x |
+| QECTOR Union-Find (CPU) | 13 | 1,000 | 11 | 0.01100 | [0.00615, 0.01959] | 132.6 | 0.02x |
+| PyMatching v2 (C++) | 13 | 5,000 | 18 | 0.00360 | [0.00228, 0.00568] | 7,576.5 | 1.00x |
+| PyMatching v2 (C++) | 13 | 10,000 | 37 | 0.00370 | [0.00269, 0.00510] | 6,932.6 | 1.00x |
+| PyMatching v2 (C++) | 13 | 50,000 | 221 | 0.00442 | [0.00388, 0.00504] | 7,243.0 | 1.00x |
+| PyMatching v2 (C++) | 13 | 100,000 | 445 | 0.00445 | [0.00406, 0.00488] | 7,218.3 | 1.00x |
+| PyMatching v2 (C++) | 15 | 1,000 | 2 | 0.00200 | [0.00055, 0.00726] | 3,350.7 | 1.00x |
+| PyMatching v2 (C++) | 15 | 5,000 | 12 | 0.00240 | [0.00137, 0.00419] | 3,887.9 | 1.00x |
+| PyMatching v2 (C++) | 15 | 10,000 | 44 | 0.00440 | [0.00328, 0.00590] | 4,107.9 | 1.00x |
+| PyMatching v2 (C++) | 15 | 50,000 | 171 | 0.00342 | [0.00295, 0.00397] | 4,074.8 | 1.00x |
+| PyMatching v2 (C++) | 15 | 100,000 | 314 | 0.00314 | [0.00281, 0.00351] | 6,480.5 | 1.00x |
 
-| Decoder | Category | d | Qubits | Shots | Throughput (dec/s) | Latency (µs) | LER (%) | Speedup vs PyMatching |
-|:---|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 3 | 9 | 1,000 | **305,782.3** | 3.27 | 0.000% | **3.84x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 3 | 9 | 1,000 | **423,710.9** | 2.36 | 0.000% | **5.32x** |
-| **QECTOR BP-OSD (CPU)** | QECTOR CPU | 3 | 9 | 1,000 | **102.9** | 9713.60 | 0.000% | **0.0x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 3 | 9 | 1,000 | **384,083.6** | 2.60 | 0.000% | **4.82x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 3 | 9 | 1,000 | **79,652.7** | 12.55 | 0.000% | **1.0x** |
-| **ldpc v2.4.1 (BP-OSD)** | ldpc | 3 | 9 | 1,000 | **187,740.5** | 5.33 | 0.000% | **2.36x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 3 | 9 | 5,000 | **3,429,120.0** | 0.29 | 0.000% | **43.85x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 3 | 9 | 5,000 | **996,850.0** | 1.00 | 0.000% | **12.75x** |
-| **QECTOR BP-OSD (CPU)** | QECTOR CPU | 3 | 9 | 5,000 | **1,222.7** | 817.86 | 0.000% | **0.02x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 3 | 9 | 5,000 | **1,446,717.4** | 0.69 | 0.000% | **18.5x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 3 | 9 | 5,000 | **78,204.4** | 12.79 | 0.000% | **1.0x** |
-| **ldpc v2.4.1 (BP-OSD)** | ldpc | 3 | 9 | 5,000 | **223,388.8** | 4.48 | 0.000% | **2.86x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 3 | 9 | 10,000 | **5,903,536.3** | 0.17 | 0.000% | **58.52x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 3 | 9 | 10,000 | **2,264,595.3** | 0.44 | 0.000% | **22.45x** |
-| **QECTOR BP-OSD (CPU)** | QECTOR CPU | 3 | 9 | 10,000 | **1,277.4** | 782.84 | 0.000% | **0.01x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 3 | 9 | 10,000 | **3,199,897.7** | 0.31 | 0.000% | **31.72x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 3 | 9 | 10,000 | **100,877.6** | 9.91 | 0.000% | **1.0x** |
-| **ldpc v2.4.1 (BP-OSD)** | ldpc | 3 | 9 | 10,000 | **250,062.5** | 4.00 | 0.000% | **2.48x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 3 | 9 | 50,000 | **7,998,464.3** | 0.13 | 0.000% | **126.15x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 3 | 9 | 50,000 | **4,109,848.0** | 0.24 | 0.000% | **64.82x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 3 | 9 | 50,000 | **7,878,606.4** | 0.13 | 0.000% | **124.26x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 3 | 9 | 50,000 | **63,405.5** | 15.77 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 3 | 9 | 100,000 | **8,043,111.1** | 0.12 | 0.000% | **85.84x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 3 | 9 | 100,000 | **5,784,693.7** | 0.17 | 0.000% | **61.73x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 3 | 9 | 100,000 | **10,727,426.8** | 0.09 | 0.000% | **114.48x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 3 | 9 | 100,000 | **93,703.1** | 10.67 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 5 | 25 | 1,000 | **968,241.7** | 1.03 | 0.000% | **20.82x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 5 | 25 | 1,000 | **186,954.3** | 5.35 | 0.000% | **4.02x** |
-| **QECTOR BP-OSD (CPU)** | QECTOR CPU | 5 | 25 | 1,000 | **530.1** | 1886.54 | 0.000% | **0.01x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 5 | 25 | 1,000 | **268,175.6** | 3.73 | 0.000% | **5.77x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 5 | 25 | 1,000 | **46,501.9** | 21.50 | 0.000% | **1.0x** |
-| **ldpc v2.4.1 (BP-OSD)** | ldpc | 5 | 25 | 1,000 | **126,614.3** | 7.90 | 0.000% | **2.72x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 5 | 25 | 5,000 | **1,555,645.4** | 0.64 | 0.000% | **19.09x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 5 | 25 | 5,000 | **607,208.8** | 1.65 | 0.000% | **7.45x** |
-| **QECTOR BP-OSD (CPU)** | QECTOR CPU | 5 | 25 | 5,000 | **529.1** | 1889.92 | 0.000% | **0.01x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 5 | 25 | 5,000 | **870,367.5** | 1.15 | 0.000% | **10.68x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 5 | 25 | 5,000 | **81,469.7** | 12.27 | 0.000% | **1.0x** |
-| **ldpc v2.4.1 (BP-OSD)** | ldpc | 5 | 25 | 5,000 | **99,700.9** | 10.03 | 0.000% | **1.22x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 5 | 25 | 10,000 | **1,688,020.1** | 0.59 | 0.000% | **20.72x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 5 | 25 | 10,000 | **1,455,265.2** | 0.69 | 0.000% | **17.86x** |
-| **QECTOR BP-OSD (CPU)** | QECTOR CPU | 5 | 25 | 10,000 | **503.4** | 1986.39 | 0.000% | **0.01x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 5 | 25 | 10,000 | **2,038,195.8** | 0.49 | 0.000% | **25.01x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 5 | 25 | 10,000 | **81,483.0** | 12.27 | 0.000% | **1.0x** |
-| **ldpc v2.4.1 (BP-OSD)** | ldpc | 5 | 25 | 10,000 | **114,817.2** | 8.71 | 0.000% | **1.41x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 5 | 25 | 50,000 | **5,261,219.5** | 0.19 | 0.000% | **69.74x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 5 | 25 | 50,000 | **2,005,615.7** | 0.50 | 0.000% | **26.59x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 5 | 25 | 50,000 | **3,199,467.6** | 0.31 | 0.000% | **42.41x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 5 | 25 | 50,000 | **75,437.5** | 13.26 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 5 | 25 | 100,000 | **6,155,626.5** | 0.16 | 0.000% | **66.46x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 5 | 25 | 100,000 | **2,989,161.3** | 0.33 | 0.000% | **32.27x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 5 | 25 | 100,000 | **3,202,756.9** | 0.31 | 0.000% | **34.58x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 5 | 25 | 100,000 | **92,622.6** | 10.80 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 7 | 49 | 1,000 | **526,509.8** | 1.90 | 0.000% | **14.47x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 7 | 49 | 1,000 | **313,755.0** | 3.19 | 0.000% | **8.62x** |
-| **QECTOR BP-OSD (CPU)** | QECTOR CPU | 7 | 49 | 1,000 | **467.0** | 2141.52 | 0.000% | **0.01x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 7 | 49 | 1,000 | **210,009.0** | 4.76 | 0.000% | **5.77x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 7 | 49 | 1,000 | **36,382.2** | 27.49 | 0.000% | **1.0x** |
-| **ldpc v2.4.1 (BP-OSD)** | ldpc | 7 | 49 | 1,000 | **35,807.6** | 27.93 | 0.000% | **0.98x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 7 | 49 | 5,000 | **1,426,818.5** | 0.70 | 0.000% | **21.2x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 7 | 49 | 5,000 | **806,308.5** | 1.24 | 0.000% | **11.98x** |
-| **QECTOR BP-OSD (CPU)** | QECTOR CPU | 7 | 49 | 5,000 | **455.1** | 2197.16 | 0.000% | **0.01x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 7 | 49 | 5,000 | **1,062,789.6** | 0.94 | 0.000% | **15.79x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 7 | 49 | 5,000 | **67,317.4** | 14.85 | 0.000% | **1.0x** |
-| **ldpc v2.4.1 (BP-OSD)** | ldpc | 7 | 49 | 5,000 | **31,000.5** | 32.26 | 0.000% | **0.46x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 7 | 49 | 10,000 | **1,673,444.1** | 0.60 | 0.000% | **20.97x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 7 | 49 | 10,000 | **871,938.4** | 1.15 | 0.000% | **10.92x** |
-| **QECTOR BP-OSD (CPU)** | QECTOR CPU | 7 | 49 | 10,000 | **480.9** | 2079.49 | 0.000% | **0.01x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 7 | 49 | 10,000 | **1,440,278.8** | 0.69 | 0.000% | **18.05x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 7 | 49 | 10,000 | **79,814.8** | 12.53 | 0.000% | **1.0x** |
-| **ldpc v2.4.1 (BP-OSD)** | ldpc | 7 | 49 | 10,000 | **36,513.0** | 27.39 | 0.000% | **0.46x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 7 | 49 | 50,000 | **3,927,483.0** | 0.25 | 0.000% | **43.67x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 7 | 49 | 50,000 | **1,126,671.7** | 0.89 | 0.000% | **12.53x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 7 | 49 | 50,000 | **1,727,796.1** | 0.58 | 0.000% | **19.21x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 7 | 49 | 50,000 | **89,932.1** | 11.12 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 7 | 49 | 100,000 | **3,859,111.6** | 0.26 | 0.000% | **48.08x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 7 | 49 | 100,000 | **1,649,764.8** | 0.61 | 0.000% | **20.56x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 7 | 49 | 100,000 | **2,245,072.1** | 0.45 | 0.000% | **27.97x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 7 | 49 | 100,000 | **80,260.0** | 12.46 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 9 | 81 | 1,000 | **290,985.3** | 3.44 | 0.000% | **3.82x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 9 | 81 | 1,000 | **300,246.2** | 3.33 | 0.000% | **3.95x** |
-| **QECTOR BP-OSD (CPU)** | QECTOR CPU | 9 | 81 | 1,000 | **402.4** | 2484.96 | 0.000% | **0.01x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 9 | 81 | 1,000 | **336,394.5** | 2.97 | 0.000% | **4.42x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 9 | 81 | 1,000 | **76,077.4** | 13.14 | 0.000% | **1.0x** |
-| **ldpc v2.4.1 (BP-OSD)** | ldpc | 9 | 81 | 1,000 | **8,156.5** | 122.60 | 0.000% | **0.11x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 9 | 81 | 5,000 | **1,096,683.7** | 0.91 | 0.000% | **13.06x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 9 | 81 | 5,000 | **453,831.7** | 2.20 | 0.000% | **5.41x** |
-| **QECTOR BP-OSD (CPU)** | QECTOR CPU | 9 | 81 | 5,000 | **362.6** | 2757.73 | 0.000% | **0.0x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 9 | 81 | 5,000 | **1,093,302.4** | 0.91 | 0.000% | **13.02x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 9 | 81 | 5,000 | **83,963.1** | 11.91 | 0.000% | **1.0x** |
-| **ldpc v2.4.1 (BP-OSD)** | ldpc | 9 | 81 | 5,000 | **8,123.0** | 123.11 | 0.000% | **0.1x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 9 | 81 | 10,000 | **1,181,348.9** | 0.85 | 0.000% | **19.86x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 9 | 81 | 10,000 | **516,406.2** | 1.94 | 0.000% | **8.68x** |
-| **QECTOR BP-OSD (CPU)** | QECTOR CPU | 9 | 81 | 10,000 | **407.5** | 2453.86 | 0.000% | **0.01x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 9 | 81 | 10,000 | **1,050,376.0** | 0.95 | 0.000% | **17.66x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 9 | 81 | 10,000 | **59,488.4** | 16.81 | 0.000% | **1.0x** |
-| **ldpc v2.4.1 (BP-OSD)** | ldpc | 9 | 81 | 10,000 | **9,468.0** | 105.62 | 0.000% | **0.16x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 9 | 81 | 50,000 | **1,765,112.9** | 0.57 | 0.000% | **33.16x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 9 | 81 | 50,000 | **773,804.5** | 1.29 | 0.000% | **14.54x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 9 | 81 | 50,000 | **1,091,526.7** | 0.92 | 0.000% | **20.51x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 9 | 81 | 50,000 | **53,231.1** | 18.79 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 9 | 81 | 100,000 | **1,862,610.2** | 0.54 | 0.000% | **26.51x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 9 | 81 | 100,000 | **792,684.5** | 1.26 | 0.000% | **11.28x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 9 | 81 | 100,000 | **1,126,490.2** | 0.89 | 0.000% | **16.03x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 9 | 81 | 100,000 | **70,271.6** | 14.23 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 11 | 121 | 1,000 | **158,353.1** | 6.32 | 0.000% | **5.54x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 11 | 121 | 1,000 | **232,628.5** | 4.30 | 0.000% | **8.14x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 11 | 121 | 1,000 | **119,838.0** | 8.34 | 0.000% | **4.19x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 11 | 121 | 1,000 | **28,594.3** | 34.97 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 11 | 121 | 5,000 | **724,364.7** | 1.38 | 0.000% | **13.33x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 11 | 121 | 5,000 | **249,591.9** | 4.01 | 0.000% | **4.59x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 11 | 121 | 5,000 | **654,501.7** | 1.53 | 0.000% | **12.04x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 11 | 121 | 5,000 | **54,341.9** | 18.40 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 11 | 121 | 10,000 | **980,315.3** | 1.02 | 0.000% | **15.39x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 11 | 121 | 10,000 | **307,169.6** | 3.26 | 0.000% | **4.82x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 11 | 121 | 10,000 | **687,989.8** | 1.45 | 0.000% | **10.8x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 11 | 121 | 10,000 | **63,678.0** | 15.70 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 11 | 121 | 50,000 | **1,119,667.9** | 0.89 | 0.000% | **27.04x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 11 | 121 | 50,000 | **466,012.3** | 2.15 | 0.000% | **11.26x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 11 | 121 | 50,000 | **458,865.9** | 2.18 | 0.000% | **11.08x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 11 | 121 | 50,000 | **41,404.4** | 24.15 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 11 | 121 | 100,000 | **1,336,482.1** | 0.75 | 0.000% | **27.15x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 11 | 121 | 100,000 | **513,235.8** | 1.95 | 0.000% | **10.42x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 11 | 121 | 100,000 | **562,781.7** | 1.78 | 0.000% | **11.43x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 11 | 121 | 100,000 | **49,232.0** | 20.31 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 13 | 169 | 1,000 | **83,015.8** | 12.05 | 0.000% | **2.75x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 13 | 169 | 1,000 | **93,936.4** | 10.65 | 0.000% | **3.11x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 13 | 169 | 1,000 | **94,512.6** | 10.58 | 0.000% | **3.13x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 13 | 169 | 1,000 | **30,202.4** | 33.11 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 13 | 169 | 5,000 | **370,895.1** | 2.70 | 0.000% | **5.2x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 13 | 169 | 5,000 | **192,991.3** | 5.18 | 0.000% | **2.71x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 13 | 169 | 5,000 | **452,878.0** | 2.21 | 0.000% | **6.35x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 13 | 169 | 5,000 | **71,316.5** | 14.02 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 13 | 169 | 10,000 | **532,594.8** | 1.88 | 0.000% | **7.75x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 13 | 169 | 10,000 | **240,956.9** | 4.15 | 0.000% | **3.5x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 13 | 169 | 10,000 | **590,113.2** | 1.69 | 0.000% | **8.58x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 13 | 169 | 10,000 | **68,747.4** | 14.55 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 13 | 169 | 50,000 | **850,976.9** | 1.18 | 0.000% | **13.38x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 13 | 169 | 50,000 | **253,510.5** | 3.94 | 0.000% | **3.99x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 13 | 169 | 50,000 | **337,733.1** | 2.96 | 0.000% | **5.31x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 13 | 169 | 50,000 | **63,580.9** | 15.73 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 13 | 169 | 100,000 | **882,815.1** | 1.13 | 0.000% | **8.66x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 13 | 169 | 100,000 | **239,409.7** | 4.18 | 0.000% | **2.35x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 13 | 169 | 100,000 | **446,470.0** | 2.24 | 0.000% | **4.38x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 13 | 169 | 100,000 | **101,957.6** | 9.81 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 15 | 225 | 1,000 | **90,916.5** | 11.00 | 0.000% | **3.63x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 15 | 225 | 1,000 | **55,870.0** | 17.90 | 0.000% | **2.23x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 15 | 225 | 1,000 | **146,331.5** | 6.83 | 0.000% | **5.84x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 15 | 225 | 1,000 | **25,050.1** | 39.92 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 15 | 225 | 5,000 | **225,266.8** | 4.44 | 0.000% | **5.05x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 15 | 225 | 5,000 | **152,546.9** | 6.56 | 0.000% | **3.42x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 15 | 225 | 5,000 | **262,472.7** | 3.81 | 0.000% | **5.88x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 15 | 225 | 5,000 | **44,607.0** | 22.42 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 15 | 225 | 10,000 | **398,942.0** | 2.51 | 0.000% | **5.81x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 15 | 225 | 10,000 | **142,717.7** | 7.01 | 0.000% | **2.08x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 15 | 225 | 10,000 | **499,390.7** | 2.00 | 0.000% | **7.27x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 15 | 225 | 10,000 | **68,719.1** | 14.55 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 15 | 225 | 50,000 | **622,015.1** | 1.61 | 0.000% | **5.76x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 15 | 225 | 50,000 | **162,173.8** | 6.17 | 0.000% | **1.5x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 15 | 225 | 50,000 | **350,567.7** | 2.85 | 0.000% | **3.25x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 15 | 225 | 50,000 | **107,898.1** | 9.27 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 15 | 225 | 100,000 | **612,141.6** | 1.63 | 0.000% | **8.98x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 15 | 225 | 100,000 | **161,444.1** | 6.19 | 0.000% | **2.37x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 15 | 225 | 100,000 | **309,200.0** | 3.23 | 0.000% | **4.53x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 15 | 225 | 100,000 | **68,194.2** | 14.66 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 17 | 289 | 1,000 | **49,375.6** | 20.25 | 0.000% | **2.9x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 17 | 289 | 1,000 | **62,016.7** | 16.12 | 0.000% | **3.64x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 17 | 289 | 1,000 | **118,842.5** | 8.41 | 0.000% | **6.98x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 17 | 289 | 1,000 | **17,014.3** | 58.77 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 17 | 289 | 5,000 | **184,103.1** | 5.43 | 0.000% | **2.25x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 17 | 289 | 5,000 | **95,042.8** | 10.52 | 0.000% | **1.16x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 17 | 289 | 5,000 | **330,517.3** | 3.03 | 0.000% | **4.04x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 17 | 289 | 5,000 | **81,739.4** | 12.23 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 17 | 289 | 10,000 | **327,010.0** | 3.06 | 0.000% | **7.66x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 17 | 289 | 10,000 | **79,711.6** | 12.55 | 0.000% | **1.87x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 17 | 289 | 10,000 | **433,954.3** | 2.30 | 0.000% | **10.17x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 17 | 289 | 10,000 | **42,684.0** | 23.43 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 17 | 289 | 50,000 | **457,543.6** | 2.19 | 0.000% | **16.84x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 17 | 289 | 50,000 | **84,536.8** | 11.83 | 0.000% | **3.11x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 17 | 289 | 50,000 | **205,502.3** | 4.87 | 0.000% | **7.56x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 17 | 289 | 50,000 | **27,168.0** | 36.81 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 17 | 289 | 100,000 | **368,013.9** | 2.72 | 0.000% | **6.65x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 17 | 289 | 100,000 | **67,906.7** | 14.73 | 0.000% | **1.23x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 17 | 289 | 100,000 | **284,579.6** | 3.51 | 0.000% | **5.14x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 17 | 289 | 100,000 | **55,328.1** | 18.07 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 19 | 361 | 1,000 | **43,884.5** | 22.79 | 0.000% | **5.38x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 19 | 361 | 1,000 | **43,272.1** | 23.11 | 0.000% | **5.31x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 19 | 361 | 1,000 | **74,540.6** | 13.42 | 0.000% | **9.15x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 19 | 361 | 1,000 | **8,150.6** | 122.69 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 19 | 361 | 5,000 | **84,951.2** | 11.77 | 0.000% | **1.8x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 19 | 361 | 5,000 | **49,924.8** | 20.03 | 0.000% | **1.06x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 19 | 361 | 5,000 | **230,892.5** | 4.33 | 0.000% | **4.89x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 19 | 361 | 5,000 | **47,259.0** | 21.16 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 19 | 361 | 10,000 | **148,528.4** | 6.73 | 0.000% | **6.38x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 19 | 361 | 10,000 | **58,605.0** | 17.06 | 0.000% | **2.52x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 19 | 361 | 10,000 | **337,474.1** | 2.96 | 0.000% | **14.51x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 19 | 361 | 10,000 | **23,263.9** | 42.98 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 19 | 361 | 50,000 | **298,036.1** | 3.36 | 0.000% | **6.19x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 19 | 361 | 50,000 | **66,733.4** | 14.98 | 0.000% | **1.39x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 19 | 361 | 50,000 | **175,751.9** | 5.69 | 0.000% | **3.65x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 19 | 361 | 50,000 | **48,181.2** | 20.75 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 19 | 361 | 100,000 | **357,352.5** | 2.80 | 0.000% | **4.89x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 19 | 361 | 100,000 | **67,008.6** | 14.92 | 0.000% | **0.92x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 19 | 361 | 100,000 | **163,862.1** | 6.10 | 0.000% | **2.24x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 19 | 361 | 100,000 | **73,019.4** | 13.69 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 21 | 441 | 1,000 | **37,574.2** | 26.61 | 0.000% | **4.59x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 21 | 441 | 1,000 | **29,881.4** | 33.47 | 0.000% | **3.65x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 21 | 441 | 1,000 | **45,595.3** | 21.93 | 0.000% | **5.56x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 21 | 441 | 1,000 | **8,194.4** | 122.04 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 21 | 441 | 5,000 | **65,058.0** | 15.37 | 0.000% | **1.14x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 21 | 441 | 5,000 | **42,781.8** | 23.37 | 0.000% | **0.75x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 21 | 441 | 5,000 | **312,431.7** | 3.20 | 0.000% | **5.47x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 21 | 441 | 5,000 | **57,159.2** | 17.49 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 21 | 441 | 10,000 | **128,637.2** | 7.77 | 0.000% | **2.21x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 21 | 441 | 10,000 | **58,702.9** | 17.03 | 0.000% | **1.01x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 21 | 441 | 10,000 | **346,804.4** | 2.88 | 0.000% | **5.95x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 21 | 441 | 10,000 | **58,326.1** | 17.14 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 21 | 441 | 50,000 | **354,371.7** | 2.82 | 0.000% | **6.0x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 21 | 441 | 50,000 | **60,379.6** | 16.56 | 0.000% | **1.02x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 21 | 441 | 50,000 | **160,213.1** | 6.24 | 0.000% | **2.71x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 21 | 441 | 50,000 | **59,049.3** | 16.94 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 21 | 441 | 100,000 | **318,659.5** | 3.14 | 0.000% | **5.58x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 21 | 441 | 100,000 | **57,306.2** | 17.45 | 0.000% | **1.0x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 21 | 441 | 100,000 | **42,521.6** | 23.52 | 0.000% | **0.74x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 21 | 441 | 100,000 | **57,126.5** | 17.50 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 25 | 625 | 1,000 | **30,981.9** | 32.28 | 0.000% | **4.6x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 25 | 625 | 1,000 | **19,570.0** | 51.10 | 0.000% | **2.91x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 25 | 625 | 1,000 | **31,202.8** | 32.05 | 0.000% | **4.64x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 25 | 625 | 1,000 | **6,730.2** | 148.58 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 25 | 625 | 5,000 | **45,270.8** | 22.09 | 0.000% | **1.23x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 25 | 625 | 5,000 | **23,648.8** | 42.29 | 0.000% | **0.64x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 25 | 625 | 5,000 | **165,830.9** | 6.03 | 0.000% | **4.49x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 25 | 625 | 5,000 | **36,907.2** | 27.09 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 25 | 625 | 10,000 | **79,828.7** | 12.53 | 0.000% | **2.68x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 25 | 625 | 10,000 | **24,143.6** | 41.42 | 0.000% | **0.81x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 25 | 625 | 10,000 | **176,222.9** | 5.67 | 0.000% | **5.91x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 25 | 625 | 10,000 | **29,806.3** | 33.55 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 25 | 625 | 50,000 | **185,145.2** | 5.40 | 0.000% | **3.32x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 25 | 625 | 50,000 | **25,988.5** | 38.48 | 0.000% | **0.47x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 25 | 625 | 50,000 | **93,461.1** | 10.70 | 0.000% | **1.67x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 25 | 625 | 50,000 | **55,850.3** | 17.90 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 25 | 625 | 100,000 | **197,734.8** | 5.06 | 0.000% | **6.67x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 25 | 625 | 100,000 | **23,603.7** | 42.37 | 0.000% | **0.8x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 25 | 625 | 100,000 | **24,321.4** | 41.12 | 0.000% | **0.82x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 25 | 625 | 100,000 | **29,651.6** | 33.73 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 31 | 961 | 1,000 | **8,583.3** | 116.51 | 0.000% | **3.31x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 31 | 961 | 1,000 | **3,086.6** | 323.98 | 0.000% | **1.19x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 31 | 961 | 1,000 | **23,648.2** | 42.29 | 0.000% | **9.11x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 31 | 961 | 1,000 | **2,596.8** | 385.09 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 31 | 961 | 5,000 | **2,082.8** | 480.13 | 0.000% | **0.07x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 31 | 961 | 5,000 | **4,198.6** | 238.18 | 0.000% | **0.14x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 31 | 961 | 5,000 | **87,219.4** | 11.47 | 0.000% | **2.84x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 31 | 961 | 5,000 | **30,717.2** | 32.56 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 31 | 961 | 10,000 | **8,551.7** | 116.94 | 0.000% | **0.19x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 31 | 961 | 10,000 | **4,596.3** | 217.57 | 0.000% | **0.1x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 31 | 961 | 10,000 | **34,057.9** | 29.36 | 0.000% | **0.77x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 31 | 961 | 10,000 | **44,072.3** | 22.69 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 31 | 961 | 50,000 | **24,144.3** | 41.42 | 0.000% | **0.56x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 31 | 961 | 50,000 | **5,268.6** | 189.80 | 0.000% | **0.12x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 31 | 961 | 50,000 | **21,178.1** | 47.22 | 0.000% | **0.5x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 31 | 961 | 50,000 | **42,771.6** | 23.38 | 0.000% | **1.0x** |
-| **QECTOR Fast Union-Find (CPU)** | QECTOR CPU | 31 | 961 | 100,000 | **86,928.9** | 11.50 | 0.000% | **2.15x** |
-| **QECTOR Blossom (CPU)** | QECTOR CPU | 31 | 961 | 100,000 | **6,780.2** | 147.49 | 0.000% | **0.17x** |
-| **QECTOR CUDA Batch (GPU)** | QECTOR GPU | 31 | 961 | 100,000 | **21,502.9** | 46.51 | 0.000% | **0.53x** |
-| **PyMatching v2.4 (C++)** | PyMatching | 31 | 961 | 100,000 | **40,436.7** | 24.73 | 0.000% | **1.0x** |
+## Not measured (63 cells)
 
-## Methodology & Integrity Notes
+These cells were **not run** and carry no numbers. They are listed so the gaps in the grid are explicit rather than quietly filled in.
 
-> Every decoder is measured on the same Stim circuit, the same detector samples, the same DEM and the same observable scoring (ler.estimate_ler_circuit_level). Only the decoder varies between rows. Rows are validated by ler.assert_comparable before being written.
+| Decoder | d | Shots | Reason | Probe rate (dec/s) | Projected decode |
+|:---|:---:|---:|:---|---:|---:|
+| ldpc BP-OSD | 3 | 100,000 | over per-cell decode budget | 2,445.9 | 41s |
+| ldpc BP-OSD | 5 | 5,000 | over per-cell decode budget | 82.1 | 61s |
+| ldpc BP-OSD | 5 | 10,000 | over per-cell decode budget | 82.1 | 122s |
+| ldpc BP-OSD | 5 | 50,000 | over per-cell decode budget | 82.1 | 609s |
+| ldpc BP-OSD | 5 | 100,000 | over per-cell decode budget | 82.1 | 1,217s |
+| QECTOR Sparse Blossom (CPU) | 7 | 50,000 | over per-cell decode budget | 1,405.9 | 36s |
+| QECTOR Sparse Blossom (CPU) | 7 | 100,000 | over per-cell decode budget | 1,405.9 | 71s |
+| ldpc BP-OSD | 7 | 1,000 | over per-cell decode budget | 19.0 | 53s |
+| ldpc BP-OSD | 7 | 5,000 | over per-cell decode budget | 19.0 | 263s |
+| ldpc BP-OSD | 7 | 10,000 | over per-cell decode budget | 19.0 | 526s |
+| ldpc BP-OSD | 7 | 50,000 | over per-cell decode budget | 19.0 | 2,629s |
+| ldpc BP-OSD | 7 | 100,000 | over per-cell decode budget | 19.0 | 5,258s |
+| QECTOR Sparse Blossom (CPU) | 9 | 5,000 | over per-cell decode budget | 190.4 | 26s |
+| QECTOR Sparse Blossom (CPU) | 9 | 10,000 | over per-cell decode budget | 190.4 | 53s |
+| QECTOR Sparse Blossom (CPU) | 9 | 50,000 | over per-cell decode budget | 190.4 | 263s |
+| QECTOR Sparse Blossom (CPU) | 9 | 100,000 | over per-cell decode budget | 190.4 | 525s |
+| ldpc BP-OSD | 9 | 1,000 | over per-cell decode budget | 8.4 | 119s |
+| ldpc BP-OSD | 9 | 5,000 | over per-cell decode budget | 8.4 | 597s |
+| ldpc BP-OSD | 9 | 10,000 | over per-cell decode budget | 8.4 | 1,193s |
+| ldpc BP-OSD | 9 | 50,000 | over per-cell decode budget | 8.4 | 5,967s |
+| ldpc BP-OSD | 9 | 100,000 | over per-cell decode budget | 8.4 | 11,935s |
+| QECTOR Sparse Blossom (CPU) | 11 | 5,000 | over per-cell decode budget | 82.0 | 61s |
+| QECTOR Sparse Blossom (CPU) | 11 | 10,000 | over per-cell decode budget | 82.0 | 122s |
+| QECTOR Sparse Blossom (CPU) | 11 | 50,000 | over per-cell decode budget | 82.0 | 609s |
+| QECTOR Sparse Blossom (CPU) | 11 | 100,000 | over per-cell decode budget | 82.0 | 1,219s |
+| QECTOR Union-Find (CPU) | 11 | 5,000 | over per-cell decode budget | 172.0 | 29s |
+| QECTOR Union-Find (CPU) | 11 | 10,000 | over per-cell decode budget | 172.0 | 58s |
+| QECTOR Union-Find (CPU) | 11 | 50,000 | over per-cell decode budget | 172.0 | 291s |
+| QECTOR Union-Find (CPU) | 11 | 100,000 | over per-cell decode budget | 172.0 | 581s |
+| ldpc BP-OSD | 11 | 1,000 | over per-cell decode budget | 3.7 | 271s |
+| ldpc BP-OSD | 11 | 5,000 | over per-cell decode budget | 3.7 | 1,353s |
+| ldpc BP-OSD | 11 | 10,000 | over per-cell decode budget | 3.7 | 2,706s |
+| ldpc BP-OSD | 11 | 50,000 | over per-cell decode budget | 3.7 | 13,530s |
+| ldpc BP-OSD | 11 | 100,000 | over per-cell decode budget | 3.7 | 27,059s |
+| QECTOR Sparse Blossom (CPU) | 13 | 1,000 | over per-cell decode budget | 25.8 | 39s |
+| QECTOR Sparse Blossom (CPU) | 13 | 5,000 | over per-cell decode budget | 25.8 | 194s |
+| QECTOR Sparse Blossom (CPU) | 13 | 10,000 | over per-cell decode budget | 25.8 | 387s |
+| QECTOR Sparse Blossom (CPU) | 13 | 50,000 | over per-cell decode budget | 25.8 | 1,937s |
+| QECTOR Sparse Blossom (CPU) | 13 | 100,000 | over per-cell decode budget | 25.8 | 3,875s |
+| QECTOR Union-Find (CPU) | 13 | 5,000 | over per-cell decode budget | 67.0 | 75s |
+| QECTOR Union-Find (CPU) | 13 | 10,000 | over per-cell decode budget | 67.0 | 149s |
+| QECTOR Union-Find (CPU) | 13 | 50,000 | over per-cell decode budget | 67.0 | 746s |
+| QECTOR Union-Find (CPU) | 13 | 100,000 | over per-cell decode budget | 67.0 | 1,492s |
+| ldpc BP-OSD | 13 | 1,000 | over per-cell decode budget | 2.2 | 452s |
+| ldpc BP-OSD | 13 | 5,000 | over per-cell decode budget | 2.2 | 2,258s |
+| ldpc BP-OSD | 13 | 10,000 | over per-cell decode budget | 2.2 | 4,516s |
+| ldpc BP-OSD | 13 | 50,000 | over per-cell decode budget | 2.2 | 22,578s |
+| ldpc BP-OSD | 13 | 100,000 | over per-cell decode budget | 2.2 | 45,156s |
+| QECTOR Sparse Blossom (CPU) | 15 | 1,000 | over per-cell decode budget | 10.5 | 95s |
+| QECTOR Sparse Blossom (CPU) | 15 | 5,000 | over per-cell decode budget | 10.5 | 474s |
+| QECTOR Sparse Blossom (CPU) | 15 | 10,000 | over per-cell decode budget | 10.5 | 949s |
+| QECTOR Sparse Blossom (CPU) | 15 | 50,000 | over per-cell decode budget | 10.5 | 4,745s |
+| QECTOR Sparse Blossom (CPU) | 15 | 100,000 | over per-cell decode budget | 10.5 | 9,489s |
+| QECTOR Union-Find (CPU) | 15 | 1,000 | over per-cell decode budget | 23.5 | 43s |
+| QECTOR Union-Find (CPU) | 15 | 5,000 | over per-cell decode budget | 23.5 | 213s |
+| QECTOR Union-Find (CPU) | 15 | 10,000 | over per-cell decode budget | 23.5 | 426s |
+| QECTOR Union-Find (CPU) | 15 | 50,000 | over per-cell decode budget | 23.5 | 2,132s |
+| QECTOR Union-Find (CPU) | 15 | 100,000 | over per-cell decode budget | 23.5 | 4,264s |
+| ldpc BP-OSD | 15 | 1,000 | over per-cell decode budget | 1.4 | 729s |
+| ldpc BP-OSD | 15 | 5,000 | over per-cell decode budget | 1.4 | 3,647s |
+| ldpc BP-OSD | 15 | 10,000 | over per-cell decode budget | 1.4 | 7,294s |
+| ldpc BP-OSD | 15 | 50,000 | over per-cell decode budget | 1.4 | 36,468s |
+| ldpc BP-OSD | 15 | 100,000 | over per-cell decode budget | 1.4 | 72,937s |
+
+## How to read this
+
+- Throughput figures are only meaningful on an otherwise-idle machine.
+- LER figures are subject to binomial error; at low p and low shot counts the confidence interval can exceed the difference between decoders. Check ci95_lo/ci95_hi per row.
+- Accuracy and speed are independent axes: a lower LER at the same (d, p) is more accurate, a higher throughput is faster. This table deliberately does not collapse them into one score.
+- Throughput counts decode time only — `LerResult.seconds` wraps the single `decode_batch` call. Circuit construction and sampling are excluded for every decoder equally.
+- A cell with 0 errors is not evidence of a zero error rate; read its `ci95_hi` as an upper bound. The LER chart plots those as open downward markers.

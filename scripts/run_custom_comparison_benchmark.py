@@ -1,676 +1,586 @@
 #!/usr/bin/env python
-"""Run comprehensive empirical benchmark comparing QECTOR CPU / GPU vs ldpc and PyMatching.
+"""QECTOR vs PyMatching vs ldpc — circuit-level decoder comparison.
 
-Supports code distances d=3..31 and shot counts 1,000..100,000.
-Generates four official data artifacts:
-  - official_benchmark_results.json (provenance-stamped)
-  - official_benchmark_results.csv
-  - official_benchmark_results.md
-  - official_benchmark_results.pdf (executive-grade ReportLab PDF report with embedded charts)
+Every row comes from :func:`qector_decoder_v3.ler.estimate_ler_circuit_level`,
+which is the only sanctioned way to produce a cross-decoder number here:
+
+* one Stim rotated-surface-code circuit per (distance, p);
+* one decomposed detector error model;
+* one detector/observable sample set per (distance, shots, seed), so every
+  decoder in a cell sees byte-identical input;
+* one resolver (``ler._dem_observable_decoder``) handing QECTOR's own backends,
+  PyMatching and ldpc alike to the same ``decode_batch(dets) -> predicted
+  observables`` interface, each in a single native batch call;
+* scoring against the circuit's own logical observables.
+
+``ler.assert_comparable`` gates the collected rows before anything is written.
+
+Why this file is written so defensively
+---------------------------------------
+Six pre-v0.7.0 artifacts were withdrawn (todo6 A1-03) for comparing
+code-capacity QECTOR against circuit-level PyMatching with nothing in the file
+saying so. The v0.7.0 regeneration reproduced that defect *and* stamped
+``_provenance.METHODOLOGY_NOTE`` — which asserts ``estimate_ler_circuit_level``
+scoring and ``assert_comparable`` validation — into a file produced by neither.
+Specifically it had:
+
+* "LER" computed as ``(H @ correction) % 2 == syndrome``: a syndrome-consistency
+  check, not a logical error rate. It asks whether the decoder returned *a*
+  valid correction, never whether the logical observable flipped, and duly read
+  0.000% for every decoder at every distance — the shape of a tautology.
+* QECTOR timed through a native ``batch_decode`` over the full shot count
+  against PyMatching timed through a Python ``[dec.decode(s) for s in ...]``
+  loop over as few as 20 shots, linearly extrapolated to 100,000 and written
+  into ``elapsed_sec`` as though measured.
+* An LER chart whose points were not measurements but hardcoded analytic curves,
+  ``0.14 * (0.03/0.10) ** ((d + 1) / 2)``, with per-decoder constants set by hand.
+
+So: no extrapolation anywhere below. A cell that does not fit the per-cell time
+budget is recorded as skipped, carrying the measured probe rate and the
+projected cost, and is absent from the charts. An honest hole beats a
+synthesised number.
+
+Usage
+-----
+    python scripts/run_custom_comparison_benchmark.py \
+        --distances 3,5,7,9,11 --shots 1000,5000,10000 --p 0.005
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
-import json
-import math
 import os
 import sys
 import time
-from datetime import datetime, timezone
 from pathlib import Path
 
-# Insert local python workspace into import path
-REPO_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(REPO_ROOT / "python"))
-sys.path.insert(0, str(REPO_ROOT / "scripts"))
+os.environ.setdefault("QECTOR_SILENT", "1")
 
-import numpy as np
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-# Import reference decoders
-import pymatching
-from ldpc import BpOsdDecoder as LdpcBpOsdDecoder
+import _provenance  # noqa: E402
+import matplotlib  # noqa: E402
+from qector_decoder_v3.ler import assert_comparable, estimate_ler_circuit_level  # noqa: E402
 
-# Import QECTOR decoders & utilities
-import qector_decoder_v3 as qd
-from qector_decoder_v3 import codes
-import _provenance
-
-# Matplotlib configuration for non-interactive plot rendering
-import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt  # noqa: E402
 
-# ReportLab imports for PDF generation
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
-from reportlab.lib.units import inch
-from reportlab.platypus import (
-    HRFlowable,
-    Image,
-    PageBreak,
-    Paragraph,
-    SimpleDocTemplate,
-    Spacer,
-    Table,
-    TableStyle,
-)
+# Label -> decoder kind understood by ler._dem_observable_decoder.
+DECODERS = [
+    ("QECTOR Sparse Blossom (CPU)", "blossom"),
+    ("QECTOR Union-Find (CPU)", "union_find"),
+    ("PyMatching v2 (C++)", "pymatching"),
+    ("ldpc BP-OSD", "ldpc_bposd"),
+]
 
+COLORS = {
+    "QECTOR Sparse Blossom (CPU)": "#059669",
+    "QECTOR Union-Find (CPU)": "#1a56db",
+    "PyMatching v2 (C++)": "#dc2626",
+    "ldpc BP-OSD": "#4b5563",
+}
 
-def wilson_score_interval(errors: int, total: int, z: float = 1.95996) -> tuple[float, float]:
-    """Calculate Wilson 95% confidence interval bounds for binomial error rate."""
-    if total == 0:
-        return 0.0, 1.0
-    p_hat = errors / total
-    denom = 1 + (z ** 2) / total
-    center = (p_hat + (z ** 2) / (2 * total)) / denom
-    margin = (z * math.sqrt(max(0.0, (p_hat * (1 - p_hat) + (z ** 2) / (4 * total)) / total))) / denom
-    return max(0.0, center - margin), min(1.0, center + margin)
+PROBE_SHOTS = 256
 
 
-def _repetition_surface_code(distance: int, max_shots: int = 100000, p: float = 0.005, seed: int = 42):
-    """Generate rotated surface code check matrix and syndromes using Stim/QECTOR codes."""
-    code = codes.rotated_surface_code(distance)
-    H = code.parity_check_matrix()
-    n_checks, n_qubits = H.shape
-    
-    rng = np.random.default_rng(seed)
-    errors = (rng.random((max_shots, n_qubits)) < p).astype(np.uint8)
-    syndromes = (errors @ H.T) % 2
-    
-    return code, H, n_qubits, n_checks, errors, syndromes
-
-
-def run_benchmark(distances=(3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 25, 31), shot_list=(1000, 5000, 10000, 50000, 100000), p=0.005, seed=42):
-    """Run empirical benchmark across QECTOR (CPU/GPU), PyMatching, and ldpc."""
-    max_shots = max(shot_list)
-    print(f"=== QECTOR v0.7.0 Comprehensive Benchmark (Distances: {distances}, Shots: {shot_list}, p: {p}) ===")
-    
-    cuda_available = qd.cuda_is_available()
-    print(f"[Info] CUDA acceleration status: {'AVAILABLE (Enterprise)' if cuda_available else 'NOT AVAILABLE'}")
-    
-    results = []
-    start_total_time = time.perf_counter()
+def run_grid(distances, shot_list, p, seed, budget_s):
+    """Measure every feasible (distance, decoder, shots) cell. Never extrapolate."""
+    rows: list[dict] = []
+    skipped: list[dict] = []
 
     for d in distances:
-        print(f"\n--- Testing Distance d={d} ---")
-        code, H, n_qubits, n_checks, errors_pool, syndromes_pool = _repetition_surface_code(d, max_shots=max_shots, p=p, seed=seed)
-        c2q = code.check_to_qubits
-
-        # Initialize decoders once per distance
-        uf_dec = None
-        blossom_dec = None
-        bposd_dec = None
-        cuda_dec = None
-        pm_dec = None
-        ldpc_dec = None
-
-        try:
-            uf_dec = qd.FastUnionFindDecoder(c2q, n_qubits)
-        except Exception as e:
-            print(f"  [QECTOR Fast UF Init FAILED] {e}")
-
-        try:
-            blossom_dec = qd.BlossomDecoder(c2q, n_qubits)
-        except Exception as e:
-            print(f"  [QECTOR Blossom Init FAILED] {e}")
-
-        try:
-            bposd_dec = qd.BpOsdDecoder(H, error_rate=p, osd_order=0)
-        except Exception as e:
-            print(f"  [QECTOR BP-OSD Init FAILED] {e}")
-
-        if cuda_available:
+        print(f"\n--- distance d={d} (p={p}) ---", flush=True)
+        for label, kind in DECODERS:
+            # Probe once so the budget decision rests on a measurement, not a guess.
             try:
-                cuda_dec = qd.CUDABatchDecoder(c2q, n_qubits)
-            except Exception as e:
-                print(f"  [QECTOR CUDA Init FAILED] {e}")
-
-        try:
-            pm_dec = pymatching.Matching(H)
-        except Exception as e:
-            print(f"  [PyMatching Init FAILED] {e}")
-
-        try:
-            ldpc_dec = LdpcBpOsdDecoder(H, error_rate=p, osd_order=0, osd_method="osd_cs")
-        except Exception as e:
-            print(f"  [ldpc BP-OSD Init FAILED] {e}")
-
-        # Benchmark across each shot count S
-        for S in shot_list:
-            syndromes = syndromes_pool[:S]
-
-            # 1. QECTOR Fast Union-Find (CPU)
-            if uf_dec is not None:
-                try:
-                    t0 = time.perf_counter()
-                    uf_corr = uf_dec.batch_decode(syndromes)
-                    elapsed = time.perf_counter() - t0
-                    
-                    errors_cnt = sum(not np.array_equal((H @ c) % 2, s) for c, s in zip(uf_corr[:min(S, 1000)], syndromes[:min(S, 1000)]))
-                    ler = (errors_cnt / min(S, 1000)) if min(S, 1000) > 0 else 0.0
-                    ci_lo, ci_hi = wilson_score_interval(errors_cnt, min(S, 1000))
-                    
-                    results.append({
-                        "decoder": "QECTOR Fast Union-Find (CPU)",
-                        "category": "QECTOR CPU",
+                probe = estimate_ler_circuit_level(
+                    distance=d, decoder=kind, p=p, shots=PROBE_SHOTS, seed=seed
+                )
+            except Exception as exc:  # noqa: BLE001 - an absent backend is data, not a crash
+                print(f"  {label:30s} unavailable: {type(exc).__name__}: {exc}", flush=True)
+                skipped.append(
+                    {
+                        "decoder": label,
                         "distance": d,
-                        "n_qubits": n_qubits,
-                        "n_checks": n_checks,
-                        "shots": S,
-                        "elapsed_sec": elapsed,
-                        "dec_per_s": S / elapsed if elapsed > 0 else 0,
-                        "latency_us": (elapsed / S) * 1e6 if S > 0 else 0,
-                        "ler": ler,
-                        "ci95_lo": ci_lo,
-                        "ci95_hi": ci_hi,
-                    })
-                    print(f"  [QECTOR Fast UF] S={S:6d} | {S / elapsed:10.1f} dec/s | {ler*100:6.3f}% LER")
-                except Exception as e:
-                    print(f"  [QECTOR Fast UF] S={S} FAILED: {e}")
+                        "shots": None,
+                        "reason": f"{type(exc).__name__}: {exc}",
+                    }
+                )
+                continue
 
-            # 2. QECTOR Blossom (CPU)
-            if blossom_dec is not None:
-                try:
-                    t0 = time.perf_counter()
-                    b_corr = blossom_dec.batch_decode(syndromes)
-                    elapsed = time.perf_counter() - t0
-                    
-                    errors_cnt = sum(not np.array_equal((H @ c) % 2, s) for c, s in zip(b_corr[:min(S, 1000)], syndromes[:min(S, 1000)]))
-                    ler = (errors_cnt / min(S, 1000)) if min(S, 1000) > 0 else 0.0
-                    ci_lo, ci_hi = wilson_score_interval(errors_cnt, min(S, 1000))
-                    
-                    results.append({
-                        "decoder": "QECTOR Blossom (CPU)",
-                        "category": "QECTOR CPU",
-                        "distance": d,
-                        "n_qubits": n_qubits,
-                        "n_checks": n_checks,
-                        "shots": S,
-                        "elapsed_sec": elapsed,
-                        "dec_per_s": S / elapsed if elapsed > 0 else 0,
-                        "latency_us": (elapsed / S) * 1e6 if S > 0 else 0,
-                        "ler": ler,
-                        "ci95_lo": ci_lo,
-                        "ci95_hi": ci_hi,
-                    })
-                    print(f"  [QECTOR Blossom] S={S:6d} | {S / elapsed:10.1f} dec/s | {ler*100:6.3f}% LER")
-                except Exception as e:
-                    print(f"  [QECTOR Blossom] S={S} FAILED: {e}")
+            rate = probe.decodes_per_s
+            print(f"  {label:30s} probe {rate:12.1f} dec/s", flush=True)
 
-            # 3. QECTOR BP-OSD (CPU)
-            if bposd_dec is not None and S <= 10000 and d <= 9:
-                try:
-                    sample_s = min(S, 200)
-                    syn_sample = syndromes[:sample_s]
-                    t0 = time.perf_counter()
-                    bo_corr = bposd_dec.batch_decode(syn_sample)
-                    elapsed_sample = time.perf_counter() - t0
-                    
-                    rate = sample_s / elapsed_sample if elapsed_sample > 0 else 0
-                    proj_elapsed = S / rate if rate > 0 else elapsed_sample
-                    
-                    errors_cnt = sum(not np.array_equal((H @ c) % 2, s) for c, s in zip(bo_corr, syn_sample))
-                    ler = errors_cnt / sample_s
-                    ci_lo, ci_hi = wilson_score_interval(errors_cnt, sample_s)
-                    
-                    results.append({
-                        "decoder": "QECTOR BP-OSD (CPU)",
-                        "category": "QECTOR CPU",
-                        "distance": d,
-                        "n_qubits": n_qubits,
-                        "n_checks": n_checks,
-                        "shots": S,
-                        "elapsed_sec": proj_elapsed,
-                        "dec_per_s": rate,
-                        "latency_us": (1.0 / rate) * 1e6 if rate > 0 else 0,
-                        "ler": ler,
-                        "ci95_lo": ci_lo,
-                        "ci95_hi": ci_hi,
-                    })
-                    print(f"  [QECTOR BP-OSD]  S={S:6d} | {rate:10.1f} dec/s | {ler*100:6.3f}% LER")
-                except Exception as e:
-                    print(f"  [QECTOR BP-OSD] S={S} FAILED: {e}")
+            for S in shot_list:
+                projected = S / rate if rate > 0 else float("inf")
+                if projected > budget_s:
+                    skipped.append(
+                        {
+                            "decoder": label,
+                            "distance": d,
+                            "shots": S,
+                            "reason": "over per-cell decode budget",
+                            "probe_rate_dec_per_s": rate,
+                            "projected_decode_seconds": projected,
+                            "budget_seconds": budget_s,
+                        }
+                    )
+                    print(
+                        f"      S={S:>7,} SKIPPED (~{projected:,.0f}s > {budget_s:g}s budget)",
+                        flush=True,
+                    )
+                    continue
 
-            # 4. QECTOR CUDA Batch (GPU)
-            if cuda_dec is not None:
-                try:
-                    t0 = time.perf_counter()
-                    cuda_corr = cuda_dec.batch_decode(syndromes)
-                    elapsed = time.perf_counter() - t0
-                    
-                    errors_cnt = sum(not np.array_equal((H @ c) % 2, s) for c, s in zip(cuda_corr[:min(S, 500)], syndromes[:min(S, 500)]))
-                    ler = (errors_cnt / min(S, 500)) if min(S, 500) > 0 else 0.0
-                    ci_lo, ci_hi = wilson_score_interval(errors_cnt, min(S, 500))
-                    
-                    results.append({
-                        "decoder": "QECTOR CUDA Batch (GPU)",
-                        "category": "QECTOR GPU",
-                        "distance": d,
-                        "n_qubits": n_qubits,
-                        "n_checks": n_checks,
-                        "shots": S,
-                        "elapsed_sec": elapsed,
-                        "dec_per_s": S / elapsed if elapsed > 0 else 0,
-                        "latency_us": (elapsed / S) * 1e6 if S > 0 else 0,
-                        "ler": ler,
-                        "ci95_lo": ci_lo,
-                        "ci95_hi": ci_hi,
-                    })
-                    print(f"  [QECTOR CUDA GPU] S={S:6d} | {S / elapsed:10.1f} dec/s | {ler*100:6.3f}% LER")
-                except Exception as e:
-                    print(f"  [QECTOR CUDA GPU] S={S} FAILED: {e}")
-
-            # 5. PyMatching v2.4 (C++)
-            if pm_dec is not None:
-                try:
-                    sample_s = min(S, 200 if d <= 9 else (50 if d <= 17 else 20))
-                    syn_sample = syndromes[:sample_s]
-                    
-                    t0 = time.perf_counter()
-                    pm_corr = np.array([pm_dec.decode(s) for s in syn_sample], dtype=np.uint8)
-                    elapsed_sample = time.perf_counter() - t0
-                    
-                    rate = sample_s / elapsed_sample if elapsed_sample > 0 else 0
-                    proj_elapsed = S / rate if rate > 0 else elapsed_sample
-                    
-                    errors_cnt = sum(not np.array_equal((H @ c) % 2, s) for c, s in zip(pm_corr, syn_sample))
-                    ler = errors_cnt / sample_s
-                    ci_lo, ci_hi = wilson_score_interval(errors_cnt, sample_s)
-                    
-                    results.append({
-                        "decoder": "PyMatching v2.4 (C++)",
-                        "category": "PyMatching",
-                        "distance": d,
-                        "n_qubits": n_qubits,
-                        "n_checks": n_checks,
-                        "shots": S,
-                        "elapsed_sec": proj_elapsed,
-                        "dec_per_s": rate,
-                        "latency_us": (1.0 / rate) * 1e6 if rate > 0 else 0,
-                        "ler": ler,
-                        "ci95_lo": ci_lo,
-                        "ci95_hi": ci_hi,
-                    })
-                    print(f"  [PyMatching v2.4] S={S:6d} | {rate:10.1f} dec/s | {ler*100:6.3f}% LER")
-                except Exception as e:
-                    print(f"  [PyMatching v2.4] S={S} FAILED: {e}")
-
-            # 6. ldpc v2.4.1 (BP-OSD)
-            if ldpc_dec is not None and S <= 10000 and d <= 9:
-                try:
-                    sample_s = min(S, 200)
-                    syn_sample = syndromes[:sample_s]
-                    
-                    t0 = time.perf_counter()
-                    ldpc_corr = np.array([ldpc_dec.decode(s) for s in syn_sample], dtype=np.uint8)
-                    elapsed_sample = time.perf_counter() - t0
-                    
-                    rate = sample_s / elapsed_sample if elapsed_sample > 0 else 0
-                    proj_elapsed = S / rate if rate > 0 else elapsed_sample
-                    
-                    errors_cnt = sum(not np.array_equal((H @ c) % 2, s) for c, s in zip(ldpc_corr, syn_sample))
-                    ler = errors_cnt / sample_s
-                    ci_lo, ci_hi = wilson_score_interval(errors_cnt, sample_s)
-                    
-                    results.append({
-                        "decoder": "ldpc v2.4.1 (BP-OSD)",
-                        "category": "ldpc",
-                        "distance": d,
-                        "n_qubits": n_qubits,
-                        "n_checks": n_checks,
-                        "shots": S,
-                        "elapsed_sec": proj_elapsed,
-                        "dec_per_s": rate,
-                        "latency_us": (1.0 / rate) * 1e6 if rate > 0 else 0,
-                        "ler": ler,
-                        "ci95_lo": ci_lo,
-                        "ci95_hi": ci_hi,
-                    })
-                    print(f"  [ldpc BP-OSD]     S={S:6d} | {rate:10.1f} dec/s | {ler*100:6.3f}% LER")
-                except Exception as e:
-                    print(f"  [ldpc BP-OSD] S={S} FAILED: {e}")
-
-    # Compute speedup vs PyMatching
-    pm_dict = {(r["distance"], r["shots"]): r["dec_per_s"] for r in results if r["decoder"] == "PyMatching v2.4 (C++)"}
-    for r in results:
-        base = pm_dict.get((r["distance"], r["shots"]), 0)
-        r["speedup_vs_pymatching"] = round(r["dec_per_s"] / base, 2) if base > 0 else 1.0
-
-    total_elapsed = time.perf_counter() - start_total_time
-    return results, total_elapsed
+                res = estimate_ler_circuit_level(
+                    distance=d, decoder=kind, p=p, shots=S, seed=seed
+                )
+                row = res.to_dict()
+                row.update({"decoder": label, "decoder_kind": kind, "distance": d})
+                rows.append(row)
+                lo, hi = res.ci95
+                print(
+                    f"      S={S:>7,} {res.decodes_per_s:12.1f} dec/s  "
+                    f"LER={res.ler:.5f} [{lo:.5f},{hi:.5f}]  errors={res.errors}",
+                    flush=True,
+                )
+    return rows, skipped
 
 
-def export_csv(path: Path, results: list[dict]):
-    """Export benchmark table as CSV."""
-    headers = [
-        "decoder", "category", "distance", "n_qubits", "n_checks",
-        "shots", "elapsed_sec", "dec_per_s", "latency_us",
-        "ler", "ci95_lo", "ci95_hi", "speedup_vs_pymatching"
-    ]
-    with path.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=headers)
-        writer.writeheader()
-        writer.writerows(results)
-    print(f"[Exported] CSV report: {path}")
-
-
-def export_markdown(path: Path, results: list[dict], provenance: dict):
-    """Export complete benchmark report as Markdown without row truncation."""
-    env = provenance.get("environment", {})
-    vers = env.get("versions", {})
-    
-    md = []
-    md.append("# QECTOR v0.7.0 Comprehensive Benchmark Report (Full Data: d=3..31, Shots=1k..100k)\n")
-    md.append("## Executive Summary\n")
-    md.append("This official benchmark evaluates **QECTOR v0.7.0** (CPU & CUDA GPU) against standard industry baselines (**PyMatching v2.4** and **ldpc v2.4.1**) across distances $d=3..31$ and shot volumes up to $100,000$.\n")
-    
-    md.append("### Environment & Provenance Metadata\n")
-    md.append(f"- **Git Commit**: `{provenance.get('git_commit', 'unknown')[:10]}`")
-    md.append(f"- **Platform**: {env.get('platform', 'unknown')}")
-    md.append(f"- **Python Version**: {env.get('python', 'unknown')}")
-    md.append(f"- **QECTOR Version**: {vers.get('qector_decoder_v3', '0.7.0')}")
-    md.append(f"- **PyMatching Version**: {vers.get('pymatching', '2.4.0')}")
-    md.append(f"- **ldpc Version**: {vers.get('ldpc', '2.4.1')}")
-    md.append(f"- **Stim Version**: {vers.get('stim', '1.16.0')}\n")
-    
-    md.append(f"## Full Throughput & Latency Table ({len(results)} Total Benchmark Configurations)\n")
-    md.append("| Decoder | Category | d | Qubits | Shots | Throughput (dec/s) | Latency (µs) | LER (%) | Speedup vs PyMatching |")
-    md.append("|:---|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|")
-    
-    for r in results:
-        md.append(
-            f"| **{r['decoder']}** | {r['category']} | {r['distance']} | {r['n_qubits']} | {r['shots']:,} | "
-            f"**{r['dec_per_s']:,.1f}** | {r['latency_us']:.2f} | {r['ler']*100:.3f}% | **{r['speedup_vs_pymatching']}x** |"
-        )
-    
-    md.append("\n## Methodology & Integrity Notes\n")
-    md.append(f"> {provenance.get('methodology_note', '')}\n")
-    
-    path.write_text("\n".join(md), encoding="utf-8")
-    print(f"[Exported] Complete Markdown report ({len(results)} rows): {path}")
-
-
-def generate_charts(results: list[dict], throughput_chart_path: Path, ler_chart_path: Path, batch_chart_path: Path):
-    """Generate high-DPI matplotlib chart images."""
-    distances = sorted(list(set(r["distance"] for r in results)))
-    decoders = sorted(list(set(r["decoder"] for r in results)))
-    
-    plt.style.use("seaborn-v0_8-whitegrid" if "seaborn-v0_8-whitegrid" in plt.style.available else "default")
-    color_map = {
-        "QECTOR Fast Union-Find (CPU)": "#1a56db",
-        "QECTOR Blossom (CPU)": "#059669",
-        "QECTOR BP-OSD (CPU)": "#7c3aed",
-        "QECTOR CUDA Batch (GPU)": "#dc2626",
-        "PyMatching v2.4 (C++)": "#d97706",
-        "ldpc v2.4.1 (BP-OSD)": "#4b5563",
+def add_speedups(rows):
+    """Speedup vs PyMatching within the SAME (distance, shots) cell. Never across cells."""
+    ref = {
+        (r["distance"], r["shots"]): r["decodes_per_s"]
+        for r in rows
+        if r["decoder"].startswith("PyMatching")
     }
-    
-    # Chart 1: Throughput vs Distance (for S=10,000 or nearest)
+    for r in rows:
+        base = ref.get((r["distance"], r["shots"]))
+        r["speedup_vs_pymatching"] = round(r["decodes_per_s"] / base, 3) if base else None
+    return rows
+
+
+FIELDS = [
+    "decoder",
+    "decoder_kind",
+    "code",
+    "distance",
+    "rounds",
+    "noise_model",
+    "physical_error_rate",
+    "shots",
+    "errors",
+    "ler",
+    "ci95_lo",
+    "ci95_hi",
+    "seconds",
+    "decodes_per_s",
+    "speedup_vs_pymatching",
+    "seed",
+]
+
+
+def export_csv(path: Path, rows):
+    with path.open("w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=FIELDS, extrasaction="ignore")
+        w.writeheader()
+        for r in rows:
+            w.writerow({k: r.get(k) for k in FIELDS})
+    print(f"[Exported] CSV ({len(rows)} rows): {path}")
+
+
+def _best_per_distance(rows, label):
+    """Largest-shot-count row per distance for one decoder (most statistics)."""
+    per_d: dict[int, dict] = {}
+    for r in rows:
+        if r["decoder"] != label:
+            continue
+        cur = per_d.get(r["distance"])
+        if cur is None or r["shots"] > cur["shots"]:
+            per_d[r["distance"]] = r
+    return per_d
+
+
+def export_markdown(path: Path, rows, skipped, prov, p, budget_s):
+    env = prov.get("environment", {})
+    v = env.get("versions", {})
+    md: list[str] = []
+    md.append("# QECTOR v0.7.0 — circuit-level decoder comparison\n")
+    md.append(
+        "Every row below is one `ler.estimate_ler_circuit_level` measurement: the same "
+        "Stim rotated-surface-code circuit, the same decomposed DEM, the same "
+        "detector/observable samples and the same `decode_batch` resolver for every "
+        "decoder, scored against the circuit's own logical observables. "
+        "`ler.assert_comparable` gated these rows before writing.\n"
+    )
+    md.append(
+        f"- **Noise model**: circuit-level, p = {p} (gate, reset and measurement noise "
+        "over d rounds of syndrome extraction)\n"
+        f"- **Per-cell decode budget**: {budget_s:g}s. Cells projected to exceed it appear "
+        "under *Not measured* — nothing is extrapolated.\n"
+        f"- **Git commit**: `{prov.get('git_commit', '')[:10]}` "
+        f"(tree dirty: {prov.get('git_tree_dirty')})\n"
+        f"- **Platform**: {env.get('platform', '?')} · Python {env.get('python', '?')}\n"
+        f"- **Versions**: qector {v.get('qector_decoder_v3', '?')}, "
+        f"pymatching {v.get('pymatching', '?')}, ldpc {v.get('ldpc', '?')}, "
+        f"stim {v.get('stim', '?')}\n"
+    )
+
+    md.append(f"\n## Measured results ({len(rows)} cells)\n")
+    md.append(
+        "| Decoder | d | Shots | Errors | LER | 95% CI | Throughput (dec/s) | vs PyMatching |"
+    )
+    md.append("|:---|:---:|---:|---:|---:|:---:|---:|---:|")
+    for r in sorted(rows, key=lambda x: (x["distance"], x["shots"], x["decoder"])):
+        sp = r.get("speedup_vs_pymatching")
+        md.append(
+            f"| {r['decoder']} | {r['distance']} | {r['shots']:,} | {r['errors']} | "
+            f"{r['ler']:.5f} | [{r['ci95_lo']:.5f}, {r['ci95_hi']:.5f}] | "
+            f"{r['decodes_per_s']:,.1f} | {f'{sp:.2f}x' if sp else '—'} |"
+        )
+
+    if skipped:
+        md.append(f"\n## Not measured ({len(skipped)} cells)\n")
+        md.append(
+            "These cells were **not run** and carry no numbers. They are listed so the gaps "
+            "in the grid are explicit rather than quietly filled in.\n"
+        )
+        md.append("| Decoder | d | Shots | Reason | Probe rate (dec/s) | Projected decode |")
+        md.append("|:---|:---:|---:|:---|---:|---:|")
+        for s in skipped:
+            sh = f"{s['shots']:,}" if s.get("shots") else "—"
+            pr = s.get("probe_rate_dec_per_s")
+            pj = s.get("projected_decode_seconds")
+            rate_cell = f"{pr:,.1f}" if pr else "—"
+            proj_cell = f"{pj:,.0f}s" if pj else "—"
+            md.append(
+                f"| {s['decoder']} | {s['distance']} | {sh} | {s['reason']} | "
+                f"{rate_cell} | {proj_cell} |"
+            )
+
+    md.append("\n## How to read this\n")
+    for c in prov.get("caveats", []):
+        md.append(f"- {c}")
+    md.append(
+        "- Accuracy and speed are independent axes: a lower LER at the same (d, p) is more "
+        "accurate, a higher throughput is faster. This table deliberately does not collapse "
+        "them into one score."
+    )
+    md.append(
+        "- Throughput counts decode time only — `LerResult.seconds` wraps the single "
+        "`decode_batch` call. Circuit construction and sampling are excluded for every "
+        "decoder equally."
+    )
+    md.append(
+        "- A cell with 0 errors is not evidence of a zero error rate; read its `ci95_hi` as "
+        "an upper bound. The LER chart plots those as open downward markers."
+    )
+    path.write_text("\n".join(md) + "\n", encoding="utf-8")
+    print(f"[Exported] Markdown ({len(rows)} measured, {len(skipped)} skipped): {path}")
+
+
+def generate_charts(rows, out_dir: Path, p: float):
+    plt.style.use(
+        "seaborn-v0_8-whitegrid"
+        if "seaborn-v0_8-whitegrid" in plt.style.available
+        else "default"
+    )
+    written: list[str] = []
+    labels = sorted({r["decoder"] for r in rows})
+
+    # 1. Throughput vs distance.
     fig, ax = plt.subplots(figsize=(8, 4.5), dpi=200)
-    for dec in decoders:
-        dec_rows = [r for r in results if r["decoder"] == dec and r["shots"] in (5000, 10000)]
-        dec_rows.sort(key=lambda x: x["distance"])
-        if dec_rows:
-            xs = [r["distance"] for r in dec_rows]
-            ys = [r["dec_per_s"] for r in dec_rows]
-            ax.plot(xs, ys, "o-", label=dec, color=color_map.get(dec, None), linewidth=2.2, markersize=5)
-            
-    ax.set_title("Decoding Throughput vs Code Distance (d=3..31)", fontsize=12, fontweight="bold", pad=12)
-    ax.set_xlabel("Code Distance (d)", fontsize=10, labelpad=8)
-    ax.set_ylabel("Throughput (decodes / sec)", fontsize=10, labelpad=8)
+    for lab in labels:
+        per_d = _best_per_distance(rows, lab)
+        xs = sorted(per_d)
+        if xs:
+            ax.plot(
+                xs,
+                [per_d[x]["decodes_per_s"] for x in xs],
+                "o-",
+                label=lab,
+                color=COLORS.get(lab),
+                linewidth=2.2,
+                markersize=5,
+            )
     ax.set_yscale("log")
+    ax.set_title("Decode throughput vs code distance (circuit-level)", fontweight="bold")
+    ax.set_xlabel("Code distance d")
+    ax.set_ylabel("Throughput (decodes/s, log)")
     ax.grid(True, which="both", linestyle="--", alpha=0.5)
-    ax.legend(fontsize=8, loc="upper right", framealpha=0.9)
+    ax.legend(fontsize=8)
     fig.tight_layout()
-    fig.savefig(throughput_chart_path)
+    q = out_dir / "chart_official_throughput.png"
+    fig.savefig(q)
     plt.close(fig)
+    written.append(q.name)
 
-    # Chart 2: Logical Error Rate (LER) vs Distance (Physical Noise p=0.03)
+    # 2. Measured LER vs distance, with Wilson CIs. Zero-error cells are drawn as
+    #    95% upper bounds, never as a point estimate of zero.
     fig, ax = plt.subplots(figsize=(8, 4.5), dpi=200)
-    for dec in decoders:
-        if "Union-Find" in dec:
-            ler_ys = [max(1e-12, 0.14 * ((0.03 / 0.10) ** ((d + 1) / 2))) for d in distances]
-        elif "Blossom" in dec:
-            ler_ys = [max(1e-12, 0.10 * ((0.03 / 0.10) ** ((d + 1) / 2))) for d in distances]
-        elif "CUDA" in dec:
-            ler_ys = [max(1e-12, 0.14 * ((0.03 / 0.10) ** ((d + 1) / 2))) for d in distances]
-        elif "PyMatching" in dec:
-            ler_ys = [max(1e-12, 0.10 * ((0.03 / 0.10) ** ((d + 1) / 2))) for d in distances]
-        elif "ldpc" in dec:
-            ler_ys = [max(1e-12, 0.08 * ((0.03 / 0.10) ** ((d + 1) / 2))) for d in distances]
-        else:
-            ler_ys = [max(1e-12, 0.15 * ((0.03 / 0.10) ** ((d + 1) / 2))) for d in distances]
-            
-        ax.plot(distances, ler_ys, "s--", label=dec, color=color_map.get(dec, None), linewidth=2.0, markersize=5)
-            
-    ax.set_title("Logical Error Rate (LER) vs Code Distance (Physical Noise p=3%)", fontsize=12, fontweight="bold", pad=12)
-    ax.set_xlabel("Code Distance (d)", fontsize=10, labelpad=8)
-    ax.set_ylabel("Logical Error Rate (P_L)", fontsize=10, labelpad=8)
-    ax.set_yscale("log")
+    any_point = False
+    for lab in labels:
+        per_d = _best_per_distance(rows, lab)
+        xs = sorted(per_d)
+        sx, sy, lo_e, hi_e, bx, by = [], [], [], [], [], []
+        for x in xs:
+            r = per_d[x]
+            if r["errors"] > 0:
+                sx.append(x)
+                sy.append(r["ler"])
+                lo_e.append(max(0.0, r["ler"] - r["ci95_lo"]))
+                hi_e.append(max(0.0, r["ci95_hi"] - r["ler"]))
+            else:
+                bx.append(x)
+                by.append(r["ci95_hi"])
+        if sx:
+            ax.errorbar(
+                sx, sy, yerr=[lo_e, hi_e], fmt="o-", capsize=3, label=lab,
+                color=COLORS.get(lab), linewidth=2.0, markersize=5,
+            )
+            any_point = True
+        if bx:
+            ax.plot(
+                bx, by, "v", mfc="none", color=COLORS.get(lab),
+                label=f"{lab} (0 errors → 95% upper bound)",
+            )
+            any_point = True
+    if any_point:
+        ax.set_yscale("log")
+    ax.set_title(
+        f"Measured logical error rate vs distance (circuit-level, p={p})", fontweight="bold"
+    )
+    ax.set_xlabel("Code distance d")
+    ax.set_ylabel("Logical error rate per shot")
     ax.grid(True, which="both", linestyle="--", alpha=0.5)
-    ax.legend(fontsize=8, loc="upper right", framealpha=0.9)
+    ax.legend(fontsize=7)
     fig.tight_layout()
-    fig.savefig(ler_chart_path)
+    q = out_dir / "chart_official_ler.png"
+    fig.savefig(q)
     plt.close(fig)
+    written.append(q.name)
 
-    # Chart 3: Throughput vs Batch Size (Shots S) for d=7
-    fig, ax = plt.subplots(figsize=(8, 4.5), dpi=200)
-    for dec in decoders:
-        dec_rows = [r for r in results if r["decoder"] == dec and r["distance"] in (7, 9)]
-        dec_rows.sort(key=lambda x: x["shots"])
-        if dec_rows:
-            xs = [r["shots"] for r in dec_rows]
-            ys = [r["dec_per_s"] for r in dec_rows]
-            ax.plot(xs, ys, "s--", label=dec, color=color_map.get(dec, None), linewidth=2.0, markersize=5)
-            
-    ax.set_title("Decoding Throughput vs Batch Size S (1k..100k)", fontsize=12, fontweight="bold", pad=12)
-    ax.set_xlabel("Batch Size / Shots (S)", fontsize=10, labelpad=8)
-    ax.set_ylabel("Throughput (decodes / sec)", fontsize=10, labelpad=8)
-    ax.set_xscale("log")
-    ax.set_yscale("log")
-    ax.grid(True, which="both", linestyle="--", alpha=0.5)
-    ax.legend(fontsize=8, loc="upper left", framealpha=0.9)
-    fig.tight_layout()
-    fig.savefig(batch_chart_path)
-    plt.close(fig)
-    
-    print(f"[Generated] Chart images: {throughput_chart_path.name}, {ler_chart_path.name}, {batch_chart_path.name}")
+    # 3. Throughput vs batch size, at the largest distance with more than one point.
+    by_d: dict[int, set] = {}
+    for r in rows:
+        by_d.setdefault(r["distance"], set()).add(r["shots"])
+    multi = [d for d, s in by_d.items() if len(s) > 1]
+    if multi:
+        dsel = max(multi)
+        fig, ax = plt.subplots(figsize=(8, 4.5), dpi=200)
+        for lab in labels:
+            pts = sorted(
+                (
+                    (r["shots"], r["decodes_per_s"])
+                    for r in rows
+                    if r["decoder"] == lab and r["distance"] == dsel
+                ),
+                key=lambda t: t[0],
+            )
+            if pts:
+                ax.plot(
+                    [a for a, _ in pts], [b for _, b in pts], "s--", label=lab,
+                    color=COLORS.get(lab), linewidth=2.0, markersize=5,
+                )
+        ax.set_xscale("log")
+        ax.set_yscale("log")
+        ax.set_title(f"Throughput vs batch size (d={dsel})", fontweight="bold")
+        ax.set_xlabel("Shots per batch (log)")
+        ax.set_ylabel("Throughput (decodes/s, log)")
+        ax.grid(True, which="both", linestyle="--", alpha=0.5)
+        ax.legend(fontsize=8)
+        fig.tight_layout()
+        q = out_dir / "chart_official_batch_scaling.png"
+        fig.savefig(q)
+        plt.close(fig)
+        written.append(q.name)
+
+    print(f"[Generated] charts: {', '.join(written)}")
+    return written
 
 
-def export_pdf(path: Path, results: list[dict], provenance: dict, chart_tp: Path, chart_batch: Path):
-    """Generate Complete Multi-Page Executive PDF Report containing 100% of benchmark data."""
+def export_pdf(path: Path, rows, skipped, prov, charts, out_dir: Path, p: float):
+    try:
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import letter
+        from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+        from reportlab.lib.units import inch
+        from reportlab.platypus import (
+            HRFlowable,
+            Image,
+            PageBreak,
+            Paragraph,
+            SimpleDocTemplate,
+            Spacer,
+            Table,
+            TableStyle,
+        )
+    except ImportError:
+        print("[Skipped] PDF: reportlab is not installed")
+        return
+
+    ss = getSampleStyleSheet()
+    st_title = ParagraphStyle("t", parent=ss["Title"], fontSize=17, spaceAfter=4)
+    st_sub = ParagraphStyle("s", parent=ss["Normal"], fontSize=9,
+                            textColor=colors.HexColor("#475569"))
+    st_h2 = ParagraphStyle("h2", parent=ss["Heading2"], fontSize=12, spaceBefore=10, spaceAfter=5)
+    cell = ParagraphStyle("c", parent=ss["Normal"], fontSize=7, leading=9)
+    cellb = ParagraphStyle("cb", parent=cell, fontName="Helvetica-Bold")
+
     doc = SimpleDocTemplate(
-        str(path),
-        pagesize=letter,
-        leftMargin=36,
-        rightMargin=36,
-        topMargin=36,
-        bottomMargin=36,
+        str(path), pagesize=letter,
+        leftMargin=0.55 * inch, rightMargin=0.55 * inch,
+        topMargin=0.55 * inch, bottomMargin=0.55 * inch,
+        title="QECTOR v0.7.0 circuit-level decoder comparison",
     )
-    
-    styles = getSampleStyleSheet()
-    
-    title_style = ParagraphStyle(
-        "DocTitle",
-        parent=styles["Heading1"],
-        fontName="Helvetica-Bold",
-        fontSize=18,
-        leading=22,
-        textColor=colors.HexColor("#1e293b"),
-        spaceAfter=6,
-    )
-    
-    subtitle_style = ParagraphStyle(
-        "DocSubTitle",
-        parent=styles["Normal"],
-        fontName="Helvetica",
-        fontSize=10.5,
-        leading=14,
-        textColor=colors.HexColor("#475569"),
-        spaceAfter=10,
-    )
-    
-    h2_style = ParagraphStyle(
-        "Heading2Custom",
-        parent=styles["Heading2"],
-        fontName="Helvetica-Bold",
-        fontSize=12,
-        leading=16,
-        textColor=colors.HexColor("#0f172a"),
-        spaceBefore=12,
-        spaceAfter=6,
-    )
-    
-    cell_style = ParagraphStyle(
-        "CellText",
-        fontName="Helvetica",
-        fontSize=8,
-        leading=10,
-        textColor=colors.HexColor("#1e293b"),
-    )
-    
-    cell_bold = ParagraphStyle(
-        "CellBold",
-        fontName="Helvetica-Bold",
-        fontSize=8,
-        leading=10,
-        textColor=colors.HexColor("#0f172a"),
-    )
-
-    story = []
-    
-    # Title & Header Banner
-    story.append(Paragraph("QECTOR v0.7.0 Complete Benchmark Report", title_style))
-    story.append(Paragraph("Full Untruncated Data: Distances d=3..31 | Shot Volumes S=1k..100k | QECTOR CPU/GPU vs PyMatching & ldpc", subtitle_style))
-    story.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor("#2563eb"), spaceAfter=10))
-
-    # Metadata Card
-    env = provenance.get("environment", {})
-    vers = env.get("versions", {})
-    meta_text = (
-        f"<b>Generated UTC:</b> {provenance.get('generated_utc', '')[:19]} &nbsp;|&nbsp; "
-        f"<b>Git Commit:</b> <code>{provenance.get('git_commit', '')[:10]}</code> &nbsp;|&nbsp; "
-        f"<b>QECTOR:</b> v{vers.get('qector_decoder_v3', '0.7.0')}<br/>"
-        f"<b>PyMatching:</b> v{vers.get('pymatching', '2.4.0')} &nbsp;|&nbsp; "
-        f"<b>ldpc:</b> v{vers.get('ldpc', '2.4.1')} &nbsp;|&nbsp; "
-        f"<b>Stim:</b> v{vers.get('stim', '1.16.0')} &nbsp;|&nbsp; "
-        f"<b>Platform:</b> {env.get('platform', '')}"
-    )
-    story.append(Paragraph(meta_text, cell_style))
-    story.append(Spacer(1, 10))
-
-    # Page 1 Visual Charts
-    story.append(Paragraph("Visual Performance Scaling (Throughput & Batch Volume)", h2_style))
-    story.append(Spacer(1, 6))
-    story.append(Image(str(chart_tp), width=7*inch, height=3.6*inch))
-    story.append(Spacer(1, 8))
-    story.append(Image(str(chart_batch), width=7*inch, height=3.6*inch))
-    story.append(PageBreak())
-
-    # Full Multi-Page Data Table
-    story.append(Paragraph(f"Complete Empirical Benchmark Table ({len(results)} Configurations)", h2_style))
-    story.append(Spacer(1, 6))
-    
-    headers = [
-        Paragraph("Decoder", cell_bold),
-        Paragraph("Category", cell_bold),
-        Paragraph("d", cell_bold),
-        Paragraph("Shots", cell_bold),
-        Paragraph("Throughput", cell_bold),
-        Paragraph("Latency", cell_bold),
-        Paragraph("Speedup", cell_bold),
+    env = prov.get("environment", {})
+    story = [
+        Paragraph("QECTOR v0.7.0 — circuit-level decoder comparison", st_title),
+        Paragraph(
+            "Measured with ler.estimate_ler_circuit_level: identical circuit, DEM, samples "
+            "and decode_batch resolver for every decoder, scored against the circuit's "
+            "logical observables. Validated by ler.assert_comparable. No extrapolated cells.",
+            st_sub,
+        ),
+        HRFlowable(width="100%", thickness=1.2, color=colors.HexColor("#2563eb"), spaceAfter=8),
+        Paragraph(
+            f"<b>Noise model:</b> circuit-level, p={p} &nbsp;|&nbsp; "
+            f"<b>Commit:</b> {prov.get('git_commit', '')[:10]} &nbsp;|&nbsp; "
+            f"<b>Generated:</b> {prov.get('generated_utc', '')[:19]}Z<br/>"
+            f"<b>Platform:</b> {env.get('platform', '?')} &nbsp;|&nbsp; "
+            f"<b>Python:</b> {env.get('python', '?')}",
+            cell,
+        ),
+        Spacer(1, 8),
     ]
-    
-    table_data = [headers]
-    for r in results:
-        table_data.append([
-            Paragraph(r["decoder"], cell_style),
-            Paragraph(r["category"], cell_style),
-            Paragraph(str(r["distance"]), cell_style),
-            Paragraph(f"{r['shots']:,}", cell_style),
-            Paragraph(f"{r['dec_per_s']:,.1f} dec/s", cell_bold),
-            Paragraph(f"{r['latency_us']:.2f} µs", cell_style),
-            Paragraph(f"{r['speedup_vs_pymatching']}x", cell_bold),
-        ])
+    for name in charts:
+        story.append(Image(str(out_dir / name), width=6.9 * inch, height=3.55 * inch))
+        story.append(Spacer(1, 6))
 
-    t = Table(table_data, colWidths=[150, 85, 30, 50, 110, 65, 50], repeatRows=1)
+    story.append(PageBreak())
+    story.append(Paragraph(f"Measured results ({len(rows)} cells)", st_h2))
+    data = [[Paragraph(x, cellb) for x in
+             ("Decoder", "d", "Shots", "Errors", "LER", "95% CI", "dec/s", "vs PM")]]
+    for r in sorted(rows, key=lambda x: (x["distance"], x["shots"], x["decoder"])):
+        sp = r.get("speedup_vs_pymatching")
+        data.append([
+            Paragraph(r["decoder"], cell),
+            Paragraph(str(r["distance"]), cell),
+            Paragraph(f"{r['shots']:,}", cell),
+            Paragraph(str(r["errors"]), cell),
+            Paragraph(f"{r['ler']:.5f}", cellb),
+            Paragraph(f"[{r['ci95_lo']:.4f}, {r['ci95_hi']:.4f}]", cell),
+            Paragraph(f"{r['decodes_per_s']:,.0f}", cellb),
+            Paragraph(f"{sp:.2f}x" if sp else "—", cell),
+        ])
+    t = Table(data, colWidths=[138, 22, 48, 38, 52, 94, 60, 40], repeatRows=1)
     t.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#f1f5f9')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor('#0f172a')),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
-        ('TOPPADDING', (0, 0), (-1, -1), 3),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#cbd5e1')),
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8fafc')]),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1e293b")),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+        ("GRID", (0, 0), (-1, -1), 0.25, colors.HexColor("#cbd5e1")),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
     ]))
     story.append(t)
 
+    if skipped:
+        story.append(PageBreak())
+        story.append(Paragraph(f"Not measured ({len(skipped)} cells)", st_h2))
+        story.append(Paragraph(
+            "Listed so the gaps are explicit. These cells were never run and carry no "
+            "numbers; nothing here was extrapolated or synthesised.", cell))
+        story.append(Spacer(1, 6))
+        sd = [[Paragraph(x, cellb) for x in ("Decoder", "d", "Shots", "Reason", "Projected")]]
+        for s in skipped:
+            pj = s.get("projected_decode_seconds")
+            sd.append([
+                Paragraph(s["decoder"], cell),
+                Paragraph(str(s["distance"]), cell),
+                Paragraph(f"{s['shots']:,}" if s.get("shots") else "—", cell),
+                Paragraph(s["reason"], cell),
+                Paragraph(f"{pj:,.0f}s" if pj else "—", cell),
+            ])
+        t2 = Table(sd, colWidths=[145, 25, 55, 190, 60], repeatRows=1)
+        t2.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#7c2d12")),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+            ("GRID", (0, 0), (-1, -1), 0.25, colors.HexColor("#cbd5e1")),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ]))
+        story.append(t2)
+
     doc.build(story)
-    print(f"[Exported] Complete Multi-Page PDF report ({len(results)} rows): {path}")
+    print(f"[Exported] PDF: {path}")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run full QECTOR CPU/GPU vs ldpc & PyMatching benchmark (d=3..31, S=1k..100k).")
-    parser.add_argument("--distances", type=str, default="3,5,7,9,11,13,15,17,19,21,25,31", help="Comma-separated distances")
-    parser.add_argument("--shots", type=str, default="1000,5000,10000,50000,100000", help="Comma-separated shot counts")
-    parser.add_argument("--p", type=float, default=0.005, help="Physical error rate p")
-    parser.add_argument("--out-dir", type=str, default=".", help="Output directory for generated files")
-    args = parser.parse_args()
+    ap = argparse.ArgumentParser(description="Circuit-level decoder comparison benchmark.")
+    ap.add_argument("--distances", default="3,5,7,9,11")
+    ap.add_argument("--shots", default="1000,5000,10000")
+    ap.add_argument("--p", type=float, default=0.005)
+    ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument(
+        "--budget-seconds", type=float, default=30.0,
+        help="Per-cell decode budget; cells projected to exceed it are recorded as "
+             "skipped rather than extrapolated.",
+    )
+    ap.add_argument("--out-dir", default=".")
+    args = ap.parse_args()
 
-    distances = tuple(int(x.strip()) for x in args.distances.split(",") if x.strip())
-    shot_list = tuple(int(x.strip()) for x in args.shots.split(",") if x.strip())
+    distances = [int(x) for x in args.distances.split(",") if x.strip()]
+    shot_list = sorted(int(x) for x in args.shots.split(",") if x.strip())
     out_dir = Path(args.out_dir).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # 1. Run Benchmark Suite
-    results, elapsed = run_benchmark(distances=distances, shot_list=shot_list, p=args.p)
+    print("QECTOR circuit-level comparison benchmark")
+    print(f"  distances={distances}  shots={shot_list}  p={args.p}  seed={args.seed}")
+    print(f"  per-cell decode budget: {args.budget_seconds:g}s (no extrapolation)")
 
-    # 2. Parameters & Provenance Metadata
-    parameters = {
-        "distances": list(distances),
-        "shot_list": list(shot_list),
+    t0 = time.perf_counter()
+    rows, skipped = run_grid(distances, shot_list, args.p, args.seed, args.budget_seconds)
+    elapsed = time.perf_counter() - t0
+
+    if not rows:
+        print("\nNo cell was measurable under this budget; nothing written.")
+        return 1
+
+    # The guard the withdrawn artifacts lacked: refuses to write a mixed-model set.
+    model = assert_comparable(rows)
+    print(f"\nassert_comparable OK — all {len(rows)} rows share noise model: {model}")
+
+    add_speedups(rows)
+
+    params = {
+        "distances": distances,
+        "shots": shot_list,
         "physical_error_rate": args.p,
-        "seed": 42,
+        "seed": args.seed,
+        "per_cell_budget_seconds": args.budget_seconds,
+        "decoders": [k for _, k in DECODERS],
+        "extrapolation": "none - infeasible cells are recorded as skipped",
+        "skipped_cells": skipped,
     }
-
-    # 3. Export JSON Artifact (Stamped)
     json_path = out_dir / "official_benchmark_results.json"
     _provenance.write_artifact(
-        path=json_path,
-        rows=results,
-        parameters=parameters,
-        elapsed_seconds=elapsed,
-        methodology="circuit_level",
-        generator="scripts/run_custom_comparison_benchmark.py",
+        json_path, rows, params, elapsed_seconds=elapsed,
+        methodology="circuit_level", generator=Path(__file__).name,
     )
-    print(f"[Exported] Stamped JSON: {json_path}")
+    print(f"[Exported] stamped JSON: {json_path}")
 
-    # Read back provenance data
-    _, provenance = _provenance.load_artifact(json_path)
+    _, prov = _provenance.load_artifact(json_path)
+    export_csv(out_dir / "official_benchmark_results.csv", rows)
+    export_markdown(
+        out_dir / "official_benchmark_results.md", rows, skipped, prov, args.p,
+        args.budget_seconds,
+    )
+    charts = generate_charts(rows, out_dir, args.p)
+    export_pdf(
+        out_dir / "official_benchmark_results.pdf", rows, skipped, prov, charts, out_dir, args.p
+    )
 
-    # 4. Export CSV
-    csv_path = out_dir / "official_benchmark_results.csv"
-    export_csv(csv_path, results)
-
-    # 5. Export Markdown
-    md_path = out_dir / "official_benchmark_results.md"
-    export_markdown(md_path, results, provenance)
-
-    # 6. Generate Charts
-    chart_tp_path = out_dir / "chart_official_throughput.png"
-    chart_ler_path = out_dir / "chart_official_ler.png"
-    chart_batch_path = out_dir / "chart_official_batch_scaling.png"
-    generate_charts(results, chart_tp_path, chart_ler_path, chart_batch_path)
-
-    # 7. Export PDF Report
-    pdf_path = out_dir / "official_benchmark_results.pdf"
-    export_pdf(pdf_path, results, provenance, chart_tp_path, chart_batch_path)
-
-    print("\n=== Comprehensive Benchmark and Report Generation Completed Successfully ===")
+    print(f"\nDone in {elapsed:,.1f}s — {len(rows)} measured, {len(skipped)} skipped.")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
