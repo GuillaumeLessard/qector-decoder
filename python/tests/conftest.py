@@ -85,6 +85,29 @@ if _installed_package_has_native_extension():
     os.environ.setdefault("QECTOR_TESTS_USE_INSTALLED", "1")
 
 
+# Starlette's TestClient emits a deprecation warning that is upstream noise, not
+# actionable here. This lived in `[tool.pytest.ini_options] filterwarnings` as
+# `ignore::starlette.exceptions.StarletteDeprecationWarning`, but pytest resolves
+# that class at config-parse time: on the 3.9/3.10 matrix legs the resolvable
+# starlette is older, has no such attribute, and pytest aborts the whole session
+# with a usage error (exit 4) before collecting a single test. Registering it
+# here instead degrades to a no-op when the class is absent.
+#
+# Note it subclasses UserWarning, not DeprecationWarning, so there is no stdlib
+# category to filter on as a substitute.
+#
+# It has to go through `addinivalue_line` rather than a module-level
+# `warnings.filterwarnings` call: pytest runs each test inside its own
+# `catch_warnings()` block seeded from the ini filters, which discards anything
+# registered at conftest import time.
+def pytest_configure(config):
+    try:
+        from starlette.exceptions import StarletteDeprecationWarning as _W
+    except Exception:  # pragma: no cover - starlette absent or too old to have it
+        return
+    config.addinivalue_line("filterwarnings", f"ignore::{_W.__module__}.{_W.__qualname__}")
+
+
 def pytest_report_header(config):
     """Make the resolution decision visible in the test header."""
     spec = importlib.util.find_spec("qector_decoder_v3")

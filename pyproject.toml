@@ -172,9 +172,11 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 filterwarnings = [
-    # Starlette's TestClient warns that httpx is deprecated in favor of httpx2;
-    # this is upstream noise, not actionable from this project.
-    "ignore::starlette.exceptions.StarletteDeprecationWarning",
+    # Starlette's TestClient deprecation warning is registered in
+    # python/tests/conftest.py, NOT here. pytest resolves a class path in this
+    # list at config-parse time, so naming a class that a older starlette does
+    # not have aborts the entire session with a usage error (exit 4) on the
+    # 3.9/3.10 legs. conftest can tolerate its absence; this list cannot.
 ]
 
 [tool.mypy]
