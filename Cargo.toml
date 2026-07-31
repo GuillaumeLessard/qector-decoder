@@ -19,12 +19,12 @@ crate-type = ["cdylib"]
 # Feature flags for optional infrastructure
 [features]
 default = ["opencl", "cuda", "extension-module"]
-opencl = ["ocl"]
-cuda = ["libloading"]
+opencl = ["ocl", "extension-module"]
+cuda = ["libloading", "extension-module"]
 extension-module = ["pyo3/extension-module"]
 prometheus = ["metrics-exporter-prometheus"]
 grpc = ["tonic", "tonic-prost", "prost", "tokio", "prometheus", "sha2"]
-full = ["opencl", "cuda", "grpc", "extension-module"]
+full = ["opencl", "cuda", "grpc"]
 # A9-05: build against the CPython stable ABI so one wheel per platform serves
 # every supported interpreter (>=3.9, matching `requires-python`), instead of
 # five near-identical wheels per platform. Release builds enable this; local
