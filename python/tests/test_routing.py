@@ -137,8 +137,14 @@ def test_code_object_is_classified_structurally():
 # ---------------------------------------------------------------------------
 @pytest.mark.parametrize("cuda_rust,gpu", [(False, False), (False, True), (True, True)])
 def test_detected_hardware_drives_huge_batch(monkeypatch, cuda_rust, gpu):
-    monkeypatch.setattr(qd.gpu_backend, "has_cuda_rust", lambda: cuda_rust)
-    monkeypatch.setattr(qd.gpu_backend, "gpu_available", lambda: gpu)
+    # Patch the canonical module by dotted path, NOT via `qd.gpu_backend`.
+    # `HardwareProfile.detect()` reads `routing._gb.has_cuda_rust()`, where `_gb`
+    # is `qector_decoder_v3.gpu_backend` bound from sys.modules. The package-level
+    # attribute `qd.gpu_backend` is not reliably that same object - in CI it is
+    # shadowed, so patching it left `detect()` reading the real hardware and these
+    # two cases failed on any machine without a GPU while passing on one with.
+    monkeypatch.setattr("qector_decoder_v3.gpu_backend.has_cuda_rust", lambda: cuda_rust)
+    monkeypatch.setattr("qector_decoder_v3.gpu_backend.gpu_available", lambda: gpu)
 
     prof = HardwareProfile.detect()
     assert prof.cuda_rust is cuda_rust and prof.gpu is gpu
