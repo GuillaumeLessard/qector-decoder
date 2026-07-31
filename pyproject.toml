@@ -5,14 +5,14 @@ build-backend = "maturin"
 [project]
 name = "qector-decoder-v3"
 version = "0.7.0"
-description = "Production-grade Rust/Python quantum error correction decoder. 25+ decoder families: MWPM Blossom, Union-Find, BP-OSD, LDPC/qLDPC, belief-matching, CUDA/GPU batch decoding, 7-tier AutoDecoder fallback. PyMatching/Stim/Sinter compatible. Ed25519 license verification."
+description = "Production-grade Rust/Python quantum error correction decoder. 25+ decoder families: MWPM Blossom, Union-Find (weighted), BP-OSD, Relay-BP for LDPC/qLDPC, belief-matching, colour-code, correlated two-stage matching, ambiguity clustering, CUDA/GPU batch decoding, 7-tier AutoDecoder fallback. PyMatching/Stim/Sinter/qiskit-qec compatible. Ed25519 license verification."
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "PolyForm-Noncommercial-1.0.0" }
 authors = [
     {name = "Guillaume Lessard / iD01t Productions", email = "admin@qector.store"}
 ]
-keywords = ["quantum", "error correction", "decoder", "union-find", "QEC", "rust", "MWPM", "Stim", "PyMatching", "LDPC", "qLDPC", "blossom", "belief propagation", "GPU decoding", "surface code", "quantum computing"]
+keywords = ["quantum", "error correction", "decoder", "union-find", "QEC", "rust", "MWPM", "Stim", "Sinter", "PyMatching", "qiskit", "LDPC", "qLDPC", "blossom", "belief propagation", "belief matching", "BP-OSD", "Relay-BP", "colour code", "color code", "toric code", "GPU decoding", "CUDA", "surface code", "syndrome decoding", "fault tolerance", "quantum computing"]
 classifiers = [
     "License :: Other/Proprietary License",
     "Operating System :: OS Independent",
@@ -114,14 +114,21 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://qector.store"
-Documentation = "https://github.com/GuillaumeLessard/qector-decoder"
+# PyPI gives a few of these keys dedicated icons in the sidebar: Homepage,
+# Documentation, Source, Issues, Changelog and Funding. "Funding" is why the
+# sponsors link is spelled exactly that way -- rename it and the icon is lost.
+Homepage = "https://www.qector.store"
+Documentation = "https://github.com/GuillaumeLessard/qector-decoder/tree/main/docs"
+Source = "https://github.com/GuillaumeLessard/qector-decoder"
 Repository = "https://github.com/GuillaumeLessard/qector-decoder"
-Pricing = "https://qector.store/pricing"
-Purchase = "https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00"
+Issues = "https://github.com/GuillaumeLessard/qector-decoder/issues"
 Changelog = "https://github.com/GuillaumeLessard/qector-decoder/blob/main/CHANGELOG.md"
 "Release Notes" = "https://github.com/GuillaumeLessard/qector-decoder/blob/main/RELEASE_NOTES.md"
-Issues = "https://github.com/GuillaumeLessard/qector-decoder/issues"
+Funding = "https://github.com/sponsors/qectorlab"
+Pricing = "https://www.qector.store/pricing"
+Purchase = "https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00"
+"Commercial Licensing" = "https://github.com/GuillaumeLessard/qector-decoder/blob/main/COMMERCIAL.md"
+Security = "https://github.com/GuillaumeLessard/qector-decoder/blob/main/SECURITY.md"
 
 
 [project.scripts]

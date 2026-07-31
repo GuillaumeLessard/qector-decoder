@@ -20,7 +20,7 @@ and commercial licences are what keep the decoder maintained.
 | Channel | Who it's for |
 |---|---|
 | [GitHub Sponsors](https://github.com/sponsors/qectorlab) | Individuals and companies funding ongoing development |
-| [Commercial licence](https://www.qector.store/pricing) | Required for company, SaaS, OEM or funded institutional use — see [COMMERCIAL.md](COMMERCIAL.md) |
+| [Commercial licence](https://www.qector.store/pricing) | Required for company, SaaS, OEM or funded institutional use — see [COMMERCIAL.md](https://github.com/GuillaumeLessard/qector-decoder/blob/main/COMMERCIAL.md) |
 | [Direct purchase](https://buy.stripe.com/6oU00l77Xc8ifsegEqeUU07) | Immediate Stripe checkout, licence issued automatically |
 | [admin@qector.store](mailto:admin@qector.store) | Site licences, custom terms, academic partnerships |
 
