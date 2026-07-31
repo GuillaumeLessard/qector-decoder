@@ -12,6 +12,33 @@ has been published. `src/*.rs` is `.gitignore`d, so `git log v0.6.9..HEAD` shows
 none of the Rust work recorded here — it is verified by `cargo test` and by
 reading the tree.
 
+### Benchmarks — corrected artifacts, and what they say
+- **`official_benchmark_results.{json,csv,md,pdf}` were regenerated.** The first
+  v0.7.0 versions reproduced the defect that got six pre-v0.7.0 artifacts
+  withdrawn (todo6 A1-03), and additionally stamped `_provenance`'s canned
+  methodology note — which asserts `ler.estimate_ler_circuit_level` scoring and
+  `ler.assert_comparable` validation — into files produced by neither. They
+  reported "LER" as a syndrome-consistency check `(H·ĉ = s)`, which reads 0.000%
+  for every decoder at every distance because it never asks whether the logical
+  observable flipped; they timed QECTOR through a native batch call against
+  PyMatching through a 20-shot Python loop extrapolated to 100,000; and their
+  LER chart plotted hardcoded analytic curves rather than measurements.
+- **What replaced them.** Every row now comes from
+  `ler.estimate_ler_circuit_level` — one circuit, one decomposed DEM, one
+  detector/observable sample set per cell, one `decode_batch` resolver for
+  QECTOR, PyMatching and ldpc alike — and `ler.assert_comparable` gates the rows
+  before writing. Nothing is extrapolated: 63 cells that exceeded the per-cell
+  decode budget are recorded as *not measured*, with their probe rate and
+  projected cost.
+- **The numbers, per-cell and not generalised.** `qector_blossom` and PyMatching
+  2 returned identical logical-failure counts on identical samples at `d = 3`
+  and `d = 5` (1891 and 1596 in 100,000). On throughput PyMatching led at every
+  distance measured, consistent with this project's long-standing note that it
+  leads on plain MWPM. Both statements are in the artifacts and in the README.
+- `scripts/run_custom_comparison_benchmark.py` gained `--from-json`, which
+  re-renders the reports from a stamped artifact without re-measuring, so a
+  presentation fix cannot silently move the numbers underneath a citation.
+
 ### Added — CLI, diagnostics, and ecosystem entry points
 - **`qector` CLI** (`decode` / `bench` / `serve`) and **`qector-doctor`**, a
   15-check environment diagnostic that reports *why* a backend is unavailable

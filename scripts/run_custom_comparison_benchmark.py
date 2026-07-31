@@ -84,6 +84,18 @@ COLORS = {
 PROBE_SHOTS = 256
 
 
+def _fmt_speedup(sp) -> str:
+    """Format a throughput ratio without collapsing small ones to '0.00x'.
+
+    A decoder ~1000x slower than the reference has a ratio of 0.001; printed with
+    two decimals that becomes '0.00x', which reads as zero throughput rather than
+    as the (accurate, unflattering) number it is.
+    """
+    if sp is None:
+        return "—"
+    return f"{sp:.2f}x" if sp >= 0.01 else f"{sp:.3g}x"
+
+
 def run_grid(distances, shot_list, p, seed, budget_s):
     """Measure every feasible (distance, decoder, shots) cell. Never extrapolate."""
     rows: list[dict] = []
@@ -236,7 +248,7 @@ def export_markdown(path: Path, rows, skipped, prov, p, budget_s):
         md.append(
             f"| {r['decoder']} | {r['distance']} | {r['shots']:,} | {r['errors']} | "
             f"{r['ler']:.5f} | [{r['ci95_lo']:.5f}, {r['ci95_hi']:.5f}] | "
-            f"{r['decodes_per_s']:,.1f} | {f'{sp:.2f}x' if sp else '—'} |"
+            f"{r['decodes_per_s']:,.1f} | {_fmt_speedup(sp)} |"
         )
 
     if skipped:
@@ -471,7 +483,7 @@ def export_pdf(path: Path, rows, skipped, prov, charts, out_dir: Path, p: float)
             Paragraph(f"{r['ler']:.5f}", cellb),
             Paragraph(f"[{r['ci95_lo']:.4f}, {r['ci95_hi']:.4f}]", cell),
             Paragraph(f"{r['decodes_per_s']:,.0f}", cellb),
-            Paragraph(f"{sp:.2f}x" if sp else "—", cell),
+            Paragraph(_fmt_speedup(sp), cell),
         ])
     t = Table(data, colWidths=[138, 22, 48, 38, 52, 94, 60, 40], repeatRows=1)
     t.setStyle(TableStyle([
@@ -525,6 +537,12 @@ def main():
              "skipped rather than extrapolated.",
     )
     ap.add_argument("--out-dir", default=".")
+    ap.add_argument(
+        "--from-json", metavar="PATH",
+        help="re-render CSV/Markdown/PDF/charts from an existing stamped artifact "
+             "instead of measuring. Use for presentation fixes so the numbers stay "
+             "byte-identical to what has already been cited.",
+    )
     args = ap.parse_args()
 
     distances = [int(x) for x in args.distances.split(",") if x.strip()]
@@ -535,6 +553,33 @@ def main():
     print("QECTOR circuit-level comparison benchmark")
     print(f"  distances={distances}  shots={shot_list}  p={args.p}  seed={args.seed}")
     print(f"  per-cell decode budget: {args.budget_seconds:g}s (no extrapolation)")
+
+    if args.from_json:
+        # Re-render the reports from an existing stamped artifact without
+        # re-measuring. A presentation fix must not silently change the numbers
+        # underneath it: re-running would produce a different (equally valid)
+        # sample, and any figure already quoted elsewhere would quietly stop
+        # matching the artifact it cites.
+        src = Path(args.from_json).resolve()
+        rows, prov = _provenance.load_artifact(src)
+        if prov is None:
+            print(f"{src} carries no provenance block - refusing to re-render it.")
+            return 1
+        skipped = prov.get("parameters", {}).get("skipped_cells", [])
+        p = prov.get("parameters", {}).get("physical_error_rate", args.p)
+        budget = prov.get("parameters", {}).get("per_cell_budget_seconds", args.budget_seconds)
+        assert_comparable(rows)
+        print(f"Re-rendering {len(rows)} measured / {len(skipped)} skipped cells from {src.name}")
+        export_csv(out_dir / "official_benchmark_results.csv", rows)
+        export_markdown(
+            out_dir / "official_benchmark_results.md", rows, skipped, prov, p, budget
+        )
+        charts = generate_charts(rows, out_dir, p)
+        export_pdf(
+            out_dir / "official_benchmark_results.pdf", rows, skipped, prov, charts, out_dir, p
+        )
+        print("\nDone - measurements untouched, reports re-rendered.")
+        return 0
 
     t0 = time.perf_counter()
     rows, skipped = run_grid(distances, shot_list, args.p, args.seed, args.budget_seconds)

@@ -423,20 +423,46 @@ quiesced**, and its provenance block records `git_tree_dirty: true`. A further
 63 cells exceeded the per-cell decode budget and are listed as *not measured*,
 carrying their measured probe rate and projected cost — no cell is extrapolated.
 
+Largest shot count measured per cell. Throughput is decode time only; LER is
+per shot with a 95% Wilson interval. Every row is one
+`estimate_ler_circuit_level` call on the same circuit, DEM and samples.
+
+| d | Decoder | Shots | Throughput (dec/s) | LER | 95% CI |
+| ---: | --- | ---: | ---: | ---: | --- |
+| 3 | PyMatching 2 | 100,000 | 2,437,651 | 0.01891 | [0.01808, 0.01977] |
+| 3 | `qector_blossom` | 100,000 | 245,629 | 0.01891 | [0.01808, 0.01977] |
+| 3 | `qector_unionfind` | 100,000 | 825,726 | 0.02210 | [0.02121, 0.02303] |
+| 3 | ldpc BP-OSD | 50,000 | 2,259 | 0.01938 | [0.01821, 0.02063] |
+| 5 | PyMatching 2 | 100,000 | 249,065 | 0.01596 | [0.01520, 0.01676] |
+| 5 | `qector_blossom` | 100,000 | 9,121 | 0.01596 | [0.01520, 0.01676] |
+| 5 | `qector_unionfind` | 100,000 | 112,797 | 0.02645 | [0.02547, 0.02746] |
+| 7 | PyMatching 2 | 100,000 | 75,767 | 0.01220 | [0.01154, 0.01290] |
+| 7 | `qector_unionfind` | 100,000 | 22,643 | 0.02042 | [0.01956, 0.02132] |
+| 9 | PyMatching 2 | 100,000 | 29,244 | 0.00878 | [0.00822, 0.00938] |
+| 9 | `qector_unionfind` | 100,000 | 4,606 | 0.01732 | [0.01653, 0.01815] |
+| 11 | PyMatching 2 | 100,000 | 13,816 | 0.00647 | [0.00599, 0.00699] |
+| 13 | PyMatching 2 | 100,000 | 7,218 | 0.00445 | [0.00406, 0.00488] |
+| 15 | PyMatching 2 | 100,000 | 6,480 | 0.00314 | [0.00281, 0.00351] |
+
+The full 77-row table, including every `qector_blossom` and ldpc cell that fit
+the budget, is in `official_benchmark_results.md`.
+
 Two findings, stated per-cell and not generalised (see
 `docs/REPRODUCIBILITY_CHECKLIST.md`):
 
-- At `d = 3` and `d = 5`, `qector_blossom` and PyMatching 2 returned **the same
-  number of logical failures on the same 100,000 samples** — 1891 and 1596
-  respectively. On this workload the two agree exactly.
-- On throughput, **PyMatching was faster than every QECTOR decoder at every
-  distance measured here**, by roughly 3× at `d = 3` and by two orders of
-  magnitude for `qector_blossom` by `d = 11`. This is consistent with the
-  long-standing note elsewhere in this project that PyMatching leads on plain
-  MWPM; it is not a regression, and it is not something the artifacts hide.
+- **Accuracy.** At `d = 3` and `d = 5`, `qector_blossom` and PyMatching 2
+  returned *the same number of logical failures on the same 100,000 samples* —
+  1891 and 1596 respectively, identical to the digit. On this workload the two
+  agree exactly, which is a checkable claim rather than a rounded one.
+- **Throughput.** PyMatching was faster than every QECTOR decoder at every
+  distance measured here — roughly 3× at `d = 3` against `qector_unionfind`,
+  and two orders of magnitude against `qector_blossom` by `d = 11`. That is
+  consistent with the long-standing note elsewhere in this project that
+  PyMatching leads on plain MWPM. It is not a regression, and the artifacts do
+  not hide it.
 
-Do not quote these as a marketing comparison. Regenerate on quiesced hardware,
-and state the noise model, before any number here is used in a claim.
+Neither finding generalises beyond the cells above. Regenerate on quiesced
+hardware, and state the noise model, before any number here is used in a claim.
 
 ### Published, citable evidence
 
