@@ -29,6 +29,7 @@ def test_stripe_keys_loaded():
     assert keys["secret_key_prefix"].startswith("sk_live_")
 
 
+@pytest.mark.skipif(not _has_stripe_key, reason="STRIPE_SECRET_KEY not set")
 @patch("stripe.checkout.Session.create")
 def test_stripe_checkout_session_structure(mock_create):
     mock_session = MagicMock()

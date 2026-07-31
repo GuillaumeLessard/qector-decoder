@@ -15,7 +15,17 @@ from qector_decoder_v3.stripe_integration import (
     handle_stripe_webhook_payload,
 )
 
+# Same convention as test_stripe_integration.py: production secrets are absent
+# from CI, so the tests that need them skip instead of failing. The import above
+# has already run load_dotenv(), so a local .env is visible here.
+_has_stripe_key = bool(os.getenv("STRIPE_SECRET_KEY"))
+_has_license_key = bool(os.getenv("QECTOR_LICENSE_PRIVATE_KEY_B64"))
 
+_needs_stripe = pytest.mark.skipif(not _has_stripe_key, reason="STRIPE_SECRET_KEY not set")
+_needs_signing = pytest.mark.skipif(not _has_license_key, reason="QECTOR_LICENSE_PRIVATE_KEY_B64 not set")
+
+
+@_needs_stripe
 def test_zero_dollar_checkout_session_creation():
     """Test creating a $0 test checkout session via Stripe."""
     with patch("stripe.checkout.Session.create") as mock_create:
@@ -32,6 +42,7 @@ def test_zero_dollar_checkout_session_creation():
         assert session["url"].startswith("https://checkout.stripe.com")
 
 
+@_needs_signing
 def test_zero_dollar_webhook_issues_valid_token():
     """Simulate Stripe $0 checkout.session.completed → token issuance → Ed25519 verification."""
     test_email = "test_sale_user@qector.store"
@@ -78,6 +89,7 @@ def test_zero_dollar_webhook_issues_valid_token():
     assert verify_license_token(issued_token) is True
 
 
+@_needs_signing
 def test_license_activates_via_environment(monkeypatch):
     """Verify QECTOR_LICENSE env var activates the license system."""
     test_email = "env_test@qector.store"

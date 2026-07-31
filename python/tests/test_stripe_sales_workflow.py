@@ -21,6 +21,20 @@ from qector_decoder_v3.stripe_integration import (
     handle_stripe_webhook_payload,
 )
 
+# Same convention as test_stripe_integration.py. These are production secrets and
+# are deliberately absent from CI, so the tests that need them skip rather than
+# fail. Importing stripe_integration above has already run load_dotenv(), so a
+# local .env is visible here.
+#
+# The tests that assert the *absence* path - `test_raises_without_secret_key`,
+# `test_missing_private_key_is_loud` - are intentionally left unguarded: they are
+# the ones that must keep running in CI.
+_has_stripe_key = bool(os.getenv("STRIPE_SECRET_KEY"))
+_has_license_key = bool(os.getenv("QECTOR_LICENSE_PRIVATE_KEY_B64"))
+
+_needs_stripe = pytest.mark.skipif(not _has_stripe_key, reason="STRIPE_SECRET_KEY not set")
+_needs_signing = pytest.mark.skipif(not _has_license_key, reason="QECTOR_LICENSE_PRIVATE_KEY_B64 not set")
+
 
 class TestPricingRegistry:
     def test_self_serve_tiers_present(self):
@@ -37,6 +51,7 @@ class TestPricingRegistry:
     def test_commercial_alias_matches_evaluation(self):
         assert PRICING["commercial"] is PRICING["evaluation"]
 
+    @_needs_stripe
     def test_keys_snapshot_includes_bot_flag(self):
         keys = get_stripe_keys()
         assert "labs_bot_configured" in keys
@@ -44,6 +59,7 @@ class TestPricingRegistry:
 
 
 class TestEnsureProducts:
+    @_needs_stripe
     @patch("stripe.Price.create")
     @patch("stripe.Price.list")
     @patch("stripe.Product.create")
@@ -72,6 +88,7 @@ class TestEnsureProducts:
         assert mock_pcreate.call_count == 3
         assert mock_price_create.call_count == 3
 
+    @_needs_stripe
     @patch("stripe.Price.create")
     @patch("stripe.Price.list")
     @patch("stripe.Product.create")
@@ -129,6 +146,7 @@ class TestLabsBot:
         with patch.object(si, "QECTOR_LABS_BOT_WEBHOOK_URL", "https://discord.test/hook"):
             assert _notify_labs_bot("sale!") is False
 
+    @_needs_signing
     @patch("urllib.request.urlopen", side_effect=OSError("network down"))
     def test_webhook_fulfillment_survives_bot_outage(self, _mock):
         with patch.object(si, "QECTOR_LABS_BOT_WEBHOOK_URL", "https://discord.test/hook"):
@@ -144,6 +162,7 @@ class TestLabsBot:
 
 
 class TestPackageInternalSigning:
+    @_needs_signing
     def test_sign_and_verify_roundtrip(self):
         token = create_license_token("rec_xyz", "Buyer@Qector.Store")
         assert verify_license_token(token, "buyer@qector.store") is True
@@ -156,6 +175,7 @@ class TestPackageInternalSigning:
         ):
             create_license_token("rec_nokey", "a@b.c")
 
+    @_needs_signing
     def test_no_demo_fallback_in_package(self):
         """The package must never mint tokens the production pubkey rejects."""
         token = create_license_token("rec_real", "real@qector.store")

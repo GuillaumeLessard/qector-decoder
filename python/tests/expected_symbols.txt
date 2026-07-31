@@ -1,0 +1,148 @@
+# Canonical public API surface of `qector_decoder_v3` (todo8 item 0.2).
+#
+# One name per line; `#` comments and blank lines ignored. This file is the
+# contract `test_public_symbols.py` enforces in both directions:
+#   * a name here that is missing from the installed package fails the build.
+#   * a public name in the package that is *not* here also fails. Adding to the
+#     public surface is a deliberate act with SemVer consequences, so it has to
+#     be recorded here in the same commit.
+#
+# Two releases (0.6.5, 0.6.7) were yanked because a symbol silently vanished
+# from a wheel — `_guard()` substitutes a stub that imports fine and only
+# raises when constructed, so nothing else catches it.
+#
+# Optional, build-dependent backends (CUDA / OpenCL) are listed but exempt from
+# the "must not be a stub" check — see OPTIONAL_SYMBOLS in the test.
+
+AmbiguityClusterDecoder
+AutoDecoder
+AutoRouter
+BPOSDDecoder
+Backend
+BackendConfig
+BatchDecoder
+BatchedBpDecoder
+BeliefMatching
+BenchmarkSuite
+BlossomDecoder
+BpOsdDecoder
+CPUBatchDecoder
+CUDABatchDecoder
+CUDABpOsdDecoder
+ColourCodeDecoder
+DecodeResult
+DecoderName
+DecoderPool
+DetectorGraph
+FastUnionFindDecoder
+GNNBeliefMatcher
+GNNPredecoder
+GNNTrainer
+HardwareProfile
+HybridCascadeDecoder
+HybridDecoder
+LERBenchmark
+LookupTableDecoder
+MAX_WORKERS
+Matching
+NativeAutoDecoder
+NeuralPredecoder
+OpenCLBatchDecoder
+PredecodedDecoder
+Recommendation
+SlidingWindowDecoder
+SpaceTimeDecoder
+SparseBlossomDecoder
+StreamingDecoder
+StreamingResult
+StreamingSession
+StreamingTelemetry
+TwoStageDecoder
+UnionFindDecoder
+Workbench
+backend
+batched_bp_decode
+belief_matching
+benchmarking
+bp_cupy
+bposd
+changelog
+check_to_edges
+clear_decoder_cache
+codes
+colour_code
+compute_detector_differences
+cuda_is_available
+decode_mmap
+decode_with_diagnostics
+decode_with_gnn
+decoder_cache
+decoder_pool
+dem
+detect_hardware
+enforce_distance_cap
+enforce_unlocked
+estimate_distance
+flush_usage
+from_circuit
+generate_biconnected_qldpc_checks
+generate_parity_check_matrix
+generate_repetition_code_checks
+generate_ring_code_checks
+generate_space_time_surface_code_checks
+generate_surface_code_checks
+generate_toy_code_checks
+generate_triangular_color_code_4_8_8_checks
+get_accumulated_shots
+get_backend
+get_decoder
+get_decoder_pool
+get_latency_quantiles
+get_license_info
+gpu_available
+gpu_backend
+has_cuda_rust
+has_cupy
+license
+opencl_is_available
+predecoder
+pymatching
+pymatching_compat
+qiskit_plugin
+recommend
+recommend_decoder
+record_shots
+rest_api
+result
+routing
+run_grpc_server
+run_mcp_server
+set_license_key
+set_license_key_file
+sinter_compat
+sliding_window_decode
+sparse_blossom_radix_neighbors
+start_metrics_server
+stim_compat
+streaming
+stripe_integration
+verify_license_token
+workbench
+
+# Reachable at package level but deliberately NOT promoted into `__all__`:
+#   * Raw PyO3 `py_*` aliases. The supported spellings are the un-prefixed wrappers.
+#   * `qector_decoder_v3`: The compiled extension submodule.
+#   * `qector_memory_align`: Buffer conditioning helper for the PyO3 boundary.
+[reachable]
+bench_quick
+cli
+doctor
+ler
+py_check_to_edges
+py_generate_parity_check_matrix
+py_generate_repetition_code_checks
+py_generate_ring_code_checks
+py_generate_surface_code_checks
+py_generate_toy_code_checks
+qector_decoder_v3
+qector_memory_align

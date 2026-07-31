@@ -115,6 +115,12 @@ licenses_issued.json
 # --- Log files & scratch test outputs ---
 *.log
 *.txt
+# ...but this one is a committed test fixture, not scratch output. The blanket
+# `*.txt` above kept it untracked, so `test_public_symbols.py` passed locally
+# (where the file exists) and failed in CI with FileNotFoundError on all six of
+# its tests - the public-API contract was never actually enforced anywhere but
+# a developer's own checkout.
+!python/tests/expected_symbols.txt
 *.xml
 run_status.json
 __all_tests_dump.txt

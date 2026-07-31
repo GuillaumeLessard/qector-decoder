@@ -1439,12 +1439,29 @@ class TwoStageDecoder:
         c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
         self._inner = _RustTwoStageDecoder(c2q, check_types, nq, x_decoder, z_decoder)
 
+    def _pad(self, syndrome):
+        """Zero-pad a short syndrome up to ``n_checks``.
+
+        Mirrors ``pymatching_compat.decode_batch``: callers routinely hand over a
+        syndrome whose trailing all-zero detectors were trimmed upstream, and the
+        matching decoders in this package already accept that. The native core is
+        strict, so without this the same input decodes fine through ``Matching``
+        and raises ``ValueError: Syndrome length mismatch`` through
+        ``TwoStageDecoder``. Longer-than-expected input is still rejected: that is
+        a genuine mismatch, not a trimmed tail.
+        """
+        n = self._inner.n_checks
+        if syndrome.shape[-1] < n:
+            pad = _np.zeros(syndrome.shape[:-1] + (n - syndrome.shape[-1],), dtype=_np.uint8)
+            syndrome = _np.concatenate([syndrome, pad], axis=-1)
+        return _np.ascontiguousarray(syndrome, dtype=_np.uint8)
+
     def decode(self, syndrome):
         if not isinstance(syndrome, _np.ndarray):
             syndrome = _np.array(syndrome, dtype=_np.uint8)
         if syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
-        return self._inner.decode(syndrome)
+        return self._inner.decode(self._pad(syndrome))
 
     def batch_decode(self, syndromes):
         if not isinstance(syndromes, _np.ndarray):
@@ -1453,7 +1470,7 @@ class TwoStageDecoder:
             syndromes = syndromes.astype(_np.uint8)
         if syndromes.ndim != 2:
             raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
-        return self._inner.batch_decode(syndromes)
+        return self._inner.batch_decode(self._pad(syndromes))
 
     @property
     def n_qubits(self):
