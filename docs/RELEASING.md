@@ -47,9 +47,11 @@ get **both** CUDA and OpenCL — which is why a locally built extension can expo
 ## Pre-flight checklist
 
 ```bash
-cargo test --lib                      # expect 203 passed, 0 failed
-cargo clippy --lib --all-targets      # expect 0 warnings
-python -m pytest python/tests -q      # see test-results/pytest.txt
+cargo test --no-default-features        # expect 221 passed, 0 failed
+cargo clippy --no-default-features --all-targets   # expect 0 warnings
+ruff check python/                      # expect 0 errors
+ruff format --check python/             # expect no reformatting needed
+python -m pytest python/tests -q        # see test-results/pytest.txt
 ```
 
 Then, from the repo that owns the fulfilment worker:

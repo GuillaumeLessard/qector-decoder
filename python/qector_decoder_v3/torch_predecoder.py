@@ -1,3 +1,15 @@
+"""PyTorch reference implementation of the Rust GNNPredecoder.
+
+Layer math is kept bit-faithful to ``src/gnn_layers.rs`` so weights round-trip
+through safetensors and ONNX export (T5-11) matches the native forward pass.
+
+Message passing is **undirected**: every edge (u, v) contributes both
+``u→v`` and ``v→u`` messages (sourced at each endpoint's embedding), matching
+the Rust ``forward_cached_with_endpoints`` scheme.
+"""
+
+from __future__ import annotations
+
 import torch
 import torch.nn.functional as F
 from torch import nn
@@ -19,7 +31,7 @@ class TorchMessagePassingLayer(nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self):
-        # Match the initialization scale in Rust (Xavier/He style uniform init)
+        # Match the initialization scale in Rust (He-style uniform init)
         scale_msg = (2.0 / (self.node_feat_dim + self.edge_feat_dim)) ** 0.5
         nn.init.uniform_(self.w_message, -scale_msg, scale_msg)
 
@@ -27,41 +39,48 @@ class TorchMessagePassingLayer(nn.Module):
         nn.init.uniform_(self.w_update, -scale_upd, scale_upd)
 
     def forward(self, node_embeddings, edge_features, edge_src, edge_dst):
-        # node_embeddings: [N, hidden_size]
-        # edge_features: [E, edge_feat_dim]
-        # edge_src, edge_dst: [E] (long tensors)
+        # node_embeddings: [N, node_feat_dim] (or hidden_size after layer 0)
+        # edge_features:   [E, edge_feat_dim]
+        # edge_src/dst:    [E] long
 
-        # 1. Message calculation
-        src_embeddings = node_embeddings[edge_src]  # [E, current_node_dim]
-        msg_input = torch.cat([src_embeddings, edge_features], dim=-1)  # [E, current_node_dim + edge_feat_dim]
-        messages = F.linear(msg_input, self.w_message, self.b_message)  # [E, hidden_size]
+        # --- Phase 1: bidirectional messages (Rust-faithful) -----------------
+        # msg_from_src = W · [emb[src] ‖ efeat]  → delivered to dst
+        # msg_from_dst = W · [emb[dst] ‖ efeat]  → delivered to src
+        emb_src = node_embeddings[edge_src]
+        emb_dst = node_embeddings[edge_dst]
 
-        # 2. Aggregation (undirected, average over incident edges)
-        N = node_embeddings.size(0)
-        H = self.hidden_size
+        msg_from_src = F.linear(
+            torch.cat([emb_src, edge_features], dim=-1), self.w_message, self.b_message
+        )
+        msg_from_dst = F.linear(
+            torch.cat([emb_dst, edge_features], dim=-1), self.w_message, self.b_message
+        )
 
-        sum_src = torch.zeros(N, H, dtype=messages.dtype, device=messages.device)
-        sum_src.scatter_add_(0, edge_src.unsqueeze(-1).expand(-1, H), messages)
+        # --- Phase 2: mean-aggregate messages from neighbours ----------------
+        n_nodes = node_embeddings.size(0)
+        hidden = self.hidden_size
+        device = msg_from_src.device
+        dtype = msg_from_src.dtype
 
-        sum_dst = torch.zeros(N, H, dtype=messages.dtype, device=messages.device)
-        sum_dst.scatter_add_(0, edge_dst.unsqueeze(-1).expand(-1, H), messages)
+        aggregated_sum = torch.zeros(n_nodes, hidden, dtype=dtype, device=device)
+        # dst receives message sourced at src; src receives message sourced at dst
+        aggregated_sum.scatter_add_(
+            0, edge_dst.unsqueeze(-1).expand(-1, hidden), msg_from_src
+        )
+        aggregated_sum.scatter_add_(
+            0, edge_src.unsqueeze(-1).expand(-1, hidden), msg_from_dst
+        )
 
-        aggregated_sum = sum_src + sum_dst
-
-        deg_src = torch.zeros(N, dtype=messages.dtype, device=messages.device)
-        deg_src.scatter_add_(0, edge_src, torch.ones_like(edge_src, dtype=messages.dtype))
-
-        deg_dst = torch.zeros(N, dtype=messages.dtype, device=messages.device)
-        deg_dst.scatter_add_(0, edge_dst, torch.ones_like(edge_dst, dtype=messages.dtype))
-
-        degree = (deg_src + deg_dst).clamp(min=1.0)
+        degree = torch.zeros(n_nodes, dtype=dtype, device=device)
+        ones = torch.ones(edge_src.size(0), dtype=dtype, device=device)
+        degree.scatter_add_(0, edge_src, ones)
+        degree.scatter_add_(0, edge_dst, ones)
+        degree = degree.clamp(min=1.0)
         aggregated = aggregated_sum / degree.unsqueeze(-1)
 
-        # 3. Update
-        upd_input = torch.cat([node_embeddings, aggregated], dim=-1)  # [N, current_node_dim + hidden_size]
-        new_embeddings = F.relu(F.linear(upd_input, self.w_update, self.b_update))
-
-        return new_embeddings
+        # --- Phase 3: node update + ReLU ------------------------------------
+        upd_input = torch.cat([node_embeddings, aggregated], dim=-1)
+        return F.relu(F.linear(upd_input, self.w_update, self.b_update))
 
 
 class TorchEdgeReadoutMLP(nn.Module):
@@ -86,20 +105,26 @@ class TorchEdgeReadoutMLP(nn.Module):
 
 
 class TorchGNNPredecoder(nn.Module):
-    def __init__(self, node_feat_dim: int = 10, edge_feat_dim: int = 8, hidden_size: int = 16, n_layers: int = 2):
+    def __init__(
+        self,
+        node_feat_dim: int = 10,
+        edge_feat_dim: int = 8,
+        hidden_size: int = 16,
+        n_layers: int = 2,
+    ):
         super().__init__()
         self.node_feat_dim = node_feat_dim
         self.edge_feat_dim = edge_feat_dim
         self.hidden_size = hidden_size
 
-        # Layers
         self.layers = nn.ModuleList()
         current_node_dim = node_feat_dim
         for _ in range(n_layers):
-            self.layers.append(TorchMessagePassingLayer(hidden_size, current_node_dim, edge_feat_dim))
+            self.layers.append(
+                TorchMessagePassingLayer(hidden_size, current_node_dim, edge_feat_dim)
+            )
             current_node_dim = hidden_size
 
-        # Readout MLP
         readout_input_dim = hidden_size + hidden_size + edge_feat_dim
         self.edge_readout = TorchEdgeReadoutMLP(readout_input_dim, hidden_size, 1)
 
@@ -113,14 +138,15 @@ class TorchGNNPredecoder(nn.Module):
         readout_input = torch.cat([src_emb, dst_emb, edge_features], dim=-1)
 
         raw_out = self.edge_readout(readout_input).squeeze(-1)  # [E]
+        # Match Rust positive_weight: softplus + clamp to [1e-6, 100]
         adjusted_weights = F.softplus(raw_out).clamp(1e-6, 100.0)
         return adjusted_weights
 
     def save_weights(self, path: str):
         from safetensors.torch import save_file
 
-        # Cast to float64 to match Rust's expected binary format exactly
-        state_dict = {k: v.to(torch.float64).cpu() for k, v in self.state_dict().items()}
+        # Cast to float64 to match Rust's on-disk safetensors format exactly
+        state_dict = {k: v.detach().to(torch.float64).cpu() for k, v in self.state_dict().items()}
         save_file(state_dict, path)
 
     def load_weights(self, path: str):

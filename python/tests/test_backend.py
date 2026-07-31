@@ -75,7 +75,7 @@ def test_gpu_path_faithful_if_available():
     syns = (np.random.default_rng(1).random((512, code.n_checks)) < 0.08).astype(np.uint8)
     out = np.asarray(ad.batch_decode(syns))
     assert _faithful(out, H, syns)
-    assert ad.last_backend in (Backend.CUDA, Backend.OPENCL, Backend.CPU_RAYON)
+    assert ad.last_backend in (Backend.CUDA, Backend.OPENCL, Backend.CPU_RAYON, Backend.AUTO_NATIVE)
 
 
 def test_calibrate_sets_threshold_and_diagnostics():

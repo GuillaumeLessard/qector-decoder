@@ -29,6 +29,7 @@ Before using QECTOR in a customer-facing or network-accessible system:
 [ ] Place any service behind TLS termination and a reverse proxy.
 [ ] Restrict logs so benchmark inputs, customer data, and proprietary circuits are not leaked.
 [ ] Document operational owner, update path, and rollback path.
+[ ] Set QECTOR_LICENSE_KEY, or point QECTOR_LICENSE_FILE at a key file (preferred: keeps the key out of process listings and shell history), or place it at ~/.qector/license.key; alternatively call set_license_key()/set_license_key_file() before first decode. Verify the result with get_license_info() -- check key_status == "valid", not just the tier.
 ```
 
 ## Dependency inventory / SBOM-lite commands
@@ -58,6 +59,16 @@ cargo audit
 ```
 
 If an audit tool reports a vulnerability, record whether the vulnerable package is actually used in the deployed feature set. Do not ignore service-layer vulnerabilities just because the local library path is safe.
+
+## License tier enforcement
+
+QECTOR v0.7.0 enforces license tiers through the Rust Ed25519 verification core:
+
+- **Community**: d≤7, no GPU batch routing
+- **Pro**: d≤19, GPU batch routing enabled
+- **Enterprise**: d≤63, all features
+
+Set `QECTOR_ENFORCE=1` to enable hard enforcement (raises PermissionError at decode time when limits are exceeded). Without enforcement, exceeding tier limits logs a warning but allows the decode to proceed.
 
 ## REST service hardening
 

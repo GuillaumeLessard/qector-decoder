@@ -40,6 +40,7 @@ import numpy as np
 
 from . import BlossomDecoder, DetectorGraph, GNNPredecoder, SparseBlossomDecoder
 from ._bp_core import build_incidence, sum_product_bp
+from .qector_memory_align import prepare_syndromes
 
 __all__ = [
     "BeliefMatching",
@@ -182,6 +183,9 @@ class BeliefMatching:
         self._edge_c2q: list[list[int]] = [
             sorted(int(e) for e in np.nonzero(matrices.edge_check[c])[0]) for c in range(self.n_checks)
         ]
+        # Pre-construct the BlossomDecoder once; reweight per shot via
+        # set_edge_weights instead of rebuilding from scratch (A10-02).
+        self._blossom = BlossomDecoder(self._edge_c2q, self._n_edges, None)
 
     # -- constructors ------------------------------------------------------
     @classmethod
@@ -285,7 +289,9 @@ class BeliefMatching:
 
     # -- decoding ----------------------------------------------------------
     def decode(self, syndrome) -> np.ndarray:
-        s: np.ndarray = np.asarray(syndrome, dtype=np.uint8).reshape(-1)
+        # Contiguous uint8 is what the native boundary requires; this repacks
+        # only when the input is strided or the wrong dtype (bool is a free view).
+        s: np.ndarray = prepare_syndromes(syndrome)
         if s.shape[0] < self.n_checks:
             s = np.concatenate([s, np.zeros(self.n_checks - s.shape[0], np.uint8)])
 
@@ -308,15 +314,59 @@ class BeliefMatching:
         p_e = self._m.hyper_to_edge @ p_h
         p_e = np.clip(p_e, 1e-14, 1 - 1e-14)
         w = -np.log(p_e)
-        matcher = BlossomDecoder(self._edge_c2q, self._n_edges, w.tolist())
-        corr = np.asarray(matcher.decode(s), dtype=np.uint8).reshape(-1)
+        self._blossom.set_edge_weights(w)
+        corr = np.asarray(self._blossom.decode(s), dtype=np.uint8).reshape(-1)
         return (self._m.edge_obs @ corr) & 1
 
     def decode_batch(self, shots) -> np.ndarray:
-        arr = np.asarray(shots, dtype=np.uint8)
+        # C-contiguous rows: every per-shot slice below is then a borrowable
+        # flat run rather than a strided gather.
+        arr = prepare_syndromes(shots, flatten=False)
         if arr.ndim != 2:
             raise ValueError(f"shots must be 2D, got shape {arr.shape}")
-        return np.stack([self.decode(arr[i]) for i in range(arr.shape[0])]).astype(np.uint8)
+        n_batch, n_checks = arr.shape
+        if n_checks < self.n_checks:
+            pad = np.zeros((n_batch, self.n_checks - n_checks), dtype=np.uint8)
+            arr = np.concatenate([arr, pad], axis=1)
+
+        # Compute BP posteriors then edge weights per shot.
+        # Any shot where BP shortcut succeeds skips the matcher entirely.
+        n_obs = self.num_observables or self._m.edge_obs.shape[0]
+        result = np.zeros((n_batch, n_obs), dtype=np.uint8)
+        match_indices: list[int] = []
+        match_syndromes: list[np.ndarray] = []
+        match_weights_list: list[np.ndarray] = []
+
+        for i in range(n_batch):
+            s = arr[i]
+            posterior = sum_product_bp(
+                self._hic, self._hie, self.n_checks, self._n_hyper,
+                self._prior_llr, s, self.max_iter,
+            )
+            if self.bp_shortcut:
+                hard = (posterior < 0.0).astype(np.uint8)
+                if np.array_equal((self._m.hyper_check @ hard) & 1, s):
+                    result[i] = ((self._m.hyper_obs @ hard) & 1).astype(np.uint8)
+                    continue
+
+            p_h = 1.0 / (1.0 + np.exp(np.clip(posterior, -60, 60)))
+            p_e = self._m.hyper_to_edge @ p_h
+            p_e = np.clip(p_e, 1e-14, 1 - 1e-14)
+            match_indices.append(i)
+            match_syndromes.append(s)
+            match_weights_list.append(-np.log(p_e))
+
+        if match_weights_list:
+            syn_arr = np.stack(match_syndromes)
+            wgt_arr = np.stack(match_weights_list)
+            # Single native batch decode call — one graph clone per Rayon worker,
+            # in-place reweight per shot (no per-shot BlossomDecoder::new).
+            corr = np.asarray(self._blossom.batch_decode_weighted(syn_arr, wgt_arr), dtype=np.uint8)
+            obs = (corr @ self._m.edge_obs.T) & 1
+            for j, i in enumerate(match_indices):
+                result[i] = obs[j]
+
+        return result
 
     @property
     def num_detectors(self) -> int:
@@ -449,7 +499,7 @@ class GNNBeliefMatcher:
         return [(q, w) for q, w in best.items()]
 
     def decode(self, syndrome) -> np.ndarray:
-        s = np.asarray(syndrome, dtype=np.uint8).reshape(-1)
+        s = prepare_syndromes(syndrome)
         if s.shape[0] != self.n_checks:
             raise ValueError(f"syndrome length {s.shape[0]} != n_checks {self.n_checks}")
         weights = self._dynamic_weights(s)
@@ -462,7 +512,7 @@ class GNNBeliefMatcher:
         return corr
 
     def batch_decode(self, syndromes) -> np.ndarray:
-        arr = np.asarray(syndromes, dtype=np.uint8)
+        arr = prepare_syndromes(syndromes, flatten=False)
         if arr.ndim != 2:
             raise ValueError(f"shots must be 2D, got shape {arr.shape}")
         return np.stack([self.decode(arr[i]) for i in range(arr.shape[0])]).astype(np.uint8)

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 """Append Section 5 (3D Circuit-Level DEM Benchmark) with empirical task results to report.md."""
-import os
 
 REPORT_PATH = r"C:\Users\Clinque du Batiment\.gemini\antigravity-cli\brain\d4777725-ef6d-4e7d-b7a2-4bd3e9d2bd3d\report.md"
 

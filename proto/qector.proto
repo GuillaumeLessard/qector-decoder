@@ -13,6 +13,11 @@ message DecodeRequest {
     uint32 qubits_per_check = 3;
     repeated uint32 syndrome = 4;
     uint32 n_qubits = 5;
+    uint32 osd_order = 6;
+    // BP-OSD check-node update rule: "" or "exact" (default, log-domain
+    // sum-product) or "min_sum". Setting osd_order > 0 or a non-empty
+    // bp_method routes the request through the BP-OSD decoder.
+    string bp_method = 7;
 }
 
 message DecodeResponse {
@@ -28,6 +33,9 @@ message BatchDecodeRequest {
     repeated uint32 syndromes_flat = 4;
     uint32 n_qubits = 5;
     uint32 batch_size = 6;
+    uint32 osd_order = 7;
+    // See DecodeRequest.bp_method.
+    string bp_method = 8;
 }
 
 message BatchDecodeResponse {

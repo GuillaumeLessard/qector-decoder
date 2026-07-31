@@ -4,11 +4,11 @@ build-backend = "maturin"
 
 [project]
 name = "qector-decoder-v3"
-version = "0.6.9"
+version = "0.7.0"
 description = "Production-grade Rust/Python quantum error correction decoder. 25+ decoder families: MWPM Blossom, Union-Find, BP-OSD, LDPC/qLDPC, belief-matching, CUDA/GPU batch decoding, 7-tier AutoDecoder fallback. PyMatching/Stim/Sinter compatible. Ed25519 license verification."
 readme = "README.md"
 requires-python = ">=3.9"
-license = { text = "LicenseRef-QECTOR-Source-Available" }
+license = { text = "PolyForm-Noncommercial-1.0.0" }
 authors = [
     {name = "Guillaume Lessard / iD01t Productions", email = "admin@qector.store"}
 ]
@@ -34,13 +34,32 @@ classifiers = [
 ]
 dependencies = [
     "numpy>=1.24.0,<2.3",
-    "cryptography>=3.4.0",
+    # SECURITY FLOOR. `cryptography` is not incidental here: it performs the
+    # Ed25519 licence-token signature verification in
+    # `python/qector_decoder_v3/license.py`, so a vulnerable copy undermines
+    # licence enforcement itself.
+    #
+    # The previous floor of 3.4.0 (released 2021) permitted **39 known
+    # advisories** — 39 of the 45 findings `safety scan` reports against this
+    # manifest. 48.0.1 is the lowest release not covered by any of them.
+    # It supports every interpreter this package targets
+    # (`!=3.9.0,!=3.9.1,>=3.9`), so the floor costs no compatibility except on
+    # 3.9.0/3.9.1 specifically.
+    "cryptography>=48.0.1",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.0.0",
-    "hypothesis>=6.0.0",
+    # `pytest>=9.0.3` clears the one advisory Safety reports, but pytest 9.x
+    # requires Python >=3.10 while this package (and the CI matrix) still
+    # support 3.9. Split by marker rather than dropping 3.9 or staying
+    # vulnerable: 8.4.2 is the newest release that still allows 3.9.
+    "pytest>=9.0.3; python_version>='3.10'",
+    "pytest>=8.4.2; python_version<'3.10'",
+    # A9-01: `tests.yml` invokes `pytest --timeout=120`. Without this plugin that
+    # is an unrecognized argument and the whole job dies at collection.
+    "pytest-timeout>=2.1.0",
+    "hypothesis>=6.0.4",  # clears 1 Safety advisory; 6.0.4 still allows py3.6+
     "fastapi>=0.110.0",
     "uvicorn>=0.29.0",
     "httpx>=0.27.0",
@@ -48,6 +67,7 @@ dev = [
     "ruff>=0.1.0",
     "pytest-cov>=4.0.0",
     "stripe>=5.0",
+    "python-dotenv>=1.0",
 ]
 # Stim ecosystem: DEM loading, syndrome sampling, Sinter harness, and
 # PyMatching / belief-matching / BP-OSD cross-checks.
@@ -68,10 +88,15 @@ bench = [
 # Stripe license fulfillment: checkout sessions, webhook signature verification.
 stripe = [
     "stripe>=5.0",
+    # `stripe_integration` reads STRIPE_SECRET_KEY / QECTOR_LICENSE_PRIVATE_KEY_B64
+    # from a repo-root .env. Without python-dotenv that import is a silent no-op
+    # and every secret in .env stays invisible, which surfaces as
+    # "STRIPE_SECRET_KEY is not configured" on a machine where it plainly is.
+    "python-dotenv>=1.0",
 ]
 cuda = []
 opencl = []
-cupy = ["cupy"]
+cupy = ["cupy>=12.3.0"]  # unbounded before: 4 Safety advisories below 12.3.0
 cupy-cuda12x = ["cupy-cuda12x>=13"]
 all = [
     "stim>=1.12",
@@ -85,6 +110,7 @@ all = [
     "scipy>=1.10",
     "cupy-cuda12x>=13",
     "stripe>=5.0",
+    "python-dotenv>=1.0",
 ]
 
 [project.urls]
@@ -99,13 +125,26 @@ Issues = "https://github.com/GuillaumeLessard/qector-decoder/issues"
 
 
 [project.scripts]
+qector = "qector_decoder_v3.cli:main"
 qector-bench-quick = "qector_decoder_v3.bench_quick:main"
+qector-doctor = "qector_decoder_v3.doctor:main"
+
+[project.entry-points.sinter_decoder]
+qector_blossom = "qector_decoder_v3.sinter_compat:QectorSinterDecoder"
+qector_belief = "qector_decoder_v3.sinter_compat:QectorSinterDecoder"
+qector_unionfind = "qector_decoder_v3.sinter_compat:QectorSinterDecoder"
+qector_bposd = "qector_decoder_v3.sinter_compat:QectorSinterDecoder"
+qector_unionfind_unweighted = "qector_decoder_v3.sinter_compat:QectorSinterDecoder"
+
+[project.entry-points."qiskit.qec"]
+qector = "qector_decoder_v3.qiskit_plugin"
 
 [tool.maturin]
-features = ["pyo3/extension-module"]
+features = ["pyo3/extension-module", "cuda"]
 module-name = "qector_decoder_v3.qector_decoder_v3"
 python-source = "python"
 manifest-path = "Cargo.toml"
+sdist-include = ["LICENSE", "README.md", "CHANGELOG.md", "COMMERCIAL.md", "docs/**/*.md"]
 exclude = [
   "src/**",
   "tests/**",
@@ -181,3 +220,6 @@ ignore = ["E702", "E731", "E741"]
 # test_exports.py runs a manual integration script top-to-bottom; the smoke_test_wheel
 # import is intentionally placed after other exercises run, and imported for side effects.
 "test_exports.py" = ["E402"]
+# Benchmark/dev scripts: sys.path insertion must precede the qector_decoder_v3
+# import when running from a source checkout (E402) -- same pattern as tests.
+"scripts/*.py" = ["E402"]

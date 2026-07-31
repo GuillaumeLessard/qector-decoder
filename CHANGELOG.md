@@ -5,9 +5,264 @@ on [Keep a Changelog](https://keepachangelog.com/), and the project aims to foll
 semantic versioning. Every benchmark artifact is stamped with the git commit and
 environment so report figures trace back to a specific build.
 
-## [Unreleased]
+## [0.7.0] — UNRELEASED
 
-_Nothing yet._
+The repo version is 0.7.0; the latest version on **PyPI is 0.6.9**. Nothing below
+has been published. `src/*.rs` is `.gitignore`d, so `git log v0.6.9..HEAD` shows
+none of the Rust work recorded here — it is verified by `cargo test` and by
+reading the tree.
+
+### Added — CLI, diagnostics, and ecosystem entry points
+- **`qector` CLI** (`decode` / `bench` / `serve`) and **`qector-doctor`**, a
+  15-check environment diagnostic that reports *why* a backend is unavailable
+  instead of letting it fail at decode time. Both registered in
+  `pyproject.toml:[project.scripts]`. `qector-doctor` must be invoked as a console
+  script or `python -m`; run as a bare script from inside its own package
+  directory it puts the raw `.pyd` on `sys.path`, shadowing the `__init__.py`
+  wrapper that supplies constructor defaults, and then misreports `native-core`
+  and `decode` as FAIL.
+- **Sinter decoder entry points** — `qector_blossom`, `qector_belief`,
+  `qector_unionfind`, `qector_bposd`, `qector_unionfind_unweighted` — so
+  `sinter.collect()` resolves them without a `custom_decoders=` argument. The
+  **qiskit-qec plugin** is registered the same way.
+- **`qector_decoder_v3.pymatching`** exists as a real submodule, so
+  `from qector_decoder_v3.pymatching import Matching` works. The attribute
+  spelling already did; the module did not.
+
+### Added — decoder families
+- **`AmbiguityClusterDecoder`** — BP, partition on `|LLR|`, DFS-cluster the
+  ambiguous mechanisms, enumerate each cluster exactly.
+- **`TwoStageDecoder`** — decode the X sector, propagate, decode the Z sector,
+  with any of blossom / unionfind / bposd / sparse_blossom per stage. It requires
+  `check_types`: a DEM does not record which sector a detector belongs to.
+- **`ColourCodeDecoder`** — BP-OSD over the **undecomposed** hypergraph DEM.
+  Matching is not a correct colour-code decoder: a colour-code mechanism can light
+  three detectors at once and has no graphlike decomposition, and Stim's
+  `detector_error_model(decompose_errors=True)` raises outright on
+  `color_code:memory_xyz` at `d ≥ 5`. Any colour-code "matching" decoder is either
+  decoding a different code than it claims or silently dropping mechanisms.
+- **Relay-BP** (`BpMethod::Relay`) — layered serial schedule over the exact
+  sum-product update, so each check sees the freshest messages. Selected with
+  `bp_method="relay"` on `BPOSDDecoder` and `BpOsdDecoder`.
+
+### Added
+- **`QECTOR_LICENSE_FILE`, plus `~/.qector/license.key`.** The core read only
+  `QECTOR_LICENSE_KEY`, so pointing a deployment at a key *file* left it silently
+  on Community tier. Resolution order is now env var, then file path, then the
+  conventional `~/.qector/license.key`; a UTF-8 BOM and trailing newline are
+  stripped so a key written by PowerShell redirection works unmodified. A
+  `QECTOR_LICENSE_FILE` that is set but unreadable reports an **invalid** key
+  rather than degrading to Community — the silent downgrade was the hardest
+  version of this failure to diagnose. `set_license_key_file()` is the Python
+  equivalent, and the pure-Python fallback resolves keys identically so the two
+  layers cannot disagree.
+- **`SpaceTimeDecoder` and `CUDABpOsdDecoder` are reachable from Python.** Both
+  were registered in `lib.rs` and shipped in every wheel, but `__init__.py` never
+  bound them. `SpaceTimeDecoder` was additionally declared in the type stub, so
+  type checkers accepted calls that raised `AttributeError` at runtime.
+- **`generate_parity_check_matrix()` and `flush_usage()`.** Both had a native
+  implementation *and* a pure-Python fallback; neither was ever bound to a
+  module-level name, leaving the native function unreachable and the fallback
+  dead code.
+- **`DemModel.make_decoder` covers every shipped decoder family.** It handled 5
+  of 9; `lookup_table`, `hybrid_cascade`, `ambiguity_cluster` and `two_stage`
+  could not be built from a detector error model at all — the entry point real
+  circuit-level workloads use. `DemModel.DECODER_KINDS` enumerates them.
+- **`batch_decode` on `TwoStageDecoder` and `AmbiguityClusterDecoder`,** reusing
+  one scratch buffer across the batch.
+- **Weighted cluster growth on the GPU.** `CUDABatchDecoder` and
+  `OpenCLBatchDecoder` now take an optional `edge_weights` argument (the DEM's
+  `log((1-p)/p)` matching weights) and run the same adaptive time-step growth as
+  `uf_core::grow_weighted`. Both kernels produce identical logical error rates,
+  which is the cross-check that the port is faithful. Omitting the weights keeps
+  the original integer growth, bit-identical to the CPU `UnionFindDecoder`.
+  `UfGraph::edge_lengths()` exposes the normalised lengths both backends upload.
+- **`scripts/full_decoder_benchmark.py`** — benchmarks every decoder family
+  against syndromes sampled from a Stim circuit, reporting LER with Wilson
+  intervals, latency, and syndrome faithfulness, with a per-decoder time budget
+  that trims (and honestly records) the shot count instead of stalling a sweep.
+  **`scripts/generate_benchmark_pdf.py`** renders its JSON to a PDF; it performs
+  no measurements of its own.
+- **Kernel-compile gate for CUDA** (`test_cuda_kernels_compile`) plus a CUDA
+  BP-OSD decode test.
+
+### Fixed
+- **The CUDA BP-OSD kernel did not compile, so `CUDABpOsdDecoder` could never be
+  constructed.** A refactor replaced the `local_pos` linear scan with O(1)
+  inverse indices in two of three call sites; the third still called the deleted
+  helper. Every CUDA test treated construction failure as "no GPU here" and
+  skipped, so a hard compile error looked like a missing device on a machine with
+  a working GPU. Availability probes now distinguish a kernel source defect from
+  an environment gap and fail rather than skip.
+- **`HybridCascadeDecoder` ignored its edge weights.** Weights reached the
+  Blossom escalation decoder but not the Union-Find pre-filter — and the
+  pre-filter *accepts* most circuit-level syndromes, so its unweighted answer is
+  what callers received. On `surface_code:rotated_memory_x` at circuit-level
+  p=0.005 this cost roughly **2.3× the logical error rate** (d=9: 0.0452 → 0.0171)
+  at no speed benefit. *Provenance:* development run, artifact not retained. The
+  fix is corroborated by `benchmark_results/full_decoder_benchmark.json`
+  (2026-07-30, QECTOR 0.7.0, p=0.005, rounds=d, seed 20260730), where
+  `qector:hybrid_cascade` scores LER 0.0126 at d=11 against 0.0438 for the
+  unweighted CUDA Union-Find — but that run does not contain a pre-fix row, so it
+  confirms the resulting accuracy, not the 2.3× ratio itself.
+- **`AutoRouter` ignored `priority`, and `explain()` no longer described
+  `decode()`.** The native-auto path ran ahead of the Python policy layer
+  unconditionally, so `AutoRouter(priority="accuracy")` behaved identically to
+  the default and the "never route a hyperedge code to a matching decoder"
+  invariant — enforced in that policy layer — was bypassed for qLDPC codes. The
+  native path is now taken only for balanced-priority graphlike problems, and
+  `explain()` consults the same predicate.
+- **`TwoStageDecoder.decode` and `AmbiguityClusterDecoder.decode` returned
+  `bytes`** while the other seven families return a `uint8` ndarray, so neither
+  was substitutable for the decoder it was meant to replace.
+- **`set_license_key()` silently accepted invalid keys.** It swallowed the
+  verifier's rejection and set `QECTOR_LICENSE_KEY` anyway, so an expired,
+  revoked, or malformed key surfaced later as an unexplained tier cap. It now
+  raises `ValueError` and leaves the environment untouched.
+- **`.env` was never read**, because `python-dotenv` was not declared as a
+  dependency and the import failure was swallowed — so Stripe fulfillment
+  reported "STRIPE_SECRET_KEY is not configured in environment or .env file" on
+  machines where it plainly was. The dependency is declared, and the error names
+  the real cause when the file goes unread.
+- **The GPU decoders were weight-blind, and it cost accuracy, not speed.** With
+  no way to receive the DEM's matching weights, both GPU backends scored the
+  *unweighted* logical error rate — the same figure as every other unweighted
+  path. **Measured cost of being weight-blind**, on
+  `surface_code:rotated_memory_x`, circuit-level p=0.005, rounds=d, d=11:
+  unweighted CUDA Union-Find LER **0.0438** and unweighted OpenCL **0.0434**,
+  against **0.0149** for the weighted CPU `UnionFindDecoder` and **0.0062** for
+  PyMatching — roughly 3×. Speed was never the problem: unweighted OpenCL decodes
+  that same d=11 at **9.6 µs/shot** against 138 µs/shot for the weighted CPU core
+  and 82 µs/shot for PyMatching.
+  *Provenance:* `benchmark_results/full_decoder_benchmark.json`, generated
+  2026-07-30 by `scripts/full_decoder_benchmark.py` on QECTOR 0.7.0 /
+  Windows 11 / AMD Zen 2 / Python 3.11.9 / numpy 2.2.6, seed 20260730, ≤20,000
+  shots per cell. The harness trims shots per decoder to a time budget and records
+  the trimmed count, so rows differ in precision — compare `shots` and
+  `ler_ci95_*`, not `ler` alone. The file is under the `.gitignore`d
+  `benchmark_results/`, so it is reproducible but not distributed.
+  *Withdrawn from an earlier draft of this entry:* the figures "0.04525 → 0.00900,
+  weighted CPU 0.01400, PyMatching 26 µs/shot". The weighted-GPU LER of 0.00900
+  has no surviving artifact and no row in the run above, and that run measures
+  PyMatching at 82 µs/shot, not 26. The qualitative conclusion — weights matter far
+  more than throughput here — is unchanged and is what the retained run supports.
+  *Known remaining gap:* the weighted kernel scans all `E` edges per growth
+  round, where the CPU walks only the frontier of odd clusters, so the weighted
+  GPU path is accurate but ~10x slower than the weighted CPU path. Porting the
+  frontier to the kernel is the outstanding work.
+- **Prometheus latency quantiles froze permanently.** The cached sorted view was
+  invalidated only when the FIFO reservoir evicted, i.e. not until 8192 samples
+  had been recorded — so any process that read `get_latency_quantiles()` before
+  then kept serving that first snapshot forever, and p50/p90/p99 never moved
+  again. Every push now invalidates the cache. The accompanying
+  `eviction_invalidates_sorted_cache` test also asserted something arithmetically
+  impossible (that one outlier in 8192 samples moves p99); it is replaced by two
+  tests that check the real property, including below the eviction threshold.
+- **`build_maturin.cmd` built the wrong checkout.** It `cd`'d to a hard-coded
+  absolute path on one machine; it now uses its own directory and reports build
+  failures instead of always writing `DONE`.
+- **`generate_report_from_json.py` could misalign every column.** It emitted
+  cells by key-presence per row while taking headers from a caller-supplied list,
+  so a row whose shape differed from the caller's assumption shifted all values
+  one column left. Headers and cells now derive from one spec.
+- OpenCL `batch_decode` reallocated four device buffers per call, including
+  Union-Find scratch proportional to `batch_size × graph size` — roughly 900 MB
+  of allocate-and-free per call at batch 20k. Buffers are now reused across
+  calls, mirroring `CudaWorkspace`.
+
+### Changed
+- Ruff and Clippy are clean across the repo and all feature combinations
+  (`--no-default-features`, `cuda`, `opencl`, default).
+- `test_license_included.py` asserts the licence's *terms* rather than one
+  revision's wording, so the deliberate move to PolyForm Noncommercial 1.0.0 no
+  longer reads as a failure.
+- `test_bposd_batch_decode` verifies BP-OSD's batch path agrees with per-shot
+  decoding; it previously asserted the method did not exist.
+- The `benchmarks_session` harnesses are documented as **not** decoder
+  performance measurements: they feed uniform-random bit patterns to a
+  boundaryless ring code, where ~49% of inputs have odd defect parity and admit
+  no correction, so every backend measured ~2 ms/shot of non-terminating cluster
+  growth. This is why GPU paths previously appeared slower than CPU.
+
+### Added — earlier in the 0.7.0 cycle (2026-07-28)
+- **Real Ed25519 license verification** in Rust core (v2 + QECT-PRO/ENT signed payloads, production key matches Python PEM), offline CRL at ~/.qector/revoked.txt, expiry enforcement, QECTOR_ENFORCE=1 hard gate.
+- **MCP decoder cache** keyed by code + decoder_type + tuning env with honest cache_hit reporting, working clear_decoder_cache, per-tier decode timeout budgets, and async startup pre-warm.
+- **Rust NativeAutoDecoder** with distance/noise/batch-aware backend selection, CPUBatch routing for batch_size > 1024, and license tier enforcement.
+- **Stripe metered billing**: real HTTP flush via ureq with 1s/2s/4s backoff retry.
+- **AutoDecoder AUTO_NATIVE backend** and license tier check in the Python fallback chain.
+- **Workbench CLI** with --license-key, license_info command, and record_shots wiring.
+- **benchmarking.decoder_type parameter** and support for all 11 decoder backends.
+- **9 real MCP tools** (no phantom): decode_syndrome, batch_decode, decode_hyperedge, benchmark_decoder, get_decoder_info, get_backend_health, clear_decoder_cache, get_server_env, recommend_decoder.
+- **MCP security**: stdin reader enforces 10 MB max_content_length (-32600 on oversize), syndrome length validation (-32602), strict decoder_type enum validation (-32602).
+- **REST API security**: bind 127.0.0.1 by default, X-Request-ID logging, per-IP 120 req/min rate limiter.
+- **Metrics server**: default bind 127.0.0.1:9090.
+- **Arena allocator** + thread-local scratch in FastUnionFindDecoder (eliminates 15 per-shot Vec allocations).
+- **AVX2 bitmask clear** with runtime detection and O(words) popcount.
+- **DecoderArena::with_capacity** and benchmark test.
+- **CI workflows**: release-build.yml (smoke test before publish) and tests.yml (full Rust + Python matrix).
+
+### Changed — earlier in the 0.7.0 cycle (2026-07-28)
+- UnionFindDecoder.decode/decode_into return Result instead of panicking on syndrome length mismatch.
+- SparseBlossomDecoder: 3 production unwraps replaced with graceful Option/break.
+- MWPM get_pr() returns Option, callers degrade gracefully.
+- BenchmarkResult includes Wilson 95% CI, n_unfaithful, unfaithful_rate fields.
+- AutoRouter ships with use_native_auto=True and _try_native_auto() routing.
+
+### Fixed — earlier in the 0.7.0 cycle (2026-07-28)
+- MCP syndrome length mismatch returns -32602 instead of SIGABRT (panic=abort).
+- Hyperedge per-decoder gate: Blossom/SparseBlossom/BPOSD accept hyperedge codes; UnionFind/FastUnionFind reject with -32602.
+- Invalid decoder_type returns -32602 in <50ms.
+
+### Fixed — crash safety in the Rust core
+Under `panic = "abort"` every one of these aborted the host process rather than
+raising a catchable Python exception:
+- `grpc_server.rs:316,325,354,369` — `decoder_cache.lock().unwrap()`: a single
+  panicking cache client poisoned the mutex and took down every later caller.
+  Now propagated with `map_err`.
+- `cuda_bp_osd.rs:249,299` — the same pattern on `workspace.lock()`;
+  `cuda_batch.rs` had always used `map_err` here, so the two files disagreed.
+- `cuda_batch.rs` — every CUDA async error return (`cu_memcpy_htod_async`,
+  `cu_launch_kernel`, `cu_memcpy_dtoh_async`, `cu_stream_synchronize`,
+  `cu_stream_destroy`) was discarded with `let _ =`, so a failed launch returned
+  corrupt corrections as `Ok`. The `let _ = cu_*` count is now zero.
+- `cuda_workspace.rs:134` — `pointers()` aborted the host; it now returns
+  `Result<_, String>` via `ok_or_else`. This is a signature change, and
+  `cargo clippy --features full` exiting 0 is what confirms every caller was
+  updated.
+- `ler_benchmark.rs:266` — `Bernoulli::new(phys_error).unwrap()` panicked on NaN
+  or out-of-range `phys_error`; now `.ok()`, with the fall-through documented.
+- `cascade_decoder.rs:159` — `BPOSDDecoder::new(…).expect("invalid BP-OSD input")`
+  inside a constructor that returns `Self` and therefore could not fail gracefully.
+
+*Verification note:* the CUDA files do not compile under `--no-default-features`.
+Any claim about them is gated on `--features full`, or it is unverified.
+
+### Changed — benchmark methodology
+- **The four comparison tables in `README.md` are withdrawn.** They put
+  code-capacity QECTOR and circuit-level PyMatching in one table, and cited
+  artifacts under `benchmark_results/` — a `.gitignore`d path that has never been
+  in a published commit or wheel, so the numbers were never checkable. The README
+  carries the full notice; the numbers are retracted, not deleted.
+- `ler.assert_comparable` tags each run with its noise model and refuses
+  cross-model comparisons, so this class of error cannot recur silently.
+- `scripts/regenerate_benchmark_artifacts.py` rewritten. It previously had no
+  argument parser, so *any* invocation — `--help` included — immediately launched
+  a 1.6M-decode run. It now requires an explicit `--yes`, supports `--dry-run`,
+  and embeds a provenance block (methodology, git commit, tree-dirty flag,
+  parameters, dependency versions, caveats) in the artifact so a future reader
+  cannot mistake its methodology for something else. **The full publication run
+  has not been performed**, so no regenerated artifact exists yet.
+
+### Validation
+Measured on the working tree 2026-07-31:
+
+| Gate | Result |
+|---|---|
+| `cargo test --no-default-features` | 303 passed, 0 failed |
+| `cargo test --features full` | 323 passed, 0 failed, 7 ignored (hardware-only) |
+| `cargo clippy --no-default-features --all-targets -- -D warnings` | exit 0 |
+| `cargo clippy --features full --all-targets -- -D warnings` | exit 0 |
+| Full Python suite | **no trustworthy baseline** — the last full run was interrupted and none has completed on a quiesced tree since |
 
 ## [0.6.9] - 2026-07-26
 
@@ -105,7 +360,7 @@ _Nothing yet._
 - **Test suite NameError**: `test_comprehensive_suite.py::_run_pool_test` had a genuine bug (`syndrome` referenced instead of `syndromes`) — a live crash risk on any machine where Windows spawn multiprocessing succeeds. Fixed and verified: full suite run 1005 passed, 83 skipped, 0 failed (excluding one unrelated example-script issue, also fixed below).
 - **ruff clean**: Full repo now passes `ruff format --check` and `ruff check` with zero errors; `.venv`, `.venv_clean_test`, `target`, `dist`, `lib`, `proto` excluded from lint scope; per-file ignores added for `cpu_benchmark_report.py` and `test_exports.py`.
 - **`examples/example_batch.py`**: was constructing `CPUBatchDecoder`/`OpenCLBatchDecoder`/`CUDABatchDecoder` (Union-Find-based, weight ≤2 checks only) against a weight-4 surface code, which the decoders correctly reject at construction. Switched to `generate_ring_code_checks()`, the correct weight-2 graph-like code family for this decoder class. Verified: `python/tests/test_examples.py` passes (1 passed in 154.39s), and the script runs end-to-end.
-- **CI secret injection**: Regenerated and verified the `RUST_SRC_B64_1/2/3` GitHub Actions secrets (byte-identical round-trip checked before upload). Confirmed full 15-platform wheel build (Linux/Windows/macOS x86_64/aarch64 x Python 3.9-3.13) succeeds end-to-end.
+- **CI secret injection**: Regenerated and verified the `RUST_SRC_B64_1/2/3` GitHub Actions secrets (byte-identical round-trip checked before upload). Confirmed the full 15-wheel build succeeds end-to-end. *Correction (2026-07-31):* this entry originally described the matrix as "Linux/Windows/macOS x86_64/aarch64 x Python 3.9-3.13". No aarch64 wheel has ever been published. The 15 wheels are CPython 3.9–3.13 x `win_amd64` / `manylinux_2_17_x86_64` / `macosx_11_0_arm64` — checked against the live PyPI JSON API.
 
 ### Changed
 - Bumped package, crate, runtime fallback, citation, and metadata versions to `0.6.5` across `pyproject.toml`, `Cargo.toml`, `python/qector_decoder_v3/__init__.py`, `CITATION.cff`, `codemeta.json`, `README.md`, `PYPI_README.md`, docs, and examples.
@@ -121,7 +376,7 @@ _Nothing yet._
 - **BP-OSD convergence cap**: 50-iteration max, early-exit on belief convergence (max |Δ| < 1e-6), `decode_timed(max_latency_ms)` for tail-latency control.
 - **AVX2 SIMD transpose + gather**: CPU batch decoder auto-detects AVX2 via `is_x86_feature_detected!` — 1.1M shots/s on surface d=3, batch=32768.
 - **Blossom intra-decode Rayon parallelism**: k-NN search parallelized via `into_par_iter()` when n_defects > 40.
-- **DecoderPool**: Multi-process batch decoding with auto-Rayon fallback on Windows (50–500× faster than multi-process IPC).
+- **DecoderPool**: Multi-process batch decoding with auto-Rayon fallback on Windows. *(The "50–500× faster than multi-process IPC" figure this entry originally carried is withdrawn: no artifact, workload, or batch size was ever recorded for it. The Rayon fallback is still the right default on Windows — Windows spawn-based IPC pays a process-creation and pickling cost per batch that Rayon does not — but the magnitude is unmeasured.)*
 - **Cached decoder factory**: `get_decoder()` / `clear_decoder_cache()` / `get_decoder_pool()` — zero construction cost after first call.
 - **`decode_mmap`**: Out-of-core decoding via memory-mapped NumPy arrays.
 - **`DecodeResult` / `decode_with_diagnostics`**: Structured decode results with per-shot diagnostic metadata.

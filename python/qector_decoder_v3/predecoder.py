@@ -154,4 +154,17 @@ class PredecodedDecoder:
         arr = np.asarray(syndromes, dtype=np.uint8)
         if arr.ndim != 2:
             raise ValueError(f"syndromes must be 2D, got {arr.shape}")
-        return np.stack([self.decode(arr[i]) for i in range(arr.shape[0])]).astype(np.uint8)
+        committed = np.zeros((arr.shape[0], self.n_qubits), dtype=np.uint8)
+        residuals = np.zeros_like(arr)
+        for i in range(arr.shape[0]):
+            c, r = self._predecode(arr[i])
+            committed[i] = c
+            residuals[i] = r
+        has_residual = residuals.any(axis=1)
+        if has_residual.any():
+            res_corr = np.asarray(
+                self._residual.batch_decode(np.ascontiguousarray(residuals[has_residual])),
+                dtype=np.uint8,
+            ).reshape(-1, self.n_qubits)
+            committed[has_residual] ^= res_corr
+        return committed

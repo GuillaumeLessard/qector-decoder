@@ -1,252 +1,410 @@
-name: Build
+name: release-build
 
 on:
+  # Primary release path: pushing a `vX.Y.Z` tag builds every wheel and
+  # publishes to PyPI. `release: published` is kept as a secondary path so
+  # cutting a GitHub Release from an existing tag also works.
   push:
-    branches: [main, master]
-    tags: ["v*", "ci-*", "test-*"]
-  pull_request: {}
-  workflow_dispatch: {}
+    tags:
+      - "v*"
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to build (0.7.0)"
+        required: true
+        default: "0.7.0"
+      publish:
+        description: "Publish to PyPI after building"
+        type: boolean
+        required: false
+        default: false
 
+# A9-02: OIDC token for PyPI Trusted Publishing (no long-lived API token) and
+# for Sigstore. `contents: read` keeps everything else least-privilege.
 permissions:
   contents: read
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-env:
-  MATURIN_ARGS: --release --no-default-features --features cuda --out dist
-
 jobs:
-  linux-x86_64:
-    name: linux-x86_64-py${{ matrix.python-version }}
-    runs-on: ubuntu-22.04
+  build:
+    name: Wheel (${{ matrix.target }})
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        include:
+          # A9-03: manylinux + musllinux + aarch64. `maturin-action` runs the
+          # Linux builds inside the proper manylinux container, so the wheels
+          # carry PyPI-acceptable platform tags. A bare `maturin build` on
+          # ubuntu-latest produces `linux_x86_64`, which PyPI rejects outright.
+          - { os: ubuntu-latest,  target: x86_64,  manylinux: auto,        features: cuda }
+          - { os: ubuntu-latest,  target: aarch64, manylinux: auto,        features: cuda }
+          - { os: ubuntu-latest,  target: x86_64,  manylinux: musllinux_1_2, features: cuda }
+          - { os: macos-13,       target: x86_64,  manylinux: "",          features: "" }
+          - { os: macos-14,       target: aarch64, manylinux: "",          features: "" }
+          - { os: windows-latest, target: x64,     manylinux: "",          features: cuda }
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
-      - name: Inject Rust source
-        env:
-          PART1: ${{ secrets.RUST_SRC_B64_1 }}
-          PART2: ${{ secrets.RUST_SRC_B64_2 }}
-          PART3: ${{ secrets.RUST_SRC_B64_3 }}
-        run: |
-          if [ -z "$PART1" ]; then
-            echo "::warning::RUST_SRC_B64_1 secret not set -- skipping wheel build"
-            echo "SKIP_BUILD=1" >> "$GITHUB_ENV"
-          else
-            echo "${PART1}${PART2}${PART3}" | base64 -d | tar -xzf - -C .
-            echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
-          fi
-
-      - uses: actions/setup-python@v6
-        if: env.SKIP_BUILD == '0'
+      - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.12"
 
-      - name: Build manylinux wheel
-        if: env.SKIP_BUILD == '0'
+      # The proprietary Rust core is gitignored (`.gitignore:5-6` keeps only
+      # `src/lib.rs`), so a fresh checkout cannot build. Restore it from the
+      # chunked secrets before maturin runs. Regenerate the chunks with
+      # `python scripts/pack_rust_core.py pack` whenever src/*.rs changes —
+      # otherwise a local fix silently never ships.
+      - name: Restore proprietary Rust core
+        shell: bash
+        env:
+          RUST_SRC_B64_1: ${{ secrets.RUST_SRC_B64_1 }}
+          RUST_SRC_B64_2: ${{ secrets.RUST_SRC_B64_2 }}
+          RUST_SRC_B64_3: ${{ secrets.RUST_SRC_B64_3 }}
+          RUST_SRC_B64_4: ${{ secrets.RUST_SRC_B64_4 }}
+          RUST_SRC_B64_5: ${{ secrets.RUST_SRC_B64_5 }}
+          RUST_SRC_B64_6: ${{ secrets.RUST_SRC_B64_6 }}
+          RUST_SRC_B64_7: ${{ secrets.RUST_SRC_B64_7 }}
+          RUST_SRC_B64_8: ${{ secrets.RUST_SRC_B64_8 }}
+          RUST_SRC_B64_9: ${{ secrets.RUST_SRC_B64_9 }}
+          RUST_SRC_B64_10: ${{ secrets.RUST_SRC_B64_10 }}
+          RUST_SRC_B64_11: ${{ secrets.RUST_SRC_B64_11 }}
+          RUST_SRC_B64_12: ${{ secrets.RUST_SRC_B64_12 }}
+        run: |
+          python scripts/pack_rust_core.py unpack --from-env
+          echo "Rust sources present after restore:"
+          ls src/*.rs | wc -l
+
+      # A9-05: one abi3 wheel per platform covers CPython >= 3.9, instead of
+      # five near-identical wheels per platform (20 -> 6 artifacts total).
+      - name: Build wheel
         uses: PyO3/maturin-action@v1
         with:
-          target: x86_64
-          manylinux: auto
-          args: ${{ env.MATURIN_ARGS }} -i python${{ matrix.python-version }}
-          sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
+          target: ${{ matrix.target }}
+          manylinux: ${{ matrix.manylinux }}
+          args: >-
+            --release
+            --out dist
+            --no-default-features
+            --features abi3${{ matrix.features && format(',{0}', matrix.features) || '' }}
+          sccache: "true"
 
-      - uses: actions/upload-artifact@v4
-        if: env.SKIP_BUILD == '0'
-        with:
-          name: wheels-linux-x86_64-py${{ matrix.python-version }}
-          path: dist
+      - name: Show built wheels
+        shell: bash
+        run: ls -la dist/
 
-  windows-x64:
-    name: windows-x64-py${{ matrix.python-version }}
-    runs-on: windows-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Inject Rust source
-        env:
-          PART1: ${{ secrets.RUST_SRC_B64_1 }}
-          PART2: ${{ secrets.RUST_SRC_B64_2 }}
-          PART3: ${{ secrets.RUST_SRC_B64_3 }}
+      # Native-arch wheels only: an aarch64 wheel cannot be imported on an
+      # x86_64 runner, so skip the smoke test rather than fake it.
+      - name: Smoke test — import and version
+        if: matrix.target != 'aarch64' || matrix.os == 'macos-14'
         shell: bash
         run: |
-          if [ -z "$PART1" ]; then
-            echo "::warning::RUST_SRC_B64_1 secret not set -- skipping wheel build"
-            echo "SKIP_BUILD=1" >> "$GITHUB_ENV"
-          else
-            echo "${PART1}${PART2}${PART3}" | base64 -d | tar -xzf - -C .
-            echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
-          fi
+          python -m pip install --upgrade pip
+          pip install dist/*.whl --force-reinstall
+          python - <<'PY'
+          import qector_decoder_v3 as qd
+          print("version:", qd.__version__)
+          from qector_decoder_v3 import get_decoder_info
+          print("decoder info:", get_decoder_info())
+          qd.set_license_key("QECT-COMM-smoke")
+          info = qd.get_license_info()
+          assert isinstance(info, dict), f"expected dict, got {type(info)}"
+          print("license info:", info)
+          PY
 
-      - uses: actions/setup-python@v6
-        if: env.SKIP_BUILD == '0'
+      - name: Upload wheel
+        uses: actions/upload-artifact@v4
         with:
-          python-version: ${{ matrix.python-version }}
-          architecture: x64
+          name: wheel-${{ matrix.os }}-${{ matrix.target }}-${{ matrix.manylinux || 'native' }}
+          path: dist/*.whl
 
-      - name: Build Windows wheel
-        if: env.SKIP_BUILD == '0'
-        uses: PyO3/maturin-action@v1
-        with:
-          target: x64
-          args: ${{ env.MATURIN_ARGS }} -i python
-          sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
-
-      - uses: actions/upload-artifact@v4
-        if: env.SKIP_BUILD == '0'
-        with:
-          name: wheels-windows-x64-py${{ matrix.python-version }}
-          path: dist
-
-  macos-arm:
-    name: macos-aarch64-py${{ matrix.python-version }}
-    runs-on: macos-14
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Inject Rust source
-        env:
-          PART1: ${{ secrets.RUST_SRC_B64_1 }}
-          PART2: ${{ secrets.RUST_SRC_B64_2 }}
-          PART3: ${{ secrets.RUST_SRC_B64_3 }}
-        run: |
-          if [ -z "$PART1" ]; then
-            echo "::warning::RUST_SRC_B64_1 secret not set -- skipping wheel build"
-            echo "SKIP_BUILD=1" >> "$GITHUB_ENV"
-          else
-            echo "${PART1}${PART2}${PART3}" | base64 -d | tar -xzf - -C .
-            echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
-          fi
-
-      - uses: actions/setup-python@v6
-        if: env.SKIP_BUILD == '0'
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Build macOS ARM wheel
-        if: env.SKIP_BUILD == '0'
-        uses: PyO3/maturin-action@v1
-        with:
-          target: aarch64
-          args: ${{ env.MATURIN_ARGS }} -i python
-          sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
-
-      - uses: actions/upload-artifact@v4
-        if: env.SKIP_BUILD == '0'
-        with:
-          name: wheels-macos-aarch64-py${{ matrix.python-version }}
-          path: dist
-
-  macos-intel:
-    name: macos-x86_64-py${{ matrix.python-version }}
-    runs-on: macos-13
-    if: false
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Inject Rust source
-        env:
-          PART1: ${{ secrets.RUST_SRC_B64_1 }}
-          PART2: ${{ secrets.RUST_SRC_B64_2 }}
-          PART3: ${{ secrets.RUST_SRC_B64_3 }}
-        run: |
-          if [ -z "$PART1" ]; then
-            echo "::warning::RUST_SRC_B64_1 secret not set -- skipping wheel build"
-            echo "SKIP_BUILD=1" >> "$GITHUB_ENV"
-          else
-            echo "${PART1}${PART2}${PART3}" | base64 -d | tar -xzf - -C .
-            echo "SKIP_BUILD=0" >> "$GITHUB_ENV"
-          fi
-
-      - uses: actions/setup-python@v6
-        if: env.SKIP_BUILD == '0'
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Build macOS Intel wheel
-        if: env.SKIP_BUILD == '0'
-        uses: PyO3/maturin-action@v1
-        with:
-          target: x86_64
-          args: ${{ env.MATURIN_ARGS }} -i python
-          sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
-
-      - uses: actions/upload-artifact@v4
-        if: env.SKIP_BUILD == '0'
-        with:
-          name: wheels-macos-x86_64-py${{ matrix.python-version }}
-          path: dist
-
-  release:
-    name: publish-to-pypi
+  sdist:
+    name: Build sdist
     runs-on: ubuntu-latest
-    if: >
-      startsWith(github.ref, 'refs/tags/v') &&
-      github.repository == 'GuillaumeLessard/qector-decoder' &&
-      github.event_name != 'pull_request'
-    needs: [linux-x86_64, windows-x64, macos-arm]
-    permissions:
-      id-token: write
-      contents: write
-      attestations: write
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          path: dist
-          merge-multiple: true
+      - uses: actions/checkout@v4
 
-      - name: Smoke-test the wheel before publishing
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # The sdist must contain the core, or `pip install` from source fails.
+      - name: Restore proprietary Rust core
+        shell: bash
+        env:
+          RUST_SRC_B64_1: ${{ secrets.RUST_SRC_B64_1 }}
+          RUST_SRC_B64_2: ${{ secrets.RUST_SRC_B64_2 }}
+          RUST_SRC_B64_3: ${{ secrets.RUST_SRC_B64_3 }}
+          RUST_SRC_B64_4: ${{ secrets.RUST_SRC_B64_4 }}
+          RUST_SRC_B64_5: ${{ secrets.RUST_SRC_B64_5 }}
+          RUST_SRC_B64_6: ${{ secrets.RUST_SRC_B64_6 }}
+          RUST_SRC_B64_7: ${{ secrets.RUST_SRC_B64_7 }}
+          RUST_SRC_B64_8: ${{ secrets.RUST_SRC_B64_8 }}
+          RUST_SRC_B64_9: ${{ secrets.RUST_SRC_B64_9 }}
+          RUST_SRC_B64_10: ${{ secrets.RUST_SRC_B64_10 }}
+          RUST_SRC_B64_11: ${{ secrets.RUST_SRC_B64_11 }}
+          RUST_SRC_B64_12: ${{ secrets.RUST_SRC_B64_12 }}
+        run: python scripts/pack_rust_core.py unpack --from-env
+
+      - name: Build sdist
+        uses: PyO3/maturin-action@v1
+        with:
+          command: sdist
+          args: --out dist
+
+      - name: Verify sdist
+        run: |
+          python - <<'PY'
+          import os, tarfile
+          name = next(f for f in os.listdir("dist") if f.endswith(".tar.gz"))
+          with tarfile.open(os.path.join("dist", name)) as tf:
+              names = tf.getnames()
+          print(f"sdist OK: {name}, {len(names)} entries")
+          for required in ("LICENSE", "README.md", "pyproject.toml", "Cargo.toml"):
+              assert any(n.endswith(required) for n in names), f"sdist missing {required}"
+          PY
+
+      - name: Upload sdist
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+
+  # todo8 5.1. The blocking half of the dependency-scanning policy. On a PR the
+  # same workflow runs non-blocking and loud; here `strict: true` turns every
+  # finding into a hard failure, and `publish` will not run until it passes.
+  # Rationale and the full blocking matrix live in docs/DEPENDENCY_POLICY.md.
+  #
+  # This job needs no Rust core: `cargo audit`/`cargo deny` work from Cargo.lock
+  # and the manifests, and the Python legs resolve from pyproject.toml. So it
+  # does not receive (and must not receive) the RUST_SRC_B64_* secrets.
+  dependency-gate:
+    name: Dependency + licence gate
+    uses: ./.github/workflows/dependency-audit.yml
+    with:
+      strict: true
+    permissions:
+      contents: read
+    secrets:
+      SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
+
+  # todo8 1.6. SPDX + CycloneDX for both dependency trees, attached to the
+  # release. Before this, no SBOM existed anywhere in the project and an
+  # enterprise review had nothing to consume but `pip freeze`.
+  #
+  # Deliberately NOT a dependency of `publish`: an SBOM tool outage must not be
+  # able to block a security release. The dependency-gate above is the thing
+  # that is allowed to say no.
+  sbom:
+    name: SBOM (SPDX + CycloneDX)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # only to attach SBOMs to an existing GitHub Release
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # No Rust core restore here on purpose. The Rust SBOM is generated from
+      # Cargo.lock, which is tracked; nothing is compiled. Keeping the twelve
+      # RUST_SRC_B64_* secrets out of this job keeps their blast radius to the
+      # two jobs that genuinely cannot build without them.
+
+      - name: Resolve version
+        id: ver
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import pathlib, tomllib
+          data = tomllib.loads(pathlib.Path("pyproject.toml").read_text(encoding="utf-8"))
+          print(f"version={data['project']['version']}")
+          PY
+
+      - uses: astral-sh/setup-uv@v6
+
+      # syft is the SBOM generator; the action downloads a pinned binary rather
+      # than us curl-piping an installer. syft emits SPDX and CycloneDX from the
+      # same scan, so both required formats come from one tool and one parse of
+      # the dependency data.
+      - uses: anchore/sbom-action/download-syft@v0
+
+      # Two single-purpose staging directories. Pointing syft at the repo root
+      # would mix ecosystems into one document and also sweep up `dist/`,
+      # `.venv/` and test fixtures; a directory holding exactly one lockfile
+      # makes the scan result deterministic and reviewable.
+      - name: Stage dependency manifests
+        run: |
+          mkdir -p sbom-src/rust sbom-src/python sbom
+          cp Cargo.lock sbom-src/rust/Cargo.lock
+
+          # Same declared-dependency extraction as dependency-audit.yml, but
+          # resolved at the DEFAULT (highest) versions rather than the floors:
+          # an SBOM must describe what `pip install` gives a user today, whereas
+          # the audit deliberately tests the worst case our floors permit.
+          python - <<'PY'
+          import pathlib, tomllib
+          data = tomllib.loads(pathlib.Path("pyproject.toml").read_text(encoding="utf-8"))
+          project = data["project"]
+          reqs = list(project.get("dependencies", []))
+          for extra_reqs in project.get("optional-dependencies", {}).values():
+              reqs.extend(extra_reqs)
+          seen, ordered = set(), []
+          for req in reqs:
+              if req not in seen:
+                  seen.add(req)
+                  ordered.append(req)
+          pathlib.Path("sbom-src/declared.txt").write_text("\n".join(ordered) + "\n", encoding="utf-8")
+          print(f"{len(ordered)} distinct declared requirements")
+          PY
+
+          uv pip compile sbom-src/declared.txt \
+            --python-version 3.12 \
+            --no-annotate \
+            -o sbom-src/python/requirements.txt
+          echo "--- resolved Python dependency set ---"
+          cat sbom-src/python/requirements.txt
+
+      - name: Generate SBOMs
+        env:
+          V: ${{ steps.ver.outputs.version }}
         run: |
           set -euo pipefail
-          PY_TAG=$(python3 -c "import sys; print(f'cp{sys.version_info.major}{sys.version_info.minor}')")
-          WHEEL=$(ls dist/qector_decoder_v3-*${PY_TAG}*linux*.whl | head -1)
-          python -m venv /tmp/smoke_venv
-          /tmp/smoke_venv/bin/pip install --upgrade pip
-          /tmp/smoke_venv/bin/pip install "$WHEEL"
-          /tmp/smoke_venv/bin/python -c "
-          import qector_decoder_v3 as q
-          print('version:', q.__version__)
-          from qector_decoder_v3 import codes, get_decoder
-          c = codes.repetition_code(5)
-          d = get_decoder(c.check_to_qubits, c.n_qubits, 'sparse_blossom')
-          print('decoder:', type(d).__name__)
-          print('OK')
-          "
-          rm -rf /tmp/smoke_venv
+          syft scan "dir:sbom-src/rust" \
+            --source-name "qector-decoder-v3-rust" \
+            --source-version "$V" \
+            -o "spdx-json=sbom/qector-decoder-v3-${V}-rust.spdx.json" \
+            -o "cyclonedx-json=sbom/qector-decoder-v3-${V}-rust.cdx.json"
+          syft scan "dir:sbom-src/python" \
+            --source-name "qector-decoder-v3-python" \
+            --source-version "$V" \
+            -o "spdx-json=sbom/qector-decoder-v3-${V}-python.spdx.json" \
+            -o "cyclonedx-json=sbom/qector-decoder-v3-${V}-python.cdx.json"
+          ls -la sbom/
 
-      # Build provenance requires a public repository or GitHub Advanced Security.
-      # On this private org repo the API returns "Feature not available for the
-      # GuillaumeLessard organization", which failed the whole publish job AFTER
-      # all 15 wheels had built and passed the smoke test. Attestation is a
-      # supply-chain nicety; it must not gate shipping. Conditioned on visibility
-      # so it resumes automatically if the repo is ever made public, and
-      # continue-on-error so a plan change can never block a release again.
-      - name: Generate artifact attestations
-        if: ${{ github.event.repository.private == false }}
-        continue-on-error: true
-        uses: actions/attest-build-provenance@v2
+      # Fail loudly rather than shipping a 0-package SBOM. A syft cataloger
+      # regression, or a staging step that silently copied nothing, otherwise
+      # produces a well-formed document that asserts the project has no
+      # dependencies — worse than having no SBOM at all.
+      - name: Verify SBOMs are non-empty
+        env:
+          V: ${{ steps.ver.outputs.version }}
+        run: |
+          python - <<'PY'
+          import json, os, pathlib, sys
+          v = os.environ["V"]
+          expectations = {
+              f"qector-decoder-v3-{v}-rust.spdx.json": ("spdx", 100),
+              f"qector-decoder-v3-{v}-rust.cdx.json": ("cdx", 100),
+              f"qector-decoder-v3-{v}-python.spdx.json": ("spdx", 10),
+              f"qector-decoder-v3-{v}-python.cdx.json": ("cdx", 10),
+          }
+          failed = False
+          for name, (kind, minimum) in expectations.items():
+              path = pathlib.Path("sbom") / name
+              if not path.is_file():
+                  print(f"MISSING: {name}")
+                  failed = True
+                  continue
+              doc = json.loads(path.read_text(encoding="utf-8"))
+              n = len(doc.get("packages", []) if kind == "spdx" else doc.get("components", []))
+              status = "ok" if n >= minimum else "TOO FEW"
+              print(f"{name}: {n} entries ({status}, expected >= {minimum})")
+              if n < minimum:
+                  failed = True
+          sys.exit(1 if failed else 0)
+          PY
+
+      - name: Upload SBOMs as a workflow artifact
+        uses: actions/upload-artifact@v4
         with:
-          subject-path: "dist/*"
+          name: sbom
+          path: sbom/*.json
 
-      - name: Publish to PyPI
+      # Attach to the GitHub Release when one exists. A bare `v*` tag push does
+      # not necessarily have a Release object yet, so this is a soft attach: it
+      # never fails the job, and the SBOMs are always retrievable from the
+      # workflow artifact above regardless.
+      #
+      # The SBOM files are NOT copied into `dist/`. PyPI accepts only wheels and
+      # sdists, and `twine check dist/*` in the publish job would reject a stray
+      # .json.
+      - name: Attach SBOMs to the GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" sbom/*.json --clobber
+            echo "SBOMs attached to release $TAG"
+          else
+            echo "::notice title=SBOM::No GitHub Release exists for $TAG yet; SBOMs remain available as the 'sbom' workflow artifact."
+          fi
+
+  publish:
+    # A9-02: the missing piece. Before this, `release-build` uploaded artifacts
+    # to the GitHub Actions run and stopped — every PyPI release was manual.
+    name: Publish to PyPI
+    needs: [build, sdist, dependency-gate]
+    runs-on: ubuntu-latest
+    # Tag push and GitHub Release both publish; manual dispatch only when asked.
+    if: >-
+      startsWith(github.ref, 'refs/tags/v')
+      || github.event_name == 'release'
+      || inputs.publish
+    environment:
+      name: pypi
+      url: https://pypi.org/p/qector-decoder-v3
+    permissions:
+      id-token: write   # PyPI Trusted Publishing (OIDC) — no stored API token
+      contents: read
+    steps:
+      # Last-line defense before publishing: re-verify the packed secrets
+      # are self-consistent. The dedicated stale-secrets-check workflow
+      # already catches this on every PR and push, but secrets could in
+      # principle be rotated between the build and the publish; this
+      # step refuses to push a wheel built from a core that no longer
+      # matches the chunks currently in CI.
+      - name: Verify packed secrets
+        env:
+          RUST_SRC_B64_1: ${{ secrets.RUST_SRC_B64_1 }}
+          RUST_SRC_B64_2: ${{ secrets.RUST_SRC_B64_2 }}
+          RUST_SRC_B64_3: ${{ secrets.RUST_SRC_B64_3 }}
+          RUST_SRC_B64_4: ${{ secrets.RUST_SRC_B64_4 }}
+          RUST_SRC_B64_5: ${{ secrets.RUST_SRC_B64_5 }}
+          RUST_SRC_B64_6: ${{ secrets.RUST_SRC_B64_6 }}
+          RUST_SRC_B64_7: ${{ secrets.RUST_SRC_B64_7 }}
+          RUST_SRC_B64_8: ${{ secrets.RUST_SRC_B64_8 }}
+          RUST_SRC_B64_9: ${{ secrets.RUST_SRC_B64_9 }}
+          RUST_SRC_B64_10: ${{ secrets.RUST_SRC_B64_10 }}
+          RUST_SRC_B64_11: ${{ secrets.RUST_SRC_B64_11 }}
+          RUST_SRC_B64_12: ${{ secrets.RUST_SRC_B64_12 }}
+        run: |
+          python scripts/pack_rust_core.py unpack --from-env
+          python scripts/pack_rust_core.py verify --from-env
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Collect distributions
+        run: |
+          mkdir -p dist
+          find artifacts -name '*.whl' -exec cp {} dist/ \;
+          find artifacts -name '*.tar.gz' -exec cp {} dist/ \;
+          ls -la dist/
+
+      - name: Check metadata
+        run: |
+          pip install twine
+          twine check dist/*
+
+      - name: Publish
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist/
-          skip-existing: true
+          # Attestations are generated on a best-effort basis and must never
+          # gate the upload itself (regression guard for commit 49ba957).
+          attestations: true

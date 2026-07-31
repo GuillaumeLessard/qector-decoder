@@ -1,13 +1,11 @@
 """
-Compatibilité Stim - Conversion et wrappers pour l'écosystème Stim.
+Stim compatibility layer - Conversion and wrappers for the Stim ecosystem.
 
 .. deprecated::
     This module is deprecated since v0.6.4. Use ``qector_decoder_v3.dem`` instead.
     See https://qector.store/docs/migration-v0.6.4 for the migration guide.
 
-Stim (https://github.com/quantumlib/stim) est un simulateur de circuits QEC
-trépidant. Ce module permet d'utiliser QECTOR comme back-end de décodage
-pour des modèles d'erreurs produits par Stim.
+Stim (https://github.com/quantumlib/stim) is a fast QEC circuit simulator.
 
 Usage (deprecated) ::
 
@@ -76,7 +74,7 @@ def from_stim_detector_error_model(dem: Any) -> tuple[list[list[int]], int]:
     elif hasattr(dem, "num_detectors"):
         model = from_stim(dem)
     else:
-        raise TypeError(f"dem doit être un stim.DetectorErrorModel (ou un texte .dem), reçu {type(dem).__name__}")
+        raise TypeError(f"dem must be a stim.DetectorErrorModel (or .dem text), got {type(dem).__name__}")
 
     check_to_qubits = model.check_to_qubits()
     n_qubits = model.num_errors
@@ -92,7 +90,7 @@ def to_stim_decoder(
     .. deprecated::
         Use ``qector_decoder_v3.dem.from_stim()`` + ``model.make_decoder()`` instead.
 
-    Retourner un wrapper compatible avec l'API de ``stim.Decoder``.
+    Return a wrapper compatible with the ``stim.Decoder`` API.
     """
     warnings.warn(_DEPRECATION_MSG, DeprecationWarning, stacklevel=2)
     decoder_cls = BatchDecoder if use_batch else UnionFindDecoder
@@ -102,7 +100,7 @@ def to_stim_decoder(
         n_qubits = max(max(c) for c in check_to_qubits) + 1
 
     class QECTORStimDecoder:
-        """Wrapper QECTOR compatible avec l'interface ``stim.Decoder``-like."""
+        """Wrapper compatible with the ``stim.Decoder``-like interface."""
 
         def __init__(self, _inner, c2q, nq):
             self._inner = _inner
@@ -112,12 +110,12 @@ def to_stim_decoder(
 
         def decode(self, syndrome: Any) -> np.ndarray:
             """
-            Décoder un syndrome.
+            Decode a syndrome.
 
-            Paramètres
+            Parameters
             ----------
             syndrome : array-like
-                Syndrome binaire de longueur ``n_checks``.
+                Binary syndrome of length ``n_checks``.
 
             Retourne
             -------

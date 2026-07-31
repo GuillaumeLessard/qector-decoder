@@ -1,92 +1,153 @@
-# Lint and static analysis -- runs on every push/PR, no Rust build needed.
-# Uses the installed wheel from PyPI (or a local sdist) to run the Python layer.
-
 name: tests
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, develop]
   pull_request:
+    branches: [main]
   workflow_dispatch:
 
-permissions:
-  contents: read
-
 jobs:
-  # ------------------------------------------------------------------
-  # Ruff lint + MyPy type-check
-  # ------------------------------------------------------------------
-  lint:
-    name: ruff-and-mypy
+  rust:
+    name: Rust tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          python-version: "3.12"
-      - name: Install linting tools
-        # numpy is intentionally omitted: numpy 2.x stubs use `type` syntax
-        # (Python 3.12+) which mypy rejects in py3.9 mode. --ignore-missing-imports
-        # in pyproject.toml handles the missing stubs gracefully.
-        run: pip install ruff mypy
-      - name: Ruff lint
-        run: ruff check python/
-      - name: Ruff format check
-        run: ruff format --check python/
-      - name: MyPy
-        # continue-on-error: pre-existing type inconsistencies in the Python layer
-        # (no-any-return, valid-type, attr-defined, operator, assignment) will be
-        # addressed in a follow-up typing PR. Lint and format checks are hard failures.
-        continue-on-error: true
-        run: mypy python/qector_decoder_v3/ --ignore-missing-imports
+          toolchain: stable
+          components: clippy, rustfmt
 
-  # ------------------------------------------------------------------
-  # Docker image build smoke test
-  # Dockerfile runs maturin build --release which requires the real Rust
-  # source (injected at CI build time via secrets). In the tests workflow
-  # the source is a stub, so the build is expected to fail -- mark
-  # continue-on-error so this job is informational only.
-  # ------------------------------------------------------------------
-  docker:
-    name: docker-build
+      # The proprietary Rust core is gitignored (only `src/lib.rs` is tracked),
+      # so a fresh checkout cannot build. Restore it from the chunked secrets.
+      # Regenerate with `python scripts/pack_rust_core.py pack` after any
+      # src/*.rs change, or CI silently tests a stale core.
+      - name: Restore proprietary Rust core
+        env:
+          RUST_SRC_B64_1: ${{ secrets.RUST_SRC_B64_1 }}
+          RUST_SRC_B64_2: ${{ secrets.RUST_SRC_B64_2 }}
+          RUST_SRC_B64_3: ${{ secrets.RUST_SRC_B64_3 }}
+          RUST_SRC_B64_4: ${{ secrets.RUST_SRC_B64_4 }}
+          RUST_SRC_B64_5: ${{ secrets.RUST_SRC_B64_5 }}
+          RUST_SRC_B64_6: ${{ secrets.RUST_SRC_B64_6 }}
+          RUST_SRC_B64_7: ${{ secrets.RUST_SRC_B64_7 }}
+          RUST_SRC_B64_8: ${{ secrets.RUST_SRC_B64_8 }}
+          RUST_SRC_B64_9: ${{ secrets.RUST_SRC_B64_9 }}
+          RUST_SRC_B64_10: ${{ secrets.RUST_SRC_B64_10 }}
+          RUST_SRC_B64_11: ${{ secrets.RUST_SRC_B64_11 }}
+          RUST_SRC_B64_12: ${{ secrets.RUST_SRC_B64_12 }}
+        run: python scripts/pack_rust_core.py unpack --from-env
+
+      # A9-06: the `full` feature pulls in `ocl`, which needs an OpenCL ICD
+      # loader at link time. Without this the `--features full` step failed on a
+      # bare runner for reasons unrelated to the code under test.
+      - name: Install OpenCL ICD loader + CPU runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ocl-icd-opencl-dev pocl-opencl-icd
+
+      - name: cargo test (no default features)
+        run: cargo test --no-default-features
+
+      - name: cargo clippy
+        run: cargo clippy --no-default-features --all-targets -- -D warnings
+
+      - name: cargo test (full features)
+        run: cargo test --features full
+
+      - name: cargo clippy (full features)
+        run: cargo clippy --features full --all-targets -- -D warnings
+
+  python:
+    name: Python tests
     runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v5
-      - name: Build Docker image (Rust source stub -- expected failure)
-        run: docker build -t qector-decoder-test:ci . || echo "::warning::Docker build failed (stub src -- expected)"
-
-  # ------------------------------------------------------------------
-  # Python layer import smoke test (installs from PyPI)
-  # ------------------------------------------------------------------
-  smoke-import:
-    name: smoke-import-py${{ matrix.python-version }}
-    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install from PyPI
-        id: install_py
+
+      # The proprietary Rust core is gitignored (only `src/lib.rs` is tracked),
+      # so a fresh checkout cannot build. Restore it from the chunked secrets.
+      # Regenerate with `python scripts/pack_rust_core.py pack` after any
+      # src/*.rs change, or CI silently tests a stale core.
+      - name: Restore proprietary Rust core
+        env:
+          RUST_SRC_B64_1: ${{ secrets.RUST_SRC_B64_1 }}
+          RUST_SRC_B64_2: ${{ secrets.RUST_SRC_B64_2 }}
+          RUST_SRC_B64_3: ${{ secrets.RUST_SRC_B64_3 }}
+          RUST_SRC_B64_4: ${{ secrets.RUST_SRC_B64_4 }}
+          RUST_SRC_B64_5: ${{ secrets.RUST_SRC_B64_5 }}
+          RUST_SRC_B64_6: ${{ secrets.RUST_SRC_B64_6 }}
+          RUST_SRC_B64_7: ${{ secrets.RUST_SRC_B64_7 }}
+          RUST_SRC_B64_8: ${{ secrets.RUST_SRC_B64_8 }}
+          RUST_SRC_B64_9: ${{ secrets.RUST_SRC_B64_9 }}
+          RUST_SRC_B64_10: ${{ secrets.RUST_SRC_B64_10 }}
+          RUST_SRC_B64_11: ${{ secrets.RUST_SRC_B64_11 }}
+          RUST_SRC_B64_12: ${{ secrets.RUST_SRC_B64_12 }}
+        run: python scripts/pack_rust_core.py unpack --from-env
+
+      # A9-08: `maturin develop` requires an active virtualenv and errors out
+      # without one. Create it and put it on PATH for every later step.
+      - name: Create virtualenv
         run: |
-          python -m pip install --upgrade pip
-          pip install qector-decoder-v3 --pre
+          python -m venv .venv
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+          echo "VIRTUAL_ENV=$PWD/.venv" >> "$GITHUB_ENV"
+
+      - name: Install maturin
+        run: pip install "maturin>=1.0,<2.0"
+
+      - name: Build + install
+        run: |
+          maturin develop --release --no-default-features --features cuda
+          pip install -e ".[dev,stim]"
+
+      - name: ruff lint
+        run: ruff check python/
+
+      - name: ruff format check
+        run: ruff format --check python/
+
+      # A5-03: `maturin develop` installs the Python layer by COPY, so the repo
+      # source and the code pytest actually imports can silently diverge — a real
+      # fix in the tree can sit beside a stale installed copy and the suite will
+      # happily test the stale one. (Observed during the A5 work: the new tests
+      # reported all 31 pre-fix line numbers against already-fixed source.)
+      - name: Verify installed package matches repo source
+        run: |
+          python - <<'PY'
+          import filecmp, pathlib, sys
+          import qector_decoder_v3 as q
+          installed = pathlib.Path(q.__file__).parent
+          source = pathlib.Path("python/qector_decoder_v3")
+          names = sorted(p.name for p in source.glob("*.py"))
+          match, mismatch, errors = filecmp.cmpfiles(source, installed, names, shallow=False)
+          if mismatch or errors:
+              print(f"installed package diverges from repo source at: {installed}")
+              for n in mismatch:
+                  print(f"  DIFFERS: {n}")
+              for n in errors:
+                  print(f"  MISSING: {n}")
+              sys.exit(1)
+          print(f"OK: {len(match)} modules identical to repo source")
+          PY
+
+      # A9-01: `--timeout` needs pytest-timeout, now in the `dev` extra.
+      # `-x` removed: one flaky test should not hide the state of the other 1200.
+      - name: pytest
+        run: python -m pytest python/tests -q --timeout=300
+
       - name: Import smoke test
-        if: steps.install_py.outcome == 'success'
         run: |
-          python -c "
-          try:
-              import qector_decoder_v3
-              print(f'qector_decoder_v3 {getattr(qector_decoder_v3, \"__version__\", \"unknown\")} imported OK')
-          except ImportError as e:
-              print(f'ImportError: {e}')
-              raise
-          "
-      - name: Skip smoke import when install fails
-        if: steps.install_py.outcome != 'success'
-        run: echo "PyPI package not yet available -- skipping import test"
+          python - <<'PY'
+          import qector_decoder_v3 as qd
+          print(f"version={qd.__version__}")
+          for name in ("NativeAutoDecoder", "set_license_key", "get_license_info"):
+              assert hasattr(qd, name), f"{name} missing"
+          print("All imports OK")
+          PY

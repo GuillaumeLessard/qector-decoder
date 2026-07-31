@@ -1,0 +1,129 @@
+# cargo-deny configuration for QECTOR Decoder v3.
+#
+# Consumed by .github/workflows/dependency-audit.yml. That workflow pins
+# `cargo-deny@0.18` via taiki-e/install-action, because the deny.toml schema
+# changed meaningfully at 0.16 (the old `[licenses] copyleft` /
+# `allow-osi-fsf-free` / `default` keys were removed in favour of an explicit
+# `allow` list). This file is written for the 0.18 schema; do not unpin the tool
+# without re-reading it.
+#
+# The graph is evaluated with `--all-features`, so `opencl`, `grpc` and
+# `prometheus` are covered here even though the published wheel is built with
+# `--no-default-features --features abi3,cuda`.
+#
+# STATUS 2026-07-31: this file has never been executed. cargo-deny is not
+# installed on the maintainer machine (`cargo deny --version` -> "no such
+# command"), and no CI run has yet consumed it. The licence data below was
+# derived offline from `cargo metadata --all-features`, not from cargo-deny
+# itself. Treat the first CI run as the real validation.
+
+# ---------------------------------------------------------------------------
+# Licences
+# ---------------------------------------------------------------------------
+#
+# QECTOR ships under the PolyForm Noncommercial License 1.0.0 (see LICENSE;
+# PyPI surfaces it as `LicenseRef-QECTOR-Source-Available`) with a proprietary,
+# unpublished Rust core. Everything statically linked into the wheel is
+# redistributed, so the allow-list below is deliberately restricted to
+# permissive and weak-file-level-copyleft terms.
+#
+# Every entry corresponds to a licence actually present in the resolved graph
+# on 2026-07-31 (281 crates under `--all-features`, 199 in the published wheel
+# feature set). It is not an aspirational list.
+[licenses]
+# Raised from the 0.8 default. The root crate declares `license-file = "LICENSE"`
+# rather than a `license` expression, and LICENSE carries ~20 lines of QECTOR
+# preamble before the verbatim PolyForm text, which depresses the askalono
+# confidence score. 0.8 keeps that detection working; if the root crate is ever
+# reported as "unlicensed", that is the knob (or add an explicit `license =`
+# field to Cargo.toml, which is the better fix and is routed as a request).
+confidence-threshold = 0.8
+
+# `PolyForm-Noncommercial-1.0.0` below is QECTOR's own licence and will not
+# match any third-party crate. Without this, cargo-deny reports it as an unused
+# allowance on every run.
+unused-allowed-license = "allow"
+
+allow = [
+    # --- permissive, no source-disclosure obligation -----------------------
+    "0BSD",                          # adler2
+    "Apache-2.0",                    # prost*, safetensors, sync_wrapper, ...
+    "Apache-2.0 WITH LLVM-exception", # target-lexicon, rustix, linux-raw-sys, wasi
+    "BSD-1-Clause",                  # fiat-crypto (as an OR alternative)
+    "BSD-2-Clause",                  # numpy (rust-numpy), Pygments-style terms
+    "BSD-3-Clause",                  # curve25519-dalek, ed25519-dalek, subtle
+    "CC0-1.0",                       # dunce (as an OR alternative)
+    "CDLA-Permissive-2.0",           # webpki-roots (Mozilla CA bundle data)
+    "ISC",                           # libloading, untrusted, rustls-webpki
+    "MIT",                           # the plurality of the tree
+    "MIT-0",                         # dunce / aws-lc-sys OR alternatives
+    "Unicode-3.0",                   # the ICU4X crates pulled in via idna/url
+    "Unlicense",                     # aho-corasick, memchr (OR MIT)
+    "Zlib",                          # foldhash, miniz_oxide (OR alternative)
+
+    # --- weak, file-level copyleft: DELIBERATE, see NOTICE.md --------------
+    # MPL-2.0 is allowed solely so that `priority-queue` (LGPL-3.0 OR MPL-2.0),
+    # reached via fusion-blossom -> priority-queue, resolves against MPL-2.0
+    # instead of LGPL-3.0. MPL-2.0 obligations are per-file and are discharged
+    # by shipping the crate unmodified and pointing at upstream sources; LGPL-3.0
+    # would not be dischargeable for a statically linked proprietary core.
+    # If a future crate arrives under MPL-2.0 *only*, that is a legal decision,
+    # not a config bump — record it in NOTICE.md first.
+    "MPL-2.0",
+
+    # --- QECTOR's own terms, for the root crate ---------------------------
+    "PolyForm-Noncommercial-1.0.0",
+]
+
+# Workspace members that are never published do not need to satisfy the
+# allow-list. (The root crate has `publish = true`, so this does not exempt it —
+# it is covered by the PolyForm entry above.)
+private = { ignore = true }
+
+# ---------------------------------------------------------------------------
+# Bans
+# ---------------------------------------------------------------------------
+[bans]
+# The tree carries several legitimately duplicated majors (hashbrown x3,
+# syn x3, indexmap x2, petgraph x2, rand x2, thiserror x2, getrandom x2 as of
+# 2026-07-31). Deduplicating those is upstream's job, not a release gate.
+multiple-versions = "warn"
+# A `*` version requirement makes Cargo.lock the only thing standing between a
+# release and an arbitrary future upstream version. None exist today.
+wildcards = "deny"
+
+[[bans.deny]]
+# QECTOR's only TLS consumer is `ureq`, configured for pure-Rust rustls
+# (Cargo.toml:57). openssl-sys appearing in the graph means something switched
+# to native-tls, which changes the wheel from "no system TLS dependency" to
+# "links against whatever libssl the host has" — a build-reproducibility and
+# supply-chain regression that is silent otherwise.
+crate = "openssl-sys"
+reason = "QECTOR links rustls only; a native-tls path must be a deliberate, reviewed change"
+
+# ---------------------------------------------------------------------------
+# Sources
+# ---------------------------------------------------------------------------
+[sources]
+# Every dependency must come from crates.io. A git or path dependency slipping
+# into a release build means the published wheel cannot be rebuilt from
+# Cargo.lock alone.
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+
+# ---------------------------------------------------------------------------
+# Advisories
+# ---------------------------------------------------------------------------
+#
+# `cargo deny check advisories` is run in a NEVER-BLOCKING step in
+# dependency-audit.yml; the blocking vulnerability gate is `cargo audit`. The
+# split is deliberate: an unmaintained transitive crate is a planning problem,
+# not a reason to refuse to ship a security fix.
+[advisories]
+yanked = "deny"
+# Do not add entries here to make a release green. The remediation for a RustSec
+# advisory is `cargo update -p <crate>` (or a dependency change), per
+# docs/DEPENDENCY_POLICY.md. An `ignore` entry requires a dated, named exception
+# recorded in that file's exception register first.
+ignore = []

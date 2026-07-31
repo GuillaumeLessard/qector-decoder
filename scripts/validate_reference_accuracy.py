@@ -23,8 +23,6 @@ import numpy as np
 import stim
 import pymatching
 from qector_decoder_v3 import dem as dem_module
-from qector_decoder_v3 import UnionFindDecoder, BlossomDecoder, FastUnionFindDecoder, BPOSDDecoder, codes
-from qector_decoder_v3.ler import wilson_ci
 
 
 def z_score_difference(err1: int, err2: int, n: int) -> float:
@@ -91,6 +89,8 @@ def validate_surface_code(distance: int, rounds: int, p: float, shots: int, seed
         "z_score": round(z, 4),
         "faithful_pct": 100.0 * faithful / shots,
         "within_3sigma": bool(z <= 3.0),
+        "pymatching_decode_s": round(pm_dt, 4),
+        "blossom_decode_s": round(q_dt, 4),
     }
 
 

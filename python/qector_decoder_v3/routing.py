@@ -91,6 +91,9 @@ class DecoderName:
     CUDA_BATCH = "CUDABatchDecoder"
     BATCH = "BatchDecoder"
     BP_OSD = "BpOsdDecoder"
+    #: Rust-native routing decoder (C4-01): distance/noise/batch-aware backend
+    #: selection inside the compiled core.
+    AUTO_NATIVE = "NativeAutoDecoder"
 
     ALL = (
         UNION_FIND,
@@ -100,6 +103,7 @@ class DecoderName:
         CUDA_BATCH,
         BATCH,
         BP_OSD,
+        AUTO_NATIVE,
     )
 
     #: Decoders that assume a graphlike (matching) problem - every qubit in at
@@ -121,6 +125,15 @@ _LARGE_DISTANCE: int = 13
 _LARGE_NQUBITS: int = 400
 
 _VALID_PRIORITIES = ("balanced", "accuracy", "speed")
+
+
+def _native_auto_available() -> bool:
+    """`True` when this build exposes the Rust-native routing decoder."""
+    try:
+        from . import NativeAutoDecoder  # noqa: F401
+    except Exception:  # pragma: no cover - defensive
+        return False
+    return True
 
 # Code-family classification. Tokens are matched as substrings (case-folded) so
 # that names like "rotated_surface_d5" or "bivariate_bicycle" classify correctly.
@@ -244,7 +257,7 @@ def _classify_family(code_family: Any, graphlike: bool | None) -> str:
     if callable(is_matching):
         try:
             return "matching" if is_matching() else "ldpc"
-        except RuntimeError:  # pragma: no cover - defensive
+        except (AttributeError, TypeError, ValueError, RuntimeError):  # pragma: no cover - defensive
             pass
 
     if code_family is None:
@@ -562,6 +575,7 @@ class AutoRouter:
         hardware: HardwareLike = None,
         error_rate: float = 0.05,
         code_family: Any = None,
+        use_native_auto: bool = True,
     ) -> None:
         p = str(priority).strip().lower()
         if p not in _VALID_PRIORITIES:
@@ -570,6 +584,10 @@ class AutoRouter:
         self.hardware = hardware
         self.error_rate = float(error_rate)
         self.default_family = code_family
+        # C4-03: when True, decode() first attempts routing through the
+        # Rust-native AutoDecoder and falls back to the Python policy path
+        # when the native build is unavailable or rejects the problem.
+        self.use_native_auto = bool(use_native_auto)
 
         self._sig: tuple | None = None
         self._cache: dict[tuple, Any] = {}
@@ -619,10 +637,113 @@ class AutoRouter:
 
         syn = np.asarray(syndromes, dtype=np.uint8)
         batch_size = int(syn.shape[0]) if syn.ndim >= 2 else 1
+
+        # C4-02: native Rust AutoDecoder first (license tier enforcement is
+        # native-side and hard — a PermissionError propagates, never falls back).
+        native_out = self._try_native_auto(c2q, n_qubits, batch_size, ctx, syn)
+        if native_out is not None:
+            return native_out
+
         rec = self._recommend_for_problem(c2q, n_qubits, batch_size, ctx)
         dec, rec = self._get_decoder(rec, H, c2q, n_qubits)
         self._last = rec
         return self._run(dec, syn, n_qubits)
+
+    # -- native auto routing (C4) ------------------------------------------
+    def _native_auto_applies(self, graphlike: bool) -> bool:
+        """Whether ``decode`` should route through the Rust-native AutoDecoder.
+
+        Two conditions beyond ``use_native_auto``, both load-bearing:
+
+        * **``priority`` must be ``"balanced"``.** The native decoder makes its
+          own distance/noise/batch tradeoff and has no notion of the caller's
+          priority, so running it unconditionally made ``AutoRouter(priority=
+          "accuracy")`` silently identical to the default -- the entire policy
+          layer became unreachable whenever the compiled core was present.
+        * **The problem must be graphlike.** The "never send a hyperedge code to
+          a matching decoder" invariant is enforced in
+          ``_recommend_for_problem``; bypassing it for qLDPC codes bypasses that
+          check too.
+
+        ``explain`` consults the same predicate, so the reported decoder is the
+        one ``decode`` will actually use.
+        """
+        return self.use_native_auto and self.priority == "balanced" and graphlike
+
+    def _try_native_auto(
+        self,
+        c2q: Sequence[Sequence[int]],
+        n_qubits: int,
+        batch_size: int,
+        ctx: Mapping[str, Any],
+        syn: np.ndarray,
+    ) -> np.ndarray | None:
+        """Attempt routing through the Rust-native AutoDecoder (C4-02).
+
+        Returns the correction array on success; ``None`` when the native
+        decoder is unavailable in this build or rejects the problem (the
+        caller then falls back to the Python policy path). A license-tier
+        ``PermissionError`` is re-raised: tier gating must never silently
+        degrade to an unlicensed path.
+        """
+        graphlike = _max_qubit_degree(c2q, n_qubits) <= 2
+        if not self._native_auto_applies(graphlike):
+            return None
+        try:
+            from . import NativeAutoDecoder
+        except Exception:
+            return None
+
+        distance = ctx.get("distance")
+        if distance is None:
+            # Surface-like estimate d ~ sqrt(n_qubits), rounded up to odd.
+            d_est = max(3, int(round(float(n_qubits) ** 0.5)))
+            distance = d_est if d_est % 2 == 1 else d_est + 1
+        distance = int(distance)
+
+        key = (DecoderName.AUTO_NATIVE, distance, batch_size > 1024, not graphlike)
+        dec = self._cache.get(key)
+        if dec is None:
+            try:
+                dec = NativeAutoDecoder(
+                    [list(map(int, c)) for c in c2q],
+                    int(n_qubits),
+                    distance=distance,
+                    noise_rate=float(self.error_rate),
+                    batch_size=int(batch_size),
+                    is_qldpc=not graphlike,
+                )
+            except PermissionError:
+                raise
+            except Exception:
+                return None
+            self._cache[key] = dec
+
+        try:
+            if syn.ndim == 1:
+                out = np.asarray(dec.decode(syn), dtype=np.uint8).reshape(-1)
+            else:
+                out = np.stack(
+                    [np.asarray(dec.decode(syn[i]), dtype=np.uint8).reshape(-1) for i in range(syn.shape[0])]
+                )
+        except Exception:
+            return None
+
+        self._last = Recommendation(
+            decoder=DecoderName.AUTO_NATIVE,
+            reason=(
+                f"native Rust AutoDecoder routing (backend={getattr(dec, 'backend_name', '?')}, "
+                f"distance={distance}, batch_size={batch_size}, is_qldpc={not graphlike})"
+            ),
+            family="unknown",
+            priority=self.priority,
+            batch_size=batch_size,
+            hardware={},
+            graphlike=graphlike,
+            distance=distance,
+            n_qubits=n_qubits,
+        )
+        return out
 
     # -- recommendation ----------------------------------------------------
     def _recommend(self, checks_or_H: Any, syndromes: Any, ctx: Mapping[str, Any]) -> Recommendation:
@@ -630,7 +751,22 @@ class AutoRouter:
         if checks_or_H is not None:
             _H, c2q, n_qubits, _ = self._normalize_problem(checks_or_H, ctx.get("n_qubits"))
             batch_size = ctx.get("batch_size", _infer_batch(syndromes))
-            return self._recommend_for_problem(c2q, n_qubits, int(batch_size), ctx)
+            rec = self._recommend_for_problem(c2q, n_qubits, int(batch_size), ctx)
+            # `decode` routes graphlike balanced problems through the native
+            # AutoDecoder, so `explain` has to report that or it describes a
+            # path that will not be taken.
+            graphlike = _max_qubit_degree(c2q, n_qubits) <= 2
+            if self._native_auto_applies(graphlike) and _native_auto_available():
+                return replace(
+                    rec,
+                    decoder=DecoderName.AUTO_NATIVE,
+                    reason=(
+                        "native Rust AutoDecoder routing (balanced priority, graphlike problem); "
+                        f"Python policy would have picked {rec.decoder!r}. Falls back to that "
+                        "policy path if the native decoder rejects the problem."
+                    ),
+                )
+            return rec
         # Pure-metadata path.
         return recommend(
             code_family=ctx.get("code_family", self.default_family),
@@ -732,7 +868,7 @@ class AutoRouter:
             raise ValueError(f"unknown decoder name {name!r}")
         try:
             return builder()
-        except RuntimeError:
+        except (ImportError, OSError, AttributeError, TypeError, ValueError, RuntimeError):
             return None
 
     # -- dispatch ----------------------------------------------------------

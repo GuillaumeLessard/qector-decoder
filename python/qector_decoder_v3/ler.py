@@ -22,15 +22,22 @@ from __future__ import annotations
 
 import math
 import time
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass
 from typing import Any, Callable
 
 import numpy as np
 
 __all__ = [
+    "CIRCUIT_LEVEL",
+    "CODE_CAPACITY",
+    "NOISE_MODELS",
     "LerResult",
+    "NoiseModelMismatch",
     "ThresholdResult",
+    "assert_comparable",
     "estimate_ler",
+    "estimate_ler_circuit_level",
     "reference_validate",
     "run_competitive_suite",
     "run_memory_experiment",
@@ -52,6 +59,51 @@ def wilson_ci(errors: int, shots: int, z: float = 1.959963985) -> tuple[float, f
     return (max(0.0, center - half), min(1.0, center + half))
 
 
+# ---------------------------------------------------------------------------
+# Noise models (A1)
+#
+# A logical error rate is meaningless without the noise model that produced it,
+# and two LERs measured under different models are NOT comparable — not even
+# ordinally. Code-capacity LER at a given nominal `p` is lower than circuit-level
+# LER at the same `p` by orders of magnitude, because circuit-level noise adds
+# measurement error, multiple rounds of syndrome extraction, and error
+# propagation through the two-qubit gates.
+#
+# Every result therefore carries its model, and any function that assembles a
+# comparison table refuses to mix them.
+# ---------------------------------------------------------------------------
+CODE_CAPACITY = "code_capacity"
+CIRCUIT_LEVEL = "circuit_level"
+NOISE_MODELS = (CODE_CAPACITY, CIRCUIT_LEVEL)
+
+
+class NoiseModelMismatch(ValueError):
+    """Raised when results from different noise models would be compared."""
+
+
+def assert_comparable(results: Sequence[Any]) -> str:
+    """Return the shared noise model of ``results``, or raise.
+
+    ``results`` may be :class:`LerResult` instances or plain dicts carrying a
+    ``noise_model`` key. Any mixture raises :class:`NoiseModelMismatch`.
+    """
+    models: dict[str, list[str]] = {}
+    for r in results:
+        model = r.noise_model if isinstance(r, LerResult) else r.get("noise_model")
+        name = r.decoder if isinstance(r, LerResult) else r.get("decoder", "?")
+        if model is None:
+            raise NoiseModelMismatch(f"result for {name!r} carries no noise_model tag")
+        models.setdefault(model, []).append(str(name))
+    if len(models) > 1:
+        detail = "; ".join(f"{m}: {', '.join(sorted(set(d)))}" for m, d in sorted(models.items()))
+        raise NoiseModelMismatch(
+            "refusing to compare logical error rates measured under different noise models "
+            f"({detail}). Code-capacity and circuit-level LER are not comparable at the same "
+            "nominal p — use estimate_ler_circuit_level() for every decoder in the comparison."
+        )
+    return next(iter(models))
+
+
 @dataclass
 class LerResult:
     """One logical-error-rate measurement with full statistical context."""
@@ -65,6 +117,10 @@ class LerResult:
     seconds: float
     seed: int
     n_logical_qubits: int = 0
+    #: Which noise model produced this number. Never compare across models (A1).
+    noise_model: str = CODE_CAPACITY
+    #: Rounds of syndrome extraction (circuit-level only; 0 for code-capacity).
+    rounds: int = 0
 
     @property
     def ler(self) -> float:
@@ -211,6 +267,131 @@ def estimate_ler(
     )
 
 
+# ---------------------------------------------------------------------------
+# Circuit-level LER (A1) — the model the QEC field actually benchmarks under
+# ---------------------------------------------------------------------------
+def _surface_code_circuit(distance: int, p: float, rounds: int | None, basis: str = "x"):
+    """Standard rotated-surface memory circuit at uniform circuit-level noise."""
+    import stim
+
+    return stim.Circuit.generated(
+        f"surface_code:rotated_memory_{basis}",
+        distance=distance,
+        rounds=rounds if rounds else distance,
+        after_clifford_depolarization=p,
+        before_measure_flip_probability=p,
+        after_reset_flip_probability=p,
+        before_round_data_depolarization=p,
+    )
+
+
+def _dem_observable_decoder(kind: str, dem: Any):
+    """Return an object with ``decode_batch(dets) -> predicted observables``.
+
+    One resolver for **every** decoder in a comparison — QECTOR's own backends and
+    the external references alike — so no decoder can accidentally be measured
+    through a different pipeline than the one it is being compared against.
+    """
+    k = kind.lower().replace("-", "_")
+    if k.startswith("qector_"):
+        k = k[len("qector_") :]
+
+    if k in ("pymatching", "pm"):
+        import pymatching
+
+        return pymatching.Matching.from_detector_error_model(dem)
+    if k in ("ldpc_bposd", "ldpc"):
+        return _LdpcBpOsdOnDem(dem)
+
+    # QECTOR backends share sinter_compat's resolver, which already returns
+    # observable-space predictions for every kind it knows.
+    from .sinter_compat import _build_matcher
+
+    return _build_matcher(k, dem)
+
+
+class _LdpcBpOsdOnDem:
+    """External `ldpc` BP-OSD driven off the same DEM (observable-space output)."""
+
+    def __init__(self, dem):
+        from ldpc import BpOsdDecoder as LdpcOsd
+
+        from .dem import from_stim
+
+        model = from_stim(dem)
+        H = model.check_matrix()
+        self._L = model.observables_matrix()
+        priors = model.priors()
+        self._dec = LdpcOsd(
+            H,
+            error_channel=list(priors),
+            max_iter=30,
+            bp_method="product_sum",
+            osd_method="OSD_CS",
+            osd_order=0,
+        )
+
+    def decode_batch(self, shots):
+        shots = np.asarray(shots, dtype=np.uint8)
+        corr = np.stack([np.asarray(self._dec.decode(s), dtype=np.uint8) for s in shots])
+        return ((self._L @ corr.T) & 1).T.astype(np.uint8)
+
+
+def estimate_ler_circuit_level(
+    distance: int,
+    decoder: str,
+    p: float,
+    shots: int,
+    rounds: int | None = None,
+    seed: int = 0,
+    basis: str = "x",
+    circuit: Any = None,
+) -> LerResult:
+    """Circuit-level logical error rate for ``decoder`` on a rotated surface code.
+
+    This is the measurement the QEC field benchmarks under, and the one that must
+    be used for **any** cross-decoder comparison. Unlike :func:`estimate_ler`
+    (code-capacity: i.i.d. data-qubit flips, one syndrome, no measurement error),
+    this samples detectors from a real Stim circuit with gate, reset and
+    measurement noise over ``rounds`` rounds of syndrome extraction, and scores
+    against the circuit's own logical observables.
+
+    ``decoder`` accepts ``"blossom"``, ``"belief"``, ``"unionfind"``, ``"bposd"``
+    (QECTOR backends, with or without a ``qector_`` prefix), ``"pymatching"``, or
+    ``"ldpc_bposd"``. Pass ``circuit=`` to score a circuit you built yourself.
+    """
+    circ = circuit if circuit is not None else _surface_code_circuit(distance, p, rounds, basis)
+    dem = circ.detector_error_model(decompose_errors=True)
+    sampler = circ.compile_detector_sampler(seed=int(seed))
+    det, obs = sampler.sample(shots=shots, separate_observables=True)
+    det = np.ascontiguousarray(det.astype(np.uint8))
+    obs = np.ascontiguousarray(obs.astype(np.uint8))
+
+    dec = _dem_observable_decoder(decoder, dem)
+    t0 = time.perf_counter()
+    pred = np.asarray(dec.decode_batch(det), dtype=np.uint8)
+    seconds = time.perf_counter() - t0
+
+    pred = pred.reshape(shots, -1)
+    obs_r = obs.reshape(shots, -1)
+    width = min(pred.shape[1], obs_r.shape[1])
+    errors = int(np.any(pred[:, :width] != obs_r[:, :width], axis=1).sum())
+
+    return LerResult(
+        decoder=str(decoder),
+        code=f"rotated_surface_d{distance}_r{rounds or distance}",
+        physical_error_rate=float(p),
+        shots=int(shots),
+        errors=errors,
+        unfaithful=0,  # observable-space scoring: faithfulness is not separable here
+        seconds=seconds,
+        seed=int(seed),
+        n_logical_qubits=int(obs_r.shape[1]),
+        noise_model=CIRCUIT_LEVEL,
+        rounds=int(rounds or distance),
+    )
+
+
 def reference_validate(
     code,
     decoder_spec: str,
@@ -308,112 +489,119 @@ def run_memory_experiment(
     return {"decoder": decoder, "distance": distance, "p": p, "results": results}
 
 
-def sample_biased_errors(rng: np.random.Generator, n_qubits: int, p_z: float, eta: float = 0.5) -> np.ndarray:
+def sample_biased_errors(
+    rng: np.random.Generator,
+    n_qubits: int,
+    p_z: float,
+    eta: float = 0.5,
+    *,
+    return_both_sectors: bool = False,
+) -> np.ndarray | tuple[np.ndarray, np.ndarray]:
     """C4: sample biased Pauli errors with Z-bias factor ``eta``.
 
-    ``p_z`` is the total Z-error probability; ``eta = p_z / (p_z + p_x)``
-    controls the bias (0.5 = depolarising, 1.0 = pure Z, 0.0 = pure X).
-    For a single-sector code, each qubit independently suffers a Z error
-    with probability ``p_z`` and an X error (if applicable) with probability
-    ``p_z * (1-eta) / eta``. Returns a ``(n_qubits,)`` uint8 error vector.
+    ``p_z`` is the Z-error probability; ``eta = p_z / (p_z + p_x)`` controls the
+    bias (0.5 = unbiased/depolarising-symmetric, 1.0 = pure Z, → 0 = X-dominated).
+    Each qubit independently suffers a Z error with probability ``p_z`` and an X
+    error with probability ``p_x = p_z * (1 - eta) / eta``.
+
+    Returns the Z-sector error vector by default. Pass
+    ``return_both_sectors=True`` to get ``(z_errors, x_errors)``.
+
+    .. note::
+       Before v0.7.0 the ``p_x`` expression on the first line of the body was
+       written as a bare expression statement, so its value was discarded and
+       ``eta`` never reached the sampler — every "biased" result was in fact
+       unbiased. Any biased-noise figure produced before v0.7.0 is invalid.
     """
-    p_z * (1.0 - eta) / eta if eta > 0 else 0.0
-    return (rng.random(n_qubits) < p_z).astype(np.uint8)
+    if not 0.0 < eta <= 1.0:
+        raise ValueError(f"eta must be in (0, 1], got {eta!r} (1.0 = pure Z, 0.5 = unbiased)")
+    if not 0.0 <= p_z <= 1.0:
+        raise ValueError(f"p_z must be in [0, 1], got {p_z!r}")
+
+    p_x = min(p_z * (1.0 - eta) / eta, 1.0)
+    z_errors = (rng.random(n_qubits) < p_z).astype(np.uint8)
+    if not return_both_sectors:
+        return z_errors
+    x_errors = (rng.random(n_qubits) < p_x).astype(np.uint8)
+    return z_errors, x_errors
 
 
 def run_competitive_suite(
-    p: float = 0.005,
-    shots: int = 2000,
+    p: float = 0.001,
+    shots: int = 20000,
     seed: int = 0,
+    distances: Sequence[int] = (3, 5, 7),
+    rounds: int | None = None,
+    decoders: Sequence[str] = ("qector_blossom", "qector_belief", "qector_unionfind", "pymatching"),
     output_json: str | None = None,
 ) -> list[dict]:
-    """One-stop competitive benchmark: QECTOR vs PyMatching vs ldpc on
-    surface + qLDPC codes. Returns a list of result dicts suitable for
-    table rendering or JSON export."""
-    from . import codes as _codes
+    """Competitive benchmark: every decoder on the **same** circuit-level task.
 
-    results: list[dict] = []
-    # Surface code — exact MWPM comparison
-    for d in (3, 5):
-        code = _codes.rotated_surface_code(d)
-        for dec in ("blossom", "sparse_blossom", "union_find"):
-            r = estimate_ler(code, dec, p=p, shots=shots, seed=seed + d * 17)
-            results.append(r.to_dict())
-        # PyMatching reference
-        try:
-            import pymatching
-            import stim
+    All decoders — QECTOR's and the external references — are driven through one
+    pipeline: the same Stim circuit, the same detector samples, the same DEM, the
+    same observable scoring (:func:`estimate_ler_circuit_level`). The only thing
+    that varies between rows is the decoder.
 
-            circ = stim.Circuit.generated(
-                "surface_code:rotated_memory_x",
-                distance=d,
-                rounds=d,
-                after_clifford_depolarization=p,
-                before_measure_flip_probability=p,
-                after_reset_flip_probability=p,
-            )
-            dem = circ.detector_error_model(decompose_errors=True)
-            det, obs = circ.compile_detector_sampler(seed=seed + d * 17).sample(shots=shots, separate_observables=True)
-            pm = pymatching.Matching.from_detector_error_model(dem)
-            t0 = time.perf_counter()
-            pred = np.asarray(pm.decode_batch(det.astype(np.uint8)), np.uint8)
-            dt = time.perf_counter() - t0
-            err = int(np.any(pred.reshape(len(det), -1) != obs.reshape(len(det), -1), axis=1).sum())
-            lo, hi = wilson_ci(err, shots)
-            results.append(
-                {
-                    "decoder": "pymatching",
-                    "code": f"rotated_surface_d{d}",
-                    "physical_error_rate": p,
-                    "shots": shots,
-                    "errors": err,
-                    "ler": err / shots,
-                    "ci95_lo": lo,
-                    "ci95_hi": hi,
-                    "decodes_per_s": round(shots / dt, 1),
-                }
-            )
-        except (ImportError, RuntimeError):
-            pass  # PyMatching optional — skip if unavailable
-    # BB72 — qLDPC comparison
-    cx, _ = _codes.bivariate_bicycle_code(6, 6, [("x", 3), ("y", 1), ("y", 2)], [("y", 3), ("x", 1), ("x", 2)])
-    for dec in ("rust_bposd", "bp_osd"):
-        r = estimate_ler(cx, dec, p=p * 6, shots=shots, seed=seed + 1009)
-        results.append(r.to_dict())
-    try:
-        from ldpc import BpOsdDecoder as LdpcOsd
+    .. warning::
+       Before v0.7.0 this function measured QECTOR with :func:`estimate_ler`
+       (**code-capacity**: i.i.d. data-qubit flips, one syndrome, no measurement
+       error) while measuring PyMatching on a **circuit-level** Stim circuit with
+       ``rounds=d`` — then printed both in one table. Those are different
+       experiments and the resulting comparison was meaningless in QECTOR's
+       favour. Any competitive figure generated before v0.7.0 must be discarded
+       and regenerated with this function.
 
-        H = cx.parity_check_matrix()
-        dec = LdpcOsd(H, error_rate=p * 6, max_iter=30, bp_method="product_sum", osd_method="OSD_CS", osd_order=0)
-        E = (np.random.default_rng(seed + 1009).random((shots, cx.n_qubits)) < p * 6).astype(np.uint8)
-        S = ((E @ H.T) & 1).astype(np.uint8)
-        t0 = time.perf_counter()
-        C = np.stack([np.asarray(dec.decode(s)) for s in S])
-        dt = time.perf_counter() - t0
-        flips = ((C ^ E) @ cx.logicals_matrix().T) & 1
-        err = int(np.any(flips, axis=1).sum())
-        lo, hi = wilson_ci(err, shots)
-        results.append(
-            {
-                "decoder": "ldpc_bposd_cs0",
-                "code": "bb72_x",
-                "physical_error_rate": p * 6,
-                "shots": shots,
-                "errors": err,
-                "ler": err / shots,
-                "ci95_lo": lo,
-                "ci95_hi": hi,
-                "decodes_per_s": round(shots / dt, 1),
-            }
-        )
-    except (ImportError, RuntimeError):
-        pass  # ldpc optional — skip if unavailable
+    Returns a list of result dicts, all tagged ``noise_model="circuit_level"``
+    and validated by :func:`assert_comparable` before returning.
+    """
+    results: list[LerResult] = []
+    skipped: list[str] = []
+
+    for d in distances:
+        for dec in decoders:
+            try:
+                results.append(
+                    estimate_ler_circuit_level(
+                        distance=d,
+                        decoder=dec,
+                        p=p,
+                        shots=shots,
+                        rounds=rounds,
+                        seed=seed + 17 * d,
+                    )
+                )
+            except ImportError as exc:
+                # An absent optional reference (pymatching / ldpc) is skipped, but
+                # recorded — a silently missing baseline is how misleading tables
+                # get published.
+                skipped.append(f"d={d} {dec}: {exc}")
+
+    # Guarantees the table is internally comparable. Raises rather than emitting
+    # a mixed-model comparison.
+    assert_comparable(results)
+
+    out = [r.to_dict() for r in results]
+    for row in out:
+        row["skipped_baselines"] = skipped
+
     if output_json:
         import json
 
         with open(output_json, "w") as fh:
-            json.dump(results, fh, indent=2)
-    return results
+            json.dump(
+                {
+                    "noise_model": CIRCUIT_LEVEL,
+                    "physical_error_rate": p,
+                    "shots": shots,
+                    "seed": seed,
+                    "distances": list(distances),
+                    "skipped_baselines": skipped,
+                    "results": out,
+                },
+                fh,
+                indent=2,
+            )
+    return out
 
 
 # ---------------------------------------------------------------------------

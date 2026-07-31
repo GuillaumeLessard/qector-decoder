@@ -29,7 +29,20 @@ def _tasks():
     return tasks
 
 
+@pytest.mark.timeout(600)
 def test_sinter_collect_runs_and_is_sane():
+    """
+    Runtime: ~160 s (A10-02 landed: cached BlossomDecoder + set_edge_weights
+    removed the 627x per-shot decoder-construction overhead). The remaining
+    cost is per-shot BP in Python (~190 shots/s for `qector_belief`).
+
+        qector_blossom   57 021 shots/s
+        qector_belief       190 shots/s   <- BP-bound, not decoder-construction-bound
+
+    With 8 (task, decoder) combinations at up to 4000 shots each, the test
+    completes in minutes. The explicit 600 s budget keeps the suite-wide
+    `--timeout=300` tight for every other test.
+    """
     results = sinter.collect(
         num_workers=2,
         tasks=_tasks(),

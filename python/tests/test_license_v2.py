@@ -159,3 +159,30 @@ def test_v2_fails_closed_on_pre_v2_verifier(signing_key):
     except (InvalidSignature, ValueError, TypeError):
         accepted = False
     assert accepted is False, "v2 token must not validate under the legacy path"
+
+
+# ---------------------------------------------------------------------------
+# 4. QECT- format acceptance (D7)
+# ---------------------------------------------------------------------------
+
+
+def test_qect_pro_format_accepted(signing_key):
+    tok = lic.create_license_token_v2("cs_pro_1", "pro@example.com", "pro", private_key=signing_key)
+    assert tok.startswith("v2.")
+    qd_key = f"QECT-PRO-{tok}"
+    assert isinstance(qd_key, str)
+    assert qd_key.startswith("QECT-PRO-")
+
+
+def test_qect_ent_format_accepted(signing_key):
+    tok = lic.create_license_token_v2("cs_ent_1", "ent@example.com", "enterprise", private_key=signing_key)
+    assert tok.startswith("v2.")
+    qd_key = f"QECT-ENT-{tok}"
+    assert isinstance(qd_key, str)
+    assert qd_key.startswith("QECT-ENT-")
+
+
+def test_qect_comm_unsigned():
+    comm_key = "QECT-COMM-unsigned_test_key_for_dev"
+    assert isinstance(comm_key, str)
+    assert comm_key.startswith("QECT-COMM-")

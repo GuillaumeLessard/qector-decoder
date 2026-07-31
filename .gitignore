@@ -200,3 +200,29 @@ K3dev.md
 
 # Test result logs are captured deliberately; the global *.txt rule would hide them
 !test-results/*.txt
+
+# Packed Rust core for CI secret upload - NEVER commit (contains the full gitignored core)
+.secrets/
+
+# --- Local dev/session artifacts (never ship) ---
+benchmarks_session/
+benchmark_export/
+audit/
+dev.bat
+scripts/_read_license_token.ps1
+scripts/_verify_enterprise_unlock.py
+*.err
+audit_section3.ps1
+audit_tools.ps1
+ANCHORED_SUMMARY.md
+GEMINI_IMPLEMENTATION_PROMPT.md
+ddddd.md
+speed.md
+vs.py
+benchmark_latency_comparison.png
+extensive_benchmark_results.csv
+production_ldpc_results.csv
+scripts/temp_stripe_sync.py
+
+# Internal planning ledgers - working docs, not release artifacts
+todo*.md

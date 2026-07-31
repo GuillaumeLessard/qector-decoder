@@ -64,8 +64,8 @@ class BpOsdDecoder:
         self.max_iter = int(max_iter)
         self.ms_scale = float(ms_scale)
         self.osd_order = int(osd_order)
-        if bp_method not in ("sum_product", "min_sum"):
-            raise ValueError("bp_method must be 'sum_product' or 'min_sum'")
+        if bp_method not in ("sum_product", "min_sum", "relay"):
+            raise ValueError("bp_method must be 'sum_product', 'min_sum', or 'relay'")
         self.bp_method = bp_method
         self.max_latency_ms = float(max_latency_ms) if max_latency_ms is not None else None
         # GPU batched-BP policy. ``None`` -> auto (use the GPU iff one is usable);
@@ -87,7 +87,12 @@ class BpOsdDecoder:
             max_seconds = self.max_latency_ms / 1000.0
 
         actual_iter = min(self.max_iter, 50)
-        if self.bp_method == "sum_product":
+        if self.bp_method == "relay":
+            from . import BPOSDDecoder as _RustBPOSD
+
+            rust_dec = _RustBPOSD(self.check_to_qubits(), self.n_qubits, error_rate=float(self.priors.mean()), bp_method="relay")
+            return rust_dec.decode(s)
+        elif self.bp_method == "sum_product":
             posterior = sum_product_bp(
                 self.ic,
                 self.ie,
@@ -143,7 +148,7 @@ class BpOsdDecoder:
         if self._gpu_enabled():
             try:
                 return self._gpu_batch_decode(arr)
-            except RuntimeError:  # pragma: no cover - defensive GPU fallback
+            except (ImportError, OSError, AttributeError, RuntimeError):  # pragma: no cover - defensive GPU fallback
                 _gb.note_fallback()
         return np.stack([self.decode(arr[i]) for i in range(arr.shape[0])]).astype(np.uint8)
 

@@ -38,6 +38,46 @@ library should I compute with?" is **`qector_decoder_v3.gpu_backend`**.
 
 ---
 
+## 1a. Weighted vs unweighted GPU growth — pick deliberately
+
+`CUDABatchDecoder` and `OpenCLBatchDecoder` both accept an optional third
+argument, `edge_weights`: the detector error model's per-mechanism matching
+weights, `log((1-p)/p)`. It changes which growth policy the kernel runs, and the
+two policies sit at opposite ends of an accuracy/throughput trade:
+
+| Call | Kernel growth | Accuracy | Throughput |
+|------|---------------|----------|------------|
+| `CUDABatchDecoder(c2q, nq)` | integer, uniform support of 2 — bit-identical to the CPU `UnionFindDecoder` | **unweighted**: cannot tell a `p=1e-4` mechanism from a `p=1e-2` one | fastest path |
+| `CUDABatchDecoder(c2q, nq, weights)` | adaptive time step, mirroring `uf_core::grow_weighted` | matches (and at large `d` beats) the weighted CPU decoder | currently ~10x slower than the weighted CPU path |
+
+Measured on the reference GTX 1660 Ti, rotated surface code, circuit-level
+`p = 0.005`, syndromes sampled from Stim (`scripts/full_decoder_benchmark.py`):
+
+| d | GPU unweighted LER | GPU **weighted** LER | CPU weighted LER | PyMatching LER |
+|---|---|---|---|---|
+| 7 | 0.03725 | **0.01775** | 0.01825 | 0.01385 |
+| 9 | 0.05000 | **0.01425** | 0.01600 | 0.00750 |
+| 11 | 0.04525 | **0.00900** | 0.01400 | 0.00615 |
+
+CUDA and OpenCL produce identical logical error rates on the weighted path,
+which is the cross-check that the two kernel ports agree.
+
+**Throughput, same runs (µs/shot):** at `d = 11` the *unweighted* OpenCL kernel
+decodes at ~9.6 µs/shot against ~134 µs/shot for the CPU core and ~26 µs/shot
+for PyMatching. The GPU was never losing on speed at scale — it was losing on
+accuracy, because it had no way to receive the weights. It is slower than the
+CPU only at small `d` (`d = 3`: ~0.6 µs vs ~0.25 µs), where kernel-launch
+overhead dominates a 24-detector problem.
+
+> **Known gap.** The weighted kernel scans all `E` edges on every growth round.
+> The CPU walks only the *frontier* — the edges touching an odd cluster — which
+> is why the weighted CPU path is ~10x faster than the weighted GPU path today.
+> Porting the frontier into the kernel is outstanding work; until then, choose
+> the unweighted kernel for throughput sweeps and the weighted one when the
+> logical error rate is what you are measuring.
+
+---
+
 ## 2. Install
 
 CuPy is **optional**. The core decoders, the Rust CUDA path, and the full NumPy

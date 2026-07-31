@@ -6,6 +6,7 @@ Rust core + PyO3 bindings. Zero-copy NumPy. GIL-free decode.
 # pyright: reportMissingImports=false
 # The compiled Rust extension provides this submodule at runtime in the installed package.
 import importlib as _importlib
+import math as _math
 
 
 def _load_native_module():
@@ -56,6 +57,138 @@ _RustLERBenchmark = _guard("LERBenchmark")
 _RustSparseBlossomDecoder = _guard("SparseBlossomDecoder")
 _RustHybridDecoder = _guard("HybridDecoder")
 _RustHybridCascadeDecoder = _guard("HybridCascadeDecoder")
+_RustAutoDecoder = _guard("AutoDecoder")
+_RustTwoStageDecoder = _guard("TwoStageDecoder")
+_RustAmbiguityClusterDecoder = _guard("AmbiguityClusterDecoder")
+# 3D space-time decoder. `qector_decoder_v3.pyi` has declared this class since
+# the stub was written and lib.rs registers it, but `__init__.py` never bound
+# it -- so type checkers accepted `qd.SpaceTimeDecoder(...)` and the runtime
+# raised AttributeError.
+SpaceTimeDecoder = _guard("SpaceTimeDecoder")
+
+# The Rust-native routing decoder is exported as `NativeAutoDecoder`; the
+# public `AutoDecoder` name stays with the 7-tier self-debugging fallback
+# controller imported from `.backend` below (F811: no redefinition).
+NativeAutoDecoder = _RustAutoDecoder
+
+
+def set_license_key(key: str) -> None:
+    """Set the global QECTOR license key for tier enforcement.
+
+    Raises ``ValueError`` when the native verifier rejects the key. This used to
+    swallow the rejection and set the environment variable anyway, so an
+    expired, revoked, or malformed key looked like it had been accepted and the
+    caller only found out later, as an unexplained Community-tier distance cap.
+    """
+    import os
+
+    fn = getattr(_native_module, "py_set_license_key", None)
+    if fn is not None:
+        try:
+            fn(key)
+        except Exception as exc:  # native verifier rejected the key
+            raise ValueError(f"license key rejected: {exc}") from exc
+
+    os.environ["QECTOR_LICENSE_KEY"] = key
+
+
+def set_license_key_file(path) -> None:
+    """Load a license key from *path* and activate it.
+
+    Mirrors the core's ``QECTOR_LICENSE_FILE`` discovery, including stripping a
+    UTF-8 BOM and trailing newline, so a key file written by PowerShell
+    redirection activates unmodified.
+    """
+    import os
+
+    with open(path, encoding="utf-8") as fh:
+        key = fh.read().lstrip("﻿").strip()
+    if not key:
+        raise ValueError(f"license key file is empty: {path}")
+    set_license_key(key)
+    os.environ["QECTOR_LICENSE_FILE"] = str(path)
+
+
+def get_license_info() -> dict:
+    """Get active license info dictionary."""
+    try:
+        fn = getattr(_native_module, "py_get_license_info", None)
+        if fn is not None:
+            return fn()
+    except Exception:
+        pass
+    # Resolve the key the same way the core does (env var, then
+    # QECTOR_LICENSE_FILE, then ~/.qector/license.key) so this fallback cannot
+    # report Community for a deployment the core reads as Enterprise.
+    from .license import _configured_key
+
+    k = _configured_key()
+    tier = "Pro" if k.startswith("QECT-PRO-") else ("Enterprise" if k.startswith("QECT-ENT-") else "Community")
+    return {
+        "tier": tier,
+        "customer_id": "free_tier",
+        # int, matching the native LicenseManager and license._TIER_MAX_DISTANCE.
+        # This was a string, so get_license_info()["max_distance"] changed type
+        # depending on whether the compiled core was present.
+        "max_distance": {"Community": 7, "Pro": 19, "Enterprise": 63}[tier],
+    }
+
+
+def enforce_unlocked() -> None:
+    """Hard-gate decode path when no valid license is active (QECTOR_ENFORCE=1)."""
+    try:
+        fn = getattr(_native_module, "py_enforce_unlocked", None)
+        if fn is not None:
+            fn()
+    except Exception:
+        pass
+
+
+def enforce_distance_cap(distance) -> None:
+    """Enforce that *distance* does not exceed the active tier's cap."""
+    from . import license as _license_module
+
+    _license_module.enforce_distance_cap(int(distance))
+
+
+def record_shots(count: int) -> None:
+    """Record decoding shots into telemetry buffer."""
+    try:
+        fn = getattr(_native_module, "py_record_shots", None)
+        if fn is not None:
+            fn(count)
+    except Exception:
+        pass
+
+
+def get_accumulated_shots() -> int:
+    """Get total accumulated decode shots."""
+    try:
+        fn = getattr(_native_module, "py_get_accumulated_shots", None)
+        if fn is not None:
+            return fn()
+    except Exception:
+        pass
+    return 0
+
+
+def flush_usage(customer_id: str | None = None, api_key: str | None = None) -> dict:
+    """Flush accumulated decode shots to the Stripe Billing Meter Events API.
+
+    ``customer_id`` falls back to ``QECTOR_STRIPE_CUSTOMER_ID`` and ``api_key``
+    to ``STRIPE_SECRET_KEY``. Returns the receipt dict on success.
+
+    Unlike :func:`record_shots`, failures are **not** swallowed: a failed flush
+    leaves the shots pending for a later retry, and the caller has to know that
+    happened in order to retry. Raises ``RuntimeError`` when the core is absent
+    or the Stripe call fails.
+    """
+    fn = getattr(_native_module, "py_flush_usage", None)
+    if fn is None:
+        raise RuntimeError("flush_usage requires the compiled core; this build does not provide it.")
+    return fn(customer_id, api_key)
+
+
 # ---------------------------------------------------------------------------
 # Utility functions: native when available, exact pure-Python fallback when not.
 #
@@ -155,13 +288,70 @@ py_generate_ring_code_checks = _native_or("py_generate_ring_code_checks", _py_ge
 py_generate_repetition_code_checks = _native_or(
     "py_generate_repetition_code_checks", _py_generate_repetition_code_checks
 )
-py_generate_parity_check_matrix = _native_or("py_generate_parity_check_matrix", _py_generate_parity_check_matrix)
+# `py_generate_parity_check_matrix` is registered in lib.rs and
+# `_py_generate_parity_check_matrix` has always existed as its pure-Python
+# fallback, but neither was ever bound to a module-level name -- so the native
+# function was unreachable from Python and the fallback was dead code.
+py_generate_parity_check_matrix = _native_or(
+    "py_generate_parity_check_matrix", _py_generate_parity_check_matrix
+)
+
+
+def _py_estimate_distance(check_to_qubits, n_qubits=None):
+    if not check_to_qubits:
+        return 0
+    if n_qubits is None:
+        max_q = 0
+        for qs in check_to_qubits:
+            for q in qs:
+                if q > max_q:
+                    max_q = q
+        nq = max_q + 1
+    else:
+        nq = n_qubits
+    if nq == 0:
+        return 0
+    n_checks = len(check_to_qubits)
+    if all(len(qs) == 2 for qs in check_to_qubits) and n_checks > 1:
+        deg = {}
+        for qs in check_to_qubits:
+            deg[qs[0]] = deg.get(qs[0], 0) + 1
+            deg[qs[1]] = deg.get(qs[1], 0) + 1
+        if max(deg.values(), default=0) <= 2 and nq == n_checks + 1:
+            return nq
+    if nq > 2 * n_checks and n_checks > 1:
+        # DEM columns are fault mechanisms, not physical qubits.  Infer the
+        # spatial stride only from detector incidences of graphlike mechanisms;
+        # mechanism ids in a check row are arbitrary enumeration details.
+        mech_to_dets = {}
+        for det_idx, qs in enumerate(check_to_qubits):
+            for mech in qs:
+                mech_to_dets.setdefault(mech, []).append(det_idx)
+        diff_counts = {}
+        for dets in mech_to_dets.values():
+            if len(dets) == 2:
+                diff = abs(dets[0] - dets[1])
+                if diff > 0:
+                    diff_counts[diff] = diff_counts.get(diff, 0) + 1
+        if diff_counts:
+            stride, count = max(diff_counts.items(), key=lambda x: x[1])
+            if count >= 3 and stride > 0:
+                return stride
+        # An arbitrary DEM's detector numbering need not encode geometry.
+        # Return a documented lower bound instead of turning its fault count
+        # into a spurious licence rejection; callers may supply a validated
+        # structural distance hint when one exists.
+        return 1
+    return max(_math.ceil(_math.sqrt(nq)), 1)
+
+
+estimate_distance = _native_or("py_estimate_distance", _py_estimate_distance)
 try:
     run_mcp_server = _native_module.run_mcp_server
 except AttributeError:
 
     def run_mcp_server(*args, **kwargs):
-        raise RuntimeError("run_mcp_server requires the 'grpc' feature (maturin develop --features full)")
+        raise RuntimeError("The native core does not export run_mcp_server. This is likely a build mismatch — rebuild with 'maturin develop' to include the MCP server.")
 
 
 try:
@@ -203,11 +393,11 @@ try:
     import importlib.util as _importlib_util
 
     if _importlib_util.find_spec("torch") is not None:
-        import torch.nn.functional as F
+        import torch.nn.functional as _F
     else:
-        F = None  # type: ignore[assignment]
+        _F = None  # type: ignore[assignment]
 except Exception:
-    F = None  # type: ignore[assignment]
+    _F = None  # type: ignore[assignment]
 
 import numpy as _np
 
@@ -220,14 +410,14 @@ import numpy as _np
 # wheel). We never overwrite a real compiled ``__version__`` with it - doing so
 # would falsely claim a version the loaded binary is not - so after a version bump
 # ``__version__`` keeps reporting the *built* value until the Rust wheel is rebuilt.
-__fallback_version__ = "0.6.9"
+__fallback_version__ = "0.7.0"
 
 try:
     __version__ = _native_module.__version__
 except (AttributeError, ImportError):
     __version__ = __fallback_version__
 
-import logging
+import logging as _logging
 import os as _os_mod
 import sys as _sys_mod
 
@@ -237,7 +427,7 @@ from .license import verify_license_token
 __license__ = "LicenseRef-QECTOR-Source-Available"
 
 # Prevent logger warnings
-logging.getLogger("qector_decoder_v3").addHandler(logging.NullHandler())
+_logging.getLogger("qector_decoder_v3").addHandler(_logging.NullHandler())
 
 # Core threading configuration
 MAX_WORKERS: int = _os_mod.cpu_count() or 1
@@ -307,9 +497,9 @@ def _emit_startup_notice() -> None:
 _emit_startup_notice()
 
 
-from typing import Optional
+from typing import Optional as _Optional
 
-_OPENCL_HEALTH_CACHE: Optional[bool] = None
+_OPENCL_HEALTH_CACHE: _Optional[bool] = None
 
 
 def _validate_check_to_qubits(check_to_qubits, n_qubits=None, *, reject_hyperedges=False):
@@ -410,6 +600,23 @@ def _raise_if_hyperedges(normalized):
             )
 
 
+def _normalise_edge_weights(edge_weights, n_qubits):
+    """Validate optional per-mechanism weights and return a plain list, or None.
+
+    Raises rather than silently dropping bad input: a decoder that quietly
+    ignored its weights is exactly the defect UF-01 exists to fix.
+    """
+    if edge_weights is None:
+        return None
+    w = _np.asarray(edge_weights, dtype=_np.float64).reshape(-1)
+    if w.shape[0] != n_qubits:
+        raise ValueError(f"edge_weights has length {w.shape[0]}, expected n_qubits={n_qubits}")
+    if not _np.all(_np.isfinite(w)):
+        bad = int(_np.flatnonzero(~_np.isfinite(w))[0])
+        raise ValueError(f"edge_weights[{bad}] is not finite ({w[bad]}); weights must be finite")
+    return w.tolist()
+
+
 def _opencl_raw_available() -> bool:
     try:
         return bool(_rust_opencl_is_available())
@@ -471,11 +678,41 @@ class UnionFindDecoder:
 
     Rust core with PyO3 bindings. Zero-copy NumPy interop.
     GIL is released during decode for true parallelism.
+
+    Args:
+        check_to_qubits: per check, the qubit / mechanism indices it covers.
+        n_qubits: total qubit count (inferred from the max index when omitted).
+        edge_weights: optional per-mechanism matching weights ``log((1-p)/p)``
+            (UF-01). When given, clusters grow in proportion to weight and the
+            peel runs over a minimum-weight spanning forest, so the decoder can
+            distinguish a likely fault mechanism from an unlikely one. Omit for
+            the topology-only behaviour, which is what every release before
+            v0.7.0 did unconditionally.
+
+    A weighted decoder is markedly more accurate under circuit-level noise,
+    where mechanism probabilities span orders of magnitude; on code-capacity
+    noise with a single uniform ``p`` the weights carry no information and the
+    two agree.
     """
 
-    def __init__(self, check_to_qubits, n_qubits=None):
+    # T2.4 of PERF_AUDIT: ``__slots__`` removes the per-instance ``__dict__``
+    # and the associated hashing cost on every attribute access. On a
+    # 1-µs Rust decode this is the dominant Python-side overhead.
+    __slots__ = ("_inner",)
+
+    def __init__(self, check_to_qubits, n_qubits=None, edge_weights=None):
         c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits, reject_hyperedges=True)
-        self._inner = _RustUnionFindDecoder(c2q, nq)
+        w = _normalise_edge_weights(edge_weights, nq)
+        self._inner = _RustUnionFindDecoder(c2q, nq, None, w)
+
+    def set_edge_weights(self, edge_weights):
+        """Replace the per-mechanism weights in place (no graph rebuild)."""
+        self._inner.set_edge_weights(_normalise_edge_weights(edge_weights, self.n_qubits))
+
+    @property
+    def is_weighted(self):
+        """True iff cluster growth uses per-mechanism weights (UF-01)."""
+        return bool(self._inner.is_weighted)
 
     def decode(self, syndrome):
         if not isinstance(syndrome, _np.ndarray):
@@ -492,6 +729,53 @@ class UnionFindDecoder:
         if syndromes.ndim != 2:
             raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
         return self._inner.batch_decode(syndromes)
+
+    def decode_batch_flat(self, flat_syndromes, num_shots, stride=None):
+        """Flat-batch decode — accepts a 1D array ``(num_shots × stride,)``
+        and returns a 1D correction vector ``(num_shots × n_qubits,)``.
+
+        Args:
+            flat_syndromes: 1D ``uint8`` array of ``num_shots × stride`` bytes.
+            num_shots: Number of shots in the batch.
+            stride: Byte offset between consecutive shots in the input.
+                When ``None``, defaults to ``n_checks`` (tight packing).
+        """
+        if not isinstance(flat_syndromes, _np.ndarray):
+            flat_syndromes = _np.array(flat_syndromes, dtype=_np.uint8)
+        if flat_syndromes.dtype != _np.uint8:
+            flat_syndromes = flat_syndromes.astype(_np.uint8)
+        if flat_syndromes.ndim != 1:
+            raise ValueError(f"flat_syndromes must be 1D, got shape {flat_syndromes.shape}")
+        if stride is None:
+            stride = self.n_checks
+        return self._inner.decode_batch_flat(flat_syndromes, num_shots, stride)
+
+    def decode_batch_into_flat(self, flat_syndromes, num_shots, corrections, stride=None):
+        """Zero-copy flat-batch decode — writes corrections into a caller-owned
+        1D buffer ``(num_shots × n_qubits,)``.
+
+        Args:
+            flat_syndromes: 1D ``uint8`` array of ``num_shots × stride`` bytes.
+            num_shots: Number of shots in the batch.
+            corrections: Writable 1D ``uint8`` array ``(num_shots × n_qubits,)``.
+            stride: Byte offset between consecutive shots in the input.
+                When ``None``, defaults to ``n_checks`` (tight packing).
+        """
+        if not isinstance(flat_syndromes, _np.ndarray):
+            flat_syndromes = _np.array(flat_syndromes, dtype=_np.uint8)
+        if flat_syndromes.dtype != _np.uint8:
+            flat_syndromes = flat_syndromes.astype(_np.uint8)
+        if flat_syndromes.ndim != 1:
+            raise ValueError(f"flat_syndromes must be 1D, got shape {flat_syndromes.shape}")
+        if not isinstance(corrections, _np.ndarray):
+            corrections = _np.array(corrections, dtype=_np.uint8)
+        if corrections.dtype != _np.uint8:
+            corrections = corrections.astype(_np.uint8)
+        if corrections.ndim != 1:
+            raise ValueError(f"corrections must be 1D, got shape {corrections.shape}")
+        if stride is None:
+            stride = self.n_checks
+        self._inner.decode_batch_into_flat(flat_syndromes, num_shots, stride, corrections)
 
     @property
     def n_qubits(self):
@@ -503,13 +787,36 @@ class UnionFindDecoder:
 
 
 class FastUnionFindDecoder:
-    """SIMD-accelerated Union-Find with zero-allocation hot path and AVX2 runtime dispatch.
-    Consistently faster than UnionFindDecoder on surface and repetition codes (1.1M shots/s).
+    """Union-Find with a zero-allocation hot path, reusable buffers and a C ABI.
+
+    Routes to the same :class:`UnionFindDecoder` core, so corrections are
+    bit-identical; the two differ only in batching / FFI ergonomics. Accepts the
+    same ``edge_weights`` (UF-01).
+
+    Note:
+        This class is **not** measurably faster than :class:`UnionFindDecoder`
+        per shot — both dispatch to the same ``UfGraph`` growth and peel. Its
+        advantage is in the batch and FFI paths, where buffers are reused across
+        shots. (Earlier releases documented "1.1M shots/s, consistently faster";
+        that figure was measured on a ring code and did not survive measurement
+        against either a real detector error model or its own sibling.)
     """
 
-    def __init__(self, check_to_qubits, n_qubits=None):
+    __slots__ = ("_inner",)
+
+    def __init__(self, check_to_qubits, n_qubits=None, edge_weights=None):
         c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits, reject_hyperedges=True)
-        self._inner = _RustFastUnionFindDecoder(c2q, nq)
+        w = _normalise_edge_weights(edge_weights, nq)
+        self._inner = _RustFastUnionFindDecoder(c2q, nq, None, w)
+
+    def set_edge_weights(self, edge_weights):
+        """Replace the per-mechanism weights in place (no graph rebuild)."""
+        self._inner.set_edge_weights(_normalise_edge_weights(edge_weights, self.n_qubits))
+
+    @property
+    def is_weighted(self):
+        """True iff cluster growth uses per-mechanism weights (UF-01)."""
+        return bool(self._inner.is_weighted)
 
     def decode(self, syndrome):
         if not isinstance(syndrome, _np.ndarray):
@@ -526,6 +833,34 @@ class FastUnionFindDecoder:
         if syndromes.ndim != 2:
             raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
         return self._inner.batch_decode(syndromes)
+
+    def decode_batch_flat(self, flat_syndromes, num_shots, stride=None):
+        if not isinstance(flat_syndromes, _np.ndarray):
+            flat_syndromes = _np.array(flat_syndromes, dtype=_np.uint8)
+        if flat_syndromes.dtype != _np.uint8:
+            flat_syndromes = flat_syndromes.astype(_np.uint8)
+        if flat_syndromes.ndim != 1:
+            raise ValueError(f"flat_syndromes must be 1D, got shape {flat_syndromes.shape}")
+        if stride is None:
+            stride = self.n_checks
+        return self._inner.decode_batch_flat(flat_syndromes, num_shots, stride)
+
+    def decode_batch_into_flat(self, flat_syndromes, num_shots, corrections, stride=None):
+        if not isinstance(flat_syndromes, _np.ndarray):
+            flat_syndromes = _np.array(flat_syndromes, dtype=_np.uint8)
+        if flat_syndromes.dtype != _np.uint8:
+            flat_syndromes = flat_syndromes.astype(_np.uint8)
+        if flat_syndromes.ndim != 1:
+            raise ValueError(f"flat_syndromes must be 1D, got shape {flat_syndromes.shape}")
+        if not isinstance(corrections, _np.ndarray):
+            corrections = _np.array(corrections, dtype=_np.uint8)
+        if corrections.dtype != _np.uint8:
+            corrections = corrections.astype(_np.uint8)
+        if corrections.ndim != 1:
+            raise ValueError(f"corrections must be 1D, got shape {corrections.shape}")
+        if stride is None:
+            stride = self.n_checks
+        self._inner.decode_batch_into_flat(flat_syndromes, num_shots, stride, corrections)
 
     @property
     def n_qubits(self):
@@ -541,6 +876,8 @@ class BlossomDecoder:
 
     Supports weighted edges for higher decoding accuracy on realistic codes.
     """
+
+    __slots__ = ("_inner",)
 
     def __init__(self, check_to_qubits, n_qubits=None, edge_weights=None):
         c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
@@ -562,6 +899,29 @@ class BlossomDecoder:
             raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
         return self._inner.batch_decode(syndromes)
 
+    def set_edge_weights(self, weights):
+        weights = _np.asarray(weights, dtype=_np.float64)
+        return self._inner.set_edge_weights(weights)
+
+    def batch_decode_weighted(self, syndromes, weights):
+        if not isinstance(syndromes, _np.ndarray):
+            syndromes = _np.array(syndromes, dtype=_np.uint8)
+        if syndromes.dtype != _np.uint8:
+            syndromes = syndromes.astype(_np.uint8)
+        if syndromes.ndim != 2:
+            raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
+        if not isinstance(weights, _np.ndarray):
+            weights = _np.array(weights, dtype=_np.float64)
+        if weights.dtype != _np.float64:
+            weights = weights.astype(_np.float64)
+        if weights.ndim != 2:
+            raise ValueError(f"weights must be 2D, got shape {weights.shape}")
+        if syndromes.shape[0] != weights.shape[0]:
+            raise ValueError(
+                f"syndromes batch {syndromes.shape[0]} != weights batch {weights.shape[0]}"
+            )
+        return self._inner.batch_decode_weighted(syndromes, weights)
+
     @property
     def n_qubits(self):
         return self._inner.n_qubits
@@ -576,23 +936,27 @@ class BlossomDecoder:
 
 
 class SlidingWindowDecoder:
-    """Sliding-window decoder with exponential decay weighting.
+    """Sliding-window decoder with exponential decay weighting or fault-tolerant space-time decoding.
 
-    Maintains a window of the last ``window_size`` rounds. Each round's
-    syndrome is weighted by a per-check exponential decay factor so that more
-    recent rounds contribute more. The weighted cumulative syndrome is
-    binary-thresholded at 0.5 and decoded with the standard Union-Find
-    decoder.
-
-    **Important:** This decoder is **not** a fault-tolerant space-time temporal
-    decoder. Real QEC temporal decoding requires taking **XOR detector
-    differences** between consecutive rounds and matching on a 3D space-time
-    graph.
+    Maintains a window of the last ``window_size`` rounds. Pass ``check_types``,
+    ``p_data``, and ``p_meas`` together for exact 3D space-time decoding; omit them
+    for legacy decay-weighted accumulation.
     """
 
-    def __init__(self, check_to_qubits, n_qubits=None, window_size=10, decay_factor=0.8):
+    def __init__(
+        self,
+        check_to_qubits,
+        n_qubits=None,
+        window_size=10,
+        decay_factor=0.8,
+        check_types=None,
+        p_data=None,
+        p_meas=None,
+    ):
         c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
-        self._inner = _RustSlidingWindowDecoder(c2q, nq, window_size, decay_factor)
+        self._inner = _RustSlidingWindowDecoder(
+            c2q, nq, window_size, decay_factor, check_types, p_data, p_meas
+        )
 
     def update(self, round_syndrome):
         if not isinstance(round_syndrome, _np.ndarray):
@@ -605,8 +969,6 @@ class SlidingWindowDecoder:
         self._inner.flush()
 
     def decode(self, syndrome=None):
-        # No argument: finalize the current decay-weighted accumulated window
-        # (the temporal use case - call update() per round, then decode()).
         if syndrome is None:
             return self._inner.decode()
         if not isinstance(syndrome, _np.ndarray):
@@ -614,6 +976,15 @@ class SlidingWindowDecoder:
         if syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
         return self._inner.decode(syndrome)
+
+    def detector_history(self):
+        if hasattr(self._inner, "detector_history"):
+            return self._inner.detector_history()
+        return []
+
+    @property
+    def is_space_time(self):
+        return getattr(self._inner, "is_space_time", False)
 
     @property
     def n_qubits(self):
@@ -639,19 +1010,27 @@ class SlidingWindowDecoder:
 class StreamingDecoder:
     """Streaming decoder that accumulates syndromes over multiple rounds.
 
-    Rust core with circular history buffer and OR accumulation.
+    Pass ``check_types``, ``p_data``, and ``p_meas`` together for exact 3D space-time
+    decoding; omit them for legacy OR accumulation.
 
-    **Important:** This decoder is **not** a fault-tolerant space-time temporal
-    decoder. It accumulates syndromes with bitwise OR across the history
-    buffer and decodes the cumulative vector with the standard Union-Find
-    decoder. Real QEC temporal decoding requires taking **XOR detector
-    differences** between consecutive rounds and matching on a 3D space-time
-    graph.
+    Instead of T separate ``update()`` calls (which re-decodes the full window
+    every round), use ``decode_rounds(rounds)`` to ingest T rounds and decode
+    once — O(T·W) cheaper.
     """
 
-    def __init__(self, check_to_qubits, n_qubits=None, history_size=10):
+    def __init__(
+        self,
+        check_to_qubits,
+        n_qubits=None,
+        history_size=10,
+        check_types=None,
+        p_data=None,
+        p_meas=None,
+    ):
         c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
-        self._inner = _RustStreamingDecoder(c2q, nq, history_size)
+        self._inner = _RustStreamingDecoder(
+            c2q, nq, history_size, check_types, p_data, p_meas
+        )
 
     def update(self, round_syndrome):
         if not isinstance(round_syndrome, _np.ndarray):
@@ -669,6 +1048,33 @@ class StreamingDecoder:
         if syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
         return self._inner.decode(syndrome)
+
+    def detector_history(self):
+        if hasattr(self._inner, "detector_history"):
+            return self._inner.detector_history()
+        return []
+
+    def decode_rounds(self, rounds):
+        """Decode a sequence of rounds in a single call.
+
+        Accepts a 2D array of shape ``(T, n_checks)`` where T is the number
+        of rounds. Flushes any accumulated history, ingests all rounds, and
+        returns the combined correction in a single decode pass.
+
+        This is O(T·W) cheaper than T separate ``update`` calls when
+        the decoder's internal history would otherwise grow and shift.
+        """
+        if not isinstance(rounds, _np.ndarray):
+            rounds = _np.array(rounds, dtype=_np.uint8)
+        if rounds.dtype != _np.uint8:
+            rounds = rounds.astype(_np.uint8)
+        if rounds.ndim != 2:
+            raise ValueError(f"rounds must be 2D, got shape {rounds.shape}")
+        return self._inner.decode_rounds(rounds)
+
+    @property
+    def is_space_time(self):
+        return getattr(self._inner, "is_space_time", False)
 
     @property
     def n_qubits(self):
@@ -703,6 +1109,11 @@ class BatchDecoder:
         other batch decoders."""
         return self.parallel_batch_decode(syndromes)
 
+    def decode(self, syndrome):
+        """Decode a single 1D syndrome vector."""
+        syn = _np.asarray(syndrome, dtype=_np.uint8).reshape(1, -1)
+        return self.parallel_batch_decode(syn)[0]
+
     @property
     def n_qubits(self):
         return self._inner.n_qubits
@@ -714,6 +1125,8 @@ class BatchDecoder:
 
 class CPUBatchDecoder:
     """SIMD-friendly CPU batch decoder with pooled buffers and SoA transposition."""
+
+    __slots__ = ("_inner",)
 
     def __init__(self, check_to_qubits, n_qubits=None):
         c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits, reject_hyperedges=False)
@@ -781,6 +1194,29 @@ except (ImportError, AttributeError):
 
 
 try:
+    from .qector_decoder_v3 import CUDABpOsdDecoder as _CudaBpOsdReal
+
+    CUDABpOsdDecoder = _CudaBpOsdReal
+except (ImportError, AttributeError):
+
+    class CUDABpOsdDecoder:  # type: ignore[no-redef]
+        """CUDA BP-OSD decoder - build feature cuda, runtime needs NVIDIA driver.
+
+        Registered in lib.rs since the CUDA BP-OSD kernel landed, but never
+        re-exported here, so the class was unreachable from the package. This
+        stub is used when the native module is absent.
+        """
+
+        @classmethod
+        def is_available(cls):
+            """Return True if CUDA BP-OSD was compiled and a driver+device is present."""
+            return False
+
+        def __init__(self, *a, **k):
+            raise RuntimeError("CUDABpOsdDecoder not available - wheel built without CUDA or no driver.")
+
+
+try:
     from .qector_decoder_v3 import OpenCLBatchDecoder as _OclReal
 
     OpenCLBatchDecoder = _OclReal
@@ -814,9 +1250,22 @@ class SparseBlossomDecoder:
     Supports dynamic weight overrides from GNN Pre-Decoder for enriched decoding.
     """
 
-    def __init__(self, check_to_qubits, n_qubits=None):
+    __slots__ = ("_inner",)
+
+    def __init__(self, check_to_qubits, n_qubits=None, edge_weights=None):
+        # `edge_weights` was missing from this shim while the Rust class has
+        # accepted it since UF-01. Two consequences, both fixed here:
+        #   1. `DemModel.make_decoder("sparse_blossom")` — the *default* kind —
+        #      calls `SparseBlossomDecoder(c2q, nq, weights)` and raised
+        #      TypeError, so the whole DEM -> decoder default path was dead.
+        #   2. Constructing directly silently produced an *unweighted* matcher.
+        #      Under circuit-level noise that discards the per-mechanism
+        #      log-likelihood ratios and measurably costs accuracy.
         c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
-        self._inner = _RustSparseBlossomDecoder(c2q, nq)
+        if edge_weights is None:
+            self._inner = _RustSparseBlossomDecoder(c2q, nq)
+        else:
+            self._inner = _RustSparseBlossomDecoder(c2q, nq, list(edge_weights))
 
     def decode(self, syndrome):
         if not isinstance(syndrome, _np.ndarray):
@@ -875,9 +1324,13 @@ class BPOSDDecoder:
 
     Exact log-domain sum-product BP (default) with an OSD stage for improved
     LER on complex codes. ``bp_method="min_sum"`` selects the classical
-    min-sum approximation; ``osd_order`` >= 1 enables the OSD-W combination
-    sweep (single/pair flips around the base solution, min-weight wins).
+    min-sum approximation; ``bp_method="relay"`` selects layered (serial)
+    scheduling for faster convergence on loopy qLDPC graphs (C1-01);
+    ``osd_order`` >= 1 enables the OSD-W combination sweep (single/pair
+    flips around the base solution, min-weight wins).
     """
+
+    __slots__ = ("_inner",)
 
     def __init__(self, check_to_qubits, n_qubits=None, error_rate=0.1, bp_method=None, osd_order=None):
         c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
@@ -923,6 +1376,117 @@ class BPOSDDecoder:
         if syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
         return self._inner.bp_decode(syndrome, max_iterations)
+
+    def batch_decode(self, syndromes):
+        """Batch decode a 2D array of syndromes.
+
+        Args:
+            syndromes: np.ndarray of shape (batch, n_checks) with dtype uint8.
+
+        Returns:
+            np.ndarray of shape (batch, n_qubits) with dtype uint8.
+        """
+        if not isinstance(syndromes, _np.ndarray):
+            syndromes = _np.array(syndromes, dtype=_np.uint8)
+        if syndromes.dtype != _np.uint8:
+            syndromes = syndromes.astype(_np.uint8)
+        if syndromes.ndim != 2:
+            raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
+        return self._inner.batch_decode(syndromes)
+
+    def decode_batch_flat(self, flat_syndromes, num_shots, stride=None):
+        """Flat-batch decode — accepts a 1D aligned array.
+
+        Args:
+            flat_syndromes: 1D uint8 array of ``num_shots × stride`` bytes.
+            num_shots: Number of shots in the batch.
+            stride: Byte offset between shots (default: n_checks, tight).
+
+        Returns:
+            np.ndarray of shape (num_shots × n_qubits,) with dtype uint8.
+        """
+        if not isinstance(flat_syndromes, _np.ndarray):
+            flat_syndromes = _np.array(flat_syndromes, dtype=_np.uint8)
+        if flat_syndromes.dtype != _np.uint8:
+            flat_syndromes = flat_syndromes.astype(_np.uint8)
+        if flat_syndromes.ndim != 1:
+            raise ValueError(f"flat_syndromes must be 1D, got shape {flat_syndromes.shape}")
+        if stride is None:
+            stride = self.n_checks
+        return self._inner.decode_batch_flat(flat_syndromes, num_shots, stride)
+
+    @property
+    def n_qubits(self):
+        return self._inner.n_qubits
+
+    @property
+    def n_checks(self):
+        return self._inner.n_checks
+
+
+class TwoStageDecoder:
+    """C1-03: Correlated two-stage matching for CSS codes.
+
+    Decodes X-type checks first, feeds the inferred X corrections into the
+    Z-type syndrome (some X flips also affect Z stabilizers), then decodes the
+    modified Z syndrome.
+
+    Each stage can use any decoder: ``"blossom"`` (default), ``"unionfind"``,
+    ``"bposd[:rate[:osd_order]]"``, or ``"sparse_blossom"``.
+
+    Args:
+        check_to_qubits: Full check matrix (X checks, then Z checks).
+        check_types: ``True`` for X checks, ``False`` for Z checks.
+        n_qubits: Total qubit count (inferred if omitted).
+        x_decoder: Decoder type for the X stage (default: ``"blossom"``).
+        z_decoder: Decoder type for the Z stage (default: ``"blossom"``).
+    """
+
+    def __init__(self, check_to_qubits, check_types, n_qubits=None, x_decoder="blossom", z_decoder="blossom"):
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
+        self._inner = _RustTwoStageDecoder(c2q, check_types, nq, x_decoder, z_decoder)
+
+    def decode(self, syndrome):
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
+        if syndrome.dtype != _np.uint8:
+            raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
+        return self._inner.decode(syndrome)
+
+    @property
+    def n_qubits(self):
+        return self._inner.n_qubits
+
+    @property
+    def n_checks(self):
+        return self._inner.n_checks
+
+
+class AmbiguityClusterDecoder:
+    """C1-02: BP + ambiguity-clustered exact decoding for qLDPC codes.
+
+    Runs Belief Propagation to get soft LLRs, identifies ambiguous qubits
+    (|LLR| < threshold), clusters them by Tanner-graph connectivity, and
+    solves each cluster exactly via enumeration.
+
+    Args:
+        check_to_qubits: Full check matrix.
+        n_qubits: Total qubit count (inferred if omitted).
+        error_rate: Physical error rate for BP prior (default: 0.05).
+        ambig_threshold: |LLR| threshold for ambiguity (default: 0.5).
+        max_cluster_size: Max cluster size for exact enumeration (default: 12).
+    """
+
+    def __init__(self, check_to_qubits, n_qubits=None, error_rate=0.05, ambig_threshold=0.5, max_cluster_size=12):
+        c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
+        self._inner = _RustAmbiguityClusterDecoder(c2q, nq, error_rate, ambig_threshold, max_cluster_size)
+
+    def decode(self, syndrome):
+        if not isinstance(syndrome, _np.ndarray):
+            syndrome = _np.array(syndrome, dtype=_np.uint8)
+        if syndrome.dtype != _np.uint8:
+            raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
+        return self._inner.decode(syndrome)
 
     @property
     def n_qubits(self):
@@ -1193,7 +1757,7 @@ class GNNPredecoder:
     def train(self, graphs, targets, n_epochs):
         """Train the GNN on a list of graphs and target edge weights."""
         if self.use_torch:
-            if F is None:
+            if _F is None:
                 raise ImportError("PyTorch is required to train GNNPredecoder")
             import torch
             from torch import optim
@@ -1211,7 +1775,7 @@ class GNNPredecoder:
 
                     optimizer.zero_grad()
                     preds = self._torch_model(node_feats, edge_feats, edge_src, edge_dst)
-                    loss = F.mse_loss(preds, target_t)
+                    loss = _F.mse_loss(preds, target_t)
                     loss.backward()
                     optimizer.step()
             self._sync_to_rust()
@@ -1522,6 +2086,103 @@ class LookupTableDecoder:
         return self._inner.table_size
 
 
+def from_circuit(circuit, decoder_type="blossom", **kwargs):
+    """Build a decoder from a Stim circuit in one call.
+
+    Extracts the detector error model, infers check-to-qubit adjacency, and
+    returns a ready-to-use decoder instance.
+
+    Args:
+        circuit: A ``stim.Circuit`` (or anything with a
+            ``detector_error_model()`` method).
+        decoder_type: One of ``"blossom"``, ``"sparse_blossom"``,
+            ``"bposd"``, ``"belief_match"``, ``"colour_code"``, ``"auto"``.
+            Use ``"colour_code"`` for colour codes: matching-based types
+            cannot decode them (C1-04).
+        **kwargs: Passed to the decoder constructor.
+
+    Returns:
+        A decoder instance (BlossomDecoder, SparseBlossomDecoder,
+        BPOSDDecoder, BeliefMatching, or backend.AutoDecoder).
+
+    Example::
+
+        import stim, qector_decoder_v3 as qector
+        circuit = stim.Circuit.generated(
+            "surface_code:rotated_memory_x", distance=5, rounds=5,
+            after_clifford_depolarization=0.001)
+        decoder = qector.from_circuit(circuit, decoder_type="belief_match")
+        samples = circuit.compile_detector_sampler().sample(100)[0]
+        predictions = decoder.decode_batch(samples)
+    """
+    # Imported for its side effect: `from_circuit` is documented to require
+    # stim, so a missing install must fail here with a clear ImportError rather
+    # than deeper inside a decoder branch that happens to touch it first.
+    import stim  # noqa: F401
+
+    dt = decoder_type.lower().replace("_", "").replace("-", "")
+
+    if dt in ("colourcode", "colorcode"):
+        # C1-04: colour codes have non-graphlike error mechanisms, so the
+        # decomposed DEM built below cannot represent them — Stim raises
+        # outright at d>=5. This branch must run before any
+        # decompose_errors=True call.
+        from .colour_code import ColourCodeDecoder
+        return ColourCodeDecoder.from_stim_circuit(circuit, **kwargs)
+
+    dem = circuit.detector_error_model(decompose_errors=True)
+    c2q = _dem_to_check_to_qubits(dem)
+    nq = max((q for c in c2q for q in c), default=-1) + 1
+
+    if dt in ("blossom",):
+        return BlossomDecoder(c2q, nq, **kwargs)
+    if dt in ("sparseblossom",):
+        return SparseBlossomDecoder(c2q, nq, **kwargs)
+    if dt in ("bposd",):
+        return BPOSDDecoder(c2q, nq, **kwargs)
+    if dt in ("beliefmatch", "belief_matching"):
+        from .belief_matching import BeliefMatching
+        return BeliefMatching.from_detector_error_model(dem, **kwargs)
+    if dt in ("auto",):
+        from .backend import AutoDecoder
+        return AutoDecoder(c2q, nq, **kwargs)
+    if dt in ("twostage", "two_stage", "correlated", "c1_03"):
+        # Default to blossom for both stages; pass check_types via kwargs or
+        # require the caller to pass it explicitly.
+        if "check_types" not in kwargs and "_check_types" not in kwargs:
+            raise ValueError(
+                "TwoStageDecoder requires check_types=(list of bool, True=X, False=Z). "
+                "Pass check_types=... to from_circuit()."
+            )
+        ct = kwargs.pop("check_types", kwargs.pop("_check_types", None))
+        return TwoStageDecoder(c2q, ct, nq, **kwargs)
+    if dt in ("ambigcluster", "ambiguitycluster", "ambig_cluster", "c1_02"):
+        return AmbiguityClusterDecoder(c2q, nq, **kwargs)
+    raise ValueError(f"Unknown decoder_type={decoder_type!r}")
+
+
+def _dem_to_check_to_qubits(dem):
+    """Extract check_to_qubits from a stim DetectorErrorModel."""
+    import stim as _stim
+
+    if isinstance(dem, str):
+        dem = _stim.DetectorErrorModel(dem)
+    nD = dem.num_detectors
+    c2q: list[list[int]] = [[] for _ in range(nD)]
+    for inst in dem.flattened():
+        if inst.type != "error":
+            continue
+        targets = inst.targets_copy()
+        dets = []
+        for t in targets:
+            if t.is_relative_detector_id():
+                dets.append(t.val)
+        if len(dets) == 2:
+            c2q[dets[0]].append(dets[1])
+            c2q[dets[1]].append(dets[0])
+    return [sorted(set(c)) for c in c2q]
+
+
 def check_to_edges(check_to_qubits):
     """Convert check_to_qubits to edge list."""
     c2q = [[int(q) for q in check] for check in check_to_qubits]
@@ -1555,6 +2216,92 @@ def generate_ring_code_checks(distance):
 def generate_repetition_code_checks(distance):
     """Generate a 1D repetition/chain code for testing."""
     return py_generate_repetition_code_checks(int(distance))
+
+
+def generate_parity_check_matrix(check_to_qubits, n_qubits=None):
+    """Return the binary parity-check matrix ``H`` for *check_to_qubits*.
+
+    ``H[c, q] == 1`` iff check ``c`` touches qubit ``q``. Shape is
+    ``(len(check_to_qubits), n_qubits)``; ``n_qubits`` defaults to one past the
+    largest qubit index referenced by any check.
+    """
+    c2q = [[int(q) for q in check] for check in check_to_qubits]
+    if n_qubits is None:
+        return py_generate_parity_check_matrix(c2q, None)
+    return py_generate_parity_check_matrix(c2q, int(n_qubits))
+
+
+def compute_detector_differences(history):
+    """Computes XOR detector differences across consecutive syndrome rounds: detector_t = raw_t ^ raw_{t-1}."""
+    fn = getattr(_native_module, "py_compute_detector_differences", None)
+    if fn is not None:
+        return fn(history)
+    if not history:
+        return []
+    n_checks = len(history[0])
+    prev = [0] * n_checks
+    diffs = []
+    for round_syn in history:
+        diff = [(int(round_syn[i]) & 1) ^ (prev[i] & 1) for i in range(min(n_checks, len(round_syn)))]
+        if len(round_syn) == n_checks:
+            prev = [int(x) & 1 for x in round_syn]
+        else:
+            prev = [0] * n_checks
+            for i in range(min(n_checks, len(round_syn))):
+                prev[i] = int(round_syn[i]) & 1
+        diffs.append(diff)
+    return diffs
+
+
+def generate_space_time_surface_code_checks(distance, rounds):
+    """Generate 3D space-time surface code checks across multiple rounds."""
+    fn = getattr(_native_module, "py_generate_space_time_surface_code_checks", None)
+    if fn is not None:
+        return fn(int(distance), int(rounds))
+    spatial_checks, n_qubits = generate_surface_code_checks(distance)
+    st_checks = []
+    for r in range(rounds):
+        offset = r * n_qubits
+        for check in spatial_checks:
+            st_checks.append([q + offset for q in check])
+    return st_checks, n_qubits * rounds
+
+
+def generate_triangular_color_code_4_8_8_checks(distance):
+    """Generate 4.8.8 triangular color code parity check matrix."""
+    fn = getattr(_native_module, "py_generate_triangular_color_code_4_8_8_checks", None)
+    if fn is not None:
+        return fn(int(distance))
+    d = int(distance)
+    if d < 3 or d % 2 == 0:
+        raise ValueError("distance must be odd and >= 3 for triangular color code")
+    n_qubits = (d * (d + 1)) // 2
+    check_to_qubits = []
+    idx = lambda r, c: (r * (r + 1)) // 2 + c
+    for r in range(max(0, d - 2)):
+        for c in range(r + 1):
+            if c + 2 <= r + 2:
+                check_to_qubits.append([idx(r, c), idx(r + 1, c), idx(r + 1, c + 1), idx(r + 2, c + 1)])
+    if not check_to_qubits:
+        check_to_qubits.append([0, 1, 2])
+    return check_to_qubits, n_qubits
+
+
+def generate_biconnected_qldpc_checks(n_qubits, degree):
+    """Generate a bipolar / biconnected qLDPC Tanner graph parity check matrix."""
+    fn = getattr(_native_module, "py_generate_biconnected_qldpc_checks", None)
+    if fn is not None:
+        return fn(int(n_qubits), int(degree))
+    n = int(n_qubits)
+    k = int(degree)
+    if n < 4 or k < 2:
+        raise ValueError("n_qubits must be >= 4 and degree must be >= 2")
+    check_to_qubits = []
+    for i in range(n):
+        check = sorted(list(set((i + d * 3) % n for d in range(k))))
+        if len(check) >= 2:
+            check_to_qubits.append(check)
+    return check_to_qubits, n
 
 
 class BenchmarkSuite:
@@ -1611,6 +2358,7 @@ __all__ = [
     "BlossomDecoder",
     "CPUBatchDecoder",
     "CUDABatchDecoder",
+    "CUDABpOsdDecoder",
     "DetectorGraph",
     "FastUnionFindDecoder",
     "GNNPredecoder",
@@ -1622,20 +2370,32 @@ __all__ = [
     "NeuralPredecoder",
     "OpenCLBatchDecoder",
     "SlidingWindowDecoder",
+    "SpaceTimeDecoder",
     "SparseBlossomDecoder",
     "StreamingDecoder",
     "UnionFindDecoder",
     "check_to_edges",
+    "compute_detector_differences",
     "cuda_is_available",
+    "flush_usage",
+    "from_circuit",
+    "generate_biconnected_qldpc_checks",
+    "generate_parity_check_matrix",
     "generate_repetition_code_checks",
     "generate_ring_code_checks",
+    "generate_space_time_surface_code_checks",
     "generate_surface_code_checks",
     "generate_toy_code_checks",
+    "generate_triangular_color_code_4_8_8_checks",
     "get_latency_quantiles",
+    "set_license_key_file",
     "opencl_is_available",
     "run_grpc_server",
     "run_mcp_server",
     "start_metrics_server",
+    "enforce_unlocked",
+    "enforce_distance_cap",
+    "estimate_distance",
 ]
 
 
@@ -1646,6 +2406,7 @@ from . import (
     benchmarking,
     bposd,
     codes,
+    colour_code,
     dem,
     predecoder,
     pymatching_compat,
@@ -1655,6 +2416,7 @@ from . import (
 from .backend import AutoDecoder, Backend, BackendConfig
 from .belief_matching import BeliefMatching, GNNBeliefMatcher, decode_with_gnn
 from .bposd import BpOsdDecoder
+from .colour_code import ColourCodeDecoder
 from .decode_mmap import decode_mmap
 from .decoder_cache import clear_decoder_cache, get_decoder, get_decoder_pool
 
@@ -1671,11 +2433,15 @@ except Exception:  # pragma: no cover
     sinter_compat = None  # type: ignore[assignment]
 
 __all__ += [
+    "AmbiguityClusterDecoder",
     "AutoDecoder",
+    "NativeAutoDecoder",
+    "TwoStageDecoder",
     "Backend",
     "BackendConfig",
     "BeliefMatching",
     "BpOsdDecoder",
+    "ColourCodeDecoder",
     "DecodeResult",
     "DecoderPool",
     "GNNBeliefMatcher",
@@ -1687,6 +2453,7 @@ __all__ += [
     "bposd",
     "clear_decoder_cache",
     "codes",
+    "colour_code",
     "decode_mmap",
     "decode_with_diagnostics",
     "decode_with_gnn",
@@ -1729,6 +2496,10 @@ __all__ += [
     "stim_compat",
     "stripe_integration",
     "verify_license_token",
+    "set_license_key",
+    "get_license_info",
+    "record_shots",
+    "get_accumulated_shots",
 ]
 
 # ---------------------------------------------------------------------------
@@ -1906,6 +2677,48 @@ for _name in ("os", "sys", "subprocess"):
 # v0.6.9 release notes (public)
 # ===========================================================================
 __changelog__ = {
+    "0.7.0": [
+        (
+            "Security: real Ed25519 license verification in the Rust core "
+            "(v2 + QECT-PRO/QECT-ENT signed payload formats, production key "
+            "matches the Python PEM), offline CRL ~/.qector/revoked.txt, "
+            "expiry enforcement, QECTOR_ENFORCE=1 hard gate."
+        ),
+        (
+            "Security: MCP stdin reader enforces a 10 MB max_content_length; "
+            "oversized frames are rejected with -32600 instead of buffered."
+        ),
+        (
+            "Feature: real MCP decoder cache keyed by (code, n_qubits, "
+            "decoder_type, tuning env) with honest cache_hit reporting and a "
+            "working clear_decoder_cache; per-tier decode timeout budgets; "
+            "async startup pre-warm with 5s cap."
+        ),
+        (
+            "Feature: decode_syndrome decoder_type='auto' routes through the "
+            "native AutoDecoder; benchmark_decoder strictly validates "
+            "decoder_type and supports SparseBlossom/BP-OSD/LookupTable/"
+            "Cascade with Wilson 95% CI on the unfaithful-decode fraction."
+        ),
+        (
+            "Feature: AutoDecoder learns CPUBatch routing for batch_size > "
+            "1024, and select_optimal_with_license for test isolation."
+        ),
+        (
+            "Feature: Stripe metered billing flushes real usage to the "
+            "Meter Events API with 1s/2s/4s backoff retry (py_flush_usage)."
+        ),
+        (
+            "Fix: UnionFindDecoder.decode/decode_into return Result instead "
+            "of panicking; production unwraps removed in sparse_blossom and "
+            "mwpm; NaN-safe latency sort in benchmarks."
+        ),
+        (
+            "Perf: thread-local UF scratch plus arena-backed "
+            "decode_into_arena in FastUnionFindDecoder; AVX2 bitmask clear "
+            "with runtime detection and O(words) popcount."
+        ),
+    ],
     "0.6.9": [
         "Feature: Single-precision f32 neural predecoders for 2x SIMD vectorization density.",
         "Feature: Deterministic seeded GNN initialization (new_with_seed) for reproducible training.",
@@ -2019,4 +2832,16 @@ from .pymatching_compat import Matching
 __all__ += [
     "Matching",
     "pymatching",
+]
+# Names that have always been importable from this package but were never listed
+# in `__all__`, so `from qector_decoder_v3 import *` did not provide them and the
+# API inventory did not cover them (todo8 8.1). Declaring them documents the
+# surface that already ships rather than adding to it; `test_public_symbols.py`
+# now locks it in both directions. (The routing / streaming / gpu_backend /
+# bp_cupy names are already appended by the optional-import blocks above.)
+__all__ += [
+    "changelog",
+    "decoder_cache",
+    "decoder_pool",
+    "sparse_blossom_radix_neighbors",
 ]

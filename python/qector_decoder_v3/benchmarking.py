@@ -68,10 +68,7 @@ def capture_environment() -> dict[str, Any]:
         "processor": platform.processor(),
         "cpu_count_logical": os.cpu_count(),
     }
-    try:
-        env["numpy_version"] = np.__version__
-    except RuntimeError:  # pragma: no cover
-        env["numpy_version"] = None
+    env["numpy_version"] = getattr(np, "__version__", None)
 
     env["rust_version"] = _safe_cmd(["rustc", "--version"])
     env["cargo_version"] = _safe_cmd(["cargo", "--version"])
@@ -85,12 +82,18 @@ def capture_environment() -> dict[str, Any]:
     env.update(_memory_info())
 
     # accelerators
+    # A5: probing an accelerator can fail with ImportError (feature not built),
+    # OSError (driver .so/.dll missing), AttributeError (older core lacking the
+    # symbol) or RuntimeError (device present but unusable). The previous
+    # `except RuntimeError` caught only the last of those, so a machine without
+    # a CUDA driver raised out of `capture_environment` instead of recording
+    # `None` — which is exactly when you most want the environment captured.
     try:
         import qector_decoder_v3 as qd
 
         env["cuda_available"] = bool(qd.cuda_is_available())
         env["opencl_available"] = bool(qd.opencl_is_available())
-    except RuntimeError:  # pragma: no cover
+    except (ImportError, OSError, AttributeError, RuntimeError):  # pragma: no cover
         env["cuda_available"] = None
         env["opencl_available"] = None
 
@@ -110,38 +113,42 @@ def git_commit() -> str:
 
 
 def _safe_cmd(cmd: Sequence[str]) -> str | None:
+    # A5: a missing binary raises FileNotFoundError (an OSError), and a hung one
+    # raises subprocess.TimeoutExpired. `except RuntimeError` caught neither, so
+    # `capture_environment` blew up on any machine without rustc/cargo/git.
     try:
         out = subprocess.run(list(cmd), capture_output=True, text=True, timeout=10, check=False)
         return out.stdout.strip() or None
-    except RuntimeError:  # pragma: no cover
+    except (OSError, subprocess.SubprocessError):  # pragma: no cover
         return None
 
 
 def _pkg_version(name: str) -> str | None:
-    try:
-        import importlib.metadata as md
+    # A5: `md.version` raises PackageNotFoundError (a subclass of ImportError but
+    # not of RuntimeError) and `__import__` raises ImportError. Neither was caught.
+    import importlib.metadata as md
 
+    for candidate in (name.replace("_", "-"), name):
         try:
-            return md.version(name.replace("_", "-"))
+            return md.version(candidate)
         except md.PackageNotFoundError:
-            return md.version(name)
-    except RuntimeError:
-        try:
-            mod = __import__(name)
-            return getattr(mod, "__version__", None)
-        except RuntimeError:
-            return None
+            continue
+    try:
+        return getattr(__import__(name), "__version__", None)
+    except ImportError:
+        return None
 
 
 def _memory_info() -> dict[str, Any]:
     info: dict[str, Any] = {"ram_total_gb": None, "ram_available_gb": None}
+    # A5: psutil is an optional extra — absence is ImportError, not RuntimeError.
     try:
         import psutil  # type: ignore
 
         vm = psutil.virtual_memory()
         info["ram_total_gb"] = round(vm.total / 1e9, 2)
         info["ram_available_gb"] = round(vm.available / 1e9, 2)
-    except RuntimeError:
+    except (ImportError, OSError):
         pass
     return info
 
@@ -201,10 +208,12 @@ def time_iterations(fn: Callable[[], Any], n_trials: int, warmup: int = 0) -> li
 # ---------------------------------------------------------------------------
 def _build_decoder(kind: str, code):
     from . import (
+        BatchDecoder,
         BlossomDecoder,
         BPOSDDecoder,
         CPUBatchDecoder,
         FastUnionFindDecoder,
+        LookupTableDecoder,
         SparseBlossomDecoder,
         UnionFindDecoder,
     )
@@ -216,11 +225,52 @@ def _build_decoder(kind: str, code):
         "blossom": lambda: BlossomDecoder(c2q, nq),
         "sparse_blossom": lambda: SparseBlossomDecoder(c2q, nq),
         "cpu_batch": lambda: CPUBatchDecoder(c2q, nq),
+        "batch": lambda: BatchDecoder(c2q, nq),
         "bp_osd": lambda: BPOSDDecoder(c2q, nq, 0.05),
+        "lookup_table": lambda: LookupTableDecoder(c2q, nq),
+        "cascade": _build_cascade(c2q, nq),
+        "hybrid": _build_hybrid(c2q, nq),
+        "auto": _build_native_auto(c2q, nq),
     }
-    if kind not in builders:
+    # Map legacy/spelling variants
+    aliases = {
+        "cascade_decoder": "cascade",
+        "hybrid_decoder": "hybrid",
+        "auto_decoder": "auto",
+        "native_auto": "auto",
+        "lookuptable": "lookup_table",
+        "bposd": "bp_osd",
+        "sparseblossom": "sparse_blossom",
+        "fastuf": "fast_union_find",
+        "fastunionfind": "fast_union_find",
+        "uf": "union_find",
+    }
+    resolved = aliases.get(kind, kind)
+    if resolved not in builders:
         raise ValueError(f"unknown decoder kind {kind!r}; choose from {list(builders)}")
-    return builders[kind]
+    return builders[resolved]
+
+
+def _build_cascade(c2q, nq):
+    from . import HybridCascadeDecoder
+
+    return lambda: HybridCascadeDecoder(c2q, nq)
+
+
+def _build_hybrid(c2q, nq):
+    from . import HybridDecoder
+
+    return lambda: HybridDecoder(c2q, nq)
+
+
+def _build_native_auto(c2q, nq):
+    try:
+        from . import NativeAutoDecoder
+    except Exception:
+        raise ValueError("NativeAutoDecoder not available in this build")
+    return lambda: NativeAutoDecoder(
+        c2q, nq, distance=max(3, int(nq**0.5) | 1), noise_rate=0.08, batch_size=1, is_qldpc=False
+    )
 
 
 def benchmark_decoder(
@@ -231,6 +281,7 @@ def benchmark_decoder(
     p: float = 0.08,
     seed: int = 1234,
     measure_memory: bool = True,
+    decoder_type: str | None = None,
 ) -> dict[str, Any]:
     """Benchmark a decoder on a code with full hot/cold and tail-latency stats.
 
@@ -238,6 +289,31 @@ def benchmark_decoder(
     The **cold path** times decoder construction; the **hot path** times
     decode-only on pre-built syndromes.  Syndromes are reachable (generated from
     real errors) and fixed by ``seed`` for reproducibility.
+
+    Parameters
+    ----------
+    kind:
+        Decoder backend name (e.g. ``"blossom"``, ``"fast_union_find"``,
+        ``"bp_osd"``, ``"auto"``, ``"cascade"``, ``"hybrid"``, ...).
+        See ``_build_decoder`` for the full list.
+    code:
+        A code object (from :mod:`qector_decoder_v3.codes`) exposing
+        ``check_to_qubits``, ``n_qubits``, ``parity_check_matrix()``, ``name``,
+        ``distance``.
+    n_trials:
+        Number of timed decode iterations.
+    warmup:
+        Untimed warmup iterations before measurement.
+    p:
+        Physical error rate for syndrome generation.
+    seed:
+        Random seed for reproducibility.
+    measure_memory:
+        Enable peak-memory tracking via ``tracemalloc``.
+    decoder_type:
+        Explicit decoder type override passed to the Rust core (used when
+        the Rust decoder supports fine-grained type selection). When ``None``,
+        ``kind`` is used as the decoder type.
     """
     rng = np.random.default_rng(seed)
     H = code.parity_check_matrix()
@@ -282,6 +358,7 @@ def benchmark_decoder(
 
     report = {
         "decoder": kind,
+        "decoder_type": decoder_type or kind,
         "code": code.name,
         "n_qubits": int(code.n_qubits),
         "n_checks": int(code.n_checks),

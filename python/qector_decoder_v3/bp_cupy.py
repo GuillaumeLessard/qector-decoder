@@ -147,7 +147,7 @@ class BatchedBpDecoder:
                 import cupy as _cp  # type: ignore[import-not-found]
 
                 self._xp = _cp
-            except RuntimeError:  # pragma: no cover - import guarded
+            except (ImportError, OSError, RuntimeError):  # pragma: no cover - import guarded
                 self.on_gpu = False
                 self._xp = np
         else:

@@ -18,16 +18,23 @@ This document separates stable user-facing surfaces from experimental or deploym
 | `import qector_decoder_v3` | Stable | Main Python package import path |
 | `UnionFindDecoder` | Stable | Fast approximate matching-graph decoder path |
 | `FastUnionFindDecoder` | Stable | Lower-overhead Union-Find family path |
-| `BlossomDecoder` | Stable | Exact weighted MWPM / PyMatching LER parity path on tested graphlike workloads |
+| `BlossomDecoder` | Stable | Exact weighted MWPM, correctness reference (Tier6 in AutoDecoder fallback). LER-parity with PyMatching on tested graphlike workloads — not a latency leader. Prefer SparseBlossom for throughput or UF for fast pre-decode. |
 | `SparseBlossomDecoder` | Supported but specialized | Near-optimal sparse path, not exact MWPM |
 | `BPOSDDecoder` / `BpOsdDecoder` | Supported but specialized | LDPC/qLDPC workflow path; compare locally against reference packages |
 | `CPUBatchDecoder` / `BatchDecoder` | Stable for batch workflows | CPU/Rayon batch path |
-| `CUDABatchDecoder` / `OpenCLBatchDecoder` | Supported but specialized | Requires local driver/runtime support; bit-identity is separate from speed |
+| `CUDABatchDecoder` / `OpenCLBatchDecoder` | Supported but specialized | Requires local driver/runtime support; bit-identity is separate from speed. Both take an optional `edge_weights` (the DEM's `log((1-p)/p)`): without it the kernel decodes weight-blind and reports the *unweighted* logical error rate. See `docs/GPU_AND_CUPY.md` §1a |
+| `CUDABpOsdDecoder` | Supported but specialized | CUDA BP-OSD; same driver/runtime requirement |
+| `SpaceTimeDecoder` | Experimental | 3D space-time (multi-round) decoding |
 | `SlidingWindowDecoder` / `StreamingDecoder` | Supported but specialized | Multi-round / streaming workflow path |
 | `AutoDecoder` | Supported but specialized | Calibrated CPU/GPU routing; hardware-specific |
 | `BeliefMatching` | Experimental accuracy mode | Selected correlated workloads only; slower than MWPM |
 | GNN / neural / hybrid modules | Experimental | Research-oriented, not a stable product guarantee |
 | Workbench modules | Experimental / roadmap | Local validation workstation direction, not shipped enterprise product |
+| `NativeAutoDecoder` | Stable | Rust-native routing decoder with license tier enforcement |
+| `set_license_key()` / `get_license_info()` | Stable | License key management API |
+| `record_shots()` / `get_accumulated_shots()` | Stable | Metered billing telemetry |
+| `Workbench.set_license_key()` / `Workbench.get_license_info()` | Experimental | Workbench controller license methods |
+| `benchmarking.benchmark_decoder(decoder_type=)` | Stable | New parameter for explicit decoder type |
 
 ## Rust crate surface
 

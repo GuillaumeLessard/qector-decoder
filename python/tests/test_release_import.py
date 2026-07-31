@@ -48,7 +48,7 @@ def _create_token(receipt_id: str, email: str = "", key=None) -> str:
 
 
 def test_1_version_and_exports():
-    assert qd.__version__ == "0.6.9"
+    assert qd.__version__ == "0.7.0"
     assert hasattr(qd, "verify_license_token")
     assert hasattr(qd, "MAX_WORKERS")
     assert qd.__license__ == "LicenseRef-QECTOR-Source-Available"
@@ -67,12 +67,14 @@ def test_3_invalid_token_rejection():
     assert verify_license_token("rec_123.corrupted_sig!!!") is False
 
 
-def test_4_special_override_tokens():
+def test_4_special_override_tokens(monkeypatch):
+    monkeypatch.setenv("QECTOR_DEBUG", "1")
     assert verify_license_token("academic") is True
     assert verify_license_token("commercial") is True
 
 
 def test_5_environment_license_check(monkeypatch, throwaway_key):
+    monkeypatch.setenv("QECTOR_DEBUG", "1")
     monkeypatch.delenv("QECTOR_LICENSE", raising=False)
     assert qd._is_license_active() is False
 

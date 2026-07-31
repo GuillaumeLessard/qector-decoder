@@ -7,13 +7,17 @@ import sys
 import time
 import numpy as np
 from qector_decoder_v3 import (
-    UnionFindDecoder,
-    FastUnionFindDecoder,
     BlossomDecoder,
     BatchDecoder,
     CUDABatchDecoder,
-    codes
+    FastUnionFindDecoder,
+    NativeAutoDecoder,
+    UnionFindDecoder,
+    codes,
+    get_license_info,
+    set_license_key,
 )
+from qector_decoder_v3 import __version__ as qector_version
 
 def main():
     print("=== QECTOR Decoder v3 Extended Smoke Test ===")
@@ -67,6 +71,28 @@ def main():
     print(f"  ✓ Batch 1024 in {elapsed:.2f} ms")
 
     print(f"\n5. GPU: {CUDABatchDecoder.is_available()}")
+
+    # 6. Native AutoDecoder
+    print("\n6. Native AutoDecoder")
+    try:
+        code = codes.rotated_surface_code(3)
+        native = NativeAutoDecoder(code.check_to_qubits, code.n_qubits, distance=3, noise_rate=0.08, batch_size=1, is_qldpc=False)
+        syndrome = np.zeros(len(code.check_to_qubits), dtype=np.uint8)
+        corr = native.decode(syndrome)
+        print(f"  ✓ NativeAutoDecoder d=3 → {corr.shape}")
+    except Exception as e:
+        print(f"  ✗ NativeAutoDecoder error: {e}")
+
+    # 7. License bridge
+    print("\n7. License bridge")
+    try:
+        set_license_key("QECT-PRO-test123")
+        info = get_license_info()
+        print(f"  ✓ set_license_key / get_license_info → tier={info.get('tier')}, max_distance={info.get('max_distance')}")
+    except Exception as e:
+        print(f"  ✗ License bridge error: {e}")
+
+    print(f"\nVersion: {qector_version}")
 
     print("\n" + "="*60)
     print("✅ ALL TESTS PASSED")

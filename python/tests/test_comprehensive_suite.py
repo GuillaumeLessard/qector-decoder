@@ -14,7 +14,15 @@ import time
 import numpy as np
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+# NOTE (todo7 V-13): this file used to do
+#     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+# which put the repo's `python/` directory at the FRONT of sys.path, shadowing
+# the installed package with a source tree that has no compiled extension.
+# The parent process never noticed (the native module was already cached in
+# sys.modules), but `multiprocessing` spawn inherits sys.path, so every worker
+# process in the entire session died at import and hung its parent. It caused
+# two separate full-suite hangs. Path resolution now lives in `conftest.py`,
+# which prefers the installed package for the whole session.
 
 from qector_decoder_v3 import (
     AutoDecoder,
@@ -220,11 +228,29 @@ def test_bposd_surface(dist):
 
 
 def test_bposd_batch_decode():
-    """BP-OSD does not have batch_decode - should not have the attribute."""
+    """BP-OSD's batch path agrees with decoding the same shots one at a time.
+
+    This test used to assert the *absence* of ``batch_decode``. BP-OSD has since
+    grown one, so the assertion was documenting a gap that no longer existed
+    while leaving the new code path untested. What actually matters is that the
+    batch entry point is not a different decoder: same input, same corrections.
+    """
     code = codes.repetition_code(5)
     c2q, nq = code.check_to_qubits, code.n_qubits
+    H = code.parity_check_matrix()
     dec = BPOSDDecoder(c2q, nq, 0.08)
-    assert not hasattr(dec, "batch_decode"), "BP-OSD should not have batch_decode"
+    assert hasattr(dec, "batch_decode")
+
+    rng = np.random.default_rng(0)
+    errors = (rng.random((64, nq)) < 0.08).astype(np.uint8)
+    syndromes = (errors @ H.T) & 1
+
+    batched = np.asarray(dec.batch_decode(syndromes), dtype=np.uint8)
+    assert batched.shape == (64, nq)
+
+    one_at_a_time = np.array([np.asarray(dec.decode(s), dtype=np.uint8) for s in syndromes])
+    assert np.array_equal(batched, one_at_a_time), "batch_decode diverged from decode()"
+    assert np.array_equal((batched @ H.T) & 1, syndromes), "corrections must reproduce the syndrome"
 
 
 def test_bposd_multiple_shots():
@@ -279,9 +305,29 @@ def test_decoderpool_basic():
         try:
             assert pool.apply_async(_probe_spawn_task).get(timeout=30) == 42
         finally:
-            pool.close()
+            # `close()` then `join()` can block FOREVER here, and did: when the
+            # spawned child cannot import this test module, it dies during
+            # bootstrap, `Pool` silently respawns a replacement, that one dies
+            # too, and `_worker_handler` never exits — so `join()` never
+            # returns. Observed on Windows as a full-suite hang at 21%, killed
+            # only by `--timeout`.
+            #
+            # The child's import failure is the source-vs-installed shadowing
+            # described in todo7 A5-03: pytest puts the repo's `python/` on
+            # `sys.path`, and `python/qector_decoder_v3/` has no compiled
+            # `.pyd`, so the child imports the source package and raises
+            # `ModuleNotFoundError: qector_decoder_v3.qector_decoder_v3`.
+            #
+            # `terminate()` kills the workers instead of waiting for them, so
+            # the subsequent `join()` is bounded. Never use bare close()+join()
+            # on a pool whose workers might fail to start.
+            pool.terminate()
             pool.join()
-    except (RuntimeError, OSError, ImportError, AttributeError) as exc:
+    except Exception as exc:  # noqa: BLE001 - any probe failure means spawn is unusable here
+        # Deliberately broad: the probe's job is only to answer "can this
+        # environment spawn a usable worker?". The previous tuple missed
+        # `AssertionError` and `multiprocessing.TimeoutError`, so a dead worker
+        # produced a hard error rather than a skip.
         pytest.skip(f"multiprocessing spawn unavailable here: {exc}")
     _run_pool_test()
 

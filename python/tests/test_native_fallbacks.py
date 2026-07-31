@@ -163,3 +163,41 @@ def test_fallbacks_faithful_against_decoder():
     syndrome[1] = 1
     corr = dec.decode(syndrome)
     assert np.array_equal((h @ corr) & 1, syndrome)
+
+
+def test_distance_estimate_handles_stim_dem_and_repetition_code():
+    """A DEM's error-mechanism count must never be mistaken for code distance."""
+    stim = pytest.importorskip("stim")
+    from qector_decoder_v3 import dem
+
+    circuit = stim.Circuit.generated(
+        "surface_code:rotated_memory_x",
+        distance=5,
+        rounds=5,
+        after_clifford_depolarization=0.003,
+    )
+    model = dem.from_stim(circuit.detector_error_model(decompose_errors=True))
+    checks = model.check_to_qubits()
+
+    # The d=5 DEM has thousands of fault mechanisms; its distance is still 5.
+    assert qd._py_estimate_distance(checks, model.num_errors) == 5
+    assert qd.estimate_distance(checks, model.num_errors) == 5
+
+    repetition_checks = [[i, i + 1] for i in range(24)]
+    assert qd._py_estimate_distance(repetition_checks, 25) == 25
+    assert qd.estimate_distance(repetition_checks, 25) == 25
+
+
+@needs_native
+@pytest.mark.parametrize(
+    ("checks", "n_qubits"),
+    [
+        ([[0, 1], [1, 2], [2, 3]], 4),
+        ([[0, 1, 2], [1, 3], [0, 2, 3]], 4),
+        ([[0, 1], [1, 2], [2, 3], [3, 4]], 5),
+    ],
+)
+def test_distance_estimator_native_fallback_equivalence(checks, n_qubits):
+    assert qd._py_estimate_distance(checks, n_qubits) == qd._native_module.py_estimate_distance(
+        checks, n_qubits
+    )

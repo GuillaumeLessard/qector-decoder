@@ -149,11 +149,11 @@ def has_cuda_rust() -> bool:
     """
     try:
         from . import CUDABatchDecoder
-    except RuntimeError:  # pragma: no cover - import wiring
+    except (ImportError, AttributeError):  # pragma: no cover - import wiring
         return False
     try:
         return bool(CUDABatchDecoder.is_available())
-    except RuntimeError:  # pragma: no cover - hardware dependent
+    except (OSError, AttributeError, RuntimeError):  # pragma: no cover - hardware dependent
         return False
 
 

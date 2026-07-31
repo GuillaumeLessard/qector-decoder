@@ -43,10 +43,69 @@ import numpy as np
 __all__ = [
     "DemError",
     "DemModel",
+    "estimate_priors_from_detectors",
     "from_stim",
     "load_dem_file",
     "parse_dem",
 ]
+
+
+def estimate_priors_from_detectors(
+    model: DemModel,
+    detection_events: np.ndarray,
+    smoothing: float = 1e-8,
+) -> np.ndarray:
+    """Estimate per-mechanism prior probabilities from empirical detection events.
+
+    Uses per-detector firing rates and pairwise correlations to recover the
+    underlying mechanism probabilities.  For weight-1 mechanisms the detector
+    firing rate is a direct estimate.  For weight-2 mechanisms the correlated
+    (XOR) probability ``P(d1 xor d2)`` is inverted under the independent-error
+    model ``P(d xor d) = 2p(1-p)``, giving the closed-form
+    ``p = (1 - sqrt(1 - 2*P_xor)) / 2``.  Hyperedges take the maximum firing
+    rate among their detectors.
+
+    Parameters
+    ----------
+    model:
+        Parsed DEM whose per-mechanism structure is used to map detector-level
+        statistics back to mechanism priors.
+    detection_events:
+        Binary array of shape ``(n_shots, n_detectors)`` — the observed
+        detection events from a Stim sampler.
+    smoothing:
+        Small constant added to avoid zero / one probabilities
+        (clamped to ``[smoothing, 0.5]``).
+
+    Returns
+    -------
+    np.ndarray
+        Per-mechanism prior probabilities, shape ``(num_errors,)``.
+    """
+    n_shots, n_det = detection_events.shape
+    f = detection_events.mean(axis=0, dtype=np.float64)
+    priors = np.zeros(model.num_errors, dtype=np.float64)
+    for j, e in enumerate(model.errors):
+        dets = e.detectors
+        if len(dets) == 1:
+            priors[j] = f[dets[0]] if dets[0] < n_det else smoothing
+        elif len(dets) == 2:
+            d1, d2 = dets
+            joint = (
+                (detection_events[:, d1] & detection_events[:, d2]).mean(dtype=np.float64)
+                if d1 < n_det and d2 < n_det
+                else 0.0
+            )
+            # P(d1 xor d2) = f1 + f2 - 2*joint
+            p_xor = f[d1] + f[d2] - 2.0 * joint
+            p_xor = np.clip(p_xor, 0.0, 0.5)
+            priors[j] = (1.0 - np.sqrt(1.0 - 2.0 * p_xor)) / 2.0
+        else:
+            # Hyperedge: use max firing rate among its detectors
+            valid = [f[d] for d in dets if 0 <= d < n_det]
+            priors[j] = max(valid) if valid else smoothing
+        priors[j] = np.clip(priors[j], smoothing, 0.5)
+    return priors
 
 
 @dataclass
@@ -171,6 +230,40 @@ class DemModel:
         """Per-mechanism prior probabilities, shape ``(num_errors,)``."""
         return np.array([e.probability for e in self.errors], dtype=np.float64)
 
+    def recalibrate(self, detection_events: np.ndarray) -> DemModel:
+        """Return a new ``DemModel`` with priors estimated from empirical data.
+
+        Uses :func:`estimate_priors_from_detectors` to replace every mechanism's
+        prior probability with the value inferred from the observed detection
+        event statistics.  The returned model has the same detector / observable
+        structure but empirically grounded error rates.
+
+        Parameters
+        ----------
+        detection_events:
+            Binary array of shape ``(n_shots, n_detectors)`` from a Stim sampler.
+
+        Returns
+        -------
+        DemModel
+            New model with recalibrated priors.
+        """
+        priors = estimate_priors_from_detectors(self, detection_events)
+        new_errors = [
+            DemError(
+                probability=float(priors[j]),
+                detectors=e.detectors,
+                observables=e.observables,
+            )
+            for j, e in enumerate(self.errors)
+        ]
+        return DemModel(
+            errors=new_errors,
+            num_detectors=self.num_detectors,
+            num_observables=self.num_observables,
+            detector_coords=dict(self.detector_coords),
+        )
+
     def weights(self) -> np.ndarray:
         """Per-mechanism matching weights ``log((1-p)/p)``, shape ``(num_errors,)``."""
         return np.array([e.weight for e in self.errors], dtype=np.float64)
@@ -199,35 +292,122 @@ class DemModel:
             _meta={"observables_matrix": self.observables_matrix()},
         )
 
-    def make_decoder(self, kind: str = "sparse_blossom"):
+    #: Decoder kinds :meth:`make_decoder` accepts, mapped to their canonical
+    #: name. Exposed so callers (and benchmarks) can enumerate what is
+    #: constructible from a DEM instead of hard-coding a list that drifts.
+    DECODER_KINDS = {
+        "union_find": "union_find",
+        "uf": "union_find",
+        "unionfind": "union_find",
+        "fast_union_find": "fast_union_find",
+        "fast_uf": "fast_union_find",
+        "fastunionfind": "fast_union_find",
+        "blossom": "blossom",
+        "mwpm": "blossom",
+        "sparse_blossom": "sparse_blossom",
+        "sparse": "sparse_blossom",
+        "bp_osd": "bp_osd",
+        "bposd": "bp_osd",
+        "bp": "bp_osd",
+        "lookup_table": "lookup_table",
+        "lookup": "lookup_table",
+        "hybrid_cascade": "hybrid_cascade",
+        "cascade": "hybrid_cascade",
+        "ambiguity_cluster": "ambiguity_cluster",
+        "ambig_cluster": "ambiguity_cluster",
+        "ambig": "ambiguity_cluster",
+        "two_stage": "two_stage",
+        "twostage": "two_stage",
+    }
+
+    def make_decoder(
+        self,
+        kind: str = "sparse_blossom",
+        *,
+        weighted: bool = True,
+        check_types: Sequence[bool] | None = None,
+    ):
         """Construct a QECTOR decoder over this model's detector graph.
 
-        ``kind`` is one of ``"union_find"``, ``"fast_union_find"``, ``"blossom"``,
-        ``"sparse_blossom"``, ``"bp_osd"``.
+        ``kind`` is any key of :attr:`DECODER_KINDS`: the matching decoders
+        (``"union_find"``, ``"fast_union_find"``, ``"blossom"``,
+        ``"sparse_blossom"``), ``"bp_osd"``, and the
+        ``"lookup_table"`` / ``"hybrid_cascade"`` / ``"ambiguity_cluster"`` /
+        ``"two_stage"`` families. Those last four ship in every wheel but were
+        previously unreachable from a DEM, which is the entry point real
+        circuit-level workloads use.
+
+        Every matching decoder — including the Union-Find variants as of UF-01 —
+        receives the DEM's per-mechanism log-likelihood weights
+        ``log((1-p)/p)``.  BP-OSD uses the mean prior as its channel probability.
+
+        Pass ``weighted=False`` to get the pre-v0.7.0 topology-only Union-Find,
+        which is useful only for reproducing older measurements: an unweighted
+        decoder cannot distinguish a ``p = 1e-4`` mechanism from a ``p = 1e-2``
+        one, which is precisely what circuit-level noise requires.
+
+        ``check_types`` is required only by ``"two_stage"``, which decodes the X
+        and Z sectors separately: it is one bool per detector. A DEM does not
+        record the sector, so it cannot be inferred here.
         """
         from . import (
+            AmbiguityClusterDecoder,
             BlossomDecoder,
             BPOSDDecoder,
             FastUnionFindDecoder,
+            HybridCascadeDecoder,
+            LookupTableDecoder,
             SparseBlossomDecoder,
+            TwoStageDecoder,
             UnionFindDecoder,
         )
 
         c2q = self.check_to_qubits()
         nq = self.num_errors
-        kind = kind.lower()
-        if kind in ("union_find", "uf", "unionfind"):
-            return UnionFindDecoder(c2q, nq)
-        if kind in ("fast_union_find", "fast_uf", "fastunionfind"):
-            return FastUnionFindDecoder(c2q, nq)
-        if kind in ("blossom", "mwpm"):
-            return BlossomDecoder(c2q, nq)
-        if kind in ("sparse_blossom", "sparse"):
-            return SparseBlossomDecoder(c2q, nq)
-        if kind in ("bp_osd", "bposd", "bp"):
-            mean_p = float(self.priors().mean()) if self.num_errors else 0.05
-            return BPOSDDecoder(c2q, nq, max(mean_p, 1e-3))
-        raise ValueError(f"unknown decoder kind: {kind!r}")
+        w = self.weights().tolist()
+        uf_w = w if weighted else None
+        mean_p = max(float(self.priors().mean()) if self.num_errors else 0.05, 1e-3)
+
+        canonical = self.DECODER_KINDS.get(kind.lower().strip())
+        if canonical is None:
+            raise ValueError(
+                f"unknown decoder kind: {kind!r}; expected one of "
+                f"{sorted(set(self.DECODER_KINDS.values()))}"
+            )
+
+        if canonical == "union_find":
+            return UnionFindDecoder(c2q, nq, edge_weights=uf_w)
+        if canonical == "fast_union_find":
+            return FastUnionFindDecoder(c2q, nq, edge_weights=uf_w)
+        if canonical == "blossom":
+            return BlossomDecoder(c2q, nq, w)
+        if canonical == "sparse_blossom":
+            return SparseBlossomDecoder(c2q, nq, w)
+        if canonical == "bp_osd":
+            return BPOSDDecoder(c2q, nq, mean_p)
+        if canonical == "lookup_table":
+            return LookupTableDecoder(c2q, nq)
+        if canonical == "hybrid_cascade":
+            # Weighted pre-filter, escalating to an exact solve; the DEM's
+            # weights and mean prior are exactly what it needs.
+            return HybridCascadeDecoder(c2q, nq, edge_weights=w, error_rate=mean_p)
+        if canonical == "ambiguity_cluster":
+            return AmbiguityClusterDecoder(c2q, nq, error_rate=mean_p)
+        if canonical == "two_stage":
+            if check_types is None:
+                raise ValueError(
+                    "two_stage needs check_types (one bool per detector, X vs Z sector); "
+                    "a detector error model does not record the sector, so pass it explicitly: "
+                    "make_decoder('two_stage', check_types=[...])"
+                )
+            types = [bool(t) for t in check_types]
+            if len(types) != self.num_detectors:
+                raise ValueError(
+                    f"check_types has {len(types)} entries, expected {self.num_detectors} "
+                    "(one per detector)"
+                )
+            return TwoStageDecoder(c2q, types, nq)
+        raise AssertionError(f"unhandled decoder kind {canonical!r}")  # pragma: no cover
 
     def predicted_observables(self, correction: Sequence[int]) -> np.ndarray:
         """Logical observable flips implied by a correction (``L @ c mod 2``)."""
@@ -452,7 +632,7 @@ def from_stim(dem: Any) -> DemModel:
         raise TypeError(f"expected a stim.DetectorErrorModel (or DEM text), got {type(dem).__name__}")
     try:
         flat = dem.flattened()
-    except RuntimeError:  # pragma: no cover - older Stim
+    except (AttributeError, RuntimeError):  # pragma: no cover - older Stim
         flat = dem
     model = parse_dem(str(flat))
     # Trust Stim's declared counts when available.

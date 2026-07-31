@@ -6,6 +6,8 @@ import json
 import time
 from unittest.mock import MagicMock, patch
 
+import os
+
 import pytest
 import qector_decoder_v3 as qd
 import stripe
@@ -16,7 +18,11 @@ from qector_decoder_v3.stripe_integration import (
     handle_stripe_webhook_payload,
 )
 
+_has_stripe_key = bool(os.getenv("STRIPE_SECRET_KEY"))
+_has_license_key = bool(os.getenv("QECTOR_LICENSE_PRIVATE_KEY_B64"))
 
+
+@pytest.mark.skipif(not _has_stripe_key, reason="STRIPE_SECRET_KEY not set")
 def test_stripe_keys_loaded():
     keys = get_stripe_keys()
     assert keys["secret_key_configured"] is True
@@ -41,6 +47,7 @@ def test_stripe_checkout_session_structure(mock_create):
     assert "https://checkout.stripe.com" in session_info["url"]
 
 
+@pytest.mark.skipif(not _has_license_key, reason="QECTOR_LICENSE_PRIVATE_KEY_B64 not set")
 def test_stripe_webhook_fulfillment_unauthenticated_fallback():
     mock_payload = json.dumps(
         {
@@ -65,6 +72,7 @@ def test_stripe_webhook_fulfillment_unauthenticated_fallback():
     assert verify_license_token(token, "purchaser@qector.store") is True
 
 
+@pytest.mark.skipif(not _has_license_key, reason="QECTOR_LICENSE_PRIVATE_KEY_B64 not set")
 @patch("stripe.Webhook.construct_event")
 def test_stripe_webhook_fulfillment_authenticated_signature(mock_construct_event):
     mock_event = {
@@ -89,3 +97,25 @@ def test_stripe_webhook_fulfillment_authenticated_signature(mock_construct_event
     assert result["customer_email"] == "vip_user@qector.store"
     assert result["receipt_id"] == "cs_live_112233445566"
     assert verify_license_token(result["license_token"], "vip_user@qector.store") is True
+
+
+# ---------------------------------------------------------------------------
+# Metered billing & customer-id validation (D8)
+# ---------------------------------------------------------------------------
+
+
+def test_stripe_metered_webhook_flow():
+
+    qd.record_shots(50)
+    accumulated = qd.get_accumulated_shots()
+    assert isinstance(accumulated, int)
+    assert accumulated >= 50
+
+
+def test_stripe_flush_validates_customer_id():
+    from qector_decoder_v3.stripe_integration import flush_metered_usage
+
+    with pytest.raises(ValueError):
+        flush_metered_usage(customer_id="")
+    with pytest.raises(ValueError):
+        flush_metered_usage(customer_id="   ")

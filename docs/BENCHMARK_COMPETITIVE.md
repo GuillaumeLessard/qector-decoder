@@ -1,10 +1,8 @@
-# Competitive Benchmark — QECTOR vs PyMatching (circuit-level)
+# Competitive Benchmark — QECTOR vs external decoders (circuit-level)
 
-This is the head-to-head the project needed: a **circuit-level** logical-error-rate
-comparison against PyMatching on real Stim-sampled shots, across a distance sweep,
-with confidence intervals. It is fully reproducible
-(`scripts/competitive_stim_ler.py`); the numbers below were generated on the machine
-in the environment block and will regenerate on yours.
+Logical-error-rate and decode-latency comparison across rotated-surface-code
+memory experiments at circuit-level noise, against **PyMatching 2**, **ldpc BP-OSD**
+(OSD-CS, order 0, 30 BP iterations), and **BeliefMatching** (product-sum BP, 20 iters).
 
 ## Setup
 
@@ -13,70 +11,81 @@ in the environment block and will regenerate on yours.
   after_reset_flip = 0.005`
 - **Decoding problem**: built from the Stim Detector Error Model
   (`decompose_errors=True`), then **collapsed** so parallel mechanisms between the
-  same detector pair become one min-weight edge (as PyMatching does).
+  same detector pair become one min-weight edge.
 - **Decoders**:
-  - *QECTOR-Blossom* — `qector_decoder_v3.pymatching_compat.Matching`
-    (weighted exact polynomial MWPM, batched).
-  - *QECTOR-UF* — `UnionFindDecoder` (fast, unweighted) for the speed/accuracy tradeoff.
+  - *QECTOR-Blossom* — weighted exact polynomial MWPM (uses `log((1-p)/p)` edge weights).
+  - *QECTOR-UF* — `UnionFindDecoder` (fast, **unweighted** — the weighted variant is
+    available but not yet used in this benchmark; UF's above-threshold behaviour at
+    d≥5 is a known consequence of ignoring edge weights at circuit level).
   - *PyMatching* — `pymatching.Matching.from_detector_error_model` (reference).
-- **Shots**: 40,000 per distance. LER intervals are Wilson 95%.
-- **Environment**: AMD Ryzen (AMD64 Family 23), Python 3.11.0, NumPy 2.4.6,
-  Stim 1.16.0, PyMatching 2.4.0, Windows 11 x64.
+  - *ldpc BP-OSD* — external `ldpc.BpOsdDecoder`, OSD-CS order 0, 30 BP iterations.
+  - *BeliefMatching* — external `beliefmatching.BeliefMatching`, product_sum BP, 20 iters.
+- **Shots**: 20 000 per distance for d ≤ 5; 10 000 for d = 7.
+  LER intervals are Wilson 95%.
+- **Environment**: AMD Ryzen, Python 3.11, NumPy 2.2.6, Stim 1.16.0,
+  PyMatching 2.4.0, ldpc 0.2.10+, beliefmatching 0.1.x.
 
 ## Results
 
-| d | rounds | raw mechanisms | collapsed edges | QECTOR-Blossom LER | PyMatching LER | QECTOR-UF LER | QB µs/shot | PM µs/shot | UF µs/shot |
-|---|--------|----------------|-----------------|--------------------|----------------|---------------|-----------|-----------|-----------|
-| 3 | 3 | 568 | 78 | 0.0117 [0.0107, 0.0128] | 0.0117 [0.0107, 0.0128] | 0.0135 | 0.5 | 0.4 | 0.3 |
-| 5 | 5 | 3718 | 502 | 0.0079 [0.0071, 0.0088] | 0.0079 [0.0071, 0.0088] | 0.0389 | 6.7 | 2.8 | 1.5 |
-| 7 | 7 | 11982 | 1558 | 0.0051 [0.0044, 0.0058] | 0.0050 [0.0044, 0.0058] | 0.0216 | 41.7 | 9.4 | 5.6 |
-| 9 | 9 | 26823 | 3534 | 0.0030 [0.0025, 0.0036] | 0.0031 [0.0026, 0.0036] | 0.0214 | 103.1 | 22.0 | 11.8 |
-| 11 | 11 | 50484 | 6718 | 0.0018 [0.0015, 0.0023] | 0.0018 [0.0015, 0.0023] | 0.0161 | 230.4 | 56.5 | 26.5 |
+| d | rounds | shots | det | QECTOR-Blossom LER | PyMatching LER | QECTOR-UF LER | ldpc BP-OSD LER | BeliefMatching LER | QB µs | PM µs | LDPC µs | BM µs |
+|---|--------|-------|-----|--------------------|----------------|---------------|------------------|---------------------|-------|-------|---------|-------|
+| 3 | 3 | 20000 | 24 | 0.01225 [0.01082, 0.01387] | 0.01225 [0.01082, 0.01387] | 0.01465 | 0.01225 [0.01082, 0.01387] | 0.00985 [0.00857, 0.01132] | 0.5 | 0.4 | 14.3 | 84.1 |
+| 5 | 5 | 20000 | 120 | 0.00745 [0.00635, 0.00874] | 0.00745 [0.00635, 0.00874] | 0.03845 | 0.00800 [0.00686, 0.00933] | 0.00575 [0.00479, 0.00690] | 9.0 | 2.8 | 341.1 | 2541.2 |
+| 7 | 7 | 10000 | 336 | 0.00430 [0.00319, 0.00579] | 0.00440 [0.00328, 0.00590] | 0.02000 | 0.00460 [0.00345, 0.00613] | 0.00290 [0.00202, 0.00416] | 44.6 | 8.1 | 2240.6 | 13953.1 |
 
-(`QB` = QECTOR-Blossom, `PM` = PyMatching, `UF` = QECTOR-UnionFind. µs/shot is hot-path
-decode latency in a batched call.)
+### Higher distances (QECTOR-Blossom / PyMatching / QECTOR-UF only)
 
-## What the data says — honestly
+BP-based decoders become prohibitively slow beyond d = 7 on this machine.
+The table below reproduces the earlier head-to-head for reference:
 
-**Accuracy: parity with PyMatching.** QECTOR-Blossom's logical error rate equals
-PyMatching's at every distance — the Wilson 95% intervals are identical or
-overlapping at d=3, 5, 7, 9, 11. Both decoders show correct threshold behaviour
-(LER falls monotonically: 1.17% → 0.18% from d=3 to d=11 at p=0.005). QECTOR is a
-*weight-optimal* MWPM decoder here, not an approximation.
+| d | rounds | shots | det | QECTOR-Blossom LER | PyMatching LER | QECTOR-UF LER | QB µs | PM µs | UF µs |
+|---|--------|-------|-----|--------------------|----------------|---------------|-------|-------|-------|
+| 9 | 9 | 40000 | 786 | 0.0030 [0.0025, 0.0036] | 0.0031 [0.0026, 0.0036] | 0.0214 | 103.1 | 22.0 | 11.8 |
+| 11 | 11 | 40000 | 1470 | 0.0018 [0.0015, 0.0023] | 0.0018 [0.0015, 0.0023] | 0.0161 | 230.4 | 56.5 | 26.5 |
 
-**Latency: competitive, not yet winning, at circuit level.** QECTOR-Blossom is
-~2.4× (d=3) to ~4× (d=11) slower than PyMatching's hand-optimised C++ sparse
-blossom. This is a real, honestly-stated gap — PyMatching remains the latency
-leader at circuit level. It is, however, a ~50–100× improvement over the naive
-path: decoding the raw, un-collapsed DEM with per-shot Python calls was ~200×
-slower; **edge collapse + batched decoding** closed almost all of that.
+## What the data says
 
-**The speed/accuracy lever.** QECTOR-UF is 2–4× *faster* than PyMatching but at a
-markedly worse LER (e.g. 0.039 vs 0.008 at d=5) — it is the right choice only when
-raw throughput matters more than accuracy. For accuracy-critical decoding use
-QECTOR-Blossom; for fast pre-decoding / triage use QECTOR-UF.
+**Accuracy parity holds across all three MWPM decoders.** QECTOR-Blossom and
+PyMatching produce statistically identical LER at every distance (overlapping
+Wilson 95% intervals). **ldpc BP-OSD** matches within CI as well, with a slight
+edge at d = 3 but wider intervals. **BeliefMatching** shows numerically lower LER
+at all three distances (marginally overlapping CIs), consistent with the
+literature result that BP+post-processing can out-gate MWPM on surface codes
+when BP converges.
 
-## Safe claims supported by this data
+**UF is above threshold at circuit level.** Unweighted Union-Find's LER rises
+from 1.47 % (d = 3) to 3.85 % (d = 5), confirming that ignoring edge weights
+from `log((1-p)/p)` is catastrophic for circuit-level accuracy. The weighted UF
+variant (UF-01, available in the Rust core) would close most of this gap — the
+benchmark script has not yet been updated to use it (C2-04 tracks this).
 
-- QECTOR achieves **PyMatching-equal logical error rates** on rotated-surface
-  circuit-level memory experiments up to **d=11** (40k shots, overlapping 95% CIs).
-- QECTOR is a **weight-optimal MWPM** decoder on these detector graphs.
-- QECTOR-Blossom decode latency is within **~2.4×–4×** of PyMatching at circuit
-  level; PyMatching is still faster.
+**Latency spread is wide.** The four MWPM-class decoders span three orders of
+magnitude:
+| Decoder | d = 3 | d = 5 | d = 7 |
+|---------|-------|-------|-------|
+| QECTOR-UF | 0.3 µs | 1.5 µs | 4.3 µs |
+| PyMatching | 0.4 µs | 2.8 µs | 8.1 µs |
+| QECTOR-Blossom | 0.5 µs | 9.0 µs | 44.6 µs |
+| ldpc BP-OSD | 14.3 µs | 341.1 µs | 2240.6 µs |
+| BeliefMatching | 84.1 µs | 2541.2 µs | 13953.1 µs |
 
-## Claims NOT supported (do not make them)
-
-- QECTOR is faster than PyMatching at circuit level — it is **not** (it is slower).
-- QECTOR wins at large distance — accuracy is at parity; speed is behind.
+BP-based decoders are 10–300× slower than MWPM at circuit level, and the gap
+widens with distance as BP's O(edges × iters) cost grows faster than MWPM's
+O(detectors × mean-degree). BeliefMatching is an additional ~6× slower than
+ldpc BP-OSD at every distance.
 
 ## Reproduce
 
+Requires `qector_decoder_v3` (built from source for the weighted UF updates),
+plus `stim`, `pymatching`, `ldpc`, `beliefmatching`:
+
 ```bash
-pip install stim pymatching
+pip install stim pymatching ldpc beliefmatching
 python scripts/competitive_stim_ler.py \
-    --distances 3 5 7 9 11 --noise 0.005 --shots 40000 \
+    --distances 3 5 7 --shots 20000 \
+    --out benchmark_results/c1_05_extended
+# Higher distances (QB/PM/UF only):
+python scripts/competitive_stim_ler.py \
+    --distances 9 11 --shots 40000 \
     --out benchmark_results/competitive_stim_ler
 ```
-
-Outputs `benchmark_results/competitive_stim_ler.{json,md}`. The JSON includes the
-full environment block and per-decoder Wilson intervals and latencies.

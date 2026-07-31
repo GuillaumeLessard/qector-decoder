@@ -23,17 +23,38 @@ import os
 from pathlib import Path
 from typing import Any
 
+# Repo-root .env, used for local fulfillment runs. `python-dotenv` is an
+# optional dependency, so track whether it actually loaded: without it the
+# import below is a no-op and every secret in .env stays invisible, which
+# previously surfaced as "STRIPE_SECRET_KEY is not configured in environment or
+# .env file" -- an error that names the one file it never managed to read.
+_DOTENV_PATH = Path(__file__).resolve().parents[2] / ".env"
+_DOTENV_LOADED = False
+_DOTENV_ERROR = ""
 try:
     from dotenv import load_dotenv
 
-    # Load environment variables from .env at repo root or current working dir
-    env_path = Path(__file__).resolve().parents[2] / ".env"
-    if env_path.exists():
-        load_dotenv(dotenv_path=env_path)
+    if _DOTENV_PATH.exists():
+        load_dotenv(dotenv_path=_DOTENV_PATH)
     else:
         load_dotenv()
+    _DOTENV_LOADED = True
 except ImportError:
-    pass
+    _DOTENV_ERROR = (
+        "python-dotenv is not installed, so .env was not read"
+        if _DOTENV_PATH.exists()
+        else "python-dotenv is not installed"
+    )
+
+
+def _env_hint() -> str:
+    """Suffix explaining *why* a secret may be missing, when .env went unread."""
+    if _DOTENV_LOADED or not _DOTENV_ERROR:
+        return ""
+    return (
+        f" ({_DOTENV_ERROR}; `pip install python-dotenv`, or export the variable "
+        f"directly. Looked for {_DOTENV_PATH})"
+    )
 
 try:
     import stripe
@@ -41,8 +62,9 @@ except ImportError:
     stripe = None
 
 # Signing lives INSIDE the package so fulfillment works in production installs
-# (pip-installed wheels do not ship repo-root helper scripts).
-from .license import create_license_token
+# (pip-installed wheels do not ship repo-root helper scripts). Imported after the
+# .env load above so the signing key it reads is already in the environment.
+from .license import create_license_token  # noqa: E402
 
 logger = logging.getLogger("qector_decoder_v3.stripe")
 
@@ -123,7 +145,9 @@ def ensure_qector_products() -> dict[str, str]:
     configured secret key; raises RuntimeError otherwise.
     """
     if not STRIPE_SECRET_KEY:
-        raise RuntimeError("[QECTOR-Stripe] STRIPE_SECRET_KEY is not configured - cannot ensure products.")
+        raise RuntimeError(
+            "[QECTOR-Stripe] STRIPE_SECRET_KEY is not configured - cannot ensure products." + _env_hint()
+        )
     if stripe is None:
         raise RuntimeError("[QECTOR-Stripe] The `stripe` package is not installed. Install it to ensure products.")
     price_ids: dict[str, str] = {}
@@ -188,7 +212,9 @@ def create_checkout_session(
     Creates a Stripe Checkout Session for purchasing a QECTOR Decoder license.
     """
     if not STRIPE_SECRET_KEY:
-        raise RuntimeError("STRIPE_SECRET_KEY is not configured in environment or .env file.")
+        raise RuntimeError(
+            "STRIPE_SECRET_KEY is not configured in environment or .env file." + _env_hint()
+        )
     if stripe is None:
         raise RuntimeError(
             "[QECTOR-Stripe] The `stripe` package is not installed. Install it to create checkout sessions."
@@ -360,6 +386,14 @@ def handle_stripe_webhook_payload(
         response_data["customer_email"] = customer_email
         response_data["receipt_id"] = receipt_id
         response_data["issued"] = True
+
+        # Record the sale in Rust metered-billing singleton (fire-and-forget).
+        try:
+            from . import record_shots as _rs
+
+            _rs(1)
+        except Exception:
+            pass
     else:
         logger.info("[QECTOR-Stripe] Event type %s ignored (not a payment completion).", event_type)
 
@@ -383,3 +417,62 @@ def _save_issued_license(receipt_id: str, email: str, token: str) -> None:
         }
     )
     record_file.write_text(json.dumps(records, indent=2), encoding="utf-8")
+
+
+# ---------------------------------------------------------------------------
+# Metered billing flush (C3-02)
+# ---------------------------------------------------------------------------
+
+
+def flush_metered_usage(customer_id: str, api_key: str | None = None) -> dict[str, Any]:
+    """Flush accumulated decode-shot usage to the Stripe Meter Events API.
+
+    Transport preference order:
+      1. Rust native ``py_flush_usage`` (ureq POST with 1s/2s/4s backoff
+         retry; the native counter is drained only after a confirmed 2xx).
+      2. Python ``stripe`` SDK ``billing.MeterEvent.create`` fallback.
+
+    ``api_key`` falls back to ``STRIPE_SECRET_KEY``. Returns a receipt dict;
+    raises ``RuntimeError`` when no transport succeeds (shots stay pending).
+    """
+    if not customer_id or not customer_id.strip():
+        raise ValueError("customer_id must be non-empty")
+    customer_id = customer_id.strip()
+    key = api_key or STRIPE_SECRET_KEY
+
+    # 1) Native path (real HTTP flush + retry + atomic drain).
+    try:
+        from . import _native_module as nm  # type: ignore[attr-defined]
+
+        native_flush = getattr(nm, "py_flush_usage", None) if nm is not None else None
+    except Exception:
+        native_flush = None
+    if native_flush is not None:
+        receipt = native_flush(customer_id, key or None)
+        receipt["transport"] = "rust-native"
+        return receipt
+
+    # 2) Python stripe SDK fallback.
+    from . import get_accumulated_shots
+
+    pending = int(get_accumulated_shots())
+    if pending <= 0:
+        return {"flushed": 0, "reason": "no pending shots"}
+    if stripe is None:
+        raise RuntimeError(
+            "[QECTOR-Stripe] cannot flush metered usage: neither the native "
+            "py_flush_usage transport nor the `stripe` package is available."
+        )
+    if not key:
+        raise RuntimeError("[QECTOR-Stripe] STRIPE_SECRET_KEY is not configured." + _env_hint())
+    stripe.api_key = key
+    event = stripe.billing.MeterEvent.create(
+        event_name="qec_syndrome_decodes",
+        payload={"value": str(pending), "stripe_customer_id": customer_id},
+    )
+    return {
+        "flushed": pending,
+        "event_name": "qec_syndrome_decodes",
+        "stripe_event_id": getattr(event, "id", None),
+        "transport": "python-stripe-sdk",
+    }

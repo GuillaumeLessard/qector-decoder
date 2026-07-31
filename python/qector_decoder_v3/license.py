@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import base64
+import binascii
 import json
 import logging
 import os
 import time
 
-from cryptography.exceptions import InvalidSignature
+from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 
@@ -38,7 +39,7 @@ def _load_ed25519_public_key() -> Ed25519PublicKey | None:
     """
     try:
         key = serialization.load_pem_public_key(PUBLIC_KEY_PEM)
-    except RuntimeError:
+    except (ValueError, TypeError, UnsupportedAlgorithm):
         return None
     if not isinstance(key, Ed25519PublicKey):
         return None
@@ -81,7 +82,7 @@ def verify_license_token(token: str, customer_email: str = "") -> bool:
         return False
 
     token_clean = token.strip()
-    if token_clean in ("academic", "commercial"):
+    if os.environ.get("QECTOR_DEBUG") == "1" and token_clean in ("academic", "commercial"):
         return True
 
     if "." not in token_clean or _PUBLIC_KEY is None:
@@ -163,6 +164,151 @@ def license_claims(token: str) -> dict | None:
 
 
 # ---------------------------------------------------------------------------
+# Rust-side tier bridging (C2)
+# ---------------------------------------------------------------------------
+
+_TIER_MAX_DISTANCE = {"community": 7, "pro": 19, "enterprise": 63}
+
+
+def _native_module():
+    """Best-effort access to the compiled Rust extension module."""
+    try:
+        from . import _native_module as nm  # type: ignore[attr-defined]
+
+        return nm
+    except Exception:
+        try:
+            import qector_decoder_v3.qector_decoder_v3 as nm  # type: ignore[no-redef]
+
+            return nm
+        except Exception:
+            return None
+
+
+def _configured_key() -> str:
+    """Resolve the configured key the same way the Rust core does.
+
+    Precedence: ``QECTOR_LICENSE_KEY``, then ``QECTOR_LICENSE_FILE``, then
+    ``~/.qector/license.key``. Keeping this in step with
+    ``LicenseManager::key_from_env`` matters because the pure-Python fallback
+    otherwise reports Community for a deployment the core would read as
+    Enterprise -- the two answers must not disagree.
+    """
+    key = os.environ.get("QECTOR_LICENSE_KEY", "")
+    if key.strip():
+        return key.strip()
+
+    candidates = []
+    from_file = os.environ.get("QECTOR_LICENSE_FILE", "").strip()
+    if from_file:
+        candidates.append(from_file)
+    home = os.environ.get("HOME") or os.environ.get("USERPROFILE")
+    if home:
+        candidates.append(os.path.join(home, ".qector", "license.key"))
+
+    for path in candidates:
+        try:
+            with open(path, encoding="utf-8") as fh:
+                text = fh.read().lstrip("﻿").strip()
+        except OSError:
+            continue
+        if text:
+            return text
+    return ""
+
+
+def activate_license(key: str) -> dict:
+    """Activate a license key: sets ``QECTOR_LICENSE_KEY`` AND installs it in
+    the Rust ``LicenseManager`` singleton (C2-01).
+
+    Raises ``ValueError`` when the native verifier rejects the key (bad
+    signature, expired, revoked, or unknown format). Returns the effective
+    license info dict after activation.
+    """
+    if not key or not key.strip():
+        raise ValueError("license key must be non-empty")
+    key = key.strip()
+
+    nm = _native_module()
+    native_set = getattr(nm, "py_set_license_key", None) if nm is not None else None
+    if native_set is not None:
+        # Native path: real Ed25519 verification; raises on rejection.
+        native_set(key)
+    elif not verify_license_token(key):
+        # Pure-Python fallback: at least enforce the Python-side signature check.
+        raise ValueError("license key failed verification (Ed25519 signature, expiry, or revocation check)")
+
+    os.environ["QECTOR_LICENSE_KEY"] = key
+    return get_tier_info()
+
+
+def get_tier() -> str:
+    """Active license tier: ``"Community"`` | ``"Pro"`` | ``"Enterprise"`` (C2-02).
+
+    Reads from the Rust LicenseManager when available; falls back to the
+    ``QECTOR_LICENSE_KEY`` prefix / v2 claims otherwise.
+    """
+    info = get_tier_info()
+    return str(info.get("tier", "Community"))
+
+
+def get_tier_info() -> dict:
+    """Full license info from the Rust LicenseManager (native types) or a
+    Python-derived fallback."""
+    nm = _native_module()
+    native_info = getattr(nm, "py_get_license_info", None) if nm is not None else None
+    if native_info is not None:
+        try:
+            info = native_info()
+            if isinstance(info, dict) and "tier" in info:
+                return info
+        except Exception:
+            pass
+
+    key = _configured_key()
+    claims = license_claims(key) if key else None
+    if claims is not None:
+        tier_raw = str(claims.get("tier", "community"))
+    elif key.startswith("QECT-ENT-"):
+        tier_raw = "enterprise"
+    elif key.startswith("QECT-PRO-"):
+        tier_raw = "pro"
+    else:
+        tier_raw = "community"
+    tier = tier_raw.strip().lower()
+    tier_name = {"community": "Community", "pro": "Pro", "enterprise": "Enterprise"}.get(tier, "Community")
+    return {
+        "tier": tier_name,
+        "max_distance": _TIER_MAX_DISTANCE.get(tier, 7),
+        "gpu_enabled": tier == "enterprise",
+        "gnn_enabled": tier in ("pro", "enterprise"),
+        "key_status": "valid" if key else "no_key",
+    }
+
+
+def enforce_distance_cap(distance: int) -> None:
+    """Raise ``PermissionError`` when ``distance`` exceeds the active tier cap
+    (C2-03): Community d<=7, Pro d<=19, Enterprise d<=63.
+
+    Delegates to the Rust enforcement path when available (which also checks
+    expiry); falls back to the Python-derived tier cap otherwise.
+    """
+    nm = _native_module()
+    native_enforce = getattr(nm, "py_enforce_distance_cap", None) if nm is not None else None
+    if native_enforce is not None:
+        native_enforce(int(distance))  # raises PyPermissionError on violation
+        return
+
+    info = get_tier_info()
+    cap = int(info.get("max_distance", 7))
+    if int(distance) > cap:
+        raise PermissionError(
+            f"License Tier '{info.get('tier', 'Community')}' caps maximum code distance at "
+            f"d<={cap}. Requested d={distance}. Upgrade at https://qector.store/pricing."
+        )
+
+
+# ---------------------------------------------------------------------------
 # Signing side (fulfillment server only - never ships a private key)
 # ---------------------------------------------------------------------------
 #
@@ -185,7 +331,7 @@ def _load_signing_private_key() -> Ed25519PrivateKey:
     try:
         raw = base64.b64decode(env_b64)
         key = serialization.load_pem_private_key(raw, password=None)
-    except RuntimeError as exc:
+    except (ValueError, TypeError, binascii.Error, UnsupportedAlgorithm) as exc:
         raise RuntimeError(f"[QECTOR-License] QECTOR_LICENSE_PRIVATE_KEY_B64 is malformed: {exc}") from exc
     if not isinstance(key, Ed25519PrivateKey):
         raise TypeError("[QECTOR-License] QECTOR_LICENSE_PRIVATE_KEY_B64 is not an Ed25519 private key.")

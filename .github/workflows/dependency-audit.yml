@@ -1,0 +1,254 @@
+name: dependency-audit
+
+# todo8 5.1 / todo7 V-14b. Before this workflow, `safety scan` was run by hand on
+# a maintainer laptop and nothing checked the Rust tree at all. A dependency
+# advisory published between two releases was therefore invisible until someone
+# remembered to look.
+#
+# BLOCKING POLICY (see docs/DEPENDENCY_POLICY.md for the full rationale):
+#
+#   * pull_request / push / schedule  -> NON-BLOCKING but LOUD. Findings are
+#     emitted as `::warning` annotations so they appear on the Checks tab and in
+#     the PR summary, but they do not fail the run. A new upstream CVE must not
+#     be able to wedge an unrelated PR at 03:00.
+#   * called from release-build.yml with `strict: true` -> BLOCKING. Nothing is
+#     published to PyPI while a known advisory or a licence-policy violation is
+#     outstanding. Four yanks in one month (0.6.3/0.6.4/0.6.5/0.6.7) is the
+#     evidence that the release path is where the gate belongs.
+#
+# The one deliberate exception is the Python 3.9 leg, which is warn-only even in
+# strict mode: `pyproject.toml` pins `pytest>=8.4.2` on 3.9 because pytest 9.x
+# requires >=3.10, and that residual advisory is an accepted, dated exception
+# recorded in docs/DEPENDENCY_POLICY.md. It must stay VISIBLE, so the leg runs;
+# it must not block a release, so it does not enforce.
+#
+# Note that no job here needs the proprietary Rust core: `cargo audit` and
+# `cargo deny` work from `Cargo.lock` and the manifest (only `src/lib.rs` is
+# tracked, which is all `cargo metadata` requires). That means this workflow
+# also runs to completion on a fork PR, where the RUST_SRC_B64_* secrets are
+# unavailable.
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+  schedule:
+    # Mondays 06:17 UTC. Advisories are published on upstream's schedule, not
+    # ours, so a code-change-only trigger is not sufficient coverage.
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      strict:
+        description: "Fail the run on any advisory or licence violation (used by release-build before publishing)"
+        type: boolean
+        required: false
+        default: false
+    secrets:
+      # Declared explicitly rather than relying on `secrets: inherit` at the
+      # call site: the caller is release-build.yml, which holds the twelve
+      # RUST_SRC_B64_* chunks of the proprietary core, and this workflow has no
+      # business seeing them.
+      SAFETY_API_KEY:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  cargo:
+    name: Rust advisories + licence policy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      # Prebuilt binaries. `cargo install cargo-audit cargo-deny --locked`
+      # would work identically but costs ~8 minutes of compile on every run.
+      #
+      # cargo-deny is PINNED to a major.minor: the deny.toml schema changed at
+      # 0.16 (the `[licenses] copyleft` / `allow-osi-fsf-free` / `default` keys
+      # were replaced by an explicit `allow` list), and .github/deny.toml is
+      # written against the 0.18 schema. An unpinned upgrade would turn a
+      # schema change into a failed release gate.
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-audit,cargo-deny@0.18
+
+      # Known vulnerabilities and YANKED crates, straight from Cargo.lock.
+      # Plain `cargo audit` (no `--deny warnings`): it exits non-zero for
+      # vulnerabilities and yanked crates, and treats RUSTSEC informational
+      # advisories (unmaintained/unsound/notice) as warnings. That split is
+      # intentional — an unmaintained transitive crate is a planning problem,
+      # not a reason to refuse to ship a security fix.
+      - name: cargo audit (vulnerabilities + yanked crates)
+        env:
+          STRICT: ${{ inputs.strict == true }}
+        run: |
+          set +e
+          cargo audit
+          rc=$?
+          set -e
+          if [ "$rc" -ne 0 ]; then
+            if [ "$STRICT" = "true" ]; then
+              echo "::error title=cargo audit::RustSec advisories in Cargo.lock. Release blocked. See docs/DEPENDENCY_POLICY.md."
+              exit "$rc"
+            fi
+            echo "::warning title=cargo audit::RustSec advisories in Cargo.lock. Not blocking this run, but a release tag WILL block. See docs/DEPENDENCY_POLICY.md."
+          fi
+
+      # Licence policy is a release gate, not advice. QECTOR ships under
+      # LicenseRef-QECTOR-Source-Available; a transitive GPL/AGPL dependency
+      # would be a live legal problem, and NOTICE.md would silently go stale.
+      # `--all-features` so the grpc/opencl/prometheus trees are covered too,
+      # not just the feature set the published wheel happens to use.
+      - name: cargo deny (licences, bans, sources)
+        env:
+          STRICT: ${{ inputs.strict == true }}
+        run: |
+          set +e
+          cargo deny --all-features --config .github/deny.toml check licenses bans sources
+          rc=$?
+          set -e
+          if [ "$rc" -ne 0 ]; then
+            if [ "$STRICT" = "true" ]; then
+              echo "::error title=cargo deny::Licence/source policy violation. Release blocked. Update .github/deny.toml AND NOTICE.md only after a deliberate legal review."
+              exit "$rc"
+            fi
+            echo "::warning title=cargo deny::Licence/source policy violation. Not blocking this run, but a release tag WILL block. See docs/DEPENDENCY_POLICY.md and NOTICE.md."
+          fi
+
+      # Informational advisories (unmaintained / unsound / notice). Never
+      # blocking, in any mode — these are inputs to the quarterly review in
+      # docs/DEPENDENCY_POLICY.md, not release gates.
+      - name: cargo deny (informational advisories, never blocking)
+        run: |
+          set +e
+          cargo deny --all-features --config .github/deny.toml check advisories
+          rc=$?
+          set -e
+          if [ "$rc" -ne 0 ]; then
+            echo "::warning title=cargo deny advisories::Informational RustSec advisories present (unmaintained/unsound/notice). Advisory only — never blocks. Triage at the quarterly review."
+          fi
+
+  python:
+    name: Python advisories (py${{ matrix.target-python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # 3.9 is the floor `requires-python` allows and the leg that carries
+          # the accepted pytest exception. Warn-only by construction.
+          - { target-python: "3.9", enforce: false }
+          # 3.13 is the newest interpreter in the tests.yml matrix and the one
+          # the release gate actually enforces against.
+          - { target-python: "3.13", enforce: true }
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # uv is here for one specific capability pip does not have:
+      # `--resolution lowest-direct`. todo7 V-14 found 45 suppressed advisories
+      # precisely because the *floors* in pyproject.toml admitted ancient
+      # releases while the maintainer's own environment happened to hold new
+      # ones. Auditing whatever pip resolves today would have reported zero and
+      # missed all 45. Auditing the lowest versions our own floors permit is the
+      # check that actually tests the policy.
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Collect declared dependencies from pyproject.toml
+        run: |
+          mkdir -p .audit-work
+          python - <<'PY'
+          import pathlib, tomllib
+          data = tomllib.loads(pathlib.Path("pyproject.toml").read_text(encoding="utf-8"))
+          project = data["project"]
+          reqs = list(project.get("dependencies", []))
+          for extra_reqs in project.get("optional-dependencies", {}).values():
+              reqs.extend(extra_reqs)
+          seen, ordered = set(), []
+          for req in reqs:
+              if req not in seen:
+                  seen.add(req)
+                  ordered.append(req)
+          out = pathlib.Path(".audit-work/declared.txt")
+          out.write_text("\n".join(ordered) + "\n", encoding="utf-8")
+          print(f"{len(ordered)} distinct declared requirements (runtime + every extra)")
+          print(out.read_text(encoding="utf-8"))
+          PY
+
+      - name: Resolve the lowest versions our floors admit
+        env:
+          TARGET_PY: ${{ matrix.target-python }}
+        run: |
+          set +e
+          uv pip compile .audit-work/declared.txt \
+            --resolution lowest-direct \
+            --python-version "$TARGET_PY" \
+            --no-annotate \
+            -o .audit-work/floor-${TARGET_PY}.txt
+          rc=$?
+          set -e
+          if [ "$rc" -ne 0 ]; then
+            echo "::warning title=uv resolve::Could not resolve the floor set for Python ${TARGET_PY}. The audit below has nothing to scan; investigate before trusting a green result."
+            : > ".audit-work/floor-${TARGET_PY}.txt"
+          fi
+          echo "--- resolved floor set (Python ${TARGET_PY}) ---"
+          cat ".audit-work/floor-${TARGET_PY}.txt"
+
+      - name: pip-audit against the floor set
+        env:
+          TARGET_PY: ${{ matrix.target-python }}
+          # `inputs.strict` is null for push/PR/schedule/dispatch, so this is
+          # false unless release-build.yml called us. The 3.9 leg never
+          # enforces (accepted pytest exception, see the header comment).
+          STRICT: ${{ inputs.strict == true && matrix.enforce }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-audit
+          if [ ! -s ".audit-work/floor-${TARGET_PY}.txt" ]; then
+            echo "::warning title=pip-audit::Floor set is empty for Python ${TARGET_PY}; nothing audited."
+            exit 0
+          fi
+          set +e
+          pip-audit --requirement ".audit-work/floor-${TARGET_PY}.txt" --strict --progress-spinner=off
+          rc=$?
+          set -e
+          if [ "$rc" -ne 0 ]; then
+            if [ "$STRICT" = "true" ]; then
+              echo "::error title=pip-audit::Advisories reachable at the declared dependency floors (Python ${TARGET_PY}). Release blocked. Raise the floor per docs/DEPENDENCY_POLICY.md."
+              exit "$rc"
+            fi
+            echo "::warning title=pip-audit::Advisories reachable at the declared dependency floors (Python ${TARGET_PY}). Not blocking this run. If this is the accepted py3.9 pytest exception it is expected; anything else must be fixed by raising the floor."
+          fi
+
+      # `safety scan` is the tool that produced the original 45-finding report in
+      # todo7 V-14. The modern CLI requires an account, so it runs only where a
+      # SAFETY_API_KEY secret exists and is advisory everywhere — pip-audit above
+      # is the gate. This step is a no-op (not a failure) on forks and on any
+      # checkout without the secret.
+      - name: safety scan (optional, advisory only)
+        env:
+          SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
+          TARGET_PY: ${{ matrix.target-python }}
+        run: |
+          if [ -z "${SAFETY_API_KEY}" ]; then
+            echo "SAFETY_API_KEY not configured; skipping safety scan (pip-audit above is the gate)."
+            exit 0
+          fi
+          pip install safety
+          set +e
+          safety --key "${SAFETY_API_KEY}" scan --file ".audit-work/floor-${TARGET_PY}.txt"
+          rc=$?
+          set -e
+          if [ "$rc" -ne 0 ]; then
+            echo "::warning title=safety::safety scan reported findings (advisory only; pip-audit is the gate)."
+          fi

@@ -45,6 +45,7 @@ class Backend:
     BLOSSOM = "blossom"
     SPARSE_BLOSSOM = "sparse_blossom"
     LOOKUP_TABLE = "lookup_table"
+    AUTO_NATIVE = "auto_native"
 
     ALL = (
         CPU_SINGLE,
@@ -55,12 +56,13 @@ class Backend:
         BLOSSOM,
         SPARSE_BLOSSOM,
         LOOKUP_TABLE,
+        AUTO_NATIVE,
     )
 
     # Multi-tier fallback hierarchy (highest performance to highest compatibility).
     # Frozen tuple avoids RUF012 "mutable default value for class attribute" while
     # still being iterable for fallback chaining.
-    TIERS: tuple[str, ...] = (CUDA, OPENCL, CPU_RAYON, CPU_BATCH, CPU_SINGLE, BLOSSOM, LOOKUP_TABLE)
+    TIERS: tuple[str, ...] = (AUTO_NATIVE, CUDA, OPENCL, CPU_RAYON, CPU_BATCH, CPU_SINGLE, BLOSSOM, LOOKUP_TABLE)
 
 
 @dataclass
@@ -114,11 +116,42 @@ class AutoDecoder:
     Features automatic hardware discovery, adaptive runtime performance calibration,
     and a robust multi-tier self-debugging fallback engine that traps hardware or solver
     errors and seamlessly recovers execution without failing downstream callers.
+
+    T2.4 of PERF_AUDIT: ``auto_select`` is now cached per code identity, so the
+    routing decision (n_det / n_qubits / batch_size → backend name) is computed
+    once per `(n_checks, n_qubits, batch_size)` triple instead of on every call.
+    Combined with ``__slots__`` this is the dominant per-decode Python overhead
+    in tight loops.
     """
+
+    __slots__ = (
+        "_c2q",
+        "_nq",
+        "config",
+        "_diag",
+        "_decoders",
+        "_native_auto",
+        "_cuda_ok",
+        "_opencl_ok",
+        # T2.4: cache the routing decision per code identity.
+        "_code_key_to_backend",
+    )
 
     def __init__(self, check_to_qubits, n_qubits=None, config: BackendConfig | None = None):
         if not check_to_qubits:
             raise ValueError("check_to_qubits must be non-empty")
+        if config is not None and not isinstance(config, BackendConfig):
+            # The native routing decoder takes
+            # (checks, n_qubits, distance, noise_rate, batch_size, is_qldpc),
+            # so callers reaching for it through this name land here with an
+            # int in `config`. Say which class they want instead of failing
+            # later with an AttributeError on a plain int.
+            raise TypeError(
+                "AutoDecoder(check_to_qubits, n_qubits, config) takes a BackendConfig as its "
+                f"third argument, got {type(config).__name__}. For the native 6-argument routing "
+                "decoder (checks, n_qubits, distance, noise_rate, batch_size, is_qldpc) use "
+                "qector_decoder_v3.NativeAutoDecoder."
+            )
         self._c2q = [[int(q) for q in check] for check in check_to_qubits]
         self._nq = None if n_qubits is None else int(n_qubits)
         self.config = config or BackendConfig()
@@ -126,6 +159,13 @@ class AutoDecoder:
 
         # Lazy decoder instances
         self._decoders: dict[str, Any] = {}
+
+        # T2.4: cache the routing decision per code identity so a high-frequency
+        # `decode()` loop doesn't re-derive `auto_select` on every call.
+        self._code_key_to_backend: dict[tuple[int, int | None, int], str] = {}
+
+        # Native AutoDecoder (lazy, imported on first use)
+        self._native_auto: Any = None
 
         self._cuda_ok = bool(self.config.allow_gpu and cuda_is_available())
         opencl_auto = os.environ.get("QECTOR_ENABLE_OPENCL_AUTO", "").lower() in {"1", "true", "yes", "on"}
@@ -140,13 +180,46 @@ class AutoDecoder:
 
     # -- availability ------------------------------------------------------
     def available_backends(self) -> list[str]:
-        avail = [Backend.CPU_SINGLE, Backend.CPU_RAYON, Backend.CPU_BATCH]
+        avail = [Backend.AUTO_NATIVE, Backend.CPU_SINGLE, Backend.CPU_RAYON, Backend.CPU_BATCH]
         if self._cuda_ok and self._diag.backend_health.get(Backend.CUDA, True):
             avail.append(Backend.CUDA)
         if self._opencl_ok and self._diag.backend_health.get(Backend.OPENCL, True):
             avail.append(Backend.OPENCL)
         avail.extend([Backend.BLOSSOM, Backend.SPARSE_BLOSSOM, Backend.LOOKUP_TABLE])
         return avail
+
+    @staticmethod
+    def _check_license_tier(distance: int, gpu_required: bool = False) -> None:
+        """Check whether the current license tier allows the given distance.
+
+        Raises PermissionError when the tier is insufficient.
+        Community: d≤7, Pro: d≤19, Enterprise: d≤63.
+        GPU decoding requires at least Pro tier.
+        """
+        try:
+            from . import get_license_info
+
+            info = get_license_info()
+        except Exception:
+            return  # No license info available — allow (will be gated by native enforcement)
+
+        tier = info.get("tier", "Community")
+        max_dist_str = info.get("max_distance", "7")
+        try:
+            max_dist = int(max_dist_str)
+        except (ValueError, TypeError):
+            max_dist = 7
+
+        if gpu_required and tier == "Community":
+            raise PermissionError(
+                f"GPU decoding requires at least Pro tier (current: {tier}). Upgrade at https://qector.store/pricing"
+            )
+
+        if distance > max_dist:
+            raise PermissionError(
+                f"Distance {distance} exceeds {tier} tier maximum of {max_dist}. "
+                f"Current tier: {tier}. Upgrade at https://qector.store/pricing"
+            )
 
     @staticmethod
     def auto_select(checks, n_qubits, batch_size=1):
@@ -228,12 +301,75 @@ class AutoDecoder:
     def _get_opencl(self) -> OpenCLBatchDecoder | None:
         return cast(OpenCLBatchDecoder | None, self._get_decoder(Backend.OPENCL))
 
+    # -- native auto decoder ------------------------------------------------
+    def _try_native_auto(self, syndromes: np.ndarray) -> np.ndarray | None:
+        """Attempt decode through Rust NativeAutoDecoder.
+
+        Returns correction on success, None to fall back to Python tiers.
+        PermissionError from license enforcement is re-raised.
+        """
+        try:
+            from . import NativeAutoDecoder
+        except Exception:
+            return None
+
+        if self._native_auto is None:
+            try:
+                self._native_auto = NativeAutoDecoder(
+                    self._c2q,
+                    self._nq or 0,
+                    distance=max(3, int((self._nq or 0) ** 0.5) | 1),
+                    noise_rate=0.08,
+                    batch_size=max(1, syndromes.shape[0] if syndromes.ndim >= 2 else 1),
+                    is_qldpc=False,
+                )
+            except PermissionError:
+                raise
+            except Exception:
+                return None
+
+        try:
+            if syndromes.ndim == 1:
+                return np.asarray(self._native_auto.decode(syndromes), dtype=np.uint8).reshape(-1)
+            return np.stack(
+                [
+                    np.asarray(self._native_auto.decode(syndromes[i]), dtype=np.uint8).reshape(-1)
+                    for i in range(syndromes.shape[0])
+                ]
+            )
+        except PermissionError:
+            raise
+        except Exception:
+            return None
+
     # -- selection ---------------------------------------------------------
     def select(self, batch_size: int) -> str:
-        """Return the backend that *would* run for a given batch size."""
+        """Return the backend that *would* run for a given batch size.
+
+        T2.4 of PERF_AUDIT: this is now cached per `(n_checks, n_qubits, batch_size)`
+        so the per-call dispatch decision in `batch_decode` is O(1) on a
+        hot loop. The cache is invalidated automatically when a backend
+        becomes unhealthy (`_record_auto_debug_failure` clears the matching
+        entries).
+        """
         if self.config.force is not None:
             return self.config.force
 
+        cache_key = (len(self._c2q), self._nq, batch_size)
+        cached = self._code_key_to_backend.get(cache_key)
+        if cached is not None:
+            return cached
+
+        chosen = self._select_uncached(batch_size)
+        self._code_key_to_backend[cache_key] = chosen
+        return chosen
+
+    def _select_uncached(self, batch_size: int) -> str:
+        """Compute the backend for `batch_size` without consulting the cache.
+
+        T2.4 of PERF_AUDIT: factored out so `select` is cache-aware and the
+        real decision logic stays in one place.
+        """
         if self.config.allow_gpu and batch_size >= self.config.gpu_threshold:
             if (
                 self.config.prefer == Backend.OPENCL
@@ -263,10 +399,17 @@ class AutoDecoder:
             return cast(np.ndarray, self._get_cpu_single().decode(s))
 
         # Self auto-debug fallback chain for single decode
-        tiers = [Backend.CPU_SINGLE, Backend.BLOSSOM, Backend.SPARSE_BLOSSOM, Backend.LOOKUP_TABLE]
+        tiers = [Backend.AUTO_NATIVE, Backend.CPU_SINGLE, Backend.BLOSSOM, Backend.SPARSE_BLOSSOM, Backend.LOOKUP_TABLE]
 
         for b in tiers:
             try:
+                if b == Backend.AUTO_NATIVE:
+                    out = self._try_native_auto(s)
+                    if out is not None:
+                        self._diag.last_backend = b
+                        self._diag.last_reason = "native AutoDecoder"
+                        return out
+                    continue
                 dec = self._get_decoder(b)
                 if dec is None:
                     continue
@@ -306,6 +449,13 @@ class AutoDecoder:
                 continue
 
             try:
+                if b == Backend.AUTO_NATIVE:
+                    out = self._try_native_auto(syn)
+                    if out is not None:
+                        self._diag.last_backend = b
+                        self._diag.last_reason = f"batch={n} native AutoDecoder"
+                        return out
+                    continue
                 out = self._exec_backend_batch(b, syn)
                 if out is not None and self._verify_batch_correction(syn, out):
                     self._diag.last_backend = b
@@ -386,6 +536,12 @@ class AutoDecoder:
         # malformed input) and should not be permanently blacklisted.
         if backend in (Backend.CUDA, Backend.OPENCL):
             self._diag.backend_health[backend] = False
+            # T2.4: invalidate cached selections that routed to a now-unhealthy
+            # backend. Otherwise a high-frequency `batch_decode` loop would
+            # happily re-pick the dead CUDA backend forever.
+            self._code_key_to_backend = {
+                k: v for k, v in self._code_key_to_backend.items() if v != backend
+            }
         msg = f"AutoDebug caught error on {backend} [{context}]: {exc}"
         self._diag.warnings.append(msg)
         self._diag.debug_log.append(

@@ -3,15 +3,20 @@
 // This lib.rs wires all decoder modules and exposes them through a single
 // PyO3 extension module for the Python package.
 
+pub mod auto_decoder;
 pub mod batch;
 pub mod benchmark;
 pub mod bitpack;
 pub mod blossom;
 pub mod bp_osd;
 pub mod cascade_decoder;
+pub mod core;
 pub mod cpu_batch;
 pub mod cross_decoder_tests;
 pub mod decoder;
+/// Test-only loader for circuit-level DEM benchmark fixtures (see UF-02).
+#[cfg(test)]
+pub mod dem_fixture;
 pub mod fast_uf;
 pub mod fusion_mwpm;
 pub mod gf2;
@@ -21,14 +26,19 @@ pub mod gnn_predecoder;
 pub mod gnn_trainer;
 pub mod hybrid_decoder;
 pub mod ler_benchmark;
+pub mod license;
 pub mod lookup_table;
 pub mod metrics;
 pub mod mwpm;
 pub mod neural_predecoder;
 pub mod safetensors_loader;
 pub mod sliding_window;
+pub mod space_time_decoder;
 pub mod sparse_blossom;
+pub mod two_stage_decoder;
+pub mod ambig_cluster;
 pub mod streaming;
+pub mod stripe_billing;
 pub mod uf_core;
 pub mod utils;
 
@@ -72,8 +82,13 @@ pub use hybrid_decoder::HybridDecoder;
 pub use ler_benchmark::LERBenchmark;
 pub use lookup_table::LookupTableDecoder;
 pub use neural_predecoder::NeuralPredecoder;
+#[allow(deprecated)]
 pub use sliding_window::SlidingWindowDecoder;
+pub use auto_decoder::AutoDecoder;
 pub use sparse_blossom::SparseBlossomDecoder;
+pub use two_stage_decoder::TwoStageDecoder;
+pub use ambig_cluster::AmbiguityClusterDecoder;
+#[allow(deprecated)]
 pub use streaming::StreamingDecoder;
 
 use pyo3::prelude::*;
@@ -92,8 +107,12 @@ fn qector_decoder_v3(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<hybrid_decoder::PyHybridDecoder>()?;
     m.add_class::<sliding_window::PySlidingWindowDecoder>()?;
     m.add_class::<streaming::PyStreamingDecoder>()?;
+    m.add_class::<space_time_decoder::PySpaceTimeDecoder>()?;
     m.add_class::<lookup_table::PyLookupTableDecoder>()?;
     m.add_class::<neural_predecoder::PyNeuralPredecoder>()?;
+    m.add_class::<auto_decoder::PyAutoDecoder>()?;
+    m.add_class::<two_stage_decoder::PyTwoStageDecoder>()?;
+    m.add_class::<ambig_cluster::PyAmbiguityClusterDecoder>()?;
 
     // Batch decoders
     m.add_class::<batch::PyBatchDecoder>()?;
@@ -115,6 +134,25 @@ fn qector_decoder_v3(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(utils::py_generate_surface_code_checks, m)?)?;
     m.add_function(wrap_pyfunction!(utils::py_generate_toy_code_checks, m)?)?;
     m.add_function(wrap_pyfunction!(utils::py_generate_repetition_code_checks, m)?)?;
+    m.add_function(wrap_pyfunction!(utils::py_compute_detector_differences, m)?)?;
+    m.add_function(wrap_pyfunction!(utils::py_generate_space_time_surface_code_checks, m)?)?;
+    m.add_function(wrap_pyfunction!(utils::py_generate_triangular_color_code_4_8_8_checks, m)?)?;
+    m.add_function(wrap_pyfunction!(utils::py_generate_biconnected_qldpc_checks, m)?)?;
+    m.add_function(wrap_pyfunction!(utils::py_estimate_distance, m)?)?;
+
+    // SIMD buffer geometry (P-04): inspect what the decoder sees for a given
+    // NumPy buffer, and allocate one with a 64-byte-multiple row stride.
+    m.add_function(wrap_pyfunction!(auto_decoder::syndrome_buffer_geometry, m)?)?;
+    m.add_function(wrap_pyfunction!(auto_decoder::aligned_syndrome_buffer, m)?)?;
+
+    // License & Stripe
+    m.add_function(wrap_pyfunction!(license::py_set_license_key, m)?)?;
+    m.add_function(wrap_pyfunction!(license::py_get_license_info, m)?)?;
+    m.add_function(wrap_pyfunction!(license::py_enforce_distance_cap, m)?)?;
+    m.add_function(wrap_pyfunction!(license::py_enforce_unlocked, m)?)?;
+    m.add_function(wrap_pyfunction!(stripe_billing::py_record_shots, m)?)?;
+    m.add_function(wrap_pyfunction!(stripe_billing::py_get_accumulated_shots, m)?)?;
+    m.add_function(wrap_pyfunction!(stripe_billing::py_flush_usage, m)?)?;
 
     // Metrics
     m.add_function(wrap_pyfunction!(metrics::start_metrics_server, m)?)?;

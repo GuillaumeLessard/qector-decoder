@@ -79,10 +79,9 @@ def decode_mmap(
     decoder: CPUBatchDecoder | UnionFindDecoder
     if decoder_type == "cpu_batch":
         decoder = CPUBatchDecoder(c2q, n_qubits)
-        batch_fn = decoder.batch_decode
     else:
         decoder = UnionFindDecoder(c2q, n_qubits)
-        batch_fn = lambda batch: _np.array([decoder.decode(batch[i]) for i in range(batch.shape[0])])
+    batch_fn = decoder.batch_decode
 
     n_chunks = (n_shots + batch_size - 1) // batch_size
     for chunk_idx in range(n_chunks):

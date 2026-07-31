@@ -2,6 +2,131 @@
 
 All notable changes to QECTOR Decoder will be documented in this file.
 
+## [0.7.0] — UNRELEASED
+**Repo version is 0.7.0; the latest version on PyPI is 0.6.9.** Everything below
+is on `main` in the working tree and has not been published. Note that `src/*.rs`
+is `.gitignore`d, so `git log v0.6.9..HEAD` shows none of the Rust work described
+here — the Rust changes are verified by `cargo test` and by reading the tree, not
+by the commit log.
+
+**Focus**: usability at the edges — a CLI and a diagnostic, real ecosystem entry
+points, three new decoder families, weighted Union-Find on the GPU, and six
+crash-safety fixes in the Rust core.
+
+### Added — reachable from a shell
+- **`qector` CLI** with `decode`, `bench`, and `serve` subcommands
+  (`python/qector_decoder_v3/cli.py`, registered at `pyproject.toml:128`).
+- **`qector-doctor`** — an environment diagnostic that reports 14 PASS / 1 WARN /
+  0 FAIL on a healthy Community-tier install and explains *why* a backend is
+  unavailable, rather than surfacing it as a decode-time failure. *Invoke it as a
+  console script or `python -m`*: run as a bare script from inside its own package
+  directory it puts the raw `.pyd` on `sys.path`, shadows the `__init__.py`
+  wrapper that supplies constructor defaults, and then misreports `native-core`
+  and `decode` as FAIL.
+- **Sinter decoder entry points** — `qector_blossom`, `qector_belief`,
+  `qector_unionfind`, `qector_bposd`, `qector_unionfind_unweighted` registered
+  under `[project.entry-points.sinter_decoder]`, so `sinter.collect()` finds them
+  without a `custom_decoders=` argument.
+- **qiskit-qec plugin entry point** under `[project.entry-points."qiskit.qec"]`.
+- **`from qector_decoder_v3.pymatching import Matching`** — the submodule
+  spelling. The attribute form already worked; the module did not exist.
+
+### Added — decoders
+- **`AmbiguityClusterDecoder`** (`src/ambig_cluster.rs`): BP, partition on
+  `|LLR|`, DFS-cluster the ambiguous mechanisms, enumerate each cluster exactly.
+- **`TwoStageDecoder`** (`src/two_stage_decoder.rs`): decode the X sector,
+  propagate, decode the Z sector. Any of blossom / unionfind / bposd /
+  sparse_blossom per stage. It needs `check_types` — a DEM does not record which
+  sector a detector belongs to.
+- **`ColourCodeDecoder`** (`python/qector_decoder_v3/colour_code.py`): BP-OSD on
+  the **undecomposed** hypergraph DEM. Matching is not a correct colour-code
+  decoder — a colour-code mechanism can light three detectors and has no graphlike
+  decomposition, and Stim's `detector_error_model(decompose_errors=True)` raises
+  outright on `color_code:memory_xyz` at `d ≥ 5`.
+- **Relay-BP** (`BpMethod::Relay` in `src/bp_osd.rs`): layered serial schedule, so
+  each check sees the freshest messages. `bp_method="relay"` on both
+  `BPOSDDecoder` and `BpOsdDecoder`.
+- **Weighted cluster growth on the GPU**: `CUDABatchDecoder` and
+  `OpenCLBatchDecoder` take an optional `edge_weights` and run the same adaptive
+  growth as `uf_core::grow_weighted`. Both kernels produce identical logical error
+  rates — that agreement is the cross-check that the port is faithful. Omitting
+  the weights keeps the original integer growth, bit-identical to the CPU
+  `UnionFindDecoder`.
+- **`DemModel.make_decoder` covers all nine shipped families** (it handled five);
+  `DemModel.DECODER_KINDS` enumerates them.
+
+### Fixed — crash safety in the Rust core
+Under `panic = "abort"` each of these killed the host process rather than raising
+a catchable Python exception:
+- `grpc_server.rs:316,325,354,369` — `decoder_cache.lock().unwrap()` mutex-poison
+  panic; now propagated via `map_err`.
+- `cuda_bp_osd.rs:249,299` — same pattern on `workspace.lock()`.
+- `cuda_batch.rs` — every CUDA async error return was discarded with `let _ =`,
+  so corrupt corrections came back as `Ok`. The `let _ = cu_*` count is now zero.
+- `cuda_workspace.rs:134` — `pointers()` aborted the host; now returns
+  `Result<_, String>`. This is a signature change; every caller was updated.
+- `ler_benchmark.rs:266` — `Bernoulli::new(phys_error).unwrap()` panicked on NaN
+  or out-of-range input; now `.ok()` with the fall-through documented.
+- `cascade_decoder.rs:159` — `BPOSDDecoder::new(…).expect("invalid BP-OSD input")`
+  inside an infallible constructor.
+
+### Fixed — correctness
+- **`HybridCascadeDecoder` ignored its edge weights.** Weights reached the Blossom
+  escalation decoder but not the Union-Find pre-filter — and the pre-filter accepts
+  most circuit-level syndromes, so its unweighted answer is what callers received.
+- **The CUDA BP-OSD kernel did not compile**, so `CUDABpOsdDecoder` could never be
+  constructed. Every CUDA test treated construction failure as "no GPU here", so a
+  hard compile error looked like a missing device.
+- **`AutoRouter` ignored `priority`**, and `explain()` no longer described
+  `decode()`. The native path bypassed the Python policy layer that enforces
+  "never route a hyperedge code to a matching decoder".
+- **`TwoStageDecoder.decode` and `AmbiguityClusterDecoder.decode` returned
+  `bytes`** while the other seven families return a `uint8` ndarray.
+- **`set_license_key()` silently accepted invalid keys**, surfacing later as an
+  unexplained tier cap. It now raises `ValueError`.
+- **`QECTOR_LICENSE_FILE` and `~/.qector/license.key` were never read**, so a
+  deployment pointed at a key *file* sat silently on Community tier.
+- **Prometheus latency quantiles froze permanently** until 8,192 samples had been
+  recorded.
+- Seven further logic defects fixed across `auto_decoder.rs`, `benchmark.rs`,
+  `lookup_table.rs`, `neural_predecoder.rs`, `safetensors_loader.rs`,
+  `cross_decoder_tests.rs`, `opencl_batch.rs`.
+
+### Changed — benchmark methodology
+- **The four pre-v0.7.0 comparison tables in `README.md` are withdrawn.** They
+  compared code-capacity QECTOR against circuit-level PyMatching in one table, and
+  cited artifacts under the `.gitignore`d `benchmark_results/` path that no reader
+  could obtain. See the README for the full notice.
+- `ler.assert_comparable` tags every run with its noise model and refuses
+  cross-model comparisons, so the error cannot recur silently.
+- `scripts/regenerate_benchmark_artifacts.py` rewritten: it previously had no
+  argument parser, so *any* invocation — including `--help` — immediately launched
+  a 1.6M-decode run. It now requires `--yes`, supports `--dry-run`, and embeds a
+  provenance block (methodology, git commit, tree-dirty flag, parameters,
+  dependency versions, caveats) in the artifact.
+- The `benchmarks_session` harnesses are documented as **not** decoder performance
+  measurements: they feed uniform-random bit patterns to a boundaryless ring code
+  where ~49% of inputs have odd defect parity and admit no correction. That is why
+  GPU paths previously appeared slower than CPU.
+
+### Validation
+Measured 2026-07-31 on the working tree:
+
+| Gate | Result |
+|---|---|
+| `cargo test --no-default-features` | 303 passed, 0 failed |
+| `cargo test --features full` | 323 passed, 0 failed, 7 ignored (hardware-only) |
+| `cargo clippy --no-default-features --all-targets -- -D warnings` | exit 0 |
+| `cargo clippy --features full --all-targets -- -D warnings` | exit 0 |
+| Full Python suite | **no trustworthy baseline yet** — the last full run was interrupted. Do not read a pytest pass rate into this release until one completes on a quiesced tree |
+
+An earlier draft of this section claimed "`cargo test` 308 passed · `pytest` 100%
+passed". Neither figure was reproducible: the Rust counts above are the measured
+ones, and no complete Python run has been captured for 0.7.0. The claim is
+withdrawn rather than corrected, since there is nothing yet to correct it to.
+
+---
+
 ## [0.6.9] - 2026-07-26
 **Focus**: BP-OSD accuracy (exact log-domain BP, true OSD-1/2), belief-matching correctness, licence hardening.
 
@@ -67,7 +192,8 @@ All notable changes to QECTOR Decoder will be documented in this file.
 - **Routing Safety**: `recommend_decoder` now safely avoids recommending the UF family on hypergraphs.
 
 ### Changed
-- Packaging: `sdist` is now published alongside wheels. Wheel matrix expanded for Linux, Windows, and macOS arm64.
+- Packaging: wheel matrix expanded to Linux x86_64, Windows x64, and macOS arm64 — 15 wheels (CPython 3.9–3.13 × 3 platforms).
+  *Correction (2026-07-31):* this entry originally read "`sdist` is now published alongside wheels." That did not happen. Checked against the live PyPI JSON API, the **only** release that ever carried an sdist is 0.5.0; every release from 0.5.1 onward, 0.6.6 included, publishes 15 wheels and nothing else.
 - Testing: Expanded test matrix and relaxed d=21 latency threshold for CI stability.
 
 ---
@@ -143,7 +269,7 @@ All notable changes to QECTOR Decoder will be documented in this file.
 
 ## 🛡️ License & Commercial Use Notice
 
-QECTOR Decoder is released under the **QECTOR Source-Available License v1.0**. 
+QECTOR Decoder is source-available under the **PolyForm Noncommercial License 1.0.0** (see `LICENSE`). 
 - **Free** for personal, academic, educational, and non-commercial research use.
 - **Commercial, institutional, lab, or product-integration use requires a paid commercial license.**
 
@@ -209,6 +335,13 @@ See `LICENSE` and `COMMERCIAL.md` for full terms.
 Three additions that move QECTOR from "matches PyMatching" to "beats PyMatching on
 accuracy and covers the LDPC frontier", all pure-Python on the `0.4.0` core and
 cross-validated against reference packages. See `docs/BEYOND_PYMATCHING.md`.
+
+> **Historical (2026-06-22), no surviving artifact.** The LER figures in this
+> section were measured circuit-level on Stim shots — the methodology is stated
+> per bullet and is internally consistent — but the raw outputs were not archived
+> and have not been reproduced on 0.7.0. Treat them as a record of what was
+> claimed at the time, not as current evidence. For citable numbers use the
+> archived Zenodo datasets listed in `README.md`.
 
 - **`belief_matching.BeliefMatching`** — sum-product BP on the hyperedge detector
   graph + QECTOR exact weighted MWPM on the edge graph (belief-matching). Achieves
@@ -297,6 +430,15 @@ This release delivers the complete QECTOR v3 decoder suite with 4 algorithmic ba
 
 ## Performance Highlights
 
+> **Historical, code-capacity, and not comparable to any circuit-level figure.**
+> The LER rows below were measured under **code-capacity** noise at `p = 0.05` —
+> an independent-error model on the data qubits with no measurement error and no
+> repeated rounds. Circuit-level LERs quoted elsewhere in this project, and every
+> number published by PyMatching, Stim, or Sinter, are a different quantity.
+> Placing the two in one table is the methodology error that caused the v0.7.0
+> benchmark withdrawal; these rows are retained as release history only. No
+> artifact backing them survives, and they must not be cited.
+
 | Metric | Value | Conditions |
 |--------|-------|------------|
 | Single-shot latency | 1.6 µs | CPU `decode()`, d=5 |
@@ -333,7 +475,7 @@ None — this is a forward-compatible release from v0.3.0. Feature flags are add
 
 ## License
 
-**QECTOR Decoder Source-Available License v1.0** — see `LICENSE`.
+**PolyForm Noncommercial License 1.0.0** — see `LICENSE`.
 Copyright © 2026 Guillaume Lessard / iD01t Productions. All rights reserved.
 Free for non-commercial use; commercial use requires a paid license
 (admin@qector.store · https://www.qector.store).

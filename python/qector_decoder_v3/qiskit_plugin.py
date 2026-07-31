@@ -1,10 +1,9 @@
 """
-QECTOR Qiskit Plugin - intégration optionnelle avec l'écosystème Qiskit.
+QECTOR Qiskit Plugin - optional integration with the Qiskit ecosystem.
 
-Permet d'utiliser QECTOR comme decoder par défaut pour les résultats
-de circuits de codes de surface Qiskit.
+Provides a QECTOR decoder for surface code Qiskit circuit results.
 
-Usage (avec Qiskit installé) ::
+Usage (with Qiskit installed)::
 
     from qiskit import QuantumCircuit
     from qector_decoder_v3.qiskit_plugin import decode_qiskit_result, create_qiskit_decoder
@@ -13,7 +12,7 @@ Usage (avec Qiskit installé) ::
     result = job.result()  # qiskit.result.Result
     decoded = decoder(result)
 
-Usage (sans Qiskit - mode dict brut) ::
+Usage (without Qiskit - raw dict mode)::
 
     raw = {"counts": {"0x0": 400, "0x3": 100}}
     out = decode_qiskit_result(raw, code_distance=3)
@@ -29,7 +28,7 @@ import numpy as np
 
 from . import BlossomDecoder, generate_surface_code_checks
 
-# Import optionnel de Qiskit - le plugin reste importable sans Qiskit
+# Optional Qiskit import - the plugin remains importable without Qiskit
 # ------------------------------------------------------------------------
 try:
     from qiskit.result import Result as _QiskitResult
@@ -41,7 +40,7 @@ except ImportError:  # pragma: no cover
 
 
 def _normalize_counts(result: Any) -> dict[str, int]:
-    """Extraire les comptes bruts depuis un Result Qiskit ou un dict."""
+    """Extract raw counts from a Qiskit Result or a dict."""
     if isinstance(result, dict):
         counts = result.get("counts")
         if counts is None:
@@ -49,19 +48,19 @@ def _normalize_counts(result: Any) -> dict[str, int]:
         return {str(k): int(v) for k, v in counts.items()}
 
     if _HAS_QISKIT and isinstance(result, _QiskitResult):
-        # get_counts() retourne un dict {bitstring: count}
+        # get_counts() returns a dict {bitstring: count}
         return {str(k): int(v) for k, v in result.get_counts().items()}
 
     raise TypeError(f"result must be a dict or qiskit.result.Result, got {type(result).__name__}")
 
 
 def _bitstring_to_syndrome(bitstring: str, n_checks: int) -> list[int]:
-    """Convertir une chaîne Qiskit (binaire ou hex) en liste de bits syndrome."""
+    """Convert a Qiskit (binary or hex) bitstring to a syndrome bit list."""
     if bitstring.startswith("0x"):
         val = int(bitstring, 16)
         return [(val >> i) & 1 for i in range(n_checks)]
 
-    # Chaîne binaire : '0101...' - on inverse pour que le LSB soit en index 0
+    # Binary string: '0101...' - reversed so LSB is at index 0
     bits = [int(c) for c in bitstring][::-1]
     if len(bits) < n_checks:
         bits += [0] * (n_checks - len(bits))
@@ -76,26 +75,26 @@ def decode_qiskit_result(
     n_qubits: int | None = None,
 ) -> dict[str, Any]:
     """
-    Décoder un résultat Qiskit (ou dictionnaire brut) avec QECTOR.
+    Decode a Qiskit result (or raw dict) with QECTOR.
 
-    Paramètres
+    Parameters
     ----------
     result : qiskit.result.Result | dict
-        Résultat d'un job Qiskit. Si Qiskit n'est pas installé, un dict
-        avec la clé ``counts`` est accepté.
+        Result of a Qiskit job. If Qiskit is not installed, a dict
+        with a ``counts`` key is accepted.
     code_distance : int
-        Distance du code de surface (ex: 3, 5, 7, ...).
-    shots : int, optionnel
-        Nombre de shots. Déduit automatiquement de ``result`` si absent.
-    n_qubits : int, optionnel
-        Nombre de qubits. Déduit automatiquement du code de surface si absent.
+        Surface code distance (e.g. 3, 5, 7, ...).
+    shots : int, optional
+        Number of shots. Auto-detected from ``result`` if absent.
+    n_qubits : int, optional
+        Number of qubits. Auto-detected from the surface code if absent.
 
-    Retourne
+    Returns
     -------
     dict
         {
-            "correction": np.ndarray - correction pour chaque shot,
-            "syndrome": np.ndarray - syndrome déduit,
+            "correction": np.ndarray - correction for each shot,
+            "syndrome": np.ndarray - inferred syndrome,
             "metadata": {
                 "decoder": "QECTOR Blossom",
                 "code_distance": int,
@@ -108,8 +107,8 @@ def decode_qiskit_result(
     """
     if not _HAS_QISKIT:
         warnings.warn(
-            "Qiskit n'est pas installé. L'intégration fonctionne en mode "
-            "'dict brut'. Pour l'usage complet : pip install qiskit",
+            "Qiskit is not installed. Integration works in 'raw dict' "
+            "mode. For full usage: pip install qiskit",
             stacklevel=2,
         )
 
@@ -117,7 +116,7 @@ def decode_qiskit_result(
     if shots is None:
         shots = sum(counts.values())
 
-    # Génération des checks pour le code de surface demandé
+    # Generate checks for the requested surface code
     check_to_qubits, auto_n_qubits = generate_surface_code_checks(code_distance)
     if n_qubits is None:
         n_qubits = auto_n_qubits
@@ -125,7 +124,7 @@ def decode_qiskit_result(
 
     decoder = BlossomDecoder(check_to_qubits, n_qubits=n_qubits)
 
-    # Extraction des syndromes à partir des comptes
+    # Extract syndromes from counts
     syndrome_list: list[np.ndarray] = []
     for bitstring, count in counts.items():
         bits = _bitstring_to_syndrome(bitstring, n_checks)
@@ -143,7 +142,7 @@ def decode_qiskit_result(
                 "n_qubits": n_qubits,
                 "n_checks": n_checks,
                 "shots": 0,
-                "warning": "Aucun compte détecté dans le résultat.",
+                "warning": "No counts detected in the result.",
             },
         }
 
@@ -169,12 +168,12 @@ def create_qiskit_decoder(
     n_qubits: int | None = None,
 ) -> Any:
     """
-    Factory retournant un callable compatible avec l'API Qiskit.
+    Factory returning a callable compatible with the Qiskit API.
 
-    Le callable retourné accepte un ``Result`` Qiskit (ou un dict) et retourne
-    le résultat décodé.
+    The returned callable accepts a Qiskit ``Result`` (or a dict) and returns
+    the decoded result.
 
-    Exemple ::
+    Example::
 
         from qector_decoder_v3.qiskit_plugin import create_qiskit_decoder
 
@@ -182,18 +181,18 @@ def create_qiskit_decoder(
         raw_result = sampler.run(circuit).result()
         decoded = decoder(raw_result)
 
-    Paramètres
+    Parameters
     ----------
     code_distance : int
-        Distance du code de surface.
-    n_qubits : int, optionnel
-        Nombre de qubits. Déduit automatiquement si absent.
+        Surface code distance.
+    n_qubits : int, optional
+        Number of qubits. Auto-detected if absent.
 
-    Retourne
+    Returns
     -------
     callable
-        Fonction ``(result) -> dict`` avec attribut ``_inner_decoder``
-        pour accéder directement à l'instance ``BlossomDecoder``.
+        Function ``(result) -> dict`` with ``_inner_decoder`` attribute
+        for direct access to the ``BlossomDecoder`` instance.
     """
     check_to_qubits, auto_n_qubits = generate_surface_code_checks(code_distance)
     if n_qubits is None:

@@ -35,7 +35,7 @@ try:
     _SINTER_BASE: type = sinter.Decoder
     _COMPILED_BASE: type = sinter.CompiledDecoder
     _HAS_SINTER = True
-except RuntimeError:  # pragma: no cover - sinter optional
+except (ImportError, RuntimeError):  # pragma: no cover - sinter optional
     _SINTER_BASE = object
     _COMPILED_BASE = object
     _HAS_SINTER = False
@@ -98,15 +98,22 @@ def _build_matcher(kind: str, dem):
         return Matching.from_detector_error_model(dem)
     if kind in ("unionfind", "uf", "union_find"):
         return _UnionFindSinter(dem)
+    if kind in ("unionfind_unweighted", "uf_unweighted", "union_find_unweighted"):
+        return _UnionFindSinter(dem, weighted=False)
     if kind in ("bposd", "bp_osd", "bp-osd"):
         return _BpOsdSinter(dem)
     raise ValueError(f"unknown QECTOR sinter decoder kind: {kind!r}")
 
 
 class _UnionFindSinter:
-    """Fast unweighted UF path with observable mapping (for Sinter)."""
+    """Weighted UF path with observable mapping (for Sinter).
 
-    def __init__(self, dem):
+    ``weighted=False`` reproduces the pre-v0.7.0 topology-only behaviour, kept so
+    the accuracy effect of UF-01 can be measured against the decoder it replaced
+    on an identical DEM.
+    """
+
+    def __init__(self, dem, weighted: bool = True):
         from . import UnionFindDecoder
         from .dem import from_stim
 
@@ -114,7 +121,11 @@ class _UnionFindSinter:
         if model.is_graphlike:
             model = model.collapse_to_graph()
         self._L = model.observables_matrix()
-        self._dec = UnionFindDecoder(model.check_to_qubits(), model.num_errors)
+        self._dec = UnionFindDecoder(
+            model.check_to_qubits(),
+            model.num_errors,
+            edge_weights=model.weights().tolist() if weighted else None,
+        )
 
     def decode_batch(self, shots):
         corr = np.asarray(self._dec.batch_decode(np.asarray(shots, np.uint8)), dtype=np.uint8)

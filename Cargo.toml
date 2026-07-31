@@ -1,6 +1,6 @@
 [package]
 name = "qector_decoder_v3"
-version = "0.6.9"
+version = "0.7.0"
 edition = "2021"
 authors = ["Guillaume Lessard / iD01t Productions <admin@qector.store>"]
 description = "Proprietary Rust QEC decoder core (Copyright (c) 2026 Guillaume Lessard. All Rights Reserved) with source-available Python suite, Union-Find, exact Blossom, Sparse Blossom, BP-OSD, and CPU/CUDA/OpenCL batch acceleration."
@@ -22,8 +22,13 @@ default = ["opencl", "cuda"]
 opencl = ["ocl"]
 cuda = ["libloading"]
 prometheus = ["metrics-exporter-prometheus"]
-grpc = ["tonic", "tonic-prost", "prost", "tokio", "prometheus"]
+grpc = ["tonic", "tonic-prost", "prost", "tokio", "prometheus", "sha2"]
 full = ["opencl", "cuda", "grpc"]
+# A9-05: build against the CPython stable ABI so one wheel per platform serves
+# every supported interpreter (>=3.9, matching `requires-python`), instead of
+# five near-identical wheels per platform. Release builds enable this; local
+# `maturin develop` does not need it.
+abi3 = ["pyo3/abi3-py39"]
 
 [dependencies]
 pyo3 = { version = "0.29.0", features = ["extension-module"] }
@@ -40,6 +45,16 @@ thiserror = "2"
 rand = "0.8"
 nohash-hasher = "0.2"
 smallvec = "1.15"
+bumpalo = "3.16"
+ed25519-dalek = "2.1"
+base64 = "0.22"
+# SHA-256 for the gRPC decoder-cache digest keys (C2-02). Already in the
+# transitive tree via ed25519-dalek; pinned explicitly because grpc_server.rs
+# now depends on it directly (grpc feature only).
+sha2 = { version = "0.10", optional = true }
+# Synchronous HTTP client used by stripe_billing::flush_to_stripe for the
+# Stripe Billing Meter Events API (R4-01). Pure-Rust TLS via rustls.
+ureq = { version = "2.10", features = ["json"] }
 
 # opencl / cuda
 ocl = { version = "0.19", optional = true }

@@ -45,7 +45,7 @@ import numpy as np
 from . import benchmarking as _bm
 from . import codes as _codes
 
-__all__ = ["Job", "Workbench", "WorkbenchError"]
+__all__ = ["Job", "Workbench", "WorkbenchError", "main"]
 
 
 class WorkbenchError(RuntimeError):
@@ -137,7 +137,7 @@ class Workbench:
 
         try:
             sdem = circuit.detector_error_model(decompose_errors=True)
-        except RuntimeError:
+        except (ValueError, RuntimeError):
             sdem = circuit.detector_error_model()
         desc = {
             "kind": "stim",
@@ -201,12 +201,12 @@ class Workbench:
         }
         try:
             info["cuda_device"] = qd.CUDABatchDecoder([[0]], 1).device_name
-        except RuntimeError:
+        except (ImportError, OSError, AttributeError, TypeError, ValueError, RuntimeError):
             pass
         if info["opencl"]:
             try:
                 info["opencl_device"] = qd.OpenCLBatchDecoder([[0]], 1).device_name
-            except RuntimeError:
+            except (ImportError, OSError, AttributeError, TypeError, ValueError, RuntimeError):
                 pass
         return info
 
@@ -217,6 +217,24 @@ class Workbench:
         env["git_commit"] = _bm.git_commit()
         env["backends"] = self.detect_backends()
         return env
+
+    def set_license_key(self, key: str) -> None:
+        """Set the QECTOR license key for tier-gated features.
+
+        Delegates to qector_decoder_v3.set_license_key().
+        """
+        from . import set_license_key as _slk
+
+        _slk(key)
+
+    def get_license_info(self) -> dict:
+        """Return current license info dict, or {"tier": "Community", ...}."""
+        from . import get_license_info as _gli
+
+        try:
+            return _gli()
+        except Exception:
+            return {"tier": "Community", "max_distance": "7"}
 
     # ------------------------------------------------------------- benchmark
     def run_benchmark(self, spec: dict, job: Job | None = None) -> dict:
@@ -278,6 +296,13 @@ class Workbench:
         }
         if job is not None:
             job.artifact = artifact
+        # C6-03: record decode shots for metered billing
+        try:
+            from . import record_shots as _rs
+
+            _rs(done * trials)
+        except Exception:
+            pass
         return artifact
 
     def _resolve_problems(self, spec, source):
@@ -318,7 +343,7 @@ class Workbench:
             m = pymatching_compat.Matching.from_detector_error_model(sdem)
             pred = np.asarray(m.decode_batch(det), np.uint8).reshape(shots, -1)
             return float(np.any(pred != obs, axis=1).mean())
-        except RuntimeError:
+        except (ImportError, AttributeError, TypeError, ValueError, RuntimeError):
             return None
 
     # ------------------------------------------------------------- job queue
@@ -416,7 +441,7 @@ class Workbench:
                 with self._lock:
                     job.status = "cancelled"
                     job.finished_unix = time.time()
-            except RuntimeError as exc:  # pragma: no cover - defensive
+            except Exception as exc:  # noqa: BLE001 - a worker thread must never die silently
                 with self._lock:
                     job.status = "failed"
                     job.error = f"{type(exc).__name__}: {exc}"
@@ -485,7 +510,7 @@ class Workbench:
             matplotlib.use("Agg")
             import matplotlib.pyplot as plt
             from matplotlib.backends.backend_pdf import PdfPages
-        except RuntimeError as exc:  # pragma: no cover
+        except ImportError as exc:  # pragma: no cover
             raise WorkbenchError(f"PDF export needs matplotlib: {exc}")
 
         _ensure_parent(path)
@@ -563,3 +588,44 @@ def _fmt(x: Any) -> str:
     if isinstance(x, float):
         return f"{x:.6f}"
     return str(x)
+
+
+# ---------------------------------------------------------------------------
+# CLI entry point
+# ---------------------------------------------------------------------------
+def main(argv: list[str] | None = None) -> int:
+    """Workbench CLI: set license key, show license info, or run a benchmark job."""
+    import argparse
+
+    parser = argparse.ArgumentParser(description="QECTOR Workbench CLI")
+    parser.add_argument("--license-key", help="Set QECTOR license key before running")
+    parser.add_argument(
+        "command",
+        nargs="?",
+        default="info",
+        choices=["info", "benchmark"],
+        help="Command: 'info' (default) shows license info; 'benchmark' runs a benchmark",
+    )
+    args = parser.parse_args(argv)
+
+    wb = Workbench()
+
+    if args.license_key:
+        wb.set_license_key(args.license_key)
+        print("License key set")
+
+    if args.command == "info":
+        info = wb.get_license_info()
+        print(f"Tier        : {info.get('tier', 'Community')}")
+        print(f"Max distance: {info.get('max_distance', '7')}")
+        print(f"Customer ID : {info.get('customer_id', 'free_tier')}")
+        return 0
+
+    if args.command == "benchmark":
+        spec = {"code": "rotated_surface", "distances": [5], "decoders": ["blossom"], "trials": 1000}
+        print(f"Running benchmark: {spec}")
+        art = wb.run_benchmark(spec)
+        print(f"Done. {len(art.get('results', []))} result(s)")
+        return 0
+
+    return 0

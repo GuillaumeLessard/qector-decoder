@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "qector": {
+      "command": "python",
+      "args": ["-c", "import qector_decoder_v3; qector_decoder_v3.run_mcp_server()"],
+      "env": {
+        "QECTOR_SILENT": "1",
+        "QECTOR_BLOSSOM_K_MULT": "2.0"
+      },
+      "timeout": 30000
+    }
+  }
+}

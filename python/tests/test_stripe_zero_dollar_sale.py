@@ -106,8 +106,26 @@ def test_license_activates_via_environment(monkeypatch):
     assert qd._is_license_active() is True
 
 
+def test_debug_tokens_are_inert_without_qector_debug(monkeypatch):
+    """The ``academic``/``commercial`` bypass requires ``QECTOR_DEBUG=1``.
+
+    Without that gate these two words would be a licence for anyone who guessed
+    them. Locked in here so the gate cannot be dropped silently.
+    """
+    monkeypatch.delenv("QECTOR_DEBUG", raising=False)
+    for token in ("academic", "commercial"):
+        monkeypatch.setenv("QECTOR_LICENSE", token)
+        assert qd._is_license_active() is False, f"{token!r} must not activate without QECTOR_DEBUG=1"
+
+
 def test_autodecoder_operates_with_active_license(monkeypatch):
     """Verify AutoDecoder works bulletproof with an activated license token."""
+    # `academic` is a debug-only token; it activates solely under QECTOR_DEBUG=1.
+    # The test previously set only QECTOR_LICENSE and asserted activation, which
+    # stopped holding once the bypass was gated -- correctly -- behind the debug
+    # flag. See test_license_activates_via_environment for the real signed-token
+    # path.
+    monkeypatch.setenv("QECTOR_DEBUG", "1")
     monkeypatch.setenv("QECTOR_LICENSE", "academic")
     assert qd._is_license_active() is True
 

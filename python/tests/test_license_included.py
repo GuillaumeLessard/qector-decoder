@@ -32,19 +32,29 @@ def test_license_file_exists_and_non_empty():
     with open(license_path, "r", encoding="utf-8") as fh:
         text = fh.read()
     assert len(text) > 100, f"LICENSE is suspiciously short ({len(text)} chars)"
-    # The QECTOR Decoder Source-Available License: proprietary, with a free
-    # non-commercial grant and a paid commercial requirement.
-    # Accept either the historic title-cased heading or the current all-caps
-    # title - the LICENSE file's actual heading is "QECTOR SOURCE-AVAILABLE LICENSE".
     text_lower = text.lower()
-    assert "qector" in text_lower and "source-available" in text_lower
-    assert "all rights reserved" in text_lower
-    # The license file currently says "commercial use restrictions" and references
-    # Section 3 - accept any of the well-known phrasings used across revisions.
-    assert (
-        "commercial use requires a paid license" in text_lower
-        or "commercial use" in text_lower
-        and "license" in text_lower
+
+    # Assert the *terms* the project depends on, not one revision's wording.
+    # v0.7.0 replaced the bespoke "QECTOR SOURCE-AVAILABLE LICENSE Version 1.0"
+    # (which said "All Rights Reserved") with the standard PolyForm
+    # Noncommercial License 1.0.0 plus a commercial-use rider. Pinning the old
+    # phrase made a deliberate, reviewed licensing change look like a failure,
+    # while still not checking that any of it survived.
+    assert "qector" in text_lower
+    assert "copyright" in text_lower, "LICENSE must carry a copyright notice"
+    assert "guillaume lessard" in text_lower, "LICENSE must name the copyright holder"
+
+    # Source-available, not open source: either the bespoke heading or PolyForm.
+    assert "source-available" in text_lower or "polyform" in text_lower, (
+        "LICENSE must identify a source-available / noncommercial license"
+    )
+
+    # Commercial use is gated behind a paid license.
+    assert "commercial" in text_lower and "license" in text_lower
+
+    # The Rust core is carved out of the distributed grant.
+    assert "rust core" in text_lower, (
+        "LICENSE must state that the proprietary Rust core is not covered by this grant"
     )
 
 

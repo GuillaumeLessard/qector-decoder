@@ -100,7 +100,11 @@ def sum_product_bp(
         t = np.tanh(np.clip(0.5 * v2c, -30.0, 30.0))
         t = np.clip(t, -1.0 + eps, 1.0 - eps)
         sgn = np.where(t < 0.0, -1.0, 1.0)
-        logabs = np.log(np.abs(t))
+        # |t| must be floored away from zero: v2c == 0 happens by exact
+        # symmetry cancellation (e.g. H=[[1,1,0],[0,1,1]] at iteration 2), and
+        # log(0) = -inf then makes the leave-one-out subtraction below
+        # -inf - -inf = NaN, which propagates into the matcher weights.
+        logabs = np.log(np.maximum(np.abs(t), eps))
 
         sum_log = np.zeros(n_checks, dtype=np.float64)
         np.add.at(sum_log, ic, logabs)
@@ -117,4 +121,54 @@ def sum_product_bp(
 
     S_e.fill(0.0)
     np.add.at(S_e, ie, c2v)
+    return prior_llr + S_e
+
+
+def batch_sum_product_bp(
+    ic: np.ndarray,
+    ie: np.ndarray,
+    n_checks: int,
+    n_edges: int,
+    prior_llr: np.ndarray,
+    syndromes: np.ndarray,
+    max_iter: int,
+) -> np.ndarray:
+    """Batch sum-product BP — same as :func:`sum_product_bp` but processes
+    ``B = len(syndromes)`` syndromes in parallel using numpy vectorisation.
+
+    Returns posterior LLRs of shape ``(B, n_edges)``.
+    """
+    B = syndromes.shape[0]
+    M = ic.shape[0]
+    synd_sign = np.where(syndromes[:, ic] == 1, -1.0, 1.0)
+    c2v = np.zeros((B, M), dtype=np.float64)
+    S_e = np.zeros((B, n_edges), dtype=np.float64)
+    eps = 1e-12
+
+    for _ in range(max_iter):
+        S_e.fill(0.0)
+        np.add.at(S_e, (slice(None), ie), c2v)
+        v2c = prior_llr[ie] + S_e[:, ie] - c2v
+
+        t = np.tanh(np.clip(0.5 * v2c, -30.0, 30.0))
+        t = np.clip(t, -1.0 + eps, 1.0 - eps)
+        sgn = np.where(t < 0.0, -1.0, 1.0)
+        # Floored for the same reason as the single-shot path above.
+        logabs = np.log(np.maximum(np.abs(t), eps))
+
+        sum_log = np.zeros((B, n_checks), dtype=np.float64)
+        np.add.at(sum_log, (slice(None), ic), logabs)
+        negcount = np.zeros((B, n_checks), dtype=np.int64)
+        np.add.at(negcount, (slice(None), ic), (sgn < 0).astype(np.int64))
+        total_sign = np.where(negcount % 2 == 0, 1.0, -1.0)
+
+        loo_log = sum_log[:, ic] - logabs
+        loo_sign = total_sign[:, ic] * sgn
+        loo = loo_sign * np.exp(np.clip(loo_log, -60.0, 0.0))
+        loo = np.clip(loo, -1.0 + eps, 1.0 - eps)
+        c2v = synd_sign * 2.0 * np.arctanh(loo)
+        np.clip(c2v, -1e6, 1e6, out=c2v)
+
+    S_e.fill(0.0)
+    np.add.at(S_e, (slice(None), ie), c2v)
     return prior_llr + S_e

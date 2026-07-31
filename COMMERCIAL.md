@@ -1,6 +1,6 @@
 # Commercial Licensing
 
-QECTOR Decoder v3 is source-available for personal, academic, educational, and non-commercial research use.
+QECTOR Decoder v3 is source-available under the **PolyForm Noncommercial License 1.0.0** for personal, academic, educational, and non-commercial research use (see the `LICENSE` file for the full text).
 
 Commercial use requires a paid commercial license.
 
@@ -49,8 +49,8 @@ All tiers below grant internal commercial use rights under the terms of a writte
 | Tier                              | Price                                      | Scope                                                                 | Notes |
 |-----------------------------------|--------------------------------------------|-----------------------------------------------------------------------|-------|
 | Personal / Academic               | Free                                       | Personal, academic, educational, and non-commercial research use under the repository license | No commercial rights included |
-| Commercial Evaluation License     | $499 USD for 60 days                       | Full decoder suite (MWPM variants, Union-Find, BP-OSD, batch/GPU paths) and reproducibility toolkit. Internal evaluation use only. Up to 3 named users. 100% credit toward any annual license | Self-serve via qector.store. Primary low-friction entry point for commercial validation |
-| Solo / Indie Commercial           | $1,299 USD / year<br>or $899 USD one-time (perpetual internal use) | Single named user. Full decoder suite and reproducibility tools for internal commercial use. Includes 12 months of updates (annual) or perpetual core license rights (one-time). No redistribution or OEM rights | One-time perpetual option available. Designed for independent researchers and solo practitioners |
+| Commercial Evaluation License     | $499 USD for 60 days                       | Full decoder suite (MWPM variants, Union-Find, BP-OSD, batch/GPU paths) and reproducibility toolkit. Internal evaluation use only. Unlimited internal seats for the pilot duration. 100% credit toward any annual license | Self-serve via qector.store. Primary low-friction entry point for commercial validation |
+| Solo / Indie Commercial           | $1,299 USD / year<br>or $3,299 USD one-time (perpetual internal use) | Single named user. Full decoder suite and reproducibility tools for internal commercial use. Includes 12 months of updates (annual) or perpetual core license rights for the major version purchased, with patch updates included (one-time). No redistribution or OEM rights | One-time perpetual option available. Designed for independent researchers and solo practitioners |
 | Startup / Growth Team             | $4,499 USD / year                          | Up to 10 named users. Complete decoder suite, including advanced BP-OSD/LDPC and batch/GPU workflows, plus reproducibility tools. Includes 90 days of priority email support | Optimized for early-stage quantum companies and internal prototype development |
 | Professional / Lab                | $11,500 USD / year                         | Up to 25 named users. Full platform access including advanced workflows and batch processing. Includes credit for one Validation Report Package | Built-in proof-of-value service. Suitable for funded laboratories and commercial R&D teams |
 | Enterprise R&D                    | $28,000+ USD / year                        | Custom user volume. Full platform capabilities with options for dedicated support, integration assistance, and strategic workflow development | Contact sales for scoping and proposal |
@@ -126,7 +126,7 @@ Unless explicitly granted in a written commercial agreement, no license tier inc
 Self-serve purchasing for the Commercial Evaluation License and Solo / Indie tiers is available at:
 
 - Licensing Portal: **https://www.qector.store**
-- Direct Stripe Checkout: **[Buy Commercial License via Stripe](https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00?locale=en&__embed_source=buy_btn_1TsoKxRsa9cg9l8A7ExMmc77)**
+- Direct Stripe Checkout (60-day Commercial Evaluation License): **[Buy Commercial License via Stripe](https://buy.stripe.com/6oU00l77Xc8ifsegEqeUU07)**
 
 Higher tiers, Validation Sprints, and custom services are initiated via:
 
@@ -135,5 +135,17 @@ Higher tiers, Validation Sprints, and custom services are initiated via:
 All commercial licenses are issued under written agreement. Source-available access for non-commercial use continues under the repository license.
 
 ---
+
+## Metered Billing (v0.7.0)
+
+Enterprise deployments can track decode usage for metered billing:
+
+```python
+from qector_decoder_v3 import record_shots, get_accumulated_shots
+record_shots(1000)
+total = get_accumulated_shots()
+```
+
+Usage is flushed to Stripe on job completion or via `flush_metered_usage(customer_id, api_key)`.
 
 *This document supersedes all prior commercial pricing and licensing statements for QECTOR Decoder v3.*
