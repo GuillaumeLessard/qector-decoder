@@ -23,6 +23,31 @@ ls dist/                       # *.whl only
 python -m twine check dist/*
 ```
 
+## Refresh the Rust core secrets after ANY `src/*.rs` change
+
+`src/*` is gitignored, so a change to the core reaches CI and the wheels only
+through the `RUST_SRC_B64_*` Actions secrets. Editing `src/` and pushing does
+**nothing** on its own: the build keeps compiling whatever the secrets last held.
+This has bitten the project — a fix once sat local-only for four hours while
+every CI run reported green against older source.
+
+```bash
+python scripts/pack_rust_core.py pack                 # writes .secrets/ + rust_core.sha256
+for i in $(seq 1 12); do
+  gh secret set "RUST_SRC_B64_$i" < ".secrets/RUST_SRC_B64_$i.txt"
+done
+rm -rf .secrets
+git add rust_core.sha256 && git commit          # MUST be committed with the change
+```
+
+`rust_core.sha256` is the tracked digest of the packed core; it is the only
+record of the core's identity that travels with a commit. The
+`stale-secrets-check` workflow restores the secrets and runs
+`pack_rust_core.py check-manifest` against it, so **forgetting the upload now
+fails CI** instead of passing silently. Do not "fix" a red check-manifest by
+regenerating the manifest alone — that just re-points the anchor at the drift.
+Upload the secrets.
+
 ## Feature flags in published wheels
 
 `Cargo.toml` defaults to `["opencl", "cuda"]`, but the release workflow builds with:
