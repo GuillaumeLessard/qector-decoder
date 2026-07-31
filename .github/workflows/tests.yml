@@ -91,6 +91,11 @@ jobs:
           RUST_SRC_B64_12: ${{ secrets.RUST_SRC_B64_12 }}
         run: python scripts/pack_rust_core.py unpack --from-env
 
+      - name: Install OpenCL ICD loader + CPU runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ocl-icd-opencl-dev pocl-opencl-icd
+
       # A9-08: `maturin develop` requires an active virtualenv and errors out
       # without one. Create it and put it on PATH for every later step.
       - name: Create virtualenv
