@@ -6,7 +6,6 @@ import platform
 import sys
 import time
 
-
 # A5: every guard in this module caught `RuntimeError`, which is not a base of
 # ImportError / PackageNotFoundError / OSError. A missing optional package or an
 # absent GPU driver therefore propagated instead of degrading — in a *diagnostic*

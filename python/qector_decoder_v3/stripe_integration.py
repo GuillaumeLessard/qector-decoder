@@ -64,7 +64,7 @@ except ImportError:
 # Signing lives INSIDE the package so fulfillment works in production installs
 # (pip-installed wheels do not ship repo-root helper scripts). Imported after the
 # .env load above so the signing key it reads is already in the environment.
-from .license import create_license_token  # noqa: E402
+from .license import create_license_token
 
 logger = logging.getLogger("qector_decoder_v3.stripe")
 

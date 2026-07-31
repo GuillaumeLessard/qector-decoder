@@ -33,7 +33,6 @@ import os
 
 import numpy as np
 import pytest
-
 import qector_decoder_v3 as q
 from qector_decoder_v3 import license as lic
 

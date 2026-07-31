@@ -1,7 +1,6 @@
 """Tests for the metered-billing functions (record_shots, flush_metered_usage)."""
 
 import pytest
-
 import qector_decoder_v3 as qd
 from qector_decoder_v3.stripe_integration import flush_metered_usage
 

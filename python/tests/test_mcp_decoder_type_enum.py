@@ -4,7 +4,6 @@ The MCP server must reject requests with an invalid or unknown decoder_type.
 """
 
 import pytest
-
 import qector_decoder_v3 as qd
 
 _HAS_MCP = hasattr(qd, "run_mcp_server") and callable(qd.run_mcp_server)

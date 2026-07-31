@@ -6,7 +6,6 @@ functions require a build with the 'grpc' feature enabled.
 """
 
 import pytest
-
 import qector_decoder_v3 as qd
 
 _HAS_MCP = hasattr(qd, "run_mcp_server") and callable(qd.run_mcp_server)

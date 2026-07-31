@@ -24,7 +24,6 @@ from __future__ import annotations
 import os
 
 import pytest
-
 import qector_decoder_v3 as qd
 
 TIER_CAPS = {"Community": 7, "Pro": 19, "Enterprise": 63}

@@ -39,8 +39,16 @@ def _build_parser() -> argparse.ArgumentParser:
 
 def cmd_decode(args: argparse.Namespace) -> None:
     import numpy as np
-    from . import BlossomDecoder, SparseBlossomDecoder, UnionFindDecoder, \
-        FastUnionFindDecoder, BPOSDDecoder, BeliefMatchingDecoder, AutoDecoder
+
+    from . import (
+        AutoDecoder,
+        BeliefMatchingDecoder,
+        BlossomDecoder,
+        BPOSDDecoder,
+        FastUnionFindDecoder,
+        SparseBlossomDecoder,
+        UnionFindDecoder,
+    )
 
     syndromes = np.load(args.input) if args.input.endswith(".npy") else \
         np.loadtxt(args.input, dtype=np.uint8, delimiter=",")
@@ -61,7 +69,7 @@ def cmd_decode(args: argparse.Namespace) -> None:
         dec = decoder_map[args.decoder](c2q, nq)
     elif args.decoder == "belief_match":
         from .dem import from_stim
-        dec = BeliefMatchingDecoder(c2q, nq, **{"dem_model": from_stim})
+        dec = BeliefMatchingDecoder(c2q, nq, dem_model=from_stim)
     elif args.decoder == "auto":
         dec = AutoDecoder(c2q, nq)
     else:
@@ -76,6 +84,7 @@ def cmd_decode(args: argparse.Namespace) -> None:
 
 def cmd_bench(args: argparse.Namespace) -> None:
     import stim
+
     from . import BlossomDecoder
 
     circuit = stim.Circuit.generated(
@@ -106,8 +115,9 @@ def cmd_bench(args: argparse.Namespace) -> None:
 
 def cmd_serve(args: argparse.Namespace) -> None:
     if args.transport == "rest":
-        from .rest_api import app as fastapi_app
         import uvicorn
+
+        from .rest_api import app as fastapi_app
         uvicorn.run(fastapi_app, host=args.host, port=args.port)
     elif args.transport == "grpc":
         print("gRPC server: use the native qector_decoder_v3 module directly")

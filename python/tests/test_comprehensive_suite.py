@@ -23,7 +23,6 @@ import pytest
 # process in the entire session died at import and hung its parent. It caused
 # two separate full-suite hangs. Path resolution now lives in `conftest.py`,
 # which prefers the installed package for the whole session.
-
 from qector_decoder_v3 import (
     AutoDecoder,
     BeliefMatching,

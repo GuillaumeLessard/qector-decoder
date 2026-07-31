@@ -9,7 +9,6 @@ rejected the weights, so `BeliefMatching.decode` raised on a 2x3 code.
 
 import numpy as np
 import pytest
-
 from qector_decoder_v3._bp_core import (
     batch_sum_product_bp,
     build_incidence,

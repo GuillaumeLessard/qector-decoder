@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 import pytest
-
-import qector_decoder_v3.rest_api as rest_api
+from qector_decoder_v3 import rest_api
 
 
 @pytest.fixture(autouse=True)

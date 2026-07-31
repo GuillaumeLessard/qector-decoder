@@ -293,8 +293,7 @@ def _dem_observable_decoder(kind: str, dem: Any):
     through a different pipeline than the one it is being compared against.
     """
     k = kind.lower().replace("-", "_")
-    if k.startswith("qector_"):
-        k = k[len("qector_") :]
+    k = k.removeprefix("qector_")
 
     if k in ("pymatching", "pm"):
         import pymatching

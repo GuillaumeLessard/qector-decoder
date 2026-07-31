@@ -20,7 +20,8 @@ Environment:
 from __future__ import annotations
 
 import os
-from typing import Any, Optional, Sequence
+from collections.abc import Sequence
+from typing import Any, Optional
 
 import numpy as np
 
@@ -223,6 +224,7 @@ def build_torch_model_from_state(
 ):
     """Construct a ``TorchGNNPredecoder`` and load ``state`` weights."""
     import torch
+
     from .torch_predecoder import TorchGNNPredecoder
 
     n_layers = count_mpnn_layers(state)

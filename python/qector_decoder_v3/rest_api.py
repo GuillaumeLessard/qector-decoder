@@ -39,7 +39,16 @@ from typing import Any
 
 import numpy as np
 
-from . import BatchDecoder, UnionFindDecoder, __version__, get_license_info, set_license_key, enforce_unlocked, enforce_distance_cap, estimate_distance
+from . import (
+    BatchDecoder,
+    UnionFindDecoder,
+    __version__,
+    enforce_distance_cap,
+    enforce_unlocked,
+    estimate_distance,
+    get_license_info,
+    set_license_key,
+)
 
 logger = logging.getLogger("qector_decoder_v3.rest_api")
 
@@ -54,8 +63,8 @@ _MAX_RATE_LIMIT_CLIENTS = 10_000
 
 # Imported here rather than at the top so the rate-limiter's state and the two
 # types it is built from stay in one readable block.
-from collections import deque as _deque  # noqa: E402
-from threading import Lock as _Lock  # noqa: E402
+from collections import deque as _deque
+from threading import Lock as _Lock
 
 _rate_buckets: dict[str, _deque[float]] = {}
 _rate_lock = _Lock()

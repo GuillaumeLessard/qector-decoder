@@ -62,7 +62,7 @@ _OPTIONAL_BACKENDS = (
 class Check:
     """One diagnostic line: a status, what was observed, and what to do."""
 
-    __slots__ = ("name", "status", "detail", "remedy")
+    __slots__ = ("detail", "name", "remedy", "status")
 
     def __init__(self, name: str, status: str, detail: str, remedy: str = "") -> None:
         self.name = name

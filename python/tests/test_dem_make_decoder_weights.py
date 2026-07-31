@@ -12,7 +12,6 @@ import math
 from pathlib import Path
 
 import numpy as np
-
 from qector_decoder_v3 import BlossomDecoder, dem
 
 # Syndrome [1, 0, 1]:

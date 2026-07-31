@@ -85,7 +85,7 @@ if _installed_package_has_native_extension():
     os.environ.setdefault("QECTOR_TESTS_USE_INSTALLED", "1")
 
 
-def pytest_report_header(config):  # noqa: ARG001 - pytest hook signature
+def pytest_report_header(config):
     """Make the resolution decision visible in the test header."""
     spec = importlib.util.find_spec("qector_decoder_v3")
     origin = spec.origin if spec else "<not found>"

@@ -67,10 +67,10 @@ class ColourCodeDecoder:
     """
 
     def __init__(self, dem: Any, max_iter: int = 30, osd_order: int = 0):
+        import stim
+
         from .belief_matching import build_matching_matrices
         from .bposd import BpOsdDecoder
-
-        import stim
 
         if isinstance(dem, str):
             dem = stim.DetectorErrorModel(dem)

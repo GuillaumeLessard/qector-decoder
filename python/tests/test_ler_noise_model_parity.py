@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-
 from qector_decoder_v3 import codes, ler
 
 stim = pytest.importorskip("stim", reason="circuit-level tests need stim")

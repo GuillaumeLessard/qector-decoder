@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-
 from qector_decoder_v3 import FastUnionFindDecoder, UnionFindDecoder
 
 stim = pytest.importorskip("stim")

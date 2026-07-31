@@ -304,8 +304,7 @@ def _py_estimate_distance(check_to_qubits, n_qubits=None):
         max_q = 0
         for qs in check_to_qubits:
             for q in qs:
-                if q > max_q:
-                    max_q = q
+                max_q = max(max_q, q)
         nq = max_q + 1
     else:
         nq = n_qubits
@@ -1453,6 +1452,15 @@ class TwoStageDecoder:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
         return self._inner.decode(syndrome)
 
+    def batch_decode(self, syndromes):
+        if not isinstance(syndromes, _np.ndarray):
+            syndromes = _np.array(syndromes, dtype=_np.uint8)
+        if syndromes.dtype != _np.uint8:
+            syndromes = syndromes.astype(_np.uint8)
+        if syndromes.ndim != 2:
+            raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
+        return self._inner.batch_decode(syndromes)
+
     @property
     def n_qubits(self):
         return self._inner.n_qubits
@@ -1487,6 +1495,15 @@ class AmbiguityClusterDecoder:
         if syndrome.dtype != _np.uint8:
             raise TypeError(f"Syndrome must be dtype uint8, got {syndrome.dtype}")
         return self._inner.decode(syndrome)
+
+    def batch_decode(self, syndromes):
+        if not isinstance(syndromes, _np.ndarray):
+            syndromes = _np.array(syndromes, dtype=_np.uint8)
+        if syndromes.dtype != _np.uint8:
+            syndromes = syndromes.astype(_np.uint8)
+        if syndromes.ndim != 2:
+            raise ValueError(f"syndromes must be 2D, got shape {syndromes.shape}")
+        return self._inner.batch_decode(syndromes)
 
     @property
     def n_qubits(self):
@@ -2377,6 +2394,9 @@ __all__ = [
     "check_to_edges",
     "compute_detector_differences",
     "cuda_is_available",
+    "enforce_distance_cap",
+    "enforce_unlocked",
+    "estimate_distance",
     "flush_usage",
     "from_circuit",
     "generate_biconnected_qldpc_checks",
@@ -2388,14 +2408,11 @@ __all__ = [
     "generate_toy_code_checks",
     "generate_triangular_color_code_4_8_8_checks",
     "get_latency_quantiles",
-    "set_license_key_file",
     "opencl_is_available",
     "run_grpc_server",
     "run_mcp_server",
+    "set_license_key_file",
     "start_metrics_server",
-    "enforce_unlocked",
-    "enforce_distance_cap",
-    "estimate_distance",
 ]
 
 
@@ -2435,8 +2452,6 @@ except Exception:  # pragma: no cover
 __all__ += [
     "AmbiguityClusterDecoder",
     "AutoDecoder",
-    "NativeAutoDecoder",
-    "TwoStageDecoder",
     "Backend",
     "BackendConfig",
     "BeliefMatching",
@@ -2445,7 +2460,9 @@ __all__ += [
     "DecodeResult",
     "DecoderPool",
     "GNNBeliefMatcher",
+    "NativeAutoDecoder",
     "PredecodedDecoder",
+    "TwoStageDecoder",
     "Workbench",
     "backend",
     "belief_matching",
@@ -2488,18 +2505,38 @@ try:
 except Exception:  # pragma: no cover
     stripe_integration = None  # type: ignore[assignment]
 
+try:
+    from . import bench_quick
+except Exception:  # pragma: no cover
+    bench_quick = None  # type: ignore[assignment]
+
+try:
+    from . import cli
+except Exception:  # pragma: no cover
+    cli = None  # type: ignore[assignment]
+
+try:
+    from . import doctor
+except Exception:  # pragma: no cover
+    doctor = None  # type: ignore[assignment]
+
+try:
+    from . import ler
+except Exception:  # pragma: no cover
+    ler = None  # type: ignore[assignment]
+
 __all__ += [
     "MAX_WORKERS",
+    "get_accumulated_shots",
+    "get_license_info",
     "license",
     "qiskit_plugin",
+    "record_shots",
     "rest_api",
+    "set_license_key",
     "stim_compat",
     "stripe_integration",
     "verify_license_token",
-    "set_license_key",
-    "get_license_info",
-    "record_shots",
-    "get_accumulated_shots",
 ]
 
 # ---------------------------------------------------------------------------

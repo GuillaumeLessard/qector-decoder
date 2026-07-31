@@ -3,10 +3,9 @@ Test suite for Stripe API & License Fulfillment Integration
 """
 
 import json
+import os
 import time
 from unittest.mock import MagicMock, patch
-
-import os
 
 import pytest
 import qector_decoder_v3 as qd

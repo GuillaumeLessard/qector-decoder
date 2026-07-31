@@ -7,7 +7,6 @@ scratch handle does not corrupt or crash.
 
 import numpy as np
 import pytest
-
 import qector_decoder_v3 as qd
 
 

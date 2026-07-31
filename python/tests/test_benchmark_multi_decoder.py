@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from qector_decoder_v3 import codes
 from qector_decoder_v3.benchmarking import benchmark_decoder
 

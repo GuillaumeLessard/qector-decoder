@@ -51,14 +51,14 @@ import numpy as np
 
 __all__ = [
     "SIMD_ALIGN",
-    "aligned_stride",
-    "alignment_of",
-    "is_simd_aligned",
-    "prepare_syndromes",
     "align_and_flatten_syndromes",
-    "buffer_report",
-    "native_buffer_geometry",
+    "aligned_stride",
     "aligned_syndrome_batch",
+    "alignment_of",
+    "buffer_report",
+    "is_simd_aligned",
+    "native_buffer_geometry",
+    "prepare_syndromes",
 ]
 
 #: Cache-line / AVX-512 register width in bytes.

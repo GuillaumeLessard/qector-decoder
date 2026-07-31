@@ -1,11 +1,12 @@
 """Tests for ONNX export, numpy forward, and runtime backend resolution (T5-11)."""
 
+import importlib.util
 import os
 import sys
 import tempfile
-import importlib.util
-import pytest
+
 import numpy as np
+import pytest
 
 # Load onnx_predecoder module directly without requiring compiled PyO3 native extension
 spec = importlib.util.spec_from_file_location(

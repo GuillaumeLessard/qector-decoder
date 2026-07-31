@@ -201,7 +201,9 @@ METHOD_SPECS: dict[str, str] = {
     "CPUBatchDecoder.batch_decode": "syndromes",
     "BatchDecoder.batch_decode": "syndromes",
     "TwoStageDecoder.decode": "syndrome",
+    "TwoStageDecoder.batch_decode": "syndromes",
     "AmbiguityClusterDecoder.decode": "syndrome",
+    "AmbiguityClusterDecoder.batch_decode": "syndromes",
 }
 
 
@@ -477,7 +479,8 @@ def test_new_decoder_families_return_a_uint8_ndarray(name):
     c2q, H, syn = _repetition_chain()
     n = H.shape[1]
     if name == "TwoStageDecoder":
-        dec = qd.TwoStageDecoder(c2q, [True] * len(c2q), n)
+        types = [i % 2 == 0 for i in range(len(c2q))]
+        dec = qd.TwoStageDecoder(c2q, types, n)
     else:
         dec = qd.AmbiguityClusterDecoder(c2q, n)
     corr = dec.decode(syn)
@@ -499,7 +502,8 @@ def test_new_decoder_families_expose_batch_decode(name):
     c2q, H, syn = _repetition_chain()
     n = H.shape[1]
     if name == "TwoStageDecoder":
-        dec = qd.TwoStageDecoder(c2q, [True] * len(c2q), n)
+        types = [i % 2 == 0 for i in range(len(c2q))]
+        dec = qd.TwoStageDecoder(c2q, types, n)
     else:
         dec = qd.AmbiguityClusterDecoder(c2q, n)
     assert hasattr(dec, "batch_decode"), (

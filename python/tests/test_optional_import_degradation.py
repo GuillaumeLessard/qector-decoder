@@ -44,7 +44,6 @@ class _BlockedFinder:
         root = fullname.split(".")[0]
         if root in self.blocked:
             raise ModuleNotFoundError(f"No module named {root!r}", name=root)
-        return None
 
 
 def _reimport_without(module_name: str, blocked: list[str]):
