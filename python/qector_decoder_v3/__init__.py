@@ -172,7 +172,7 @@ def get_accumulated_shots() -> int:
     return 0
 
 
-def flush_usage(customer_id: str | None = None, api_key: str | None = None) -> dict:
+def flush_usage(customer_id: "str | None" = None, api_key: "str | None" = None) -> dict:
     """Flush accumulated decode shots to the Stripe Billing Meter Events API.
 
     ``customer_id`` falls back to ``QECTOR_STRIPE_CUSTOMER_ID`` and ``api_key``

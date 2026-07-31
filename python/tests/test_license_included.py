@@ -10,7 +10,10 @@ its metadata. This test asserts:
 
 import os
 
-import tomllib
+try:
+    import tomllib
+except ModuleNotFoundError:  # Python < 3.11 - tomllib entered the stdlib in 3.11
+    import tomli as tomllib
 
 
 def _repo_root():

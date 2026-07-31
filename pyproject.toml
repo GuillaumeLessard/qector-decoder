@@ -59,6 +59,10 @@ dev = [
     # A9-01: `tests.yml` invokes `pytest --timeout=120`. Without this plugin that
     # is an unrecognized argument and the whole job dies at collection.
     "pytest-timeout>=2.1.0",
+    # Four packaging tests parse pyproject.toml with `tomllib`, which only
+    # entered the stdlib in 3.11. Without this the 3.9/3.10 matrix legs die at
+    # collection with ModuleNotFoundError rather than running the tests.
+    "tomli>=2.0; python_version<'3.11'",
     "hypothesis>=6.0.4",  # clears 1 Safety advisory; 6.0.4 still allows py3.6+
     "fastapi>=0.110.0",
     "uvicorn>=0.29.0",
@@ -195,8 +199,12 @@ docstring-code-format = true
 # E702: semicolons used intentionally for chained one-liners in plotting helpers.
 # E731: lambda assignments used for compact callback tables in a few helpers.
 # E741: single-letter variable names (l, I, O) are domain-conventional in QEC math.
-# S110, BLE001, FA102, C414, C401, RUF*, ISC004, UP045, B017, PLW1510, SIM118: style & optional-dep guards.
-ignore = ["E702", "E731", "E741", "S110", "BLE001", "FA102", "FA100", "C414", "C401", "RUF012", "RUF023", "RUF034", "RUF046", "RUF059", "RUF100", "ISC004", "UP045", "B017", "PLW1510", "SIM118"]
+# S110, BLE001, C414, C401, RUF*, ISC004, UP045, B017, PLW1510, SIM118: style & optional-dep guards.
+#
+# FA102 is deliberately NOT ignored: `requires-python = ">=3.9"`, and a bare
+# PEP 604 `X | Y` in a signature is evaluated at import time, so on 3.9 it
+# raises TypeError and makes the whole package unimportable. Keep it enforcing.
+ignore = ["E702", "E731", "E741", "S110", "BLE001", "FA100", "C414", "C401", "RUF012", "RUF023", "RUF034", "RUF046", "RUF059", "RUF100", "ISC004", "UP045", "B017", "PLW1510", "SIM118"]
 
 [tool.ruff.lint.per-file-ignores]
 # __init__: late imports (E402) are intentional (runtime optional deps).
