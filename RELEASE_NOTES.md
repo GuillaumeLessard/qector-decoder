@@ -393,8 +393,8 @@ This release delivers the complete QECTOR v3 decoder suite with 4 algorithmic ba
 | `GNNPredecoder` | Experimental | Message-passing + edge readout, forward pass OK |
 | `LookupTableDecoder` | Stable | Exact d=3,5,7 precomputed, SIMD fallback |
 | `HybridDecoder` | Stable | Auto-selection per syndrome difficulty |
-| `StreamingDecoder` | Stable | Sliding window, 1.6 µs real-time |
-| `BatchDecoder` / `CPUBatchDecoder` | Stable | SIMD, parallel, pooled — 4.1M dec/s d=5 |
+| `StreamingDecoder` | Stable | Sliding window; latency figure withdrawn, see below |
+| `BatchDecoder` / `CPUBatchDecoder` | Stable | SIMD, parallel, pooled; throughput figure withdrawn, see below |
 | `OpenCLBatchDecoder` | Stable | GPU dual-kernel, transparent fallback, resilience |
 
 ### GPU Acceleration (OpenCL)
@@ -403,7 +403,11 @@ This release delivers the complete QECTOR v3 decoder suite with 4 algorithmic ba
 - Transparent CPU fallback on GPU failure
 - Auto-recovery: exits degraded mode after 10 successful calls
 - Observability: `consecutive_failures`, `total_failures`, `gpu_recoveries`, `degraded_calls`
-- Performance: 14.6M dec/s @ d=5, batch=10000
+- Performance: the "14.6M dec/s @ d=5, batch=10000" figure is **withdrawn** — it
+  is one of the rows under *Performance Highlights* below, which no surviving
+  artifact backs and which must not be cited. The GPU path has not been
+  re-measured under the circuit-level pipeline; `official_benchmark_results.*`
+  covers the CPU decoders, PyMatching and ldpc only.
 
 ### Production Infrastructure
 

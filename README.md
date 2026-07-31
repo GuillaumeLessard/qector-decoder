@@ -454,12 +454,21 @@ Two findings, stated per-cell and not generalised (see
   returned *the same number of logical failures on the same 100,000 samples* —
   1891 and 1596 respectively, identical to the digit. On this workload the two
   agree exactly, which is a checkable claim rather than a rounded one.
-- **Throughput.** PyMatching was faster than every QECTOR decoder at every
-  distance measured here — roughly 3× at `d = 3` against `qector_unionfind`,
-  and two orders of magnitude against `qector_blossom` by `d = 11`. That is
-  consistent with the long-standing note elsewhere in this project that
-  PyMatching leads on plain MWPM. It is not a regression, and the artifacts do
-  not hide it.
+- **Throughput.** PyMatching was faster than every QECTOR decoder measured here,
+  at every distance — roughly 3× at `d = 3` against `qector_unionfind`, and two
+  orders of magnitude against `qector_blossom` by `d = 11`. That is consistent
+  with the long-standing note elsewhere in this project that PyMatching leads on
+  plain MWPM. It is not a regression, and the artifacts do not hide it.
+
+Note which Union-Find this is. `qector_unionfind` above is the **weighted**
+variant, which is what `ler._dem_observable_decoder` resolves and what the
+accuracy column reflects. `docs/BENCHMARK_COMPETITIVE.md` benchmarks the
+**unweighted** one (`qector_unionfind_unweighted`) and reports it beating
+PyMatching on latency at `d = 3` — both results are real, and they are not in
+conflict: unweighted UF is faster precisely because it discards the
+`log((1-p)/p)` edge weights, which is also why that document records it as
+above threshold at circuit level from `d = 5` upward. Speed and accuracy are
+being traded, so quote the two numbers together or neither.
 
 Neither finding generalises beyond the cells above. Regenerate on quiesced
 hardware, and state the noise model, before any number here is used in a claim.
