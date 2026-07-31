@@ -396,17 +396,47 @@ method that produced them cannot support the claim they were used to make.
 cross-model comparisons through `assert_comparable`, so this class of error
 cannot recur silently.
 
-**What replaces them:** `scripts/regenerate_benchmark_artifacts.py` drives every
-decoder through one circuit-level pipeline and stamps the result with its
-methodology, git commit, tree-dirty flag, parameters, and dependency versions.
-The full publication run — 100,000 shots × 4 distances × 4 decoders, on a
-quiesced machine — **has not been performed**, so there is no replacement table
-to print yet. Run it yourself:
+**What replaces them:** `scripts/regenerate_benchmark_artifacts.py` and
+`scripts/run_custom_comparison_benchmark.py` both drive every decoder through
+one circuit-level pipeline — `ler.estimate_ler_circuit_level`, one Stim circuit,
+one decomposed DEM, one detector/observable sample set per cell, one
+`decode_batch` resolver, scored against the circuit's own logical observables —
+and stamp the result with its methodology, git commit, tree-dirty flag,
+parameters and dependency versions. `ler.assert_comparable` gates the rows
+before they are written.
 
 ```bash
 python scripts/regenerate_benchmark_artifacts.py --dry-run   # show the plan
 python scripts/regenerate_benchmark_artifacts.py --yes       # ~1.6M decodes
+
+# QECTOR vs PyMatching vs ldpc, with a per-cell time budget:
+python scripts/run_custom_comparison_benchmark.py \
+    --distances 3,5,7,9,11,13,15 --shots 1000,5000,10000,50000,100000 --p 0.005
 ```
+
+### Indicative circuit-level run (not a publication run)
+
+`official_benchmark_results.{json,csv,md,pdf}` in the repo root hold a 77-cell
+run at `p = 0.005`, `seed = 1`, `d ∈ {3..15}`, shots up to 100,000. Read it as
+indicative only: it was taken on a **developer workstation that was not
+quiesced**, and its provenance block records `git_tree_dirty: true`. A further
+63 cells exceeded the per-cell decode budget and are listed as *not measured*,
+carrying their measured probe rate and projected cost — no cell is extrapolated.
+
+Two findings, stated per-cell and not generalised (see
+`docs/REPRODUCIBILITY_CHECKLIST.md`):
+
+- At `d = 3` and `d = 5`, `qector_blossom` and PyMatching 2 returned **the same
+  number of logical failures on the same 100,000 samples** — 1891 and 1596
+  respectively. On this workload the two agree exactly.
+- On throughput, **PyMatching was faster than every QECTOR decoder at every
+  distance measured here**, by roughly 3× at `d = 3` and by two orders of
+  magnitude for `qector_blossom` by `d = 11`. This is consistent with the
+  long-standing note elsewhere in this project that PyMatching leads on plain
+  MWPM; it is not a regression, and it is not something the artifacts hide.
+
+Do not quote these as a marketing comparison. Regenerate on quiesced hardware,
+and state the noise model, before any number here is used in a claim.
 
 ### Published, citable evidence
 
