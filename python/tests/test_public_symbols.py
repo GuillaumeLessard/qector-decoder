@@ -100,9 +100,7 @@ def test_no_required_symbol_degraded_to_a_stub():
     That is precisely why this check exists: presence is not availability.
     """
     stubs = sorted(
-        name
-        for name in _load_expected()
-        if name not in OPTIONAL_SYMBOLS and _is_guard_stub(getattr(qd, name, None))
+        name for name in _load_expected() if name not in OPTIONAL_SYMBOLS and _is_guard_stub(getattr(qd, name, None))
     )
     assert not stubs, (
         f"these required symbols resolved to _guard() stubs: {stubs}. The wheel "
@@ -118,11 +116,7 @@ def test_public_surface_has_not_grown_silently():
     unable to change it without a breaking release.
     """
     expected = _load_expected()
-    actual_public = {
-        name
-        for name in dir(qd)
-        if not name.startswith("_") and name not in {"annotations", "math", "np"}
-    }
+    actual_public = {name for name in dir(qd) if not name.startswith("_") and name not in {"annotations", "math", "np"}}
     undeclared = sorted(actual_public - expected)
     assert not undeclared, (
         f"public names not declared in expected_symbols.txt: {undeclared}. "
@@ -181,8 +175,7 @@ def test_no_stdlib_or_third_party_module_leaked_into_the_namespace():
             if not mod.startswith("qector_decoder_v3"):
                 leaked.append(f"{name} -> {mod}")
     assert not leaked, (
-        f"foreign modules exposed as public attributes: {leaked}. Import them "
-        "under a leading-underscore alias."
+        f"foreign modules exposed as public attributes: {leaked}. Import them under a leading-underscore alias."
     )
 
 

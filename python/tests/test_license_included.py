@@ -53,9 +53,7 @@ def test_license_file_exists_and_non_empty():
     assert "commercial" in text_lower and "license" in text_lower
 
     # The Rust core is carved out of the distributed grant.
-    assert "rust core" in text_lower, (
-        "LICENSE must state that the proprietary Rust core is not covered by this grant"
-    )
+    assert "rust core" in text_lower, "LICENSE must state that the proprietary Rust core is not covered by this grant"
 
 
 def test_pyproject_declares_license():

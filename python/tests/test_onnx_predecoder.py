@@ -44,9 +44,9 @@ def test_numpy_gnn_forward_mock_state():
     state = {
         "layers.0.w_message": np.zeros((4, 4), dtype=np.float32),  # in_dim = 2 + 2 = 4
         "layers.0.b_message": np.zeros(4, dtype=np.float32),
-        "layers.0.w_update": np.zeros((4, 6), dtype=np.float32),   # in_dim = 2 + 4 = 6
+        "layers.0.w_update": np.zeros((4, 6), dtype=np.float32),  # in_dim = 2 + 4 = 6
         "layers.0.b_update": np.zeros(4, dtype=np.float32),
-        "edge_readout.w1": np.zeros((4, 10), dtype=np.float32),    # 4 + 4 + 2 = 10
+        "edge_readout.w1": np.zeros((4, 10), dtype=np.float32),  # 4 + 4 + 2 = 10
         "edge_readout.b1": np.zeros(4, dtype=np.float32),
         "edge_readout.w2": np.zeros((1, 4), dtype=np.float32),
         "edge_readout.b2": np.zeros(1, dtype=np.float32),

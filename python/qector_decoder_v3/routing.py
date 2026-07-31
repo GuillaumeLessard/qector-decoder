@@ -135,6 +135,7 @@ def _native_auto_available() -> bool:
         return False
     return True
 
+
 # Code-family classification. Tokens are matched as substrings (case-folded) so
 # that names like "rotated_surface_d5" or "bivariate_bicycle" classify correctly.
 _MATCHING_TOKENS = (

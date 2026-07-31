@@ -107,8 +107,7 @@ def decode_qiskit_result(
     """
     if not _HAS_QISKIT:
         warnings.warn(
-            "Qiskit is not installed. Integration works in 'raw dict' "
-            "mode. For full usage: pip install qiskit",
+            "Qiskit is not installed. Integration works in 'raw dict' mode. For full usage: pip install qiskit",
             stacklevel=2,
         )
 

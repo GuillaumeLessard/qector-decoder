@@ -59,9 +59,7 @@ _PREFIX_KEY = {
 def _layout(d: int):
     """Repetition-code layout whose `estimate_distance` is exactly `d`."""
     c2q, n_qubits = q._native_module.py_generate_repetition_code_checks(d)
-    assert q._native_module.py_estimate_distance(c2q, n_qubits) == d, (
-        f"anchor broken: estimate_distance != {d}"
-    )
+    assert q._native_module.py_estimate_distance(c2q, n_qubits) == d, f"anchor broken: estimate_distance != {d}"
     return c2q, n_qubits
 
 

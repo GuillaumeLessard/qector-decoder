@@ -28,9 +28,7 @@ def test_flush_metered_usage_reports_missing_key_clearly():
         return
     with pytest.raises(RuntimeError) as exc:
         flush_metered_usage(customer_id="cus_test_flush_no_crash")
-    assert "api key" in str(exc.value).lower(), (
-        f"error message should name the missing key, got: {exc.value}"
-    )
+    assert "api key" in str(exc.value).lower(), f"error message should name the missing key, got: {exc.value}"
 
 
 def test_flush_metered_usage_rejects_empty_customer():

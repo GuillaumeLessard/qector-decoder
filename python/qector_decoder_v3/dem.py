@@ -371,8 +371,7 @@ class DemModel:
         canonical = self.DECODER_KINDS.get(kind.lower().strip())
         if canonical is None:
             raise ValueError(
-                f"unknown decoder kind: {kind!r}; expected one of "
-                f"{sorted(set(self.DECODER_KINDS.values()))}"
+                f"unknown decoder kind: {kind!r}; expected one of {sorted(set(self.DECODER_KINDS.values()))}"
             )
 
         if canonical == "union_find":
@@ -403,8 +402,7 @@ class DemModel:
             types = [bool(t) for t in check_types]
             if len(types) != self.num_detectors:
                 raise ValueError(
-                    f"check_types has {len(types)} entries, expected {self.num_detectors} "
-                    "(one per detector)"
+                    f"check_types has {len(types)} entries, expected {self.num_detectors} (one per detector)"
                 )
             return TwoStageDecoder(c2q, types, nq)
         raise AssertionError(f"unhandled decoder kind {canonical!r}")  # pragma: no cover

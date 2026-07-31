@@ -48,9 +48,7 @@ def test_batch_bp_matches_single_shot():
     """Batch and single-shot BP must agree bit-for-bit on the same syndrome."""
     _, (ic, ie, n_checks, n_hyper, prior_llr) = _bp_args()
     single = sum_product_bp(ic, ie, n_checks, n_hyper, prior_llr, _SYNDROME, 20)
-    batch = batch_sum_product_bp(
-        ic, ie, n_checks, n_hyper, prior_llr, _SYNDROME[None, :], 20
-    )
+    batch = batch_sum_product_bp(ic, ie, n_checks, n_hyper, prior_llr, _SYNDROME[None, :], 20)
     np.testing.assert_allclose(batch[0], single, rtol=0, atol=1e-12)
 
 
@@ -74,7 +72,5 @@ def test_belief_matching_decode_batch_does_not_raise():
 def test_finite_across_prior_magnitudes(p):
     """Extreme priors must not reintroduce a non-finite posterior."""
     bm = BeliefMatching.from_numpy_h(_H, [p, p, p])
-    post = sum_product_bp(
-        bm._hic, bm._hie, bm.n_checks, bm._n_hyper, bm._prior_llr, _SYNDROME, 30
-    )
+    post = sum_product_bp(bm._hic, bm._hie, bm.n_checks, bm._n_hyper, bm._prior_llr, _SYNDROME, 30)
     assert np.all(np.isfinite(post)), f"non-finite at p={p}: {post}"

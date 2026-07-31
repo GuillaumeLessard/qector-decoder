@@ -198,6 +198,4 @@ def test_distance_estimate_handles_stim_dem_and_repetition_code():
     ],
 )
 def test_distance_estimator_native_fallback_equivalence(checks, n_qubits):
-    assert qd._py_estimate_distance(checks, n_qubits) == qd._native_module.py_estimate_distance(
-        checks, n_qubits
-    )
+    assert qd._py_estimate_distance(checks, n_qubits) == qd._native_module.py_estimate_distance(checks, n_qubits)

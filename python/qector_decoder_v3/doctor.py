@@ -25,9 +25,9 @@ project:
 
 Usage::
 
-    qector-doctor              # human-readable report
-    qector-doctor --json       # machine-readable, for support bundles
-    qector-doctor --strict     # exit non-zero on WARN as well as FAIL
+    qector - doctor  # human-readable report
+    qector - doctor - -json  # machine-readable, for support bundles
+    qector - doctor - -strict  # exit non-zero on WARN as well as FAIL
 
 Exit status is 0 unless a check FAILs (``--strict``: unless a check FAILs or
 WARNs). A machine with no GPU and a Community licence exits 0: neither is a
@@ -454,8 +454,7 @@ def run_checks(repo: str | None = None, skip_gpu: bool = False) -> list[Check]:
                 "package",
                 FAIL,
                 f"import qector_decoder_v3 failed: {type(exc).__name__}: {exc}",
-                "Install a wheel built for this interpreter, or build from source: "
-                "maturin develop --release",
+                "Install a wheel built for this interpreter, or build from source: maturin develop --release",
             )
         ]
 

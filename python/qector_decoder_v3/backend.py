@@ -539,9 +539,7 @@ class AutoDecoder:
             # T2.4: invalidate cached selections that routed to a now-unhealthy
             # backend. Otherwise a high-frequency `batch_decode` loop would
             # happily re-pick the dead CUDA backend forever.
-            self._code_key_to_backend = {
-                k: v for k, v in self._code_key_to_backend.items() if v != backend
-            }
+            self._code_key_to_backend = {k: v for k, v in self._code_key_to_backend.items() if v != backend}
         msg = f"AutoDebug caught error on {backend} [{context}]: {exc}"
         self._diag.warnings.append(msg)
         self._diag.debug_log.append(

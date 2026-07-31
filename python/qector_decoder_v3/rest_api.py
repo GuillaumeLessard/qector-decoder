@@ -151,6 +151,7 @@ if _FRAMEWORK == "fastapi":
 _DECODER_CACHE: dict[tuple[str, bytes], Any] = {}
 _MAX_DECODER_CACHE_SIZE = 64
 
+
 # A8-03: API-key / bearer auth support. Set QECTOR_API_KEY env var to enable.
 def _check_api_auth(authorization: str | None) -> str | None:
     """Validate the Authorization header against QECTOR_API_KEY.
@@ -179,10 +180,7 @@ def _decode_impl(check_to_qubits: Any, syndrome: Any, n_qubits: Any, use_batch: 
     # Build a layout key for the decoder cache (A8-02).
     import json
 
-    layout_key = hashlib.sha256(
-        json.dumps(check_to_qubits, sort_keys=True).encode()
-        + str(n_qubits).encode()
-    ).digest()
+    layout_key = hashlib.sha256(json.dumps(check_to_qubits, sort_keys=True).encode() + str(n_qubits).encode()).digest()
     dec_type = "batch" if use_batch else "unionfind"
     cache_key = (dec_type, layout_key)
 
@@ -196,16 +194,8 @@ def _decode_impl(check_to_qubits: Any, syndrome: Any, n_qubits: Any, use_batch: 
             _DECODER_CACHE[cache_key] = UnionFindDecoder(check_to_qubits, n_qubits)
 
     dec_any = _DECODER_CACHE[cache_key]
-    syndrome_arr = (
-        np.array([syndrome], dtype=np.uint8)
-        if use_batch
-        else np.array(syndrome, dtype=np.uint8)
-    )
-    correction = (
-        dec_any.parallel_batch_decode(syndrome_arr)[0]
-        if use_batch
-        else dec_any.decode(syndrome_arr)
-    )
+    syndrome_arr = np.array([syndrome], dtype=np.uint8) if use_batch else np.array(syndrome, dtype=np.uint8)
+    correction = dec_any.parallel_batch_decode(syndrome_arr)[0] if use_batch else dec_any.decode(syndrome_arr)
     return {
         "correction": correction.tolist(),
         "n_qubits": dec_any.n_qubits,

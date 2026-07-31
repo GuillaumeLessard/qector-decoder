@@ -104,8 +104,8 @@ def aligned_stride(n_checks: int, alignment: int = SIMD_ALIGN) -> int:
 
     Example::
 
-        stride = aligned_stride(24)        # -> 64
-        stride = aligned_stride(100)       # -> 128
+        stride = aligned_stride(24)  # -> 64
+        stride = aligned_stride(100)  # -> 128
         buf = np.zeros(num_shots * stride, dtype=np.uint8)
         for i, row in enumerate(syndromes):
             buf[i * stride : i * stride + n_checks] = row
@@ -190,9 +190,7 @@ def align_and_flatten_syndromes(
     if target_dtype != np.uint8:
         # The native endpoints are uint8-only; anything else would be silently
         # misread as bytes on the Rust side.
-        raise ValueError(
-            f"target_dtype must be np.uint8 for the native boundary, got {target_dtype}"
-        )
+        raise ValueError(f"target_dtype must be np.uint8 for the native boundary, got {target_dtype}")
 
     flat = prepare_syndromes(syndromes, flatten=True)
     if not force_alignment or is_simd_aligned(flat, alignment):
@@ -228,9 +226,7 @@ def native_buffer_geometry(a: np.ndarray) -> dict:
     core = _native()
     fn = getattr(core, "syndrome_buffer_geometry", None) if core is not None else None
     if fn is None:
-        raise RuntimeError(
-            "native_buffer_geometry requires the compiled core; use buffer_report() instead."
-        )
+        raise RuntimeError("native_buffer_geometry requires the compiled core; use buffer_report() instead.")
     arr = np.ascontiguousarray(np.asarray(a).reshape(-1), dtype=np.uint8)
     return fn(arr)
 
@@ -275,7 +271,5 @@ def buffer_report(a: np.ndarray) -> dict:
         "simd_align": SIMD_ALIGN,
         # A row stride that is not a multiple of 64 means only every 64th row can
         # start aligned, whatever the base pointer is.
-        "row_stride_aligned": (
-            bool(arr.shape[-1] % SIMD_ALIGN == 0) if arr.ndim >= 2 else None
-        ),
+        "row_stride_aligned": (bool(arr.shape[-1] % SIMD_ALIGN == 0) if arr.ndim >= 2 else None),
     }

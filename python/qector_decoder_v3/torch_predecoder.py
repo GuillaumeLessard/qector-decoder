@@ -49,12 +49,8 @@ class TorchMessagePassingLayer(nn.Module):
         emb_src = node_embeddings[edge_src]
         emb_dst = node_embeddings[edge_dst]
 
-        msg_from_src = F.linear(
-            torch.cat([emb_src, edge_features], dim=-1), self.w_message, self.b_message
-        )
-        msg_from_dst = F.linear(
-            torch.cat([emb_dst, edge_features], dim=-1), self.w_message, self.b_message
-        )
+        msg_from_src = F.linear(torch.cat([emb_src, edge_features], dim=-1), self.w_message, self.b_message)
+        msg_from_dst = F.linear(torch.cat([emb_dst, edge_features], dim=-1), self.w_message, self.b_message)
 
         # --- Phase 2: mean-aggregate messages from neighbours ----------------
         n_nodes = node_embeddings.size(0)
@@ -64,12 +60,8 @@ class TorchMessagePassingLayer(nn.Module):
 
         aggregated_sum = torch.zeros(n_nodes, hidden, dtype=dtype, device=device)
         # dst receives message sourced at src; src receives message sourced at dst
-        aggregated_sum.scatter_add_(
-            0, edge_dst.unsqueeze(-1).expand(-1, hidden), msg_from_src
-        )
-        aggregated_sum.scatter_add_(
-            0, edge_src.unsqueeze(-1).expand(-1, hidden), msg_from_dst
-        )
+        aggregated_sum.scatter_add_(0, edge_dst.unsqueeze(-1).expand(-1, hidden), msg_from_src)
+        aggregated_sum.scatter_add_(0, edge_src.unsqueeze(-1).expand(-1, hidden), msg_from_dst)
 
         degree = torch.zeros(n_nodes, dtype=dtype, device=device)
         ones = torch.ones(edge_src.size(0), dtype=dtype, device=device)
@@ -120,9 +112,7 @@ class TorchGNNPredecoder(nn.Module):
         self.layers = nn.ModuleList()
         current_node_dim = node_feat_dim
         for _ in range(n_layers):
-            self.layers.append(
-                TorchMessagePassingLayer(hidden_size, current_node_dim, edge_feat_dim)
-            )
+            self.layers.append(TorchMessagePassingLayer(hidden_size, current_node_dim, edge_feat_dim))
             current_node_dim = hidden_size
 
         readout_input_dim = hidden_size + hidden_size + edge_feat_dim

@@ -90,7 +90,9 @@ class BpOsdDecoder:
         if self.bp_method == "relay":
             from . import BPOSDDecoder as _RustBPOSD
 
-            rust_dec = _RustBPOSD(self.check_to_qubits(), self.n_qubits, error_rate=float(self.priors.mean()), bp_method="relay")
+            rust_dec = _RustBPOSD(
+                self.check_to_qubits(), self.n_qubits, error_rate=float(self.priors.mean()), bp_method="relay"
+            )
             return rust_dec.decode(s)
         elif self.bp_method == "sum_product":
             posterior = sum_product_bp(

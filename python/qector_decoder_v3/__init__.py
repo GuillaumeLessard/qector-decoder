@@ -292,9 +292,7 @@ py_generate_repetition_code_checks = _native_or(
 # `_py_generate_parity_check_matrix` has always existed as its pure-Python
 # fallback, but neither was ever bound to a module-level name -- so the native
 # function was unreachable from Python and the fallback was dead code.
-py_generate_parity_check_matrix = _native_or(
-    "py_generate_parity_check_matrix", _py_generate_parity_check_matrix
-)
+py_generate_parity_check_matrix = _native_or("py_generate_parity_check_matrix", _py_generate_parity_check_matrix)
 
 
 def _py_estimate_distance(check_to_qubits, n_qubits=None):
@@ -350,7 +348,9 @@ try:
 except AttributeError:
 
     def run_mcp_server(*args, **kwargs):
-        raise RuntimeError("The native core does not export run_mcp_server. This is likely a build mismatch — rebuild with 'maturin develop' to include the MCP server.")
+        raise RuntimeError(
+            "The native core does not export run_mcp_server. This is likely a build mismatch — rebuild with 'maturin develop' to include the MCP server."
+        )
 
 
 try:
@@ -916,9 +916,7 @@ class BlossomDecoder:
         if weights.ndim != 2:
             raise ValueError(f"weights must be 2D, got shape {weights.shape}")
         if syndromes.shape[0] != weights.shape[0]:
-            raise ValueError(
-                f"syndromes batch {syndromes.shape[0]} != weights batch {weights.shape[0]}"
-            )
+            raise ValueError(f"syndromes batch {syndromes.shape[0]} != weights batch {weights.shape[0]}")
         return self._inner.batch_decode_weighted(syndromes, weights)
 
     @property
@@ -953,9 +951,7 @@ class SlidingWindowDecoder:
         p_meas=None,
     ):
         c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
-        self._inner = _RustSlidingWindowDecoder(
-            c2q, nq, window_size, decay_factor, check_types, p_data, p_meas
-        )
+        self._inner = _RustSlidingWindowDecoder(c2q, nq, window_size, decay_factor, check_types, p_data, p_meas)
 
     def update(self, round_syndrome):
         if not isinstance(round_syndrome, _np.ndarray):
@@ -1027,9 +1023,7 @@ class StreamingDecoder:
         p_meas=None,
     ):
         c2q, nq = _validate_check_to_qubits(check_to_qubits, n_qubits)
-        self._inner = _RustStreamingDecoder(
-            c2q, nq, history_size, check_types, p_data, p_meas
-        )
+        self._inner = _RustStreamingDecoder(c2q, nq, history_size, check_types, p_data, p_meas)
 
     def update(self, round_syndrome):
         if not isinstance(round_syndrome, _np.ndarray):
@@ -2125,9 +2119,10 @@ def from_circuit(circuit, decoder_type="blossom", **kwargs):
     Example::
 
         import stim, qector_decoder_v3 as qector
+
         circuit = stim.Circuit.generated(
-            "surface_code:rotated_memory_x", distance=5, rounds=5,
-            after_clifford_depolarization=0.001)
+            "surface_code:rotated_memory_x", distance=5, rounds=5, after_clifford_depolarization=0.001
+        )
         decoder = qector.from_circuit(circuit, decoder_type="belief_match")
         samples = circuit.compile_detector_sampler().sample(100)[0]
         predictions = decoder.decode_batch(samples)
@@ -2145,6 +2140,7 @@ def from_circuit(circuit, decoder_type="blossom", **kwargs):
         # outright at d>=5. This branch must run before any
         # decompose_errors=True call.
         from .colour_code import ColourCodeDecoder
+
         return ColourCodeDecoder.from_stim_circuit(circuit, **kwargs)
 
     dem = circuit.detector_error_model(decompose_errors=True)
@@ -2159,9 +2155,11 @@ def from_circuit(circuit, decoder_type="blossom", **kwargs):
         return BPOSDDecoder(c2q, nq, **kwargs)
     if dt in ("beliefmatch", "belief_matching"):
         from .belief_matching import BeliefMatching
+
         return BeliefMatching.from_detector_error_model(dem, **kwargs)
     if dt in ("auto",):
         from .backend import AutoDecoder
+
         return AutoDecoder(c2q, nq, **kwargs)
     if dt in ("twostage", "two_stage", "correlated", "c1_03"):
         # Default to blossom for both stages; pass check_types via kwargs or

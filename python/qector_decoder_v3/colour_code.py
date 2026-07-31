@@ -34,8 +34,7 @@ Usage
 -----
 >>> import stim
 >>> from qector_decoder_v3.colour_code import ColourCodeDecoder
->>> circuit = stim.Circuit.generated("color_code:memory_xyz", distance=5, rounds=5,
-...                                  after_clifford_depolarization=0.003)
+>>> circuit = stim.Circuit.generated("color_code:memory_xyz", distance=5, rounds=5, after_clifford_depolarization=0.003)
 >>> dec = ColourCodeDecoder.from_stim_circuit(circuit)
 >>> det, obs = circuit.compile_detector_sampler().sample(100, separate_observables=True)
 >>> prediction = dec.decode_batch(det)
@@ -95,16 +94,12 @@ class ColourCodeDecoder:
 
     # -- constructors ------------------------------------------------------
     @classmethod
-    def from_detector_error_model(
-        cls, dem: Any, max_iter: int = 30, osd_order: int = 0
-    ) -> ColourCodeDecoder:
+    def from_detector_error_model(cls, dem: Any, max_iter: int = 30, osd_order: int = 0) -> ColourCodeDecoder:
         """Build from an existing (undecomposed) DEM."""
         return cls(dem, max_iter=max_iter, osd_order=osd_order)
 
     @classmethod
-    def from_stim_circuit(
-        cls, circuit: Any, max_iter: int = 30, osd_order: int = 0
-    ) -> ColourCodeDecoder:
+    def from_stim_circuit(cls, circuit: Any, max_iter: int = 30, osd_order: int = 0) -> ColourCodeDecoder:
         """Build from a Stim circuit, deriving the DEM without decomposition.
 
         This is the recommended entry point: it cannot be handed a decomposed
@@ -124,9 +119,7 @@ class ColourCodeDecoder:
         if s.shape[0] < self.n_checks:
             s = np.concatenate([s, np.zeros(self.n_checks - s.shape[0], np.uint8)])
         elif s.shape[0] > self.n_checks:
-            raise ValueError(
-                f"syndrome length {s.shape[0]} exceeds detector count {self.n_checks}"
-            )
+            raise ValueError(f"syndrome length {s.shape[0]} exceeds detector count {self.n_checks}")
         e = np.asarray(self._bposd.decode(s), dtype=np.uint8).reshape(-1)
         return self._predict(e[None, :])[0]
 
@@ -143,9 +136,7 @@ class ColourCodeDecoder:
             pad = np.zeros((arr.shape[0], self.n_checks - arr.shape[1]), dtype=np.uint8)
             arr = np.concatenate([arr, pad], axis=1)
         elif arr.shape[1] > self.n_checks:
-            raise ValueError(
-                f"syndrome width {arr.shape[1]} exceeds detector count {self.n_checks}"
-            )
+            raise ValueError(f"syndrome width {arr.shape[1]} exceeds detector count {self.n_checks}")
         e = np.asarray(self._bposd.batch_decode(arr), dtype=np.uint8)
         return self._predict(e)
 
@@ -164,14 +155,11 @@ class ColourCodeDecoder:
 
     def __repr__(self) -> str:  # pragma: no cover
         return (
-            f"<ColourCodeDecoder detectors={self.n_checks} "
-            f"mechanisms={self._n_mechanisms} observables={self._n_obs}>"
+            f"<ColourCodeDecoder detectors={self.n_checks} mechanisms={self._n_mechanisms} observables={self._n_obs}>"
         )
 
 
-def colour_codes_from_dem(
-    dem: Any, distance: int | None = None, max_iter: int = 30
-) -> ColourCodeDecoder:
+def colour_codes_from_dem(dem: Any, distance: int | None = None, max_iter: int = 30) -> ColourCodeDecoder:
     """Build a :class:`ColourCodeDecoder` from a DEM.
 
     ``distance`` is accepted and ignored — the DEM already determines the

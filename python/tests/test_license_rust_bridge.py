@@ -62,9 +62,7 @@ def test_set_license_key_rejects_invalid_key(monkeypatch):
     monkeypatch.delenv("QECTOR_LICENSE_KEY", raising=False)
     with pytest.raises(ValueError, match="rejected"):
         qd.set_license_key("QECT-PRO-not-a-real-signed-token")
-    assert os.environ.get("QECTOR_LICENSE_KEY") is None, (
-        "a rejected key must not be left in the environment"
-    )
+    assert os.environ.get("QECTOR_LICENSE_KEY") is None, "a rejected key must not be left in the environment"
 
 
 def test_get_license_info_returns_dict(no_native, monkeypatch):

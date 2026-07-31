@@ -101,9 +101,7 @@ def test_competitive_suite_fails_loudly_on_an_unknown_decoder():
     otherwise produce a table quietly missing a row.
     """
     with pytest.raises(ValueError, match="definitely_not_a_decoder"):
-        ler.run_competitive_suite(
-            p=0.003, shots=200, distances=(3,), decoders=("definitely_not_a_decoder",)
-        )
+        ler.run_competitive_suite(p=0.003, shots=200, distances=(3,), decoders=("definitely_not_a_decoder",))
 
 
 def test_qector_blossom_matches_pymatching_at_circuit_level():

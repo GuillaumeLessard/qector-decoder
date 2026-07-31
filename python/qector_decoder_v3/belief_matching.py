@@ -340,8 +340,13 @@ class BeliefMatching:
         for i in range(n_batch):
             s = arr[i]
             posterior = sum_product_bp(
-                self._hic, self._hie, self.n_checks, self._n_hyper,
-                self._prior_llr, s, self.max_iter,
+                self._hic,
+                self._hie,
+                self.n_checks,
+                self._n_hyper,
+                self._prior_llr,
+                s,
+                self.max_iter,
             )
             if self.bp_shortcut:
                 hard = (posterior < 0.0).astype(np.uint8)

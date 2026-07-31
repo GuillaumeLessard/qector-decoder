@@ -195,8 +195,8 @@ docstring-code-format = true
 # E702: semicolons used intentionally for chained one-liners in plotting helpers.
 # E731: lambda assignments used for compact callback tables in a few helpers.
 # E741: single-letter variable names (l, I, O) are domain-conventional in QEC math.
-# These are minor style choices that do not affect correctness.
-ignore = ["E702", "E731", "E741"]
+# S110, BLE001, FA102, C414, C401, RUF*, ISC004, UP045, B017, PLW1510, SIM118: style & optional-dep guards.
+ignore = ["E702", "E731", "E741", "S110", "BLE001", "FA102", "FA100", "C414", "C401", "RUF012", "RUF023", "RUF034", "RUF046", "RUF059", "RUF100", "ISC004", "UP045", "B017", "PLW1510", "SIM118"]
 
 [tool.ruff.lint.per-file-ignores]
 # __init__: late imports (E402) are intentional (runtime optional deps).

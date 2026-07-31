@@ -62,9 +62,7 @@ def test_two_stage_decoder_stage_combinations(x_dec, z_dec):
 
 def test_two_stage_decoder_single_error_decoding():
     c2q, types, n = make_css_ring(8)
-    dec = TwoStageDecoder(
-        c2q, types, n_qubits=n, x_decoder="blossom", z_decoder="blossom"
-    )
+    dec = TwoStageDecoder(c2q, types, n_qubits=n, x_decoder="blossom", z_decoder="blossom")
 
     # Physical Z error on qubit 1: triggers X check 0 ([0,1]), X check 1 ([1,2]), and Z check 1 ([1,3])
     syndrome = np.zeros(2 * n, dtype=np.uint8)

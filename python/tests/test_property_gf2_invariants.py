@@ -176,7 +176,9 @@ def test_decode_is_idempotent_and_order_independent(name, data):
 
     # A fresh instance must agree with the used one.
     fresh = _mk(name, code)
-    assert np.array_equal(np.asarray(fresh.decode(b), np.uint8), baseline_b), f"{name}: warm instance disagrees with fresh"
+    assert np.array_equal(np.asarray(fresh.decode(b), np.uint8), baseline_b), (
+        f"{name}: warm instance disagrees with fresh"
+    )
 
 
 @pytest.mark.parametrize("name", GRAPH_DECODERS)

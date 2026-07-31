@@ -52,9 +52,9 @@ def _env_hint() -> str:
     if _DOTENV_LOADED or not _DOTENV_ERROR:
         return ""
     return (
-        f" ({_DOTENV_ERROR}; `pip install python-dotenv`, or export the variable "
-        f"directly. Looked for {_DOTENV_PATH})"
+        f" ({_DOTENV_ERROR}; `pip install python-dotenv`, or export the variable directly. Looked for {_DOTENV_PATH})"
     )
+
 
 try:
     import stripe
@@ -212,9 +212,7 @@ def create_checkout_session(
     Creates a Stripe Checkout Session for purchasing a QECTOR Decoder license.
     """
     if not STRIPE_SECRET_KEY:
-        raise RuntimeError(
-            "STRIPE_SECRET_KEY is not configured in environment or .env file." + _env_hint()
-        )
+        raise RuntimeError("STRIPE_SECRET_KEY is not configured in environment or .env file." + _env_hint())
     if stripe is None:
         raise RuntimeError(
             "[QECTOR-Stripe] The `stripe` package is not installed. Install it to create checkout sessions."

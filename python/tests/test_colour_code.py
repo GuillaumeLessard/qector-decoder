@@ -86,9 +86,7 @@ def test_observable_matrix_is_not_all_zero(d3):
 def test_prediction_is_not_constant_zero(d3):
     """Over real samples the decoder must sometimes predict a logical flip."""
     circuit, dec = d3
-    det, _ = circuit.compile_detector_sampler().sample(
-        4000, separate_observables=True
-    )
+    det, _ = circuit.compile_detector_sampler().sample(4000, separate_observables=True)
     pred = dec.decode_batch(np.ascontiguousarray(det.astype(np.uint8)))
     assert pred.any(), "decoder never predicts a flip — it is a no-op"
 
@@ -100,23 +98,17 @@ def test_prediction_is_not_constant_zero(d3):
 def test_beats_trivial_predictor(d):
     circuit = _circuit(d)
     dec = ColourCodeDecoder.from_stim_circuit(circuit)
-    det, obs = circuit.compile_detector_sampler().sample(
-        1500, separate_observables=True
-    )
+    det, obs = circuit.compile_detector_sampler().sample(1500, separate_observables=True)
     pred = dec.decode_batch(np.ascontiguousarray(det.astype(np.uint8)))
     ler = (pred[:, 0].astype(bool) != obs[:, 0]).mean()
     trivial = obs[:, 0].mean()  # error rate of always predicting zero
-    assert ler < trivial, (
-        f"d={d}: decoder LER {ler:.4f} is no better than always-zero {trivial:.4f}"
-    )
+    assert ler < trivial, f"d={d}: decoder LER {ler:.4f} is no better than always-zero {trivial:.4f}"
 
 
 def test_single_and_batch_agree(d3):
     """decode() and decode_batch() must produce identical predictions."""
     circuit, dec = d3
-    det, _ = circuit.compile_detector_sampler().sample(
-        24, separate_observables=True
-    )
+    det, _ = circuit.compile_detector_sampler().sample(24, separate_observables=True)
     det = np.ascontiguousarray(det.astype(np.uint8))
     batch = dec.decode_batch(det)
     single = np.stack([dec.decode(det[i]) for i in range(det.shape[0])])

@@ -16,10 +16,19 @@ def _build_parser() -> argparse.ArgumentParser:
     d.add_argument("input", help="Path to syndrome file (numpy .npy or CSV)")
     d.add_argument("--check-to-qubits", "-c", required=True, help="Check matrix file (.npy)")
     d.add_argument("--n-qubits", "-n", type=int, required=True)
-    d.add_argument("--decoder", default="blossom", choices=[
-        "blossom", "sparse_blossom", "union_find", "fast_union_find",
-        "bposd", "belief_match", "auto",
-    ])
+    d.add_argument(
+        "--decoder",
+        default="blossom",
+        choices=[
+            "blossom",
+            "sparse_blossom",
+            "union_find",
+            "fast_union_find",
+            "bposd",
+            "belief_match",
+            "auto",
+        ],
+    )
     d.add_argument("--output", "-o", default=None, help="Output path for correction")
 
     b = sub.add_parser("bench", help="Run a quick throughput benchmark")
@@ -50,8 +59,9 @@ def cmd_decode(args: argparse.Namespace) -> None:
         UnionFindDecoder,
     )
 
-    syndromes = np.load(args.input) if args.input.endswith(".npy") else \
-        np.loadtxt(args.input, dtype=np.uint8, delimiter=",")
+    syndromes = (
+        np.load(args.input) if args.input.endswith(".npy") else np.loadtxt(args.input, dtype=np.uint8, delimiter=",")
+    )
     if syndromes.ndim == 1:
         syndromes = syndromes.reshape(1, -1)
 
@@ -69,6 +79,7 @@ def cmd_decode(args: argparse.Namespace) -> None:
         dec = decoder_map[args.decoder](c2q, nq)
     elif args.decoder == "belief_match":
         from .dem import from_stim
+
         dec = BeliefMatchingDecoder(c2q, nq, dem_model=from_stim)
     elif args.decoder == "auto":
         dec = AutoDecoder(c2q, nq)
@@ -89,7 +100,8 @@ def cmd_bench(args: argparse.Namespace) -> None:
 
     circuit = stim.Circuit.generated(
         "surface_code:rotated_memory_z",
-        distance=args.distance, rounds=args.rounds,
+        distance=args.distance,
+        rounds=args.rounds,
         after_clifford_depolarization=args.noise,
         after_reset_flip_probability=args.noise,
         before_measure_flip_probability=args.noise,
@@ -98,6 +110,7 @@ def cmd_bench(args: argparse.Namespace) -> None:
     shots = sampler.sample(args.shots)
 
     from .dem import from_stim
+
     dem = from_stim(circuit.detector_error_model(decompose_errors=True))
     if dem.is_graphlike:
         dem = dem.collapse_to_graph()
@@ -105,12 +118,15 @@ def cmd_bench(args: argparse.Namespace) -> None:
     nq = dem.num_errors
 
     import time
+
     dec = BlossomDecoder(list(c2q), nq)
     t0 = time.perf_counter()
     dec.decode_batch(shots)
     elapsed = time.perf_counter() - t0
-    print(f"{args.decoder} @ d={args.distance}, r={args.rounds}: "
-          f"{args.shots / elapsed:.0f} shots/s ({elapsed:.2f}s for {args.shots} shots)")
+    print(
+        f"{args.decoder} @ d={args.distance}, r={args.rounds}: "
+        f"{args.shots / elapsed:.0f} shots/s ({elapsed:.2f}s for {args.shots} shots)"
+    )
 
 
 def cmd_serve(args: argparse.Namespace) -> None:
@@ -118,6 +134,7 @@ def cmd_serve(args: argparse.Namespace) -> None:
         import uvicorn
 
         from .rest_api import app as fastapi_app
+
         uvicorn.run(fastapi_app, host=args.host, port=args.port)
     elif args.transport == "grpc":
         print("gRPC server: use the native qector_decoder_v3 module directly")

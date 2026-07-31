@@ -110,7 +110,13 @@ def _resolve_default_decoder(check_to_qubits: list[list[int]], n_qubits: int) ->
             inst = _coerce_decoder(choice, check_to_qubits, n_qubits)
             if inst is not None and _decoder_works(inst, len(check_to_qubits), n_qubits):
                 return inst
-    except (ImportError, AttributeError, TypeError, ValueError, RuntimeError):  # pragma: no cover - routing API is sibling-owned / may churn
+    except (
+        ImportError,
+        AttributeError,
+        TypeError,
+        ValueError,
+        RuntimeError,
+    ):  # pragma: no cover - routing API is sibling-owned / may churn
         pass
 
     from . import FastUnionFindDecoder

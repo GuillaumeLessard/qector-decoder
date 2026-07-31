@@ -136,8 +136,7 @@ def test_weighted_uf_beats_unweighted_on_circuit_level_dem(d):
     ler_weighted = _ler(UnionFindDecoder(c2q, nq, edge_weights=w), det, obs, L)
 
     assert ler_weighted < ler_unweighted * 0.8, (
-        f"d={d}: weighted UF LER {ler_weighted:.5f} is not clearly better than "
-        f"unweighted {ler_unweighted:.5f}"
+        f"d={d}: weighted UF LER {ler_weighted:.5f} is not clearly better than unweighted {ler_unweighted:.5f}"
     )
 
 
@@ -164,9 +163,7 @@ def test_weighted_uf_is_within_3x_of_pymatching(d):
     det = np.ascontiguousarray(det.astype(np.uint8))
     obs = np.ascontiguousarray(obs.astype(np.uint8))
 
-    dec = UnionFindDecoder(
-        model.check_to_qubits(), model.num_errors, edge_weights=model.weights().tolist()
-    )
+    dec = UnionFindDecoder(model.check_to_qubits(), model.num_errors, edge_weights=model.weights().tolist())
     ler_uf = _ler(dec, det, obs, L)
 
     pm = pymatching.Matching.from_detector_error_model(dem)
@@ -174,9 +171,7 @@ def test_weighted_uf_is_within_3x_of_pymatching(d):
     ler_pm = float(np.any(pm_pred != obs, axis=1).mean())
 
     assert ler_pm > 0, "degenerate comparison: PyMatching made no logical errors"
-    assert ler_uf <= ler_pm * 3.0, (
-        f"d={d}: weighted UF LER {ler_uf:.5f} is more than 3x PyMatching's {ler_pm:.5f}"
-    )
+    assert ler_uf <= ler_pm * 3.0, f"d={d}: weighted UF LER {ler_uf:.5f} is more than 3x PyMatching's {ler_pm:.5f}"
 
 
 # ---------------------------------------------------------------------------

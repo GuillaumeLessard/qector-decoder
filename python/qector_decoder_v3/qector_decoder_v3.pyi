@@ -92,6 +92,7 @@ class StreamingDecoder:
     def n_qubits(self) -> int: ...
     @property
     def n_checks(self) -> int: ...
+
 class SpaceTimeDecoder:
     def __init__(
         self,

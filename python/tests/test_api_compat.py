@@ -101,24 +101,17 @@ CONSTRUCTOR_SPECS: dict[str, str] = {
     "CPUBatchDecoder": "check_to_qubits, n_qubits=",
     "BatchDecoder": "check_to_qubits, n_qubits=",
     "LookupTableDecoder": "check_to_qubits, n_qubits=",
-    "HybridCascadeDecoder": (
-        "check_to_qubits, n_qubits=, edge_weights=, max_accept_weight=, escalation=, error_rate="
-    ),
+    "HybridCascadeDecoder": ("check_to_qubits, n_qubits=, edge_weights=, max_accept_weight=, escalation=, error_rate="),
     "HybridDecoder": (
-        "check_to_qubits, n_qubits=, check_positions=, check_types=, base_weights=, "
-        "gnn_hidden_size=, gnn_n_layers="
+        "check_to_qubits, n_qubits=, check_positions=, check_types=, base_weights=, gnn_hidden_size=, gnn_n_layers="
     ),
     "StreamingDecoder": "check_to_qubits, n_qubits=, history_size=, check_types=, p_data=, p_meas=",
-    "SlidingWindowDecoder": (
-        "check_to_qubits, n_qubits=, window_size=, decay_factor=, check_types=, p_data=, p_meas="
-    ),
+    "SlidingWindowDecoder": ("check_to_qubits, n_qubits=, window_size=, decay_factor=, check_types=, p_data=, p_meas="),
     # C1-03 / C1-02, new in 0.7.0. `check_types` is the one *required* second
     # positional in the whole family; a caller who omits it gets a TypeError,
     # so it must never silently move.
     "TwoStageDecoder": "check_to_qubits, check_types, n_qubits=, x_decoder=, z_decoder=",
-    "AmbiguityClusterDecoder": (
-        "check_to_qubits, n_qubits=, error_rate=, ambig_threshold=, max_cluster_size="
-    ),
+    "AmbiguityClusterDecoder": ("check_to_qubits, n_qubits=, error_rate=, ambig_threshold=, max_cluster_size="),
     "BeliefMatching": "matrices, max_iter=, bp_shortcut=",
     "BpOsdDecoder": (
         "H, error_rate=, priors=, max_iter=, ms_scale=, osd_order=, bp_method=, use_gpu=, max_latency_ms="
@@ -161,8 +154,7 @@ FUNCTION_SPECS: dict[str, str] = {
     "recommend": "code_family=, distance=, n_qubits=, batch_size=, priority=, hardware=, *graphlike=",
     "detect_hardware": "",
     "sliding_window_decode": (
-        "syndrome_rounds, code=, *check_to_qubits=, *n_qubits=, *window_size=, *decoder=, "
-        "*logicals=, *prefer_gpu="
+        "syndrome_rounds, code=, *check_to_qubits=, *n_qubits=, *window_size=, *decoder=, *logicals=, *prefer_gpu="
     ),
     "batched_bp_decode": (
         "H, syndromes, *error_rate=, *priors=, *max_iter=, *alpha=, *bp_method=, *prefer_gpu=, "
@@ -255,9 +247,7 @@ def test_public_method_arity_is_unchanged(dotted):
     )
     actual = signature_spec(meth)
     assert actual == METHOD_SPECS[dotted], (
-        f"{dotted}() parameters changed\n"
-        f"  recorded: ({METHOD_SPECS[dotted]})\n"
-        f"  actual:   ({actual})"
+        f"{dotted}() parameters changed\n  recorded: ({METHOD_SPECS[dotted]})\n  actual:   ({actual})"
     )
 
 
@@ -349,8 +339,7 @@ def test_declared_entry_points_resolve(label, target):
         module = importlib.import_module(module_name)
     except ImportError as exc:
         pytest.fail(
-            f"entry point {label} = {target!r} does not import: {type(exc).__name__}: {exc}. "
-            f"{STALE_WHEEL_HINT}"
+            f"entry point {label} = {target!r} does not import: {type(exc).__name__}: {exc}. {STALE_WHEEL_HINT}"
         )
     if attr:
         obj = getattr(module, attr, None)
@@ -431,8 +420,7 @@ def test_from_circuit_builds_every_documented_decoder_type(small_circuit, decode
     """
     dec = qd.from_circuit(small_circuit, decoder_type=decoder_type)
     assert type(dec).__name__ == expected_cls, (
-        f"from_circuit(decoder_type={decoder_type!r}) returned {type(dec).__name__}, "
-        f"expected {expected_cls}"
+        f"from_circuit(decoder_type={decoder_type!r}) returned {type(dec).__name__}, expected {expected_cls}"
     )
 
 

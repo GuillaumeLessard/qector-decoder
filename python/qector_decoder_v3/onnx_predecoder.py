@@ -42,9 +42,7 @@ def resolve_gnn_backend(explicit: Optional[str] = None) -> str:
     """
     raw = (explicit or os.environ.get("QECTOR_GNN_BACKEND") or "auto").strip().lower()
     if raw not in _VALID_BACKENDS:
-        raise ValueError(
-            f"Unknown GNN backend {raw!r}; expected one of {sorted(_VALID_BACKENDS)}"
-        )
+        raise ValueError(f"Unknown GNN backend {raw!r}; expected one of {sorted(_VALID_BACKENDS)}")
     if raw != "auto":
         return raw
 
@@ -82,14 +80,13 @@ def default_ort_providers() -> list[str]:
 # SafeTensors helpers (shared key layout with Rust / Torch)
 # ---------------------------------------------------------------------------
 
+
 def load_safetensors_numpy(path: str) -> dict[str, np.ndarray]:
     """Load a GNN safetensors checkpoint as float32 numpy arrays."""
     try:
         from safetensors import safe_open
     except ImportError as exc:
-        raise ImportError(
-            "safetensors is required to load GNN weights for ONNX export"
-        ) from exc
+        raise ImportError("safetensors is required to load GNN weights for ONNX export") from exc
 
     out: dict[str, np.ndarray] = {}
     with safe_open(path, framework="np") as f:
@@ -111,6 +108,7 @@ def count_mpnn_layers(state: dict[str, np.ndarray]) -> int:
 # ---------------------------------------------------------------------------
 # Pure-NumPy forward (bit-faithful to Rust f32 MPNN + softplus clamp)
 # ---------------------------------------------------------------------------
+
 
 def _linear(x: np.ndarray, w: np.ndarray, b: np.ndarray) -> np.ndarray:
     """``y = x @ W.T + b`` with W shaped [out, in] (matches Rust row layout)."""
@@ -156,12 +154,8 @@ def numpy_mpnn_layer(
     src = np.asarray(edge_src, dtype=np.int64)
     dst = np.asarray(edge_dst, dtype=np.int64)
 
-    msg_from_src = _linear(
-        np.concatenate([emb[src], efeat], axis=-1), w_message, b_message
-    )
-    msg_from_dst = _linear(
-        np.concatenate([emb[dst], efeat], axis=-1), w_message, b_message
-    )
+    msg_from_src = _linear(np.concatenate([emb[src], efeat], axis=-1), w_message, b_message)
+    msg_from_dst = _linear(np.concatenate([emb[dst], efeat], axis=-1), w_message, b_message)
 
     agg = np.zeros((n_nodes, hidden), dtype=np.float32)
     # Node receives the message *sourced at the neighbour*.
@@ -216,6 +210,7 @@ def numpy_gnn_forward(
 # ---------------------------------------------------------------------------
 # Torch model helpers + ONNX export
 # ---------------------------------------------------------------------------
+
 
 def build_torch_model_from_state(
     state: dict[str, np.ndarray],
@@ -328,6 +323,7 @@ def export_gnn_to_onnx(
 # ---------------------------------------------------------------------------
 # ONNX Runtime backend
 # ---------------------------------------------------------------------------
+
 
 class OnnxGNNRuntime:
     """Optional ONNX Runtime session for GNN pre-decoding.
