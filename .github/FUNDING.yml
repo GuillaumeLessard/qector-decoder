@@ -1,0 +1,10 @@
+# Renders the "Sponsor" button on the repository page.
+# Only verified-live channels are listed. A dead funding link is worse than no link:
+# open_collective: qectorlab returned HTTP 404 on 2026-07-31 and is deliberately omitted.
+# Re-add it here and in README.md once the collective exists.
+
+github: [qectorlab]
+
+custom:
+  - https://www.qector.store/pricing
+  - https://buy.stripe.com/6oU00l77Xc8ifsegEqeUU07

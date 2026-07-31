@@ -10,9 +10,19 @@
 
 ## 🚀 Support QECTOR Development
 
-[![Sponsor qectorlab](https://img.shields.io/badge/Sponsor-qectorlab-ea4aaa?style=for-the-badge&logo=github)](https://github.com/sponsors/qectorlab)
+QECTOR is source-available and developed independently. Non-commercial use is free — sponsorship
+and commercial licences are what keep the decoder maintained.
 
-[![Open Collective](https://img.shields.io/badge/Open%20Collective-qectorlab-3385FF?style=for-the-badge&logo=opencollective)](https://opencollective.com/qectorlab)
+[![Sponsor qectorlab](https://img.shields.io/badge/GitHub_Sponsors-qectorlab-ea4aaa?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/qectorlab)
+[![Commercial licence](https://img.shields.io/badge/Commercial_Licence-Buy_via_Stripe-635BFF?style=for-the-badge&logo=stripe&logoColor=white)](https://buy.stripe.com/6oU00l77Xc8ifsegEqeUU07)
+[![Pricing](https://img.shields.io/badge/Pricing_&_Tiers-qector.store-0A7CFF?style=for-the-badge&logo=quantconnect&logoColor=white)](https://www.qector.store/pricing)
+
+| Channel | Who it's for |
+|---|---|
+| [GitHub Sponsors](https://github.com/sponsors/qectorlab) | Individuals and companies funding ongoing development |
+| [Commercial licence](https://www.qector.store/pricing) | Required for company, SaaS, OEM or funded institutional use — see [COMMERCIAL.md](COMMERCIAL.md) |
+| [Direct purchase](https://buy.stripe.com/6oU00l77Xc8ifsegEqeUU07) | Immediate Stripe checkout, licence issued automatically |
+| [admin@qector.store](mailto:admin@qector.store) | Site licences, custom terms, academic partnerships |
 
 
 PyMatching-compatible MWPM validation · Belief-matching accuracy mode · BP-OSD for LDPC/qLDPC · CPU/GPU batch decoding · 7-tier self-debugging fallback engine · Ed25519 cryptographic license verification · Artifact-backed benchmark evidence
