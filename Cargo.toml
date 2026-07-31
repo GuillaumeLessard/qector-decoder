@@ -18,9 +18,9 @@ crate-type = ["cdylib"]
 
 # Feature flags for optional infrastructure
 [features]
-default = ["opencl", "cuda", "extension-module"]
-opencl = ["ocl", "extension-module"]
-cuda = ["libloading", "extension-module"]
+default = ["opencl", "cuda"]
+opencl = ["ocl"]
+cuda = ["libloading"]
 extension-module = ["pyo3/extension-module"]
 prometheus = ["metrics-exporter-prometheus"]
 grpc = ["tonic", "tonic-prost", "prost", "tokio", "prometheus", "sha2"]
