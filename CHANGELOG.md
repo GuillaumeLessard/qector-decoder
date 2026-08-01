@@ -12,6 +12,40 @@ has been published. `src/*.rs` is `.gitignore`d, so `git log v0.6.9..HEAD` shows
 none of the Rust work recorded here — it is verified by `cargo test` and by
 reading the tree.
 
+### Release pipeline — four blockers, found by running it instead of trusting it
+`release-build.yml` had never executed. A `workflow_dispatch` dry run with
+`publish: false` builds every wheel and runs the strict dependency gate without
+uploading anything; doing that surfaced four faults, each of which would have
+fired on the first `v0.7.0` tag.
+
+- **The publish job shipped an sdist.** `docs/RELEASING.md` opens with "Wheels
+  only — never publish an sdist" and explains why: `src/*` is gitignored, so the
+  tarball carries `Cargo.toml` and `build.rs` but no `.rs` sources, and any
+  platform without a matching wheel falls back to it and fails on a source
+  build. The collect step copied `*.tar.gz` into `dist/` anyway. `twine check`
+  accepts sdists, so nothing in the pipeline objected. Wheels only now, plus
+  guards that fail the job if a tarball reaches `dist/` or if no wheel does.
+- **The smoke test called a function that does not exist.** Every wheel job ran
+  `from qector_decoder_v3 import get_decoder_info`; that name is absent from the
+  package and from `expected_symbols.txt`. All six wheels would have failed.
+  Replaced with a test that decodes: it builds a repetition-code layout, runs
+  `UnionFindDecoder` and `BlossomDecoder`, and asserts `H @ c == s (mod 2)`, so a
+  wheel that compiles but decodes wrongly cannot reach PyPI.
+- **RUSTSEC-2026-0204** (`crossbeam-epoch` 0.9.18, invalid pointer dereference)
+  hard-blocks publish under the release gate's `strict: true`. Updated to 0.9.20.
+- **aarch64 Linux never built, and musllinux never smoke-tested.** sccache
+  wrapping the cross-assembler breaks `ring`'s `.S` files (`#error "ARM
+  assembler must define __ARM_ARCH"`), so sccache is disabled for that one job.
+  Separately, musllinux built correctly and then failed trying to `pip install`
+  a musl wheel on a glibc runner; the smoke-test guard excluded aarch64 but not
+  musllinux. Both are now excluded from smoke-testing, still built and uploaded.
+
+`tests.yml` also gained a concurrency group. Without one, every push spawned a
+fresh five-version matrix and superseded runs kept running, so several pushes in
+succession starved the release wheels of runners. `release-build.yml`
+deliberately does not get one: cancelling a half-finished release is worse than
+paying for it to finish.
+
 ### GPU — the weighted path measured, and made faster without changing its output
 - **Both GPU paths are now measurable through the standard pipeline.**
   `sinter_compat._build_matcher` resolves `cuda` / `opencl` (topology-only) and
