@@ -7,6 +7,17 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# One in-flight test run per branch or PR. Without this, every push spawns a
+# fresh 5-version matrix and the superseded runs keep going: four pushes in
+# quick succession put ~20 test jobs in the pool at once, which starved the
+# release-build wheels of runners and made a healthy run look hung at 7%.
+#
+# Deliberately NOT applied to release-build.yml: cancelling a half-finished
+# release is worse than paying for it to complete.
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   rust:
     name: Rust tests
