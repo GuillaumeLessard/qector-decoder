@@ -72,12 +72,20 @@ get **both** CUDA and OpenCL — which is why a locally built extension can expo
 ## Pre-flight checklist
 
 ```bash
-cargo test --no-default-features        # expect 221 passed, 0 failed
+cargo test --no-default-features        # expect 303 passed, 0 failed
 cargo clippy --no-default-features --all-targets   # expect 0 warnings
 ruff check python/                      # expect 0 errors
 ruff format --check python/             # expect no reformatting needed
-python -m pytest python/tests -q        # see test-results/pytest.txt
+dev.bat python -m pytest python/tests -q           # see test-results/pytest.txt
 ```
+
+**Run pytest through `dev.bat`, never bare.** `dev.bat` exports the Enterprise token that
+unlocks the GPU paths. A bare `python -m pytest python/tests` fails 58 CUDA tests
+(`test_max_capacity.py::TestGPUCapacity::test_cuda_large_batch[*]` and
+`test_syndrome_faithfulness.py::test_cuda_bit_identical_and_faithful[*]`) purely on licensing,
+which looks like a broken tree and is not one. Confirm the unlock first with
+`dev.bat python scripts\_verify_enterprise_unlock.py` — expect
+`PASS: Enterprise/GPU unlock is confirmed working.`
 
 Then, from the repo that owns the fulfilment worker:
 

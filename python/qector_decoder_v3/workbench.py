@@ -328,11 +328,36 @@ class Workbench:
         dists = spec.get("distances", [spec.get("distance", 5)])
         return [(_CODE_FAMILIES[fam](int(d)), None) for d in dists]
 
-    def _ler(self, kind, code, ler_ctx, shots) -> float | None:
-        """Real LER from Stim shots for a stim-loaded problem (graphlike only)."""
-        try:
-            import stim
+    #: Decoder kinds whose LER this method can honestly measure. ``Matching``
+    #: in ``pymatching_compat`` is hard-wired to ``BlossomDecoder``
+    #: (``self._decoder: BlossomDecoder``; ``from_detector_error_model`` takes no
+    #: decoder argument), so it is the only decoder actually exercised here.
+    _LER_MEASURABLE_KINDS = frozenset({"blossom"})
 
+    def _ler(self, kind, code, ler_ctx, shots) -> float | None:
+        """Real LER from Stim shots, for the decoder named by ``kind``.
+
+        Returns ``None`` when the LER cannot be attributed to ``kind`` — a
+        missing number, never a wrong one.
+
+        This previously accepted ``kind`` and then ignored it: the body built
+        ``pymatching_compat.Matching.from_detector_error_model(sdem)`` and
+        decoded with that, and ``Matching`` only ever drives ``BlossomDecoder``.
+        Every row therefore carried Blossom's LER while being labelled with
+        whatever decoder had just been benchmarked. That is how a row could
+        report a 5.0% logical error rate while 42.5% of that decoder's own
+        corrections failed to reproduce their syndrome — the two columns were
+        measuring different decoders.
+
+        Until the Stim-shot path can drive an arbitrary decoder, only the kinds
+        in :attr:`_LER_MEASURABLE_KINDS` yield a figure. Read
+        ``syndrome_match_rate`` for the others: it *is* measured per decoder,
+        and a correction that does not reproduce its syndrome is not a valid
+        correction regardless of any logical-error figure.
+        """
+        if kind not in self._LER_MEASURABLE_KINDS:
+            return None
+        try:
             from . import pymatching_compat
 
             circuit = ler_ctx["circuit"]
@@ -344,6 +369,7 @@ class Workbench:
             pred = np.asarray(m.decode_batch(det), np.uint8).reshape(shots, -1)
             return float(np.any(pred != obs, axis=1).mean())
         except (ImportError, AttributeError, TypeError, ValueError, RuntimeError):
+            # Unsupported problem shape (e.g. a non-graphlike DEM) or Stim absent.
             return None
 
     # ------------------------------------------------------------- job queue
