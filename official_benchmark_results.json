@@ -4,9 +4,9 @@
     "methodology_note": "Every decoder is measured on the same Stim circuit, the same detector samples, the same DEM and the same observable scoring (ler.estimate_ler_circuit_level). Only the decoder varies between rows. Rows are validated by ler.assert_comparable before being written.",
     "supersedes": "The six pre-v0.7.0 artifacts (benchmark_results.json, benchmark_results_empirical.json, chart_competitor.png, chart_throughput.png, competitive_results.json, live_test_results.json), which mixed code-capacity and circuit-level measurements and were withdrawn.",
     "generator": "run_custom_comparison_benchmark.py",
-    "generated_utc": "2026-08-01T03:40:26.225827+00:00",
-    "elapsed_seconds": 769.3,
-    "git_commit": "07966e4da55381be44967d753dc64af811c9d5a8",
+    "generated_utc": "2026-08-01T04:33:23.056178+00:00",
+    "elapsed_seconds": 726.2,
+    "git_commit": "b436f04e3ba757b5834c5221b6ecc7e161493356",
     "git_tree_dirty": true,
     "parameters": {
       "distances": [
@@ -45,8 +45,8 @@
           "distance": 3,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 2505.571471262868,
-          "projected_decode_seconds": 39.91105468230671,
+          "probe_rate_dec_per_s": 2499.2311939850742,
+          "projected_decode_seconds": 40.01230468020367,
           "budget_seconds": 25.0
         },
         {
@@ -54,8 +54,8 @@
           "distance": 5,
           "shots": 5000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 104.11850084457369,
-          "projected_decode_seconds": 48.0222050782686,
+          "probe_rate_dec_per_s": 109.54159026597226,
+          "projected_decode_seconds": 45.64476367249881,
           "budget_seconds": 25.0
         },
         {
@@ -63,8 +63,8 @@
           "distance": 5,
           "shots": 10000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 104.11850084457369,
-          "projected_decode_seconds": 96.0444101565372,
+          "probe_rate_dec_per_s": 109.54159026597226,
+          "projected_decode_seconds": 91.28952734499762,
           "budget_seconds": 25.0
         },
         {
@@ -72,8 +72,8 @@
           "distance": 5,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 104.11850084457369,
-          "projected_decode_seconds": 480.222050782686,
+          "probe_rate_dec_per_s": 109.54159026597226,
+          "projected_decode_seconds": 456.4476367249881,
           "budget_seconds": 25.0
         },
         {
@@ -81,8 +81,8 @@
           "distance": 5,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 104.11850084457369,
-          "projected_decode_seconds": 960.444101565372,
+          "probe_rate_dec_per_s": 109.54159026597226,
+          "projected_decode_seconds": 912.8952734499762,
           "budget_seconds": 25.0
         },
         {
@@ -90,8 +90,8 @@
           "distance": 7,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 1191.2694837902432,
-          "projected_decode_seconds": 41.97203124931548,
+          "probe_rate_dec_per_s": 1286.7069597188422,
+          "projected_decode_seconds": 38.85888672812143,
           "budget_seconds": 25.0
         },
         {
@@ -99,8 +99,8 @@
           "distance": 7,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 1191.2694837902432,
-          "projected_decode_seconds": 83.94406249863096,
+          "probe_rate_dec_per_s": 1286.7069597188422,
+          "projected_decode_seconds": 77.71777345624287,
           "budget_seconds": 25.0
         },
         {
@@ -108,8 +108,8 @@
           "distance": 7,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 912.7994811079978,
-          "projected_decode_seconds": 54.77654297010304,
+          "probe_rate_dec_per_s": 1078.6977422376383,
+          "projected_decode_seconds": 46.352187496268016,
           "budget_seconds": 25.0
         },
         {
@@ -117,8 +117,8 @@
           "distance": 7,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 912.7994811079978,
-          "projected_decode_seconds": 109.55308594020607,
+          "probe_rate_dec_per_s": 1078.6977422376383,
+          "projected_decode_seconds": 92.70437499253603,
           "budget_seconds": 25.0
         },
         {
@@ -126,8 +126,8 @@
           "distance": 7,
           "shots": 1000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 27.822902141325702,
-          "projected_decode_seconds": 35.94161367209381,
+          "probe_rate_dec_per_s": 28.297392954511533,
+          "projected_decode_seconds": 35.33894453130415,
           "budget_seconds": 25.0
         },
         {
@@ -135,8 +135,8 @@
           "distance": 7,
           "shots": 5000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 27.822902141325702,
-          "projected_decode_seconds": 179.70806836046904,
+          "probe_rate_dec_per_s": 28.297392954511533,
+          "projected_decode_seconds": 176.69472265652075,
           "budget_seconds": 25.0
         },
         {
@@ -144,8 +144,8 @@
           "distance": 7,
           "shots": 10000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 27.822902141325702,
-          "projected_decode_seconds": 359.4161367209381,
+          "probe_rate_dec_per_s": 28.297392954511533,
+          "projected_decode_seconds": 353.3894453130415,
           "budget_seconds": 25.0
         },
         {
@@ -153,8 +153,8 @@
           "distance": 7,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 27.822902141325702,
-          "projected_decode_seconds": 1797.0806836046904,
+          "probe_rate_dec_per_s": 28.297392954511533,
+          "projected_decode_seconds": 1766.9472265652075,
           "budget_seconds": 25.0
         },
         {
@@ -162,8 +162,8 @@
           "distance": 7,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 27.822902141325702,
-          "projected_decode_seconds": 3594.161367209381,
+          "probe_rate_dec_per_s": 28.297392954511533,
+          "projected_decode_seconds": 3533.894453130415,
           "budget_seconds": 25.0
         },
         {
@@ -171,8 +171,8 @@
           "distance": 9,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 2066.7695750562743,
-          "projected_decode_seconds": 48.38468748857849,
+          "probe_rate_dec_per_s": 2450.881838748156,
+          "projected_decode_seconds": 40.8016406254319,
           "budget_seconds": 25.0
         },
         {
@@ -180,17 +180,8 @@
           "distance": 9,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 2589.1695841999754,
-          "projected_decode_seconds": 38.622421880063484,
-          "budget_seconds": 25.0
-        },
-        {
-          "decoder": "QECTOR CUDA Batch (GPU, weighted)",
-          "distance": 9,
-          "shots": 10000,
-          "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 330.9471526754152,
-          "projected_decode_seconds": 30.216304685382056,
+          "probe_rate_dec_per_s": 3311.399624509625,
+          "projected_decode_seconds": 30.198710919648875,
           "budget_seconds": 25.0
         },
         {
@@ -198,8 +189,8 @@
           "distance": 9,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 330.9471526754152,
-          "projected_decode_seconds": 151.08152342691028,
+          "probe_rate_dec_per_s": 414.763507027089,
+          "projected_decode_seconds": 120.55062500166969,
           "budget_seconds": 25.0
         },
         {
@@ -207,17 +198,8 @@
           "distance": 9,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 330.9471526754152,
-          "projected_decode_seconds": 302.16304685382056,
-          "budget_seconds": 25.0
-        },
-        {
-          "decoder": "QECTOR OpenCL Batch (GPU, weighted)",
-          "distance": 9,
-          "shots": 10000,
-          "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 328.983934430062,
-          "projected_decode_seconds": 30.396621091313136,
+          "probe_rate_dec_per_s": 414.763507027089,
+          "projected_decode_seconds": 241.10125000333937,
           "budget_seconds": 25.0
         },
         {
@@ -225,8 +207,8 @@
           "distance": 9,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 328.983934430062,
-          "projected_decode_seconds": 151.98310545656568,
+          "probe_rate_dec_per_s": 420.5523955420607,
+          "projected_decode_seconds": 118.8912500083461,
           "budget_seconds": 25.0
         },
         {
@@ -234,8 +216,8 @@
           "distance": 9,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 328.983934430062,
-          "projected_decode_seconds": 303.96621091313136,
+          "probe_rate_dec_per_s": 420.5523955420607,
+          "projected_decode_seconds": 237.7825000166922,
           "budget_seconds": 25.0
         },
         {
@@ -243,8 +225,8 @@
           "distance": 9,
           "shots": 1000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 10.074697110138366,
-          "projected_decode_seconds": 99.25856718746216,
+          "probe_rate_dec_per_s": 10.155962457463188,
+          "projected_decode_seconds": 98.46432617177925,
           "budget_seconds": 25.0
         },
         {
@@ -252,8 +234,8 @@
           "distance": 9,
           "shots": 5000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 10.074697110138366,
-          "projected_decode_seconds": 496.2928359373108,
+          "probe_rate_dec_per_s": 10.155962457463188,
+          "projected_decode_seconds": 492.3216308588962,
           "budget_seconds": 25.0
         },
         {
@@ -261,8 +243,8 @@
           "distance": 9,
           "shots": 10000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 10.074697110138366,
-          "projected_decode_seconds": 992.5856718746217,
+          "probe_rate_dec_per_s": 10.155962457463188,
+          "projected_decode_seconds": 984.6432617177924,
           "budget_seconds": 25.0
         },
         {
@@ -270,8 +252,8 @@
           "distance": 9,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 10.074697110138366,
-          "projected_decode_seconds": 4962.928359373109,
+          "probe_rate_dec_per_s": 10.155962457463188,
+          "projected_decode_seconds": 4923.216308588962,
           "budget_seconds": 25.0
         },
         {
@@ -279,8 +261,8 @@
           "distance": 9,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 10.074697110138366,
-          "projected_decode_seconds": 9925.856718746218,
+          "probe_rate_dec_per_s": 10.155962457463188,
+          "projected_decode_seconds": 9846.432617177925,
           "budget_seconds": 25.0
         },
         {
@@ -288,8 +270,8 @@
           "distance": 11,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 714.4096994143264,
-          "projected_decode_seconds": 69.9878515661112,
+          "probe_rate_dec_per_s": 694.2173323522666,
+          "projected_decode_seconds": 72.02355468507449,
           "budget_seconds": 25.0
         },
         {
@@ -297,8 +279,8 @@
           "distance": 11,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 714.4096994143264,
-          "projected_decode_seconds": 139.9757031322224,
+          "probe_rate_dec_per_s": 694.2173323522666,
+          "projected_decode_seconds": 144.04710937014897,
           "budget_seconds": 25.0
         },
         {
@@ -306,8 +288,8 @@
           "distance": 11,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 2446.859655696461,
-          "projected_decode_seconds": 40.868710948416265,
+          "probe_rate_dec_per_s": 2405.1176393562623,
+          "projected_decode_seconds": 41.578007812859134,
           "budget_seconds": 25.0
         },
         {
@@ -315,8 +297,8 @@
           "distance": 11,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 1189.5800225339885,
-          "projected_decode_seconds": 42.03164062346332,
+          "probe_rate_dec_per_s": 1462.8713542995374,
+          "projected_decode_seconds": 34.17935545257933,
           "budget_seconds": 25.0
         },
         {
@@ -324,8 +306,8 @@
           "distance": 11,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 1189.5800225339885,
-          "projected_decode_seconds": 84.06328124692664,
+          "probe_rate_dec_per_s": 1462.8713542995374,
+          "projected_decode_seconds": 68.35871090515866,
           "budget_seconds": 25.0
         },
         {
@@ -333,8 +315,8 @@
           "distance": 11,
           "shots": 5000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 102.05771882065474,
-          "projected_decode_seconds": 48.99188476656491,
+          "probe_rate_dec_per_s": 125.73681899001782,
+          "projected_decode_seconds": 39.76559960847226,
           "budget_seconds": 25.0
         },
         {
@@ -342,8 +324,8 @@
           "distance": 11,
           "shots": 10000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 102.05771882065474,
-          "projected_decode_seconds": 97.98376953312982,
+          "probe_rate_dec_per_s": 125.73681899001782,
+          "projected_decode_seconds": 79.53119921694451,
           "budget_seconds": 25.0
         },
         {
@@ -351,8 +333,8 @@
           "distance": 11,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 102.05771882065474,
-          "projected_decode_seconds": 489.9188476656491,
+          "probe_rate_dec_per_s": 125.73681899001782,
+          "projected_decode_seconds": 397.6559960847226,
           "budget_seconds": 25.0
         },
         {
@@ -360,8 +342,8 @@
           "distance": 11,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 102.05771882065474,
-          "projected_decode_seconds": 979.8376953312982,
+          "probe_rate_dec_per_s": 125.73681899001782,
+          "projected_decode_seconds": 795.3119921694451,
           "budget_seconds": 25.0
         },
         {
@@ -369,8 +351,8 @@
           "distance": 11,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 2237.2811457188686,
-          "projected_decode_seconds": 44.69710934245086,
+          "probe_rate_dec_per_s": 2644.9751134253224,
+          "projected_decode_seconds": 37.80753909268242,
           "budget_seconds": 25.0
         },
         {
@@ -378,8 +360,8 @@
           "distance": 11,
           "shots": 5000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 106.17524780534882,
-          "projected_decode_seconds": 47.09195507757613,
+          "probe_rate_dec_per_s": 128.77417747345035,
+          "projected_decode_seconds": 38.82766015749439,
           "budget_seconds": 25.0
         },
         {
@@ -387,8 +369,8 @@
           "distance": 11,
           "shots": 10000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 106.17524780534882,
-          "projected_decode_seconds": 94.18391015515226,
+          "probe_rate_dec_per_s": 128.77417747345035,
+          "projected_decode_seconds": 77.65532031498878,
           "budget_seconds": 25.0
         },
         {
@@ -396,8 +378,8 @@
           "distance": 11,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 106.17524780534882,
-          "projected_decode_seconds": 470.9195507757613,
+          "probe_rate_dec_per_s": 128.77417747345035,
+          "projected_decode_seconds": 388.2766015749439,
           "budget_seconds": 25.0
         },
         {
@@ -405,8 +387,8 @@
           "distance": 11,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 106.17524780534882,
-          "projected_decode_seconds": 941.8391015515226,
+          "probe_rate_dec_per_s": 128.77417747345035,
+          "projected_decode_seconds": 776.5532031498878,
           "budget_seconds": 25.0
         },
         {
@@ -414,8 +396,8 @@
           "distance": 11,
           "shots": 1000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 4.7715724594248154,
-          "projected_decode_seconds": 209.57451835920438,
+          "probe_rate_dec_per_s": 5.087991627837345,
+          "projected_decode_seconds": 196.54120390623575,
           "budget_seconds": 25.0
         },
         {
@@ -423,8 +405,8 @@
           "distance": 11,
           "shots": 5000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 4.7715724594248154,
-          "projected_decode_seconds": 1047.8725917960219,
+          "probe_rate_dec_per_s": 5.087991627837345,
+          "projected_decode_seconds": 982.7060195311786,
           "budget_seconds": 25.0
         },
         {
@@ -432,8 +414,8 @@
           "distance": 11,
           "shots": 10000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 4.7715724594248154,
-          "projected_decode_seconds": 2095.7451835920438,
+          "probe_rate_dec_per_s": 5.087991627837345,
+          "projected_decode_seconds": 1965.4120390623573,
           "budget_seconds": 25.0
         },
         {
@@ -441,8 +423,8 @@
           "distance": 11,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 4.7715724594248154,
-          "projected_decode_seconds": 10478.725917960219,
+          "probe_rate_dec_per_s": 5.087991627837345,
+          "projected_decode_seconds": 9827.060195311788,
           "budget_seconds": 25.0
         },
         {
@@ -450,8 +432,8 @@
           "distance": 11,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 4.7715724594248154,
-          "projected_decode_seconds": 20957.451835920438,
+          "probe_rate_dec_per_s": 5.087991627837345,
+          "projected_decode_seconds": 19654.120390623575,
           "budget_seconds": 25.0
         },
         {
@@ -459,8 +441,8 @@
           "distance": 13,
           "shots": 10000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 209.27067452552274,
-          "projected_decode_seconds": 47.78500390784757,
+          "probe_rate_dec_per_s": 254.8786359600831,
+          "projected_decode_seconds": 39.2343593739497,
           "budget_seconds": 25.0
         },
         {
@@ -468,8 +450,8 @@
           "distance": 13,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 209.27067452552274,
-          "projected_decode_seconds": 238.92501953923784,
+          "probe_rate_dec_per_s": 254.8786359600831,
+          "projected_decode_seconds": 196.1717968697485,
           "budget_seconds": 25.0
         },
         {
@@ -477,8 +459,8 @@
           "distance": 13,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 209.27067452552274,
-          "projected_decode_seconds": 477.8500390784757,
+          "probe_rate_dec_per_s": 254.8786359600831,
+          "projected_decode_seconds": 392.343593739497,
           "budget_seconds": 25.0
         },
         {
@@ -486,8 +468,8 @@
           "distance": 13,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 638.6083127941691,
-          "projected_decode_seconds": 78.29525391116476,
+          "probe_rate_dec_per_s": 761.8866215857473,
+          "projected_decode_seconds": 65.62656251389853,
           "budget_seconds": 25.0
         },
         {
@@ -495,8 +477,8 @@
           "distance": 13,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 638.6083127941691,
-          "projected_decode_seconds": 156.59050782232953,
+          "probe_rate_dec_per_s": 761.8866215857473,
+          "projected_decode_seconds": 131.25312502779707,
           "budget_seconds": 25.0
         },
         {
@@ -504,8 +486,8 @@
           "distance": 13,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 740.3065388943861,
-          "projected_decode_seconds": 67.53958984972996,
+          "probe_rate_dec_per_s": 841.0967770959302,
+          "projected_decode_seconds": 59.446191403367266,
           "budget_seconds": 25.0
         },
         {
@@ -513,8 +495,8 @@
           "distance": 13,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 740.3065388943861,
-          "projected_decode_seconds": 135.07917969945993,
+          "probe_rate_dec_per_s": 841.0967770959302,
+          "projected_decode_seconds": 118.89238280673453,
           "budget_seconds": 25.0
         },
         {
@@ -522,8 +504,8 @@
           "distance": 13,
           "shots": 5000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 49.57810293136499,
-          "projected_decode_seconds": 100.85097461114856,
+          "probe_rate_dec_per_s": 61.272760167337914,
+          "projected_decode_seconds": 81.60233007856732,
           "budget_seconds": 25.0
         },
         {
@@ -531,8 +513,8 @@
           "distance": 13,
           "shots": 10000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 49.57810293136499,
-          "projected_decode_seconds": 201.70194922229712,
+          "probe_rate_dec_per_s": 61.272760167337914,
+          "projected_decode_seconds": 163.20466015713464,
           "budget_seconds": 25.0
         },
         {
@@ -540,8 +522,8 @@
           "distance": 13,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 49.57810293136499,
-          "projected_decode_seconds": 1008.5097461114855,
+          "probe_rate_dec_per_s": 61.272760167337914,
+          "projected_decode_seconds": 816.0233007856732,
           "budget_seconds": 25.0
         },
         {
@@ -549,8 +531,8 @@
           "distance": 13,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 49.57810293136499,
-          "projected_decode_seconds": 2017.019492222971,
+          "probe_rate_dec_per_s": 61.272760167337914,
+          "projected_decode_seconds": 1632.0466015713464,
           "budget_seconds": 25.0
         },
         {
@@ -558,8 +540,8 @@
           "distance": 13,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 1228.350914460494,
-          "projected_decode_seconds": 40.70498048349692,
+          "probe_rate_dec_per_s": 1503.3328770209139,
+          "projected_decode_seconds": 33.25943359868688,
           "budget_seconds": 25.0
         },
         {
@@ -567,8 +549,8 @@
           "distance": 13,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 1228.350914460494,
-          "projected_decode_seconds": 81.40996096699384,
+          "probe_rate_dec_per_s": 1503.3328770209139,
+          "projected_decode_seconds": 66.51886719737377,
           "budget_seconds": 25.0
         },
         {
@@ -576,8 +558,8 @@
           "distance": 13,
           "shots": 5000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 50.69157465816072,
-          "projected_decode_seconds": 98.63572070344162,
+          "probe_rate_dec_per_s": 62.931541986964994,
+          "projected_decode_seconds": 79.45141406253242,
           "budget_seconds": 25.0
         },
         {
@@ -585,8 +567,8 @@
           "distance": 13,
           "shots": 10000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 50.69157465816072,
-          "projected_decode_seconds": 197.27144140688324,
+          "probe_rate_dec_per_s": 62.931541986964994,
+          "projected_decode_seconds": 158.90282812506484,
           "budget_seconds": 25.0
         },
         {
@@ -594,8 +576,8 @@
           "distance": 13,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 50.69157465816072,
-          "projected_decode_seconds": 986.3572070344162,
+          "probe_rate_dec_per_s": 62.931541986964994,
+          "projected_decode_seconds": 794.5141406253242,
           "budget_seconds": 25.0
         },
         {
@@ -603,8 +585,8 @@
           "distance": 13,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 50.69157465816072,
-          "projected_decode_seconds": 1972.7144140688324,
+          "probe_rate_dec_per_s": 62.931541986964994,
+          "projected_decode_seconds": 1589.0282812506484,
           "budget_seconds": 25.0
         },
         {
@@ -612,8 +594,8 @@
           "distance": 13,
           "shots": 1000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 2.765472263408913,
-          "projected_decode_seconds": 361.60189101565265,
+          "probe_rate_dec_per_s": 2.8528560270428747,
+          "projected_decode_seconds": 350.52592578131225,
           "budget_seconds": 25.0
         },
         {
@@ -621,8 +603,8 @@
           "distance": 13,
           "shots": 5000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 2.765472263408913,
-          "projected_decode_seconds": 1808.0094550782633,
+          "probe_rate_dec_per_s": 2.8528560270428747,
+          "projected_decode_seconds": 1752.6296289065613,
           "budget_seconds": 25.0
         },
         {
@@ -630,8 +612,8 @@
           "distance": 13,
           "shots": 10000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 2.765472263408913,
-          "projected_decode_seconds": 3616.0189101565265,
+          "probe_rate_dec_per_s": 2.8528560270428747,
+          "projected_decode_seconds": 3505.2592578131225,
           "budget_seconds": 25.0
         },
         {
@@ -639,8 +621,8 @@
           "distance": 13,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 2.765472263408913,
-          "projected_decode_seconds": 18080.094550782633,
+          "probe_rate_dec_per_s": 2.8528560270428747,
+          "projected_decode_seconds": 17526.296289065613,
           "budget_seconds": 25.0
         },
         {
@@ -648,8 +630,8 @@
           "distance": 13,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 2.765472263408913,
-          "projected_decode_seconds": 36160.189101565265,
+          "probe_rate_dec_per_s": 2.8528560270428747,
+          "projected_decode_seconds": 35052.592578131225,
           "budget_seconds": 25.0
         },
         {
@@ -657,8 +639,8 @@
           "distance": 15,
           "shots": 5000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 56.10477356124845,
-          "projected_decode_seconds": 89.11897656162182,
+          "probe_rate_dec_per_s": 67.84806581345498,
+          "projected_decode_seconds": 73.69406835778136,
           "budget_seconds": 25.0
         },
         {
@@ -666,8 +648,8 @@
           "distance": 15,
           "shots": 10000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 56.10477356124845,
-          "projected_decode_seconds": 178.23795312324364,
+          "probe_rate_dec_per_s": 67.84806581345498,
+          "projected_decode_seconds": 147.38813671556272,
           "budget_seconds": 25.0
         },
         {
@@ -675,8 +657,8 @@
           "distance": 15,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 56.10477356124845,
-          "projected_decode_seconds": 891.1897656162182,
+          "probe_rate_dec_per_s": 67.84806581345498,
+          "projected_decode_seconds": 736.9406835778136,
           "budget_seconds": 25.0
         },
         {
@@ -684,17 +666,8 @@
           "distance": 15,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 56.10477356124845,
-          "projected_decode_seconds": 1782.3795312324364,
-          "budget_seconds": 25.0
-        },
-        {
-          "decoder": "QECTOR Union-Find (CPU)",
-          "distance": 15,
-          "shots": 5000,
-          "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 191.13269715340988,
-          "projected_decode_seconds": 26.1598359384152,
+          "probe_rate_dec_per_s": 67.84806581345498,
+          "projected_decode_seconds": 1473.8813671556272,
           "budget_seconds": 25.0
         },
         {
@@ -702,8 +675,8 @@
           "distance": 15,
           "shots": 10000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 191.13269715340988,
-          "projected_decode_seconds": 52.3196718768304,
+          "probe_rate_dec_per_s": 263.1973959796486,
+          "projected_decode_seconds": 37.994296876604494,
           "budget_seconds": 25.0
         },
         {
@@ -711,8 +684,8 @@
           "distance": 15,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 191.13269715340988,
-          "projected_decode_seconds": 261.598359384152,
+          "probe_rate_dec_per_s": 263.1973959796486,
+          "projected_decode_seconds": 189.9714843830225,
           "budget_seconds": 25.0
         },
         {
@@ -720,8 +693,8 @@
           "distance": 15,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 191.13269715340988,
-          "projected_decode_seconds": 523.196718768304,
+          "probe_rate_dec_per_s": 263.1973959796486,
+          "projected_decode_seconds": 379.942968766045,
           "budget_seconds": 25.0
         },
         {
@@ -729,8 +702,8 @@
           "distance": 15,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 437.729701230768,
-          "projected_decode_seconds": 114.2257421861359,
+          "probe_rate_dec_per_s": 494.045116018533,
+          "projected_decode_seconds": 101.20533202098159,
           "budget_seconds": 25.0
         },
         {
@@ -738,8 +711,8 @@
           "distance": 15,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 437.729701230768,
-          "projected_decode_seconds": 228.4514843722718,
+          "probe_rate_dec_per_s": 494.045116018533,
+          "projected_decode_seconds": 202.41066404196317,
           "budget_seconds": 25.0
         },
         {
@@ -747,8 +720,8 @@
           "distance": 15,
           "shots": 1000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 22.4944325840288,
-          "projected_decode_seconds": 44.4554445311951,
+          "probe_rate_dec_per_s": 27.46132415739674,
+          "projected_decode_seconds": 36.41485000025568,
           "budget_seconds": 25.0
         },
         {
@@ -756,8 +729,8 @@
           "distance": 15,
           "shots": 5000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 22.4944325840288,
-          "projected_decode_seconds": 222.2772226559755,
+          "probe_rate_dec_per_s": 27.46132415739674,
+          "projected_decode_seconds": 182.07425000127841,
           "budget_seconds": 25.0
         },
         {
@@ -765,8 +738,8 @@
           "distance": 15,
           "shots": 10000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 22.4944325840288,
-          "projected_decode_seconds": 444.554445311951,
+          "probe_rate_dec_per_s": 27.46132415739674,
+          "projected_decode_seconds": 364.14850000255683,
           "budget_seconds": 25.0
         },
         {
@@ -774,8 +747,8 @@
           "distance": 15,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 22.4944325840288,
-          "projected_decode_seconds": 2222.772226559755,
+          "probe_rate_dec_per_s": 27.46132415739674,
+          "projected_decode_seconds": 1820.7425000127841,
           "budget_seconds": 25.0
         },
         {
@@ -783,8 +756,8 @@
           "distance": 15,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 22.4944325840288,
-          "projected_decode_seconds": 4445.54445311951,
+          "probe_rate_dec_per_s": 27.46132415739674,
+          "projected_decode_seconds": 3641.4850000255683,
           "budget_seconds": 25.0
         },
         {
@@ -792,8 +765,8 @@
           "distance": 15,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 703.4609730401459,
-          "projected_decode_seconds": 71.07714843641588,
+          "probe_rate_dec_per_s": 833.8770362871801,
+          "projected_decode_seconds": 59.960878911624604,
           "budget_seconds": 25.0
         },
         {
@@ -801,8 +774,8 @@
           "distance": 15,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 703.4609730401459,
-          "projected_decode_seconds": 142.15429687283176,
+          "probe_rate_dec_per_s": 833.8770362871801,
+          "projected_decode_seconds": 119.92175782324921,
           "budget_seconds": 25.0
         },
         {
@@ -810,8 +783,8 @@
           "distance": 15,
           "shots": 1000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 29.388621166491816,
-          "projected_decode_seconds": 34.02677500025675,
+          "probe_rate_dec_per_s": 28.00700980470754,
+          "projected_decode_seconds": 35.70534687469262,
           "budget_seconds": 25.0
         },
         {
@@ -819,8 +792,8 @@
           "distance": 15,
           "shots": 5000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 29.388621166491816,
-          "projected_decode_seconds": 170.13387500128374,
+          "probe_rate_dec_per_s": 28.00700980470754,
+          "projected_decode_seconds": 178.5267343734631,
           "budget_seconds": 25.0
         },
         {
@@ -828,8 +801,8 @@
           "distance": 15,
           "shots": 10000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 29.388621166491816,
-          "projected_decode_seconds": 340.2677500025675,
+          "probe_rate_dec_per_s": 28.00700980470754,
+          "projected_decode_seconds": 357.0534687469262,
           "budget_seconds": 25.0
         },
         {
@@ -837,8 +810,8 @@
           "distance": 15,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 29.388621166491816,
-          "projected_decode_seconds": 1701.3387500128374,
+          "probe_rate_dec_per_s": 28.00700980470754,
+          "projected_decode_seconds": 1785.2673437346311,
           "budget_seconds": 25.0
         },
         {
@@ -846,8 +819,17 @@
           "distance": 15,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 29.388621166491816,
-          "projected_decode_seconds": 3402.677500025675,
+          "probe_rate_dec_per_s": 28.00700980470754,
+          "projected_decode_seconds": 3570.5346874692623,
+          "budget_seconds": 25.0
+        },
+        {
+          "decoder": "PyMatching v2 (C++)",
+          "distance": 15,
+          "shots": 100000,
+          "reason": "over per-cell decode budget",
+          "probe_rate_dec_per_s": 3016.346002189084,
+          "projected_decode_seconds": 33.15269532322418,
           "budget_seconds": 25.0
         },
         {
@@ -855,8 +837,8 @@
           "distance": 15,
           "shots": 1000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 1.796627465384958,
-          "projected_decode_seconds": 556.5984152344754,
+          "probe_rate_dec_per_s": 1.772709639082128,
+          "projected_decode_seconds": 564.1081753906292,
           "budget_seconds": 25.0
         },
         {
@@ -864,8 +846,8 @@
           "distance": 15,
           "shots": 5000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 1.796627465384958,
-          "projected_decode_seconds": 2782.992076172377,
+          "probe_rate_dec_per_s": 1.772709639082128,
+          "projected_decode_seconds": 2820.540876953146,
           "budget_seconds": 25.0
         },
         {
@@ -873,8 +855,8 @@
           "distance": 15,
           "shots": 10000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 1.796627465384958,
-          "projected_decode_seconds": 5565.984152344754,
+          "probe_rate_dec_per_s": 1.772709639082128,
+          "projected_decode_seconds": 5641.081753906292,
           "budget_seconds": 25.0
         },
         {
@@ -882,8 +864,8 @@
           "distance": 15,
           "shots": 50000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 1.796627465384958,
-          "projected_decode_seconds": 27829.92076172377,
+          "probe_rate_dec_per_s": 1.772709639082128,
+          "projected_decode_seconds": 28205.40876953146,
           "budget_seconds": 25.0
         },
         {
@@ -891,8 +873,8 @@
           "distance": 15,
           "shots": 100000,
           "reason": "over per-cell decode budget",
-          "probe_rate_dec_per_s": 1.796627465384958,
-          "projected_decode_seconds": 55659.84152344754,
+          "probe_rate_dec_per_s": 1.772709639082128,
+          "projected_decode_seconds": 56410.81753906292,
           "budget_seconds": 25.0
         }
       ]
@@ -923,7 +905,7 @@
       "shots": 1000,
       "errors": 13,
       "unfaithful": 0,
-      "seconds": 0.001372499973513186,
+      "seconds": 0.0014153000665828586,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -931,10 +913,10 @@
       "ler": 0.013,
       "ci95_lo": 0.007612820388415339,
       "ci95_hi": 0.022114442378258013,
-      "decodes_per_s": 728597.4639695633,
+      "decodes_per_s": 706563.946127996,
       "decoder_kind": "blossom",
       "distance": 3,
-      "speedup_vs_pymatching": 0.351
+      "speedup_vs_pymatching": 0.343
     },
     {
       "decoder": "QECTOR Sparse Blossom (CPU)",
@@ -943,7 +925,7 @@
       "shots": 5000,
       "errors": 84,
       "unfaithful": 0,
-      "seconds": 0.0033527000341564417,
+      "seconds": 0.00327590003143996,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -951,10 +933,10 @@
       "ler": 0.0168,
       "ci95_lo": 0.013590685008470143,
       "ci95_hi": 0.020751222151581008,
-      "decodes_per_s": 1491335.3264715876,
+      "decodes_per_s": 1526298.1018997065,
       "decoder_kind": "blossom",
       "distance": 3,
-      "speedup_vs_pymatching": 0.629
+      "speedup_vs_pymatching": 0.639
     },
     {
       "decoder": "QECTOR Sparse Blossom (CPU)",
@@ -963,7 +945,7 @@
       "shots": 10000,
       "errors": 202,
       "unfaithful": 0,
-      "seconds": 0.006185999955050647,
+      "seconds": 0.005211899988353252,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -971,10 +953,10 @@
       "ler": 0.0202,
       "ci95_lo": 0.01762126835679094,
       "ci95_hi": 0.023147216479883194,
-      "decodes_per_s": 1616553.5196674806,
+      "decodes_per_s": 1918686.0880574172,
       "decoder_kind": "blossom",
       "distance": 3,
-      "speedup_vs_pymatching": 0.663
+      "speedup_vs_pymatching": 0.795
     },
     {
       "decoder": "QECTOR Sparse Blossom (CPU)",
@@ -983,7 +965,7 @@
       "shots": 50000,
       "errors": 960,
       "unfaithful": 0,
-      "seconds": 0.022993599995970726,
+      "seconds": 0.021880900021642447,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -991,10 +973,10 @@
       "ler": 0.0192,
       "ci95_lo": 0.01803358670309175,
       "ci95_hi": 0.02044028655736075,
-      "decodes_per_s": 2174518.1271641557,
+      "decodes_per_s": 2285097.9598894417,
       "decoder_kind": "blossom",
       "distance": 3,
-      "speedup_vs_pymatching": 0.869
+      "speedup_vs_pymatching": 0.92
     },
     {
       "decoder": "QECTOR Sparse Blossom (CPU)",
@@ -1003,7 +985,7 @@
       "shots": 100000,
       "errors": 1891,
       "unfaithful": 0,
-      "seconds": 0.044248700025491416,
+      "seconds": 0.04278170003090054,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1011,10 +993,10 @@
       "ler": 0.01891,
       "ci95_lo": 0.018084088428350083,
       "ci95_hi": 0.01977287190033241,
-      "decodes_per_s": 2259953.398458951,
+      "decodes_per_s": 2337448.0193113317,
       "decoder_kind": "blossom",
       "distance": 3,
-      "speedup_vs_pymatching": 0.908
+      "speedup_vs_pymatching": 0.943
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -1023,7 +1005,7 @@
       "shots": 1000,
       "errors": 16,
       "unfaithful": 0,
-      "seconds": 0.0011262999614700675,
+      "seconds": 0.000927699962630868,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1031,10 +1013,10 @@
       "ler": 0.016,
       "ci95_lo": 0.009872242001177374,
       "ci95_hi": 0.025832060214571913,
-      "decodes_per_s": 887862.9443392518,
+      "decodes_per_s": 1077934.7205793737,
       "decoder_kind": "union_find",
       "distance": 3,
-      "speedup_vs_pymatching": 0.428
+      "speedup_vs_pymatching": 0.523
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -1043,7 +1025,7 @@
       "shots": 5000,
       "errors": 105,
       "unfaithful": 0,
-      "seconds": 0.0020336000015959144,
+      "seconds": 0.0023180999560281634,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1051,10 +1033,10 @@
       "ler": 0.021,
       "ci95_lo": 0.017377941131743246,
       "ci95_hi": 0.025357517331966405,
-      "decodes_per_s": 2458693.9398486107,
+      "decodes_per_s": 2156938.9132671435,
       "decoder_kind": "union_find",
       "distance": 3,
-      "speedup_vs_pymatching": 1.037
+      "speedup_vs_pymatching": 0.904
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -1063,7 +1045,7 @@
       "shots": 10000,
       "errors": 233,
       "unfaithful": 0,
-      "seconds": 0.0035597000969573855,
+      "seconds": 0.0031952999997884035,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1071,10 +1053,10 @@
       "ler": 0.0233,
       "ci95_lo": 0.020521261820035032,
       "ci95_hi": 0.026444842226739797,
-      "decodes_per_s": 2809225.420014284,
+      "decodes_per_s": 3129596.5952061503,
       "decoder_kind": "union_find",
       "distance": 3,
-      "speedup_vs_pymatching": 1.153
+      "speedup_vs_pymatching": 1.296
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -1083,7 +1065,7 @@
       "shots": 50000,
       "errors": 1128,
       "unfaithful": 0,
-      "seconds": 0.011085800011642277,
+      "seconds": 0.011164400028064847,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1091,7 +1073,7 @@
       "ler": 0.02256,
       "ci95_lo": 0.021294611341308785,
       "ci95_hi": 0.023898745666741217,
-      "decodes_per_s": 4510274.400358128,
+      "decodes_per_s": 4478521.001962577,
       "decoder_kind": "union_find",
       "distance": 3,
       "speedup_vs_pymatching": 1.803
@@ -1103,7 +1085,7 @@
       "shots": 100000,
       "errors": 2210,
       "unfaithful": 0,
-      "seconds": 0.020762200001627207,
+      "seconds": 0.020185999921523035,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1111,10 +1093,10 @@
       "ler": 0.0221,
       "ci95_lo": 0.021207036913146404,
       "ci95_hi": 0.023029678339877693,
-      "decodes_per_s": 4816445.270354907,
+      "decodes_per_s": 4953928.484532313,
       "decoder_kind": "union_find",
       "distance": 3,
-      "speedup_vs_pymatching": 1.935
+      "speedup_vs_pymatching": 1.999
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -1123,7 +1105,7 @@
       "shots": 1000,
       "errors": 16,
       "unfaithful": 0,
-      "seconds": 0.0008202999597415328,
+      "seconds": 0.0008038999512791634,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1131,10 +1113,10 @@
       "ler": 0.016,
       "ci95_lo": 0.009872242001177374,
       "ci95_hi": 0.025832060214571913,
-      "decodes_per_s": 1219066.255123417,
+      "decodes_per_s": 1243935.8883015267,
       "decoder_kind": "cuda",
       "distance": 3,
-      "speedup_vs_pymatching": 0.587
+      "speedup_vs_pymatching": 0.604
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -1143,7 +1125,7 @@
       "shots": 5000,
       "errors": 105,
       "unfaithful": 0,
-      "seconds": 0.0029929999727755785,
+      "seconds": 0.003664499963633716,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1151,10 +1133,10 @@
       "ler": 0.021,
       "ci95_lo": 0.017377941131743246,
       "ci95_hi": 0.025357517331966405,
-      "decodes_per_s": 1670564.6660474963,
+      "decodes_per_s": 1364442.6387282598,
       "decoder_kind": "cuda",
       "distance": 3,
-      "speedup_vs_pymatching": 0.705
+      "speedup_vs_pymatching": 0.572
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -1163,7 +1145,7 @@
       "shots": 10000,
       "errors": 235,
       "unfaithful": 0,
-      "seconds": 0.005546899978071451,
+      "seconds": 0.004932499956339598,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1171,10 +1153,10 @@
       "ler": 0.0235,
       "ci95_lo": 0.020708857111176187,
       "ci95_hi": 0.026657093336250295,
-      "decodes_per_s": 1802808.7832001622,
+      "decodes_per_s": 2027369.506034621,
       "decoder_kind": "cuda",
       "distance": 3,
-      "speedup_vs_pymatching": 0.74
+      "speedup_vs_pymatching": 0.84
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -1183,7 +1165,7 @@
       "shots": 50000,
       "errors": 1131,
       "unfaithful": 0,
-      "seconds": 0.03667910001240671,
+      "seconds": 0.05088749993592501,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1191,10 +1173,10 @@
       "ler": 0.02262,
       "ci95_lo": 0.021352917896739074,
       "ci95_hi": 0.023960429892518027,
-      "decodes_per_s": 1363174.123222421,
+      "decodes_per_s": 982559.56891098,
       "decoder_kind": "cuda",
       "distance": 3,
-      "speedup_vs_pymatching": 0.545
+      "speedup_vs_pymatching": 0.396
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -1203,7 +1185,7 @@
       "shots": 100000,
       "errors": 2215,
       "unfaithful": 0,
-      "seconds": 0.07188689999748021,
+      "seconds": 0.06915039999876171,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1211,10 +1193,10 @@
       "ler": 0.02215,
       "ci95_lo": 0.021256028440718503,
       "ci95_hi": 0.02308068297099433,
-      "decodes_per_s": 1391074.0343999423,
+      "decodes_per_s": 1446123.2328633054,
       "decoder_kind": "cuda",
       "distance": 3,
-      "speedup_vs_pymatching": 0.559
+      "speedup_vs_pymatching": 0.583
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, weighted)",
@@ -1223,7 +1205,7 @@
       "shots": 1000,
       "errors": 16,
       "unfaithful": 0,
-      "seconds": 0.0006299000233411789,
+      "seconds": 0.000985399936325848,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1231,10 +1213,10 @@
       "ler": 0.016,
       "ci95_lo": 0.009872242001177374,
       "ci95_hi": 0.025832060214571913,
-      "decodes_per_s": 1587553.5211059363,
+      "decodes_per_s": 1014816.3838213645,
       "decoder_kind": "cuda_weighted",
       "distance": 3,
-      "speedup_vs_pymatching": 0.764
+      "speedup_vs_pymatching": 0.493
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, weighted)",
@@ -1243,7 +1225,7 @@
       "shots": 5000,
       "errors": 105,
       "unfaithful": 0,
-      "seconds": 0.00365059997420758,
+      "seconds": 0.0038792999694123864,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1251,10 +1233,10 @@
       "ler": 0.021,
       "ci95_lo": 0.017377941131743246,
       "ci95_hi": 0.025357517331966405,
-      "decodes_per_s": 1369637.8774246085,
+      "decodes_per_s": 1288892.336097786,
       "decoder_kind": "cuda_weighted",
       "distance": 3,
-      "speedup_vs_pymatching": 0.578
+      "speedup_vs_pymatching": 0.54
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, weighted)",
@@ -1263,7 +1245,7 @@
       "shots": 10000,
       "errors": 238,
       "unfaithful": 0,
-      "seconds": 0.007097900030203164,
+      "seconds": 0.006920600077137351,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1271,10 +1253,10 @@
       "ler": 0.0238,
       "ci95_lo": 0.020990354890095486,
       "ci95_hi": 0.026975365158308486,
-      "decodes_per_s": 1408867.4054928566,
+      "decodes_per_s": 1444961.403424487,
       "decoder_kind": "cuda_weighted",
       "distance": 3,
-      "speedup_vs_pymatching": 0.578
+      "speedup_vs_pymatching": 0.599
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, weighted)",
@@ -1283,7 +1265,7 @@
       "shots": 50000,
       "errors": 1129,
       "unfaithful": 0,
-      "seconds": 0.041452899924479425,
+      "seconds": 0.04314449999947101,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1291,10 +1273,10 @@
       "ler": 0.02258,
       "ci95_lo": 0.02131404659291466,
       "ci95_hi": 0.023919307342204373,
-      "decodes_per_s": 1206188.2302828517,
+      "decodes_per_s": 1158896.2672093324,
       "decoder_kind": "cuda_weighted",
       "distance": 3,
-      "speedup_vs_pymatching": 0.482
+      "speedup_vs_pymatching": 0.467
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, weighted)",
@@ -1303,7 +1285,7 @@
       "shots": 100000,
       "errors": 2201,
       "unfaithful": 0,
-      "seconds": 0.07986409997101873,
+      "seconds": 0.08324399997945875,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1311,10 +1293,10 @@
       "ler": 0.02201,
       "ci95_lo": 0.021118855236743367,
       "ci95_hi": 0.022937866930640996,
-      "decodes_per_s": 1252127.0512819681,
+      "decodes_per_s": 1201287.780797126,
       "decoder_kind": "cuda_weighted",
       "distance": 3,
-      "speedup_vs_pymatching": 0.503
+      "speedup_vs_pymatching": 0.485
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -1323,7 +1305,7 @@
       "shots": 1000,
       "errors": 16,
       "unfaithful": 0,
-      "seconds": 0.002266200026497245,
+      "seconds": 0.0020936999935656786,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1331,10 +1313,10 @@
       "ler": 0.016,
       "ci95_lo": 0.009872242001177374,
       "ci95_hi": 0.025832060214571913,
-      "decodes_per_s": 441267.31458283996,
+      "decodes_per_s": 477623.3476969872,
       "decoder_kind": "opencl",
       "distance": 3,
-      "speedup_vs_pymatching": 0.212
+      "speedup_vs_pymatching": 0.232
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -1343,7 +1325,7 @@
       "shots": 5000,
       "errors": 105,
       "unfaithful": 0,
-      "seconds": 0.003293400048278272,
+      "seconds": 0.003548300010152161,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1351,10 +1333,10 @@
       "ler": 0.021,
       "ci95_lo": 0.017377941131743246,
       "ci95_hi": 0.025357517331966405,
-      "decodes_per_s": 1518187.8686781176,
+      "decodes_per_s": 1409125.492685041,
       "decoder_kind": "opencl",
       "distance": 3,
-      "speedup_vs_pymatching": 0.64
+      "speedup_vs_pymatching": 0.59
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -1363,7 +1345,7 @@
       "shots": 10000,
       "errors": 235,
       "unfaithful": 0,
-      "seconds": 0.006241699913516641,
+      "seconds": 0.005946099990978837,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1371,10 +1353,10 @@
       "ler": 0.0235,
       "ci95_lo": 0.020708857111176187,
       "ci95_hi": 0.026657093336250295,
-      "decodes_per_s": 1602127.647685307,
+      "decodes_per_s": 1681774.6111184747,
       "decoder_kind": "opencl",
       "distance": 3,
-      "speedup_vs_pymatching": 0.657
+      "speedup_vs_pymatching": 0.697
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -1383,7 +1365,7 @@
       "shots": 50000,
       "errors": 1131,
       "unfaithful": 0,
-      "seconds": 0.03900500002782792,
+      "seconds": 0.04191119992174208,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1391,10 +1373,10 @@
       "ler": 0.02262,
       "ci95_lo": 0.021352917896739074,
       "ci95_hi": 0.023960429892518027,
-      "decodes_per_s": 1281886.9366575505,
+      "decodes_per_s": 1192998.5324534154,
       "decoder_kind": "opencl",
       "distance": 3,
-      "speedup_vs_pymatching": 0.512
+      "speedup_vs_pymatching": 0.48
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -1403,7 +1385,7 @@
       "shots": 100000,
       "errors": 2215,
       "unfaithful": 0,
-      "seconds": 0.08426969998981804,
+      "seconds": 0.07775089994538575,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1411,10 +1393,10 @@
       "ler": 0.02215,
       "ci95_lo": 0.021256028440718503,
       "ci95_hi": 0.02308068297099433,
-      "decodes_per_s": 1186666.144676943,
+      "decodes_per_s": 1286158.7463327446,
       "decoder_kind": "opencl",
       "distance": 3,
-      "speedup_vs_pymatching": 0.477
+      "speedup_vs_pymatching": 0.519
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, weighted)",
@@ -1423,7 +1405,7 @@
       "shots": 1000,
       "errors": 16,
       "unfaithful": 0,
-      "seconds": 0.002786999917589128,
+      "seconds": 0.003093100036494434,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1431,10 +1413,10 @@
       "ler": 0.016,
       "ci95_lo": 0.009872242001177374,
       "ci95_hi": 0.025832060214571913,
-      "decodes_per_s": 358808.76554350316,
+      "decodes_per_s": 323300.24512668216,
       "decoder_kind": "opencl_weighted",
       "distance": 3,
-      "speedup_vs_pymatching": 0.173
+      "speedup_vs_pymatching": 0.157
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, weighted)",
@@ -1443,7 +1425,7 @@
       "shots": 5000,
       "errors": 105,
       "unfaithful": 0,
-      "seconds": 0.004203999997116625,
+      "seconds": 0.00402260001283139,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1451,10 +1433,10 @@
       "ler": 0.021,
       "ci95_lo": 0.017377941131743246,
       "ci95_hi": 0.025357517331966405,
-      "decodes_per_s": 1189343.483213445,
+      "decodes_per_s": 1242977.174974115,
       "decoder_kind": "opencl_weighted",
       "distance": 3,
-      "speedup_vs_pymatching": 0.502
+      "speedup_vs_pymatching": 0.521
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, weighted)",
@@ -1463,7 +1445,7 @@
       "shots": 10000,
       "errors": 238,
       "unfaithful": 0,
-      "seconds": 0.006983199971728027,
+      "seconds": 0.007623399957083166,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1471,10 +1453,10 @@
       "ler": 0.0238,
       "ci95_lo": 0.020990354890095486,
       "ci95_hi": 0.026975365158308486,
-      "decodes_per_s": 1432008.254165096,
+      "decodes_per_s": 1311750.6698187406,
       "decoder_kind": "opencl_weighted",
       "distance": 3,
-      "speedup_vs_pymatching": 0.588
+      "speedup_vs_pymatching": 0.543
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, weighted)",
@@ -1483,7 +1465,7 @@
       "shots": 50000,
       "errors": 1129,
       "unfaithful": 0,
-      "seconds": 0.03762509999796748,
+      "seconds": 0.037307600025087595,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1491,10 +1473,10 @@
       "ler": 0.02258,
       "ci95_lo": 0.02131404659291466,
       "ci95_hi": 0.023919307342204373,
-      "decodes_per_s": 1328900.122596379,
+      "decodes_per_s": 1340209.5006480548,
       "decoder_kind": "opencl_weighted",
       "distance": 3,
-      "speedup_vs_pymatching": 0.531
+      "speedup_vs_pymatching": 0.54
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, weighted)",
@@ -1503,7 +1485,7 @@
       "shots": 100000,
       "errors": 2201,
       "unfaithful": 0,
-      "seconds": 0.06693009997252375,
+      "seconds": 0.06434949999675155,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1511,10 +1493,10 @@
       "ler": 0.02201,
       "ci95_lo": 0.021118855236743367,
       "ci95_hi": 0.022937866930640996,
-      "decodes_per_s": 1494096.079955837,
+      "decodes_per_s": 1554013.6287779724,
       "decoder_kind": "opencl_weighted",
       "distance": 3,
-      "speedup_vs_pymatching": 0.6
+      "speedup_vs_pymatching": 0.627
     },
     {
       "decoder": "PyMatching v2 (C++)",
@@ -1523,7 +1505,7 @@
       "shots": 1000,
       "errors": 13,
       "unfaithful": 0,
-      "seconds": 0.0004814999410882592,
+      "seconds": 0.00048559997230768204,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1531,7 +1513,7 @@
       "ler": 0.013,
       "ci95_lo": 0.007612820388415339,
       "ci95_hi": 0.022114442378258013,
-      "decodes_per_s": 2076843.4524412525,
+      "decodes_per_s": 2059308.189923841,
       "decoder_kind": "pymatching",
       "distance": 3,
       "speedup_vs_pymatching": 1.0
@@ -1543,7 +1525,7 @@
       "shots": 5000,
       "errors": 84,
       "unfaithful": 0,
-      "seconds": 0.002108599990606308,
+      "seconds": 0.0020946000004187226,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1551,7 +1533,7 @@
       "ler": 0.0168,
       "ci95_lo": 0.013590685008470143,
       "ci95_hi": 0.020751222151581008,
-      "decodes_per_s": 2371241.592656129,
+      "decodes_per_s": 2387090.6134825125,
       "decoder_kind": "pymatching",
       "distance": 3,
       "speedup_vs_pymatching": 1.0
@@ -1563,7 +1545,7 @@
       "shots": 10000,
       "errors": 202,
       "unfaithful": 0,
-      "seconds": 0.004103699931874871,
+      "seconds": 0.004142199992202222,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1571,7 +1553,7 @@
       "ler": 0.0202,
       "ci95_lo": 0.01762126835679094,
       "ci95_hi": 0.023147216479883194,
-      "decodes_per_s": 2436825.3444474596,
+      "decodes_per_s": 2414176.0462616985,
       "decoder_kind": "pymatching",
       "distance": 3,
       "speedup_vs_pymatching": 1.0
@@ -1583,7 +1565,7 @@
       "shots": 50000,
       "errors": 960,
       "unfaithful": 0,
-      "seconds": 0.01998969994019717,
+      "seconds": 0.020134199992753565,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1591,7 +1573,7 @@
       "ler": 0.0192,
       "ci95_lo": 0.01803358670309175,
       "ci95_hi": 0.02044028655736075,
-      "decodes_per_s": 2501288.1708872127,
+      "decodes_per_s": 2483336.810898637,
       "decoder_kind": "pymatching",
       "distance": 3,
       "speedup_vs_pymatching": 1.0
@@ -1603,7 +1585,7 @@
       "shots": 100000,
       "errors": 1891,
       "unfaithful": 0,
-      "seconds": 0.04018410004209727,
+      "seconds": 0.04034239996690303,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1611,7 +1593,7 @@
       "ler": 0.01891,
       "ci95_lo": 0.018084088428350083,
       "ci95_hi": 0.01977287190033241,
-      "decodes_per_s": 2488546.4622882926,
+      "decodes_per_s": 2478781.6312871855,
       "decoder_kind": "pymatching",
       "distance": 3,
       "speedup_vs_pymatching": 1.0
@@ -1623,7 +1605,7 @@
       "shots": 1000,
       "errors": 12,
       "unfaithful": 0,
-      "seconds": 0.41075689997524023,
+      "seconds": 0.4147041999967769,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1631,7 +1613,7 @@
       "ler": 0.012,
       "ci95_lo": 0.006877647805525981,
       "ci95_hi": 0.02085726847812206,
-      "decodes_per_s": 2434.5300104764606,
+      "decodes_per_s": 2411.357299993036,
       "decoder_kind": "ldpc_bposd",
       "distance": 3,
       "speedup_vs_pymatching": 0.001
@@ -1643,7 +1625,7 @@
       "shots": 5000,
       "errors": 87,
       "unfaithful": 0,
-      "seconds": 2.119025200023316,
+      "seconds": 2.1551207000156865,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1651,7 +1633,7 @@
       "ler": 0.0174,
       "ci95_lo": 0.01412867343534707,
       "ci95_hi": 0.02141231248236957,
-      "decodes_per_s": 2359.575525550609,
+      "decodes_per_s": 2320.0556701829305,
       "decoder_kind": "ldpc_bposd",
       "distance": 3,
       "speedup_vs_pymatching": 0.001
@@ -1663,7 +1645,7 @@
       "shots": 10000,
       "errors": 199,
       "unfaithful": 0,
-      "seconds": 4.2174601999577135,
+      "seconds": 4.2468210000079125,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1671,7 +1653,7 @@
       "ler": 0.0199,
       "ci95_lo": 0.01734145985882319,
       "ci95_hi": 0.02282725537687346,
-      "decodes_per_s": 2371.095286234181,
+      "decodes_per_s": 2354.7024939316652,
       "decoder_kind": "ldpc_bposd",
       "distance": 3,
       "speedup_vs_pymatching": 0.001
@@ -1683,7 +1665,7 @@
       "shots": 50000,
       "errors": 969,
       "unfaithful": 0,
-      "seconds": 21.226633699960075,
+      "seconds": 20.839286100002937,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1691,7 +1673,7 @@
       "ler": 0.01938,
       "ci95_lo": 0.018208061882162424,
       "ci95_hi": 0.020625783721911373,
-      "decodes_per_s": 2355.5312965189596,
+      "decodes_per_s": 2399.3144371674493,
       "decoder_kind": "ldpc_bposd",
       "distance": 3,
       "speedup_vs_pymatching": 0.001
@@ -1703,7 +1685,7 @@
       "shots": 1000,
       "errors": 19,
       "unfaithful": 0,
-      "seconds": 0.010296900058165193,
+      "seconds": 0.01117730000987649,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1711,10 +1693,10 @@
       "ler": 0.019,
       "ci95_lo": 0.012196885749539194,
       "ci95_hi": 0.029484455915286034,
-      "decodes_per_s": 97116.60736252599,
+      "decodes_per_s": 89467.04473498785,
       "decoder_kind": "blossom",
       "distance": 5,
-      "speedup_vs_pymatching": 0.355
+      "speedup_vs_pymatching": 0.303
     },
     {
       "decoder": "QECTOR Sparse Blossom (CPU)",
@@ -1723,7 +1705,7 @@
       "shots": 5000,
       "errors": 73,
       "unfaithful": 0,
-      "seconds": 0.04816509992815554,
+      "seconds": 0.04714000003878027,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1731,10 +1713,10 @@
       "ler": 0.0146,
       "ci95_lo": 0.011628443441217553,
       "ci95_hi": 0.01831684160739343,
-      "decodes_per_s": 103809.60503472733,
+      "decodes_per_s": 106067.03427846186,
       "decoder_kind": "blossom",
       "distance": 5,
-      "speedup_vs_pymatching": 0.348
+      "speedup_vs_pymatching": 0.329
     },
     {
       "decoder": "QECTOR Sparse Blossom (CPU)",
@@ -1743,7 +1725,7 @@
       "shots": 10000,
       "errors": 166,
       "unfaithful": 0,
-      "seconds": 0.08836210006847978,
+      "seconds": 0.08902289997786283,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1751,10 +1733,10 @@
       "ler": 0.0166,
       "ci95_lo": 0.014275044215049687,
       "ci95_hi": 0.019296205409894615,
-      "decodes_per_s": 113170.69187185566,
+      "decodes_per_s": 112330.64753548449,
       "decoder_kind": "blossom",
       "distance": 5,
-      "speedup_vs_pymatching": 0.374
+      "speedup_vs_pymatching": 0.352
     },
     {
       "decoder": "QECTOR Sparse Blossom (CPU)",
@@ -1763,7 +1745,7 @@
       "shots": 50000,
       "errors": 810,
       "unfaithful": 0,
-      "seconds": 0.4943609999027103,
+      "seconds": 0.4723053000634536,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1771,10 +1753,10 @@
       "ler": 0.0162,
       "ci95_lo": 0.015130028023426962,
       "ci95_hi": 0.017344306176670623,
-      "decodes_per_s": 101140.66443315703,
+      "decodes_per_s": 105863.72838348958,
       "decoder_kind": "blossom",
       "distance": 5,
-      "speedup_vs_pymatching": 0.331
+      "speedup_vs_pymatching": 0.312
     },
     {
       "decoder": "QECTOR Sparse Blossom (CPU)",
@@ -1783,7 +1765,7 @@
       "shots": 100000,
       "errors": 1596,
       "unfaithful": 0,
-      "seconds": 0.9734449000097811,
+      "seconds": 0.894109099986963,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1791,10 +1773,10 @@
       "ler": 0.01596,
       "ci95_lo": 0.01520165439582207,
       "ci95_hi": 0.01675553257022476,
-      "decodes_per_s": 102727.95101088434,
+      "decodes_per_s": 111843.17439723866,
       "decoder_kind": "blossom",
       "distance": 5,
-      "speedup_vs_pymatching": 0.371
+      "speedup_vs_pymatching": 0.329
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -1803,7 +1785,7 @@
       "shots": 1000,
       "errors": 26,
       "unfaithful": 0,
-      "seconds": 0.0031315000960603356,
+      "seconds": 0.003118900000117719,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1811,10 +1793,10 @@
       "ler": 0.026,
       "ci95_lo": 0.01780393820004751,
       "ci95_hi": 0.03782382884595489,
-      "decodes_per_s": 319335.77177854016,
+      "decodes_per_s": 320625.86166990164,
       "decoder_kind": "union_find",
       "distance": 5,
-      "speedup_vs_pymatching": 1.167
+      "speedup_vs_pymatching": 1.086
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -1823,7 +1805,7 @@
       "shots": 5000,
       "errors": 148,
       "unfaithful": 0,
-      "seconds": 0.00949409999884665,
+      "seconds": 0.009314200025983155,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1831,10 +1813,10 @@
       "ler": 0.0296,
       "ci95_lo": 0.025251375350455615,
       "ci95_hi": 0.03467087863979285,
-      "decodes_per_s": 526642.8624732627,
+      "decodes_per_s": 536814.7544664984,
       "decoder_kind": "union_find",
       "distance": 5,
-      "speedup_vs_pymatching": 1.767
+      "speedup_vs_pymatching": 1.664
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -1843,7 +1825,7 @@
       "shots": 10000,
       "errors": 268,
       "unfaithful": 0,
-      "seconds": 0.018895199988037348,
+      "seconds": 0.016932600061409175,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1851,10 +1833,10 @@
       "ler": 0.0268,
       "ci95_lo": 0.023811791443923116,
       "ci95_hi": 0.030151624614255714,
-      "decodes_per_s": 529234.9383087268,
+      "decodes_per_s": 590576.7551193065,
       "decoder_kind": "union_find",
       "distance": 5,
-      "speedup_vs_pymatching": 1.75
+      "speedup_vs_pymatching": 1.85
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -1863,7 +1845,7 @@
       "shots": 50000,
       "errors": 1356,
       "unfaithful": 0,
-      "seconds": 0.08539499994367361,
+      "seconds": 0.07433650002349168,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1871,10 +1853,10 @@
       "ler": 0.02712,
       "ci95_lo": 0.02573215690622785,
       "ci95_hi": 0.028580499473561623,
-      "decodes_per_s": 585514.3747640952,
+      "decodes_per_s": 672617.0856066548,
       "decoder_kind": "union_find",
       "distance": 5,
-      "speedup_vs_pymatching": 1.919
+      "speedup_vs_pymatching": 1.981
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -1883,7 +1865,7 @@
       "shots": 100000,
       "errors": 2645,
       "unfaithful": 0,
-      "seconds": 0.15860610001254827,
+      "seconds": 0.1440524000208825,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1891,10 +1873,10 @@
       "ler": 0.02645,
       "ci95_lo": 0.025473462519384937,
       "ci95_hi": 0.02746291853955953,
-      "decodes_per_s": 630492.7741876788,
+      "decodes_per_s": 694191.8356480249,
       "decoder_kind": "union_find",
       "distance": 5,
-      "speedup_vs_pymatching": 2.279
+      "speedup_vs_pymatching": 2.041
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -1903,7 +1885,7 @@
       "shots": 1000,
       "errors": 60,
       "unfaithful": 0,
-      "seconds": 0.01161279994994402,
+      "seconds": 0.011530099902302027,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1911,10 +1893,10 @@
       "ler": 0.06,
       "ci95_lo": 0.04689647267321751,
       "ci95_hi": 0.07647107479564548,
-      "decodes_per_s": 86111.87692119165,
+      "decodes_per_s": 86729.51739128873,
       "decoder_kind": "cuda",
       "distance": 5,
-      "speedup_vs_pymatching": 0.315
+      "speedup_vs_pymatching": 0.294
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -1923,7 +1905,7 @@
       "shots": 5000,
       "errors": 336,
       "unfaithful": 0,
-      "seconds": 0.021374300005845726,
+      "seconds": 0.023168500047177076,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1931,10 +1913,10 @@
       "ler": 0.0672,
       "ci95_lo": 0.06058725245899569,
       "ci95_hi": 0.07447727034495741,
-      "decodes_per_s": 233925.78931859916,
+      "decodes_per_s": 215810.25918029665,
       "decoder_kind": "cuda",
       "distance": 5,
-      "speedup_vs_pymatching": 0.785
+      "speedup_vs_pymatching": 0.669
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -1943,7 +1925,7 @@
       "shots": 10000,
       "errors": 600,
       "unfaithful": 0,
-      "seconds": 0.040942099993117154,
+      "seconds": 0.041652899933978915,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1951,10 +1933,10 @@
       "ler": 0.06,
       "ci95_lo": 0.055512130388350296,
       "ci95_hi": 0.06482578817800362,
-      "decodes_per_s": 244247.3640013853,
+      "decodes_per_s": 240079.3225885904,
       "decoder_kind": "cuda",
       "distance": 5,
-      "speedup_vs_pymatching": 0.808
+      "speedup_vs_pymatching": 0.752
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -1963,7 +1945,7 @@
       "shots": 50000,
       "errors": 3041,
       "unfaithful": 0,
-      "seconds": 0.33088880009017885,
+      "seconds": 0.3285894999280572,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1971,10 +1953,10 @@
       "ler": 0.06082,
       "ci95_lo": 0.05875866048350756,
       "ci95_hi": 0.06294881800760212,
-      "decodes_per_s": 151108.1668112467,
+      "decodes_per_s": 152165.54397187743,
       "decoder_kind": "cuda",
       "distance": 5,
-      "speedup_vs_pymatching": 0.495
+      "speedup_vs_pymatching": 0.448
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -1983,7 +1965,7 @@
       "shots": 100000,
       "errors": 6094,
       "unfaithful": 0,
-      "seconds": 0.6365398000925779,
+      "seconds": 0.6644288999959826,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -1991,10 +1973,10 @@
       "ler": 0.06094,
       "ci95_lo": 0.05947412313935386,
       "ci95_hi": 0.06243960818308338,
-      "decodes_per_s": 157099.3675265177,
+      "decodes_per_s": 150505.19325785592,
       "decoder_kind": "cuda",
       "distance": 5,
-      "speedup_vs_pymatching": 0.568
+      "speedup_vs_pymatching": 0.442
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, weighted)",
@@ -2003,7 +1985,7 @@
       "shots": 1000,
       "errors": 31,
       "unfaithful": 0,
-      "seconds": 0.027307200012728572,
+      "seconds": 0.02738630003295839,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2011,10 +1993,10 @@
       "ler": 0.031,
       "ci95_lo": 0.02192400344538714,
       "ci95_hi": 0.04366549601574181,
-      "decodes_per_s": 36620.378491162584,
+      "decodes_per_s": 36514.60762485394,
       "decoder_kind": "cuda_weighted",
       "distance": 5,
-      "speedup_vs_pymatching": 0.134
+      "speedup_vs_pymatching": 0.124
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, weighted)",
@@ -2023,7 +2005,7 @@
       "shots": 5000,
       "errors": 181,
       "unfaithful": 0,
-      "seconds": 0.04698660003487021,
+      "seconds": 0.046852100058458745,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2031,10 +2013,10 @@
       "ler": 0.0362,
       "ci95_lo": 0.03136842467721859,
       "ci95_hi": 0.04174369564735038,
-      "decodes_per_s": 106413.31776058165,
+      "decodes_per_s": 106718.80222575621,
       "decoder_kind": "cuda_weighted",
       "distance": 5,
-      "speedup_vs_pymatching": 0.357
+      "speedup_vs_pymatching": 0.331
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, weighted)",
@@ -2043,7 +2025,7 @@
       "shots": 10000,
       "errors": 316,
       "unfaithful": 0,
-      "seconds": 0.11096099996939301,
+      "seconds": 0.11061590001918375,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2051,10 +2033,10 @@
       "ler": 0.0316,
       "ci95_lo": 0.028347190301590365,
       "ci95_hi": 0.03521253937222824,
-      "decodes_per_s": 90121.7545151752,
+      "decodes_per_s": 90402.91674402806,
       "decoder_kind": "cuda_weighted",
       "distance": 5,
-      "speedup_vs_pymatching": 0.298
+      "speedup_vs_pymatching": 0.283
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, weighted)",
@@ -2063,7 +2045,7 @@
       "shots": 50000,
       "errors": 1561,
       "unfaithful": 0,
-      "seconds": 0.733180700102821,
+      "seconds": 0.743136000004597,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2071,10 +2053,10 @@
       "ler": 0.03122,
       "ci95_lo": 0.029731270345212075,
       "ci95_hi": 0.03278075608372913,
-      "decodes_per_s": 68196.01224225899,
+      "decodes_per_s": 67282.4355160976,
       "decoder_kind": "cuda_weighted",
       "distance": 5,
-      "speedup_vs_pymatching": 0.224
+      "speedup_vs_pymatching": 0.198
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, weighted)",
@@ -2083,7 +2065,7 @@
       "shots": 100000,
       "errors": 3182,
       "unfaithful": 0,
-      "seconds": 1.4189810999669135,
+      "seconds": 1.4460037000244483,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2091,10 +2073,10 @@
       "ler": 0.03182,
       "ci95_lo": 0.030749988422287572,
       "ci95_hi": 0.032925980079827555,
-      "decodes_per_s": 70473.10214514605,
+      "decodes_per_s": 69156.11626602979,
       "decoder_kind": "cuda_weighted",
       "distance": 5,
-      "speedup_vs_pymatching": 0.255
+      "speedup_vs_pymatching": 0.203
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -2103,7 +2085,7 @@
       "shots": 1000,
       "errors": 60,
       "unfaithful": 0,
-      "seconds": 0.008114499971270561,
+      "seconds": 0.007814800017513335,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2111,10 +2093,10 @@
       "ler": 0.06,
       "ci95_lo": 0.04689647267321751,
       "ci95_hi": 0.07647107479564548,
-      "decodes_per_s": 123236.1825793957,
+      "decodes_per_s": 127962.32760389938,
       "decoder_kind": "opencl",
       "distance": 5,
-      "speedup_vs_pymatching": 0.45
+      "speedup_vs_pymatching": 0.433
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -2123,7 +2105,7 @@
       "shots": 5000,
       "errors": 336,
       "unfaithful": 0,
-      "seconds": 0.02366109995637089,
+      "seconds": 0.02124919998459518,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2131,10 +2113,10 @@
       "ler": 0.0672,
       "ci95_lo": 0.06058725245899569,
       "ci95_hi": 0.07447727034495741,
-      "decodes_per_s": 211317.31023577036,
+      "decodes_per_s": 235302.97628262712,
       "decoder_kind": "opencl",
       "distance": 5,
-      "speedup_vs_pymatching": 0.709
+      "speedup_vs_pymatching": 0.729
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -2143,7 +2125,7 @@
       "shots": 10000,
       "errors": 600,
       "unfaithful": 0,
-      "seconds": 0.0537802999606356,
+      "seconds": 0.05571590003091842,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2151,10 +2133,10 @@
       "ler": 0.06,
       "ci95_lo": 0.055512130388350296,
       "ci95_hi": 0.06482578817800362,
-      "decodes_per_s": 185941.69254019563,
+      "decodes_per_s": 179481.97901228734,
       "decoder_kind": "opencl",
       "distance": 5,
-      "speedup_vs_pymatching": 0.615
+      "speedup_vs_pymatching": 0.562
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -2163,7 +2145,7 @@
       "shots": 50000,
       "errors": 3041,
       "unfaithful": 0,
-      "seconds": 0.36279849999118596,
+      "seconds": 0.35580580006353557,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2171,10 +2153,10 @@
       "ler": 0.06082,
       "ci95_lo": 0.05875866048350756,
       "ci95_hi": 0.06294881800760212,
-      "decodes_per_s": 137817.54886311473,
+      "decodes_per_s": 140526.09595198167,
       "decoder_kind": "opencl",
       "distance": 5,
-      "speedup_vs_pymatching": 0.452
+      "speedup_vs_pymatching": 0.414
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -2183,7 +2165,7 @@
       "shots": 100000,
       "errors": 6094,
       "unfaithful": 0,
-      "seconds": 0.7196049999911338,
+      "seconds": 0.6901965999277309,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2191,10 +2173,10 @@
       "ler": 0.06094,
       "ci95_lo": 0.05947412313935386,
       "ci95_hi": 0.06243960818308338,
-      "decodes_per_s": 138965.12670316646,
+      "decodes_per_s": 144886.25416362644,
       "decoder_kind": "opencl",
       "distance": 5,
-      "speedup_vs_pymatching": 0.502
+      "speedup_vs_pymatching": 0.426
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, weighted)",
@@ -2203,7 +2185,7 @@
       "shots": 1000,
       "errors": 31,
       "unfaithful": 0,
-      "seconds": 0.034811199991963804,
+      "seconds": 0.027425599982962012,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2211,10 +2193,10 @@
       "ler": 0.031,
       "ci95_lo": 0.02192400344538714,
       "ci95_hi": 0.04366549601574181,
-      "decodes_per_s": 28726.386916591524,
+      "decodes_per_s": 36462.28343668849,
       "decoder_kind": "opencl_weighted",
       "distance": 5,
-      "speedup_vs_pymatching": 0.105
+      "speedup_vs_pymatching": 0.124
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, weighted)",
@@ -2223,7 +2205,7 @@
       "shots": 5000,
       "errors": 181,
       "unfaithful": 0,
-      "seconds": 0.06863230001181364,
+      "seconds": 0.06097140000201762,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2231,10 +2213,10 @@
       "ler": 0.0362,
       "ci95_lo": 0.03136842467721859,
       "ci95_hi": 0.04174369564735038,
-      "decodes_per_s": 72851.99533076049,
+      "decodes_per_s": 82005.66166816809,
       "decoder_kind": "opencl_weighted",
       "distance": 5,
-      "speedup_vs_pymatching": 0.244
+      "speedup_vs_pymatching": 0.254
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, weighted)",
@@ -2243,7 +2225,7 @@
       "shots": 10000,
       "errors": 316,
       "unfaithful": 0,
-      "seconds": 0.17092980002053082,
+      "seconds": 0.15019509999547154,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2251,10 +2233,10 @@
       "ler": 0.0316,
       "ci95_lo": 0.028347190301590365,
       "ci95_hi": 0.03521253937222824,
-      "decodes_per_s": 58503.549403315716,
+      "decodes_per_s": 66580.06819331327,
       "decoder_kind": "opencl_weighted",
       "distance": 5,
-      "speedup_vs_pymatching": 0.193
+      "speedup_vs_pymatching": 0.209
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, weighted)",
@@ -2263,7 +2245,7 @@
       "shots": 50000,
       "errors": 1561,
       "unfaithful": 0,
-      "seconds": 1.0055461999727413,
+      "seconds": 0.8326091999188066,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2271,10 +2253,10 @@
       "ler": 0.03122,
       "ci95_lo": 0.029731270345212075,
       "ci95_hi": 0.03278075608372913,
-      "decodes_per_s": 49724.219534970565,
+      "decodes_per_s": 60052.1829507479,
       "decoder_kind": "opencl_weighted",
       "distance": 5,
-      "speedup_vs_pymatching": 0.163
+      "speedup_vs_pymatching": 0.177
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, weighted)",
@@ -2283,7 +2265,7 @@
       "shots": 100000,
       "errors": 3182,
       "unfaithful": 0,
-      "seconds": 1.9515571999363601,
+      "seconds": 1.6281207000138238,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2291,10 +2273,10 @@
       "ler": 0.03182,
       "ci95_lo": 0.030749988422287572,
       "ci95_hi": 0.032925980079827555,
-      "decodes_per_s": 51241.13195516943,
+      "decodes_per_s": 61420.507705080425,
       "decoder_kind": "opencl_weighted",
       "distance": 5,
-      "speedup_vs_pymatching": 0.185
+      "speedup_vs_pymatching": 0.181
     },
     {
       "decoder": "PyMatching v2 (C++)",
@@ -2303,7 +2285,7 @@
       "shots": 1000,
       "errors": 19,
       "unfaithful": 0,
-      "seconds": 0.003653799998573959,
+      "seconds": 0.0033874999498948455,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2311,7 +2293,7 @@
       "ler": 0.019,
       "ci95_lo": 0.012196885749539194,
       "ci95_hi": 0.029484455915286034,
-      "decodes_per_s": 273687.667740514,
+      "decodes_per_s": 295202.95639592316,
       "decoder_kind": "pymatching",
       "distance": 5,
       "speedup_vs_pymatching": 1.0
@@ -2323,7 +2305,7 @@
       "shots": 5000,
       "errors": 73,
       "unfaithful": 0,
-      "seconds": 0.01677490002475679,
+      "seconds": 0.015499799977988005,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2331,7 +2313,7 @@
       "ler": 0.0146,
       "ci95_lo": 0.011628443441217553,
       "ci95_hi": 0.01831684160739343,
-      "decodes_per_s": 298064.3695414508,
+      "decodes_per_s": 322584.8080040217,
       "decoder_kind": "pymatching",
       "distance": 5,
       "speedup_vs_pymatching": 1.0
@@ -2343,7 +2325,7 @@
       "shots": 10000,
       "errors": 166,
       "unfaithful": 0,
-      "seconds": 0.033068699995055795,
+      "seconds": 0.03133109991904348,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2351,7 +2333,7 @@
       "ler": 0.0166,
       "ci95_lo": 0.014275044215049687,
       "ci95_hi": 0.019296205409894615,
-      "decodes_per_s": 302400.75967592106,
+      "decodes_per_s": 319171.686466132,
       "decoder_kind": "pymatching",
       "distance": 5,
       "speedup_vs_pymatching": 1.0
@@ -2363,7 +2345,7 @@
       "shots": 50000,
       "errors": 809,
       "unfaithful": 0,
-      "seconds": 0.16387970000505447,
+      "seconds": 0.14723640005104244,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2371,7 +2353,7 @@
       "ler": 0.01618,
       "ci95_lo": 0.015110701133843695,
       "ci95_hi": 0.017323636139184855,
-      "decodes_per_s": 305101.8521418935,
+      "decodes_per_s": 339589.9382399088,
       "decoder_kind": "pymatching",
       "distance": 5,
       "speedup_vs_pymatching": 1.0
@@ -2383,7 +2365,7 @@
       "shots": 100000,
       "errors": 1596,
       "unfaithful": 0,
-      "seconds": 0.36147719994187355,
+      "seconds": 0.29394280002452433,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2391,7 +2373,7 @@
       "ler": 0.01596,
       "ci95_lo": 0.01520165439582207,
       "ci95_hi": 0.01675553257022476,
-      "decodes_per_s": 276642.6209345437,
+      "decodes_per_s": 340202.2434012902,
       "decoder_kind": "pymatching",
       "distance": 5,
       "speedup_vs_pymatching": 1.0
@@ -2403,7 +2385,7 @@
       "shots": 1000,
       "errors": 21,
       "unfaithful": 0,
-      "seconds": 9.733450299943797,
+      "seconds": 8.866846999968402,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2411,7 +2393,7 @@
       "ler": 0.021,
       "ci95_lo": 0.013775739566577244,
       "ci95_hi": 0.03189029506429861,
-      "decodes_per_s": 102.73849140687287,
+      "decodes_per_s": 112.77966113586527,
       "decoder_kind": "ldpc_bposd",
       "distance": 5,
       "speedup_vs_pymatching": 0.0
@@ -2423,7 +2405,7 @@
       "shots": 1000,
       "errors": 11,
       "unfaithful": 0,
-      "seconds": 0.0575715999584645,
+      "seconds": 0.05616559996269643,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2431,10 +2413,10 @@
       "ler": 0.011,
       "ci95_lo": 0.006153174097269186,
       "ci95_hi": 0.01958939570335354,
-      "decodes_per_s": 17369.675338560297,
+      "decodes_per_s": 17804.492441355047,
       "decoder_kind": "blossom",
       "distance": 7,
-      "speedup_vs_pymatching": 0.191
+      "speedup_vs_pymatching": 0.203
     },
     {
       "decoder": "QECTOR Sparse Blossom (CPU)",
@@ -2443,7 +2425,7 @@
       "shots": 5000,
       "errors": 75,
       "unfaithful": 0,
-      "seconds": 0.2819255000213161,
+      "seconds": 0.24203620001208037,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2451,10 +2433,10 @@
       "ler": 0.015,
       "ci95_lo": 0.011983909566214195,
       "ci95_hi": 0.018760761320840456,
-      "decodes_per_s": 17735.18181087541,
+      "decodes_per_s": 20658.066850125902,
       "decoder_kind": "blossom",
       "distance": 7,
-      "speedup_vs_pymatching": 0.182
+      "speedup_vs_pymatching": 0.217
     },
     {
       "decoder": "QECTOR Sparse Blossom (CPU)",
@@ -2463,7 +2445,7 @@
       "shots": 10000,
       "errors": 133,
       "unfaithful": 0,
-      "seconds": 0.5562112999614328,
+      "seconds": 0.48999100003857166,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2471,10 +2453,10 @@
       "ler": 0.0133,
       "ci95_lo": 0.011234297617755028,
       "ci95_hi": 0.01573948639643693,
-      "decodes_per_s": 17978.77892932666,
+      "decodes_per_s": 20408.53811439967,
       "decoder_kind": "blossom",
       "distance": 7,
-      "speedup_vs_pymatching": 0.179
+      "speedup_vs_pymatching": 0.21
     },
     {
       "decoder": "QECTOR Sparse Blossom (CPU)",
@@ -2483,7 +2465,7 @@
       "shots": 50000,
       "errors": 624,
       "unfaithful": 0,
-      "seconds": 2.7787211999529973,
+      "seconds": 2.458938799914904,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2491,10 +2473,10 @@
       "ler": 0.01248,
       "ci95_lo": 0.011543701413046416,
       "ci95_hi": 0.01349120435221108,
-      "decodes_per_s": 17993.88869989755,
+      "decodes_per_s": 20333.97496583906,
       "decoder_kind": "blossom",
       "distance": 7,
-      "speedup_vs_pymatching": 0.178
+      "speedup_vs_pymatching": 0.21
     },
     {
       "decoder": "QECTOR Sparse Blossom (CPU)",
@@ -2503,7 +2485,7 @@
       "shots": 100000,
       "errors": 1233,
       "unfaithful": 0,
-      "seconds": 5.876228900044225,
+      "seconds": 4.767488899989985,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2511,10 +2493,10 @@
       "ler": 0.01233,
       "ci95_lo": 0.011664521918978682,
       "ci95_hi": 0.013032943926265642,
-      "decodes_per_s": 17017.716923731034,
+      "decodes_per_s": 20975.402795423408,
       "decoder_kind": "blossom",
       "distance": 7,
-      "speedup_vs_pymatching": 0.168
+      "speedup_vs_pymatching": 0.214
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -2523,7 +2505,7 @@
       "shots": 1000,
       "errors": 18,
       "unfaithful": 0,
-      "seconds": 0.014168199966661632,
+      "seconds": 0.0116584999486804,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2531,10 +2513,10 @@
       "ler": 0.018,
       "ci95_lo": 0.011415740008365406,
       "ci95_hi": 0.028273255173434507,
-      "decodes_per_s": 70580.59614863158,
+      "decodes_per_s": 85774.32812127667,
       "decoder_kind": "union_find",
       "distance": 7,
-      "speedup_vs_pymatching": 0.776
+      "speedup_vs_pymatching": 0.977
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -2543,7 +2525,7 @@
       "shots": 5000,
       "errors": 107,
       "unfaithful": 0,
-      "seconds": 0.0350295000243932,
+      "seconds": 0.03379740007221699,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2551,10 +2533,10 @@
       "ler": 0.0214,
       "ci95_lo": 0.017740979069881316,
       "ci95_hi": 0.025793865232271996,
-      "decodes_per_s": 142736.83599589465,
+      "decodes_per_s": 147940.37379550474,
       "decoder_kind": "union_find",
       "distance": 7,
-      "speedup_vs_pymatching": 1.465
+      "speedup_vs_pymatching": 1.554
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -2563,7 +2545,7 @@
       "shots": 10000,
       "errors": 209,
       "unfaithful": 0,
-      "seconds": 0.07469579996541142,
+      "seconds": 0.06507580005563796,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2571,10 +2553,10 @@
       "ler": 0.0209,
       "ci95_lo": 0.01827476057750364,
       "ci95_hi": 0.02389318666145129,
-      "decodes_per_s": 133876.3358131326,
+      "decodes_per_s": 153666.95440471396,
       "decoder_kind": "union_find",
       "distance": 7,
-      "speedup_vs_pymatching": 1.331
+      "speedup_vs_pymatching": 1.58
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -2583,7 +2565,7 @@
       "shots": 50000,
       "errors": 1055,
       "unfaithful": 0,
-      "seconds": 0.3325203999411315,
+      "seconds": 0.30423250002786517,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2591,10 +2573,10 @@
       "ler": 0.0211,
       "ci95_lo": 0.01987658348128241,
       "ci95_hi": 0.0223969978507282,
-      "decodes_per_s": 150366.7143695601,
+      "decodes_per_s": 164347.99041989405,
       "decoder_kind": "union_find",
       "distance": 7,
-      "speedup_vs_pymatching": 1.489
+      "speedup_vs_pymatching": 1.698
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -2603,7 +2585,7 @@
       "shots": 100000,
       "errors": 2042,
       "unfaithful": 0,
-      "seconds": 0.6536585999419913,
+      "seconds": 0.575807899935171,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2611,10 +2593,10 @@
       "ler": 0.02042,
       "ci95_lo": 0.019561656642339446,
       "ci95_hi": 0.021315187678742988,
-      "decodes_per_s": 152985.05979860813,
+      "decodes_per_s": 173669.03095851722,
       "decoder_kind": "union_find",
       "distance": 7,
-      "speedup_vs_pymatching": 1.507
+      "speedup_vs_pymatching": 1.773
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -2623,7 +2605,7 @@
       "shots": 1000,
       "errors": 44,
       "unfaithful": 0,
-      "seconds": 0.048667000024579465,
+      "seconds": 0.04036169999744743,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2631,10 +2613,10 @@
       "ler": 0.044,
       "ci95_lo": 0.0329382145861849,
       "ci95_hi": 0.0585517891542731,
-      "decodes_per_s": 20547.80445671494,
+      "decodes_per_s": 24775.963352961902,
       "decoder_kind": "cuda",
       "distance": 7,
-      "speedup_vs_pymatching": 0.226
+      "speedup_vs_pymatching": 0.282
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -2643,7 +2625,7 @@
       "shots": 5000,
       "errors": 218,
       "unfaithful": 0,
-      "seconds": 0.08741949999239296,
+      "seconds": 0.07343210000544786,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2651,10 +2633,10 @@
       "ler": 0.0436,
       "ci95_lo": 0.03828158743672397,
       "ci95_hi": 0.04961917089905282,
-      "decodes_per_s": 57195.476986657304,
+      "decodes_per_s": 68090.11317433458,
       "decoder_kind": "cuda",
       "distance": 7,
-      "speedup_vs_pymatching": 0.587
+      "speedup_vs_pymatching": 0.715
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -2663,7 +2645,7 @@
       "shots": 10000,
       "errors": 409,
       "unfaithful": 0,
-      "seconds": 0.177560199983418,
+      "seconds": 0.1542584999697283,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2671,10 +2653,10 @@
       "ler": 0.0409,
       "ci95_lo": 0.03719116089949639,
       "ci95_hi": 0.04496142640462427,
-      "decodes_per_s": 56318.92733244207,
+      "decodes_per_s": 64826.24945764675,
       "decoder_kind": "cuda",
       "distance": 7,
-      "speedup_vs_pymatching": 0.56
+      "speedup_vs_pymatching": 0.667
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -2683,7 +2665,7 @@
       "shots": 50000,
       "errors": 2197,
       "unfaithful": 0,
-      "seconds": 1.2490350999869406,
+      "seconds": 1.1140916000586003,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2691,10 +2673,10 @@
       "ler": 0.04394,
       "ci95_lo": 0.04217822838611574,
       "ci95_hi": 0.04577184365873028,
-      "decodes_per_s": 40030.90065325048,
+      "decodes_per_s": 44879.61312819344,
       "decoder_kind": "cuda",
       "distance": 7,
-      "speedup_vs_pymatching": 0.396
+      "speedup_vs_pymatching": 0.464
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -2703,7 +2685,7 @@
       "shots": 100000,
       "errors": 4274,
       "unfaithful": 0,
-      "seconds": 2.3533994000172243,
+      "seconds": 2.20491359999869,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2711,10 +2693,10 @@
       "ler": 0.04274,
       "ci95_lo": 0.04150380426472425,
       "ci95_hi": 0.04401132529501167,
-      "decodes_per_s": 42491.72494871381,
+      "decodes_per_s": 45353.25102990857,
       "decoder_kind": "cuda",
       "distance": 7,
-      "speedup_vs_pymatching": 0.419
+      "speedup_vs_pymatching": 0.463
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, weighted)",
@@ -2723,7 +2705,7 @@
       "shots": 1000,
       "errors": 25,
       "unfaithful": 0,
-      "seconds": 0.24101610004436225,
+      "seconds": 0.22834329993929714,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2731,10 +2713,10 @@
       "ler": 0.025,
       "ci95_lo": 0.016990131291907917,
       "ci95_hi": 0.03664528927106918,
-      "decodes_per_s": 4149.100412030302,
+      "decodes_per_s": 4379.370887018977,
       "decoder_kind": "cuda_weighted",
       "distance": 7,
-      "speedup_vs_pymatching": 0.046
+      "speedup_vs_pymatching": 0.05
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, weighted)",
@@ -2743,7 +2725,7 @@
       "shots": 5000,
       "errors": 105,
       "unfaithful": 0,
-      "seconds": 0.337078099953942,
+      "seconds": 0.3097657000180334,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2751,10 +2733,10 @@
       "ler": 0.021,
       "ci95_lo": 0.017377941131743246,
       "ci95_hi": 0.025357517331966405,
-      "decodes_per_s": 14833.357612622103,
+      "decodes_per_s": 16141.231904335822,
       "decoder_kind": "cuda_weighted",
       "distance": 7,
-      "speedup_vs_pymatching": 0.152
+      "speedup_vs_pymatching": 0.17
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, weighted)",
@@ -2763,7 +2745,7 @@
       "shots": 10000,
       "errors": 180,
       "unfaithful": 0,
-      "seconds": 0.7886702000396326,
+      "seconds": 0.7379025999689475,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2771,10 +2753,10 @@
       "ler": 0.018,
       "ci95_lo": 0.015573227249071604,
       "ci95_hi": 0.0207969471804343,
-      "decodes_per_s": 12679.57125741213,
+      "decodes_per_s": 13551.924062092778,
       "decoder_kind": "cuda_weighted",
       "distance": 7,
-      "speedup_vs_pymatching": 0.126
+      "speedup_vs_pymatching": 0.139
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -2783,7 +2765,7 @@
       "shots": 1000,
       "errors": 44,
       "unfaithful": 0,
-      "seconds": 0.02475460001733154,
+      "seconds": 0.024145000032149255,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2791,10 +2773,10 @@
       "ler": 0.044,
       "ci95_lo": 0.0329382145861849,
       "ci95_hi": 0.0585517891542731,
-      "decodes_per_s": 40396.53233337908,
+      "decodes_per_s": 41416.442272457745,
       "decoder_kind": "opencl",
       "distance": 7,
-      "speedup_vs_pymatching": 0.444
+      "speedup_vs_pymatching": 0.472
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -2803,7 +2785,7 @@
       "shots": 5000,
       "errors": 218,
       "unfaithful": 0,
-      "seconds": 0.08637120004277676,
+      "seconds": 0.08228089998010546,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2811,10 +2793,10 @@
       "ler": 0.0436,
       "ci95_lo": 0.03828158743672397,
       "ci95_hi": 0.04961917089905282,
-      "decodes_per_s": 57889.66689734156,
+      "decodes_per_s": 60767.444221063946,
       "decoder_kind": "opencl",
       "distance": 7,
-      "speedup_vs_pymatching": 0.594
+      "speedup_vs_pymatching": 0.638
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -2823,7 +2805,7 @@
       "shots": 10000,
       "errors": 409,
       "unfaithful": 0,
-      "seconds": 0.1961951000848785,
+      "seconds": 0.19081020005978644,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2831,10 +2813,10 @@
       "ler": 0.0409,
       "ci95_lo": 0.03719116089949639,
       "ci95_hi": 0.04496142640462427,
-      "decodes_per_s": 50969.672513094214,
+      "decodes_per_s": 52408.09976021568,
       "decoder_kind": "opencl",
       "distance": 7,
-      "speedup_vs_pymatching": 0.507
+      "speedup_vs_pymatching": 0.539
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -2843,7 +2825,7 @@
       "shots": 50000,
       "errors": 2197,
       "unfaithful": 0,
-      "seconds": 0.22361690003890544,
+      "seconds": 0.21115170000120997,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2851,10 +2833,10 @@
       "ler": 0.04394,
       "ci95_lo": 0.04217822838611574,
       "ci95_hi": 0.04577184365873028,
-      "decodes_per_s": 223596.69591744128,
+      "decodes_per_s": 236796.578003935,
       "decoder_kind": "opencl",
       "distance": 7,
-      "speedup_vs_pymatching": 2.214
+      "speedup_vs_pymatching": 2.447
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -2863,7 +2845,7 @@
       "shots": 100000,
       "errors": 4274,
       "unfaithful": 0,
-      "seconds": 0.42138559999875724,
+      "seconds": 0.4093020000727847,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2871,10 +2853,10 @@
       "ler": 0.04274,
       "ci95_lo": 0.04150380426472425,
       "ci95_hi": 0.04401132529501167,
-      "decodes_per_s": 237312.33340744182,
+      "decodes_per_s": 244318.3761188984,
       "decoder_kind": "opencl",
       "distance": 7,
-      "speedup_vs_pymatching": 2.338
+      "speedup_vs_pymatching": 2.495
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, weighted)",
@@ -2883,7 +2865,7 @@
       "shots": 1000,
       "errors": 25,
       "unfaithful": 0,
-      "seconds": 0.21314269991125911,
+      "seconds": 0.1970053999684751,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2891,10 +2873,10 @@
       "ler": 0.025,
       "ci95_lo": 0.016990131291907917,
       "ci95_hi": 0.03664528927106918,
-      "decodes_per_s": 4691.692469018854,
+      "decodes_per_s": 5076.002993623629,
       "decoder_kind": "opencl_weighted",
       "distance": 7,
-      "speedup_vs_pymatching": 0.052
+      "speedup_vs_pymatching": 0.058
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, weighted)",
@@ -2903,7 +2885,7 @@
       "shots": 5000,
       "errors": 105,
       "unfaithful": 0,
-      "seconds": 0.5188081000233069,
+      "seconds": 0.49755770002957433,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2911,10 +2893,10 @@
       "ler": 0.021,
       "ci95_lo": 0.017377941131743246,
       "ci95_hi": 0.025357517331966405,
-      "decodes_per_s": 9637.474819254712,
+      "decodes_per_s": 10049.085763727111,
       "decoder_kind": "opencl_weighted",
       "distance": 7,
-      "speedup_vs_pymatching": 0.099
+      "speedup_vs_pymatching": 0.106
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, weighted)",
@@ -2923,7 +2905,7 @@
       "shots": 10000,
       "errors": 180,
       "unfaithful": 0,
-      "seconds": 1.2402226000558585,
+      "seconds": 1.1504113998962566,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2931,10 +2913,10 @@
       "ler": 0.018,
       "ci95_lo": 0.015573227249071604,
       "ci95_hi": 0.0207969471804343,
-      "decodes_per_s": 8063.068677791881,
+      "decodes_per_s": 8692.542512097667,
       "decoder_kind": "opencl_weighted",
       "distance": 7,
-      "speedup_vs_pymatching": 0.08
+      "speedup_vs_pymatching": 0.089
     },
     {
       "decoder": "PyMatching v2 (C++)",
@@ -2943,7 +2925,7 @@
       "shots": 1000,
       "errors": 11,
       "unfaithful": 0,
-      "seconds": 0.01099500001873821,
+      "seconds": 0.011385699966922402,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2951,7 +2933,7 @@
       "ler": 0.011,
       "ci95_lo": 0.006153174097269186,
       "ci95_hi": 0.01958939570335354,
-      "decodes_per_s": 90950.43185954995,
+      "decodes_per_s": 87829.47055562572,
       "decoder_kind": "pymatching",
       "distance": 7,
       "speedup_vs_pymatching": 1.0
@@ -2963,7 +2945,7 @@
       "shots": 5000,
       "errors": 74,
       "unfaithful": 0,
-      "seconds": 0.051310400012880564,
+      "seconds": 0.052533900015987456,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2971,7 +2953,7 @@
       "ler": 0.0148,
       "ci95_lo": 0.011806099315267085,
       "ci95_hi": 0.018538878652565732,
-      "decodes_per_s": 97446.1317538908,
+      "decodes_per_s": 95176.638294099,
       "decoder_kind": "pymatching",
       "distance": 7,
       "speedup_vs_pymatching": 1.0
@@ -2983,7 +2965,7 @@
       "shots": 10000,
       "errors": 130,
       "unfaithful": 0,
-      "seconds": 0.09940199996344745,
+      "seconds": 0.1028480000095442,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -2991,7 +2973,7 @@
       "ler": 0.013,
       "ci95_lo": 0.010959440194868638,
       "ci95_hi": 0.015414574218345837,
-      "decodes_per_s": 100601.59759036281,
+      "decodes_per_s": 97230.8649567518,
       "decoder_kind": "pymatching",
       "distance": 7,
       "speedup_vs_pymatching": 1.0
@@ -3003,7 +2985,7 @@
       "shots": 50000,
       "errors": 619,
       "unfaithful": 0,
-      "seconds": 0.49519549997057766,
+      "seconds": 0.5165899000130594,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3011,7 +2993,7 @@
       "ler": 0.01238,
       "ci95_lo": 0.011447563067658184,
       "ci95_hi": 0.01338735806225415,
-      "decodes_per_s": 100970.22287757215,
+      "decodes_per_s": 96788.57445477738,
       "decoder_kind": "pymatching",
       "distance": 7,
       "speedup_vs_pymatching": 1.0
@@ -3023,7 +3005,7 @@
       "shots": 100000,
       "errors": 1220,
       "unfaithful": 0,
-      "seconds": 0.9852410999592394,
+      "seconds": 1.021025100024417,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3031,7 +3013,7 @@
       "ler": 0.0122,
       "ci95_lo": 0.011538095810986736,
       "ci95_hi": 0.012899380021666863,
-      "decodes_per_s": 101497.99881890547,
+      "decodes_per_s": 97940.7851948092,
       "decoder_kind": "pymatching",
       "distance": 7,
       "speedup_vs_pymatching": 1.0
@@ -3043,7 +3025,7 @@
       "shots": 1000,
       "errors": 7,
       "unfaithful": 0,
-      "seconds": 0.4306790999835357,
+      "seconds": 0.3709217000287026,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3051,10 +3033,10 @@
       "ler": 0.007,
       "ci95_lo": 0.0033948684004375083,
       "ci95_hi": 0.014378315468083977,
-      "decodes_per_s": 2321.9143906408012,
+      "decodes_per_s": 2695.9867808289946,
       "decoder_kind": "blossom",
       "distance": 9,
-      "speedup_vs_pymatching": 0.066
+      "speedup_vs_pymatching": 0.07
     },
     {
       "decoder": "QECTOR Sparse Blossom (CPU)",
@@ -3063,7 +3045,7 @@
       "shots": 5000,
       "errors": 36,
       "unfaithful": 0,
-      "seconds": 1.9463402999099344,
+      "seconds": 1.8387279000598937,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3071,10 +3053,10 @@
       "ler": 0.0072,
       "ci95_lo": 0.0052053959970617195,
       "ci95_hi": 0.009951251040341436,
-      "decodes_per_s": 2568.923841443026,
+      "decodes_per_s": 2719.271296115718,
       "decoder_kind": "blossom",
       "distance": 9,
-      "speedup_vs_pymatching": 0.066
+      "speedup_vs_pymatching": 0.065
     },
     {
       "decoder": "QECTOR Sparse Blossom (CPU)",
@@ -3083,7 +3065,7 @@
       "shots": 10000,
       "errors": 79,
       "unfaithful": 0,
-      "seconds": 3.8919689999893308,
+      "seconds": 3.8370374999940395,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3091,10 +3073,10 @@
       "ler": 0.0079,
       "ci95_lo": 0.006343878268454187,
       "ci95_hi": 0.009834052928143027,
-      "decodes_per_s": 2569.39353834201,
+      "decodes_per_s": 2606.1772917297612,
       "decoder_kind": "blossom",
       "distance": 9,
-      "speedup_vs_pymatching": 0.064
+      "speedup_vs_pymatching": 0.061
     },
     {
       "decoder": "QECTOR Sparse Blossom (CPU)",
@@ -3103,7 +3085,7 @@
       "shots": 50000,
       "errors": 453,
       "unfaithful": 0,
-      "seconds": 21.344498899998143,
+      "seconds": 18.874764299951494,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3111,10 +3093,10 @@
       "ler": 0.00906,
       "ci95_lo": 0.008266370081743581,
       "ci95_hi": 0.009929061154709313,
-      "decodes_per_s": 2342.523955903427,
+      "decodes_per_s": 2649.0397021873537,
       "decoder_kind": "blossom",
       "distance": 9,
-      "speedup_vs_pymatching": 0.059
+      "speedup_vs_pymatching": 0.063
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -3123,7 +3105,7 @@
       "shots": 1000,
       "errors": 14,
       "unfaithful": 0,
-      "seconds": 0.05571000010240823,
+      "seconds": 0.05574049998540431,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3131,10 +3113,10 @@
       "ler": 0.014,
       "ci95_lo": 0.00835757512943187,
       "ci95_hi": 0.023362034120266797,
-      "decodes_per_s": 17950.09869254644,
+      "decodes_per_s": 17940.276823168984,
       "decoder_kind": "union_find",
       "distance": 9,
-      "speedup_vs_pymatching": 0.512
+      "speedup_vs_pymatching": 0.466
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -3143,7 +3125,7 @@
       "shots": 5000,
       "errors": 85,
       "unfaithful": 0,
-      "seconds": 0.11329530004877597,
+      "seconds": 0.10778969991952181,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3151,10 +3133,10 @@
       "ler": 0.017,
       "ci95_lo": 0.01376988906055625,
       "ci95_hi": 0.02097171101871673,
-      "decodes_per_s": 44132.45737331908,
+      "decodes_per_s": 46386.62139084821,
       "decoder_kind": "union_find",
       "distance": 9,
-      "speedup_vs_pymatching": 1.126
+      "speedup_vs_pymatching": 1.103
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -3163,7 +3145,7 @@
       "shots": 10000,
       "errors": 156,
       "unfaithful": 0,
-      "seconds": 0.26764400000683963,
+      "seconds": 0.24185400002170354,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3171,10 +3153,10 @@
       "ler": 0.0156,
       "ci95_lo": 0.013350536778660155,
       "ci95_hi": 0.01822148084302586,
-      "decodes_per_s": 37363.06436813248,
+      "decodes_per_s": 41347.25908648448,
       "decoder_kind": "union_find",
       "distance": 9,
-      "speedup_vs_pymatching": 0.924
+      "speedup_vs_pymatching": 0.975
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -3183,7 +3165,7 @@
       "shots": 50000,
       "errors": 827,
       "unfaithful": 0,
-      "seconds": 1.2348085999256,
+      "seconds": 1.1414708000374958,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3191,10 +3173,10 @@
       "ler": 0.01654,
       "ci95_lo": 0.015458651042172283,
       "ci95_hi": 0.017695630918098858,
-      "decodes_per_s": 40492.105418615174,
+      "decodes_per_s": 43803.135391950076,
       "decoder_kind": "union_find",
       "distance": 9,
-      "speedup_vs_pymatching": 1.012
+      "speedup_vs_pymatching": 1.041
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -3203,7 +3185,7 @@
       "shots": 100000,
       "errors": 1732,
       "unfaithful": 0,
-      "seconds": 2.3767995999660343,
+      "seconds": 2.2512372999917716,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3211,10 +3193,10 @@
       "ler": 0.01732,
       "ci95_lo": 0.01652975472413783,
       "ci95_hi": 0.018147327758242727,
-      "decodes_per_s": 42073.38304896595,
+      "decodes_per_s": 44420.01738349196,
       "decoder_kind": "union_find",
       "distance": 9,
-      "speedup_vs_pymatching": 1.037
+      "speedup_vs_pymatching": 1.05
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -3223,7 +3205,7 @@
       "shots": 1000,
       "errors": 56,
       "unfaithful": 0,
-      "seconds": 0.1163861999521032,
+      "seconds": 0.09933770005591214,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3231,10 +3213,10 @@
       "ler": 0.056,
       "ci95_lo": 0.04337481338284066,
       "ci95_hi": 0.07202334815392109,
-      "decodes_per_s": 8592.0839447592,
+      "decodes_per_s": 10066.671560114144,
       "decoder_kind": "cuda",
       "distance": 9,
-      "speedup_vs_pymatching": 0.245
+      "speedup_vs_pymatching": 0.262
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -3243,7 +3225,7 @@
       "shots": 5000,
       "errors": 224,
       "unfaithful": 0,
-      "seconds": 0.17251029994804412,
+      "seconds": 0.16891110001597553,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3251,10 +3233,10 @@
       "ler": 0.0448,
       "ci95_lo": 0.03940712743315874,
       "ci95_hi": 0.05089178841794905,
-      "decodes_per_s": 28983.776629603435,
+      "decodes_per_s": 29601.370185423588,
       "decoder_kind": "cuda",
       "distance": 9,
-      "speedup_vs_pymatching": 0.739
+      "speedup_vs_pymatching": 0.704
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -3263,7 +3245,7 @@
       "shots": 10000,
       "errors": 431,
       "unfaithful": 0,
-      "seconds": 0.41546119994018227,
+      "seconds": 0.36137659999076277,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3271,10 +3253,10 @@
       "ler": 0.0431,
       "ci95_lo": 0.03929200902665421,
       "ci95_hi": 0.04725888868463468,
-      "decodes_per_s": 24069.63634977175,
+      "decodes_per_s": 27671.963265622657,
       "decoder_kind": "cuda",
       "distance": 9,
-      "speedup_vs_pymatching": 0.595
+      "speedup_vs_pymatching": 0.653
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -3283,7 +3265,7 @@
       "shots": 50000,
       "errors": 2324,
       "unfaithful": 0,
-      "seconds": 3.2380248000845313,
+      "seconds": 2.736338199931197,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3291,10 +3273,10 @@
       "ler": 0.04648,
       "ci95_lo": 0.04466930806645489,
       "ci95_hi": 0.0483603737161583,
-      "decodes_per_s": 15441.512368495358,
+      "decodes_per_s": 18272.59510584518,
       "decoder_kind": "cuda",
       "distance": 9,
-      "speedup_vs_pymatching": 0.386
+      "speedup_vs_pymatching": 0.434
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, weighted)",
@@ -3303,7 +3285,7 @@
       "shots": 1000,
       "errors": 17,
       "unfaithful": 0,
-      "seconds": 1.082815399975516,
+      "seconds": 0.8925640999805182,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3311,10 +3293,10 @@
       "ler": 0.017,
       "ci95_lo": 0.010640689855664479,
       "ci95_hi": 0.02705595884311012,
-      "decodes_per_s": 923.5184501648309,
+      "decodes_per_s": 1120.3677136710146,
       "decoder_kind": "cuda_weighted",
       "distance": 9,
-      "speedup_vs_pymatching": 0.026
+      "speedup_vs_pymatching": 0.029
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, weighted)",
@@ -3323,7 +3305,7 @@
       "shots": 5000,
       "errors": 57,
       "unfaithful": 0,
-      "seconds": 1.3279790000524372,
+      "seconds": 1.112389399902895,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3331,10 +3313,30 @@
       "ler": 0.0114,
       "ci95_lo": 0.008809845215021763,
       "ci95_hi": 0.01474035312603989,
-      "decodes_per_s": 3765.1197796068823,
+      "decodes_per_s": 4494.828879560045,
       "decoder_kind": "cuda_weighted",
       "distance": 9,
-      "speedup_vs_pymatching": 0.096
+      "speedup_vs_pymatching": 0.107
+    },
+    {
+      "decoder": "QECTOR CUDA Batch (GPU, weighted)",
+      "code": "rotated_surface_d9_r9",
+      "physical_error_rate": 0.005,
+      "shots": 10000,
+      "errors": 140,
+      "unfaithful": 0,
+      "seconds": 2.9568947000661865,
+      "seed": 1,
+      "n_logical_qubits": 1,
+      "noise_model": "circuit_level",
+      "rounds": 9,
+      "ler": 0.014,
+      "ci95_lo": 0.011876744048375621,
+      "ci95_hi": 0.016496502368097143,
+      "decodes_per_s": 3381.9263160694095,
+      "decoder_kind": "cuda_weighted",
+      "distance": 9,
+      "speedup_vs_pymatching": 0.08
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -3343,7 +3345,7 @@
       "shots": 1000,
       "errors": 56,
       "unfaithful": 0,
-      "seconds": 0.06614380003884435,
+      "seconds": 0.05806130007840693,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3351,10 +3353,10 @@
       "ler": 0.056,
       "ci95_lo": 0.04337481338284066,
       "ci95_hi": 0.07202334815392109,
-      "decodes_per_s": 15118.574974717643,
+      "decodes_per_s": 17223.17617155633,
       "decoder_kind": "opencl",
       "distance": 9,
-      "speedup_vs_pymatching": 0.431
+      "speedup_vs_pymatching": 0.448
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -3363,7 +3365,7 @@
       "shots": 5000,
       "errors": 224,
       "unfaithful": 0,
-      "seconds": 0.22287289996165782,
+      "seconds": 0.19379249995108694,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3371,10 +3373,10 @@
       "ler": 0.0448,
       "ci95_lo": 0.03940712743315874,
       "ci95_hi": 0.05089178841794905,
-      "decodes_per_s": 22434.311218906292,
+      "decodes_per_s": 25800.792090829087,
       "decoder_kind": "opencl",
       "distance": 9,
-      "speedup_vs_pymatching": 0.572
+      "speedup_vs_pymatching": 0.613
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -3383,7 +3385,7 @@
       "shots": 10000,
       "errors": 431,
       "unfaithful": 0,
-      "seconds": 0.5298166000284255,
+      "seconds": 0.45663420006167144,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3391,10 +3393,10 @@
       "ler": 0.0431,
       "ci95_lo": 0.03929200902665421,
       "ci95_hi": 0.04725888868463468,
-      "decodes_per_s": 18874.455801240438,
+      "decodes_per_s": 21899.367149130387,
       "decoder_kind": "opencl",
       "distance": 9,
-      "speedup_vs_pymatching": 0.467
+      "speedup_vs_pymatching": 0.517
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -3403,7 +3405,7 @@
       "shots": 50000,
       "errors": 2324,
       "unfaithful": 0,
-      "seconds": 0.4908625999232754,
+      "seconds": 0.4692189999623224,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3411,10 +3413,10 @@
       "ler": 0.04648,
       "ci95_lo": 0.04466930806645489,
       "ci95_hi": 0.0483603737161583,
-      "decodes_per_s": 101861.49852894737,
+      "decodes_per_s": 106560.04979341188,
       "decoder_kind": "opencl",
       "distance": 9,
-      "speedup_vs_pymatching": 2.547
+      "speedup_vs_pymatching": 2.532
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -3423,7 +3425,7 @@
       "shots": 100000,
       "errors": 4663,
       "unfaithful": 0,
-      "seconds": 0.9806199000449851,
+      "seconds": 0.9299823000328615,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3431,10 +3433,10 @@
       "ler": 0.04663,
       "ci95_lo": 0.045340517147693056,
       "ci95_hi": 0.047954313558026825,
-      "decodes_per_s": 101976.31110220442,
+      "decodes_per_s": 107528.92823494214,
       "decoder_kind": "opencl",
       "distance": 9,
-      "speedup_vs_pymatching": 2.513
+      "speedup_vs_pymatching": 2.542
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, weighted)",
@@ -3443,7 +3445,7 @@
       "shots": 1000,
       "errors": 17,
       "unfaithful": 0,
-      "seconds": 0.9999822999816388,
+      "seconds": 0.8298673999961466,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3451,10 +3453,10 @@
       "ler": 0.017,
       "ci95_lo": 0.010640689855664479,
       "ci95_hi": 0.02705595884311012,
-      "decodes_per_s": 1000.0177003316574,
+      "decodes_per_s": 1205.0117886359235,
       "decoder_kind": "opencl_weighted",
       "distance": 9,
-      "speedup_vs_pymatching": 0.029
+      "speedup_vs_pymatching": 0.031
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, weighted)",
@@ -3463,7 +3465,7 @@
       "shots": 5000,
       "errors": 57,
       "unfaithful": 0,
-      "seconds": 2.5204617999261245,
+      "seconds": 2.1085243000416085,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3471,10 +3473,30 @@
       "ler": 0.0114,
       "ci95_lo": 0.008809845215021763,
       "ci95_hi": 0.01474035312603989,
-      "decodes_per_s": 1983.7634516605456,
+      "decodes_per_s": 2371.3267140916196,
       "decoder_kind": "opencl_weighted",
       "distance": 9,
-      "speedup_vs_pymatching": 0.051
+      "speedup_vs_pymatching": 0.056
+    },
+    {
+      "decoder": "QECTOR OpenCL Batch (GPU, weighted)",
+      "code": "rotated_surface_d9_r9",
+      "physical_error_rate": 0.005,
+      "shots": 10000,
+      "errors": 140,
+      "unfaithful": 0,
+      "seconds": 4.895052700070664,
+      "seed": 1,
+      "n_logical_qubits": 1,
+      "noise_model": "circuit_level",
+      "rounds": 9,
+      "ler": 0.014,
+      "ci95_lo": 0.011876744048375621,
+      "ci95_hi": 0.016496502368097143,
+      "decodes_per_s": 2042.878925461955,
+      "decoder_kind": "opencl_weighted",
+      "distance": 9,
+      "speedup_vs_pymatching": 0.048
     },
     {
       "decoder": "PyMatching v2 (C++)",
@@ -3483,7 +3505,7 @@
       "shots": 1000,
       "errors": 7,
       "unfaithful": 0,
-      "seconds": 0.02851970004849136,
+      "seconds": 0.02599790005479008,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3491,7 +3513,7 @@
       "ler": 0.007,
       "ci95_lo": 0.0033948684004375083,
       "ci95_hi": 0.014378315468083977,
-      "decodes_per_s": 35063.48237533088,
+      "decodes_per_s": 38464.645140281296,
       "decoder_kind": "pymatching",
       "distance": 9,
       "speedup_vs_pymatching": 1.0
@@ -3503,7 +3525,7 @@
       "shots": 5000,
       "errors": 36,
       "unfaithful": 0,
-      "seconds": 0.12755939993076026,
+      "seconds": 0.11885500000789762,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3511,7 +3533,7 @@
       "ler": 0.0072,
       "ci95_lo": 0.0052053959970617195,
       "ci95_hi": 0.009951251040341436,
-      "decodes_per_s": 39197.4249072512,
+      "decodes_per_s": 42068.06612820464,
       "decoder_kind": "pymatching",
       "distance": 9,
       "speedup_vs_pymatching": 1.0
@@ -3523,7 +3545,7 @@
       "shots": 10000,
       "errors": 78,
       "unfaithful": 0,
-      "seconds": 0.24737190001178533,
+      "seconds": 0.23586550005711615,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3531,7 +3553,7 @@
       "ler": 0.0078,
       "ci95_lo": 0.006254775828859509,
       "ci95_hi": 0.009723232167411878,
-      "decodes_per_s": 40424.96338316348,
+      "decodes_per_s": 42397.04406782019,
       "decoder_kind": "pymatching",
       "distance": 9,
       "speedup_vs_pymatching": 1.0
@@ -3543,7 +3565,7 @@
       "shots": 50000,
       "errors": 450,
       "unfaithful": 0,
-      "seconds": 1.2501539000077173,
+      "seconds": 1.1880804999964312,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3551,7 +3573,7 @@
       "ler": 0.009,
       "ci95_lo": 0.00820910113660897,
       "ci95_hi": 0.009866339318636824,
-      "decodes_per_s": 39995.07580601984,
+      "decodes_per_s": 42084.69038937193,
       "decoder_kind": "pymatching",
       "distance": 9,
       "speedup_vs_pymatching": 1.0
@@ -3563,7 +3585,7 @@
       "shots": 100000,
       "errors": 878,
       "unfaithful": 0,
-      "seconds": 2.4641798000084236,
+      "seconds": 2.3643494000425562,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3571,7 +3593,7 @@
       "ler": 0.00878,
       "ci95_lo": 0.00822036952830609,
       "ci95_hi": 0.009377369050037698,
-      "decodes_per_s": 40581.45432393292,
+      "decodes_per_s": 42294.93322695879,
       "decoder_kind": "pymatching",
       "distance": 9,
       "speedup_vs_pymatching": 1.0
@@ -3583,7 +3605,7 @@
       "shots": 1000,
       "errors": 7,
       "unfaithful": 0,
-      "seconds": 1.4271263000555336,
+      "seconds": 1.3616998000070453,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3591,10 +3613,10 @@
       "ler": 0.007,
       "ci95_lo": 0.0033948684004375083,
       "ci95_hi": 0.014378315468083977,
-      "decodes_per_s": 700.708830018119,
+      "decodes_per_s": 734.3762553206119,
       "decoder_kind": "blossom",
       "distance": 11,
-      "speedup_vs_pymatching": 0.038
+      "speedup_vs_pymatching": 0.037
     },
     {
       "decoder": "QECTOR Sparse Blossom (CPU)",
@@ -3603,7 +3625,7 @@
       "shots": 5000,
       "errors": 24,
       "unfaithful": 0,
-      "seconds": 6.938213899964467,
+      "seconds": 5.837307799956761,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3611,10 +3633,10 @@
       "ler": 0.0048,
       "ci95_lo": 0.0032277808786324493,
       "ci95_hi": 0.0071325511281087085,
-      "decodes_per_s": 720.6465629469288,
+      "decodes_per_s": 856.5592515160904,
       "decoder_kind": "blossom",
       "distance": 11,
-      "speedup_vs_pymatching": 0.035
+      "speedup_vs_pymatching": 0.04
     },
     {
       "decoder": "QECTOR Sparse Blossom (CPU)",
@@ -3623,7 +3645,7 @@
       "shots": 10000,
       "errors": 78,
       "unfaithful": 0,
-      "seconds": 13.21070019993931,
+      "seconds": 11.241290600039065,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3631,10 +3653,10 @@
       "ler": 0.0078,
       "ci95_lo": 0.006254775828859509,
       "ci95_hi": 0.009723232167411878,
-      "decodes_per_s": 756.962148005292,
+      "decodes_per_s": 889.5775721664245,
       "decoder_kind": "blossom",
       "distance": 11,
-      "speedup_vs_pymatching": 0.039
+      "speedup_vs_pymatching": 0.042
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -3643,7 +3665,7 @@
       "shots": 1000,
       "errors": 13,
       "unfaithful": 0,
-      "seconds": 0.22005509992595762,
+      "seconds": 0.26962639996781945,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3651,10 +3673,10 @@
       "ler": 0.013,
       "ci95_lo": 0.007612820388415339,
       "ci95_hi": 0.022114442378258013,
-      "decodes_per_s": 4544.316402285028,
+      "decodes_per_s": 3708.8356337485957,
       "decoder_kind": "union_find",
       "distance": 11,
-      "speedup_vs_pymatching": 0.245
+      "speedup_vs_pymatching": 0.188
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -3663,7 +3685,7 @@
       "shots": 5000,
       "errors": 71,
       "unfaithful": 0,
-      "seconds": 0.6108016999205574,
+      "seconds": 0.5704565000487491,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3671,10 +3693,10 @@
       "ler": 0.0142,
       "ci95_lo": 0.011273607305081756,
       "ci95_hi": 0.01787229190508556,
-      "decodes_per_s": 8185.962810271016,
+      "decodes_per_s": 8764.910207128358,
       "decoder_kind": "union_find",
       "distance": 11,
-      "speedup_vs_pymatching": 0.403
+      "speedup_vs_pymatching": 0.414
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -3683,7 +3705,7 @@
       "shots": 10000,
       "errors": 172,
       "unfaithful": 0,
-      "seconds": 1.2470165999839082,
+      "seconds": 1.2056671000318602,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3691,10 +3713,10 @@
       "ler": 0.0172,
       "ci95_lo": 0.01483088056748203,
       "ci95_hi": 0.019939908259417247,
-      "decodes_per_s": 8019.139440588876,
+      "decodes_per_s": 8294.163455016518,
       "decoder_kind": "union_find",
       "distance": 11,
-      "speedup_vs_pymatching": 0.412
+      "speedup_vs_pymatching": 0.389
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -3703,7 +3725,7 @@
       "shots": 50000,
       "errors": 839,
       "unfaithful": 0,
-      "seconds": 5.759457299951464,
+      "seconds": 5.142969200038351,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3711,10 +3733,10 @@
       "ler": 0.01678,
       "ci95_lo": 0.015690693841952378,
       "ci95_hi": 0.01794355124314716,
-      "decodes_per_s": 8681.373503788518,
+      "decodes_per_s": 9722.010390345551,
       "decoder_kind": "union_find",
       "distance": 11,
-      "speedup_vs_pymatching": 0.461
+      "speedup_vs_pymatching": 0.45
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -3723,7 +3745,7 @@
       "shots": 1000,
       "errors": 44,
       "unfaithful": 0,
-      "seconds": 0.19641400000546128,
+      "seconds": 0.17606700002215803,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3731,10 +3753,10 @@
       "ler": 0.044,
       "ci95_lo": 0.0329382145861849,
       "ci95_hi": 0.0585517891542731,
-      "decodes_per_s": 5091.286771677147,
+      "decodes_per_s": 5679.656039315431,
       "decoder_kind": "cuda",
       "distance": 11,
-      "speedup_vs_pymatching": 0.274
+      "speedup_vs_pymatching": 0.288
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -3743,7 +3765,7 @@
       "shots": 5000,
       "errors": 229,
       "unfaithful": 0,
-      "seconds": 0.3478795000119135,
+      "seconds": 0.31188659998588264,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3751,10 +3773,10 @@
       "ler": 0.0458,
       "ci95_lo": 0.0403459347002936,
       "ci95_hi": 0.051951445746923355,
-      "decodes_per_s": 14372.792877501462,
+      "decodes_per_s": 16031.467848334369,
       "decoder_kind": "cuda",
       "distance": 11,
-      "speedup_vs_pymatching": 0.707
+      "speedup_vs_pymatching": 0.758
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -3763,7 +3785,7 @@
       "shots": 10000,
       "errors": 440,
       "unfaithful": 0,
-      "seconds": 0.8430436999769881,
+      "seconds": 0.7341383000602946,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3771,10 +3793,10 @@
       "ler": 0.044,
       "ci95_lo": 0.040152272335686155,
       "ci95_hi": 0.04819793417853519,
-      "decodes_per_s": 11861.781305373566,
+      "decodes_per_s": 13621.411659327272,
       "decoder_kind": "cuda",
       "distance": 11,
-      "speedup_vs_pymatching": 0.61
+      "speedup_vs_pymatching": 0.638
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, weighted)",
@@ -3783,7 +3805,7 @@
       "shots": 1000,
       "errors": 10,
       "unfaithful": 0,
-      "seconds": 3.6116314999526367,
+      "seconds": 3.0296736999880522,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3791,10 +3813,10 @@
       "ler": 0.01,
       "ci95_lo": 0.0054407544447740265,
       "ci95_hi": 0.018309468872823392,
-      "decodes_per_s": 276.88317593118626,
+      "decodes_per_s": 330.0685483073453,
       "decoder_kind": "cuda_weighted",
       "distance": 11,
-      "speedup_vs_pymatching": 0.015
+      "speedup_vs_pymatching": 0.017
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -3803,7 +3825,7 @@
       "shots": 1000,
       "errors": 44,
       "unfaithful": 0,
-      "seconds": 0.13967109995428473,
+      "seconds": 0.13133279990870506,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3811,10 +3833,10 @@
       "ler": 0.044,
       "ci95_lo": 0.0329382145861849,
       "ci95_hi": 0.0585517891542731,
-      "decodes_per_s": 7159.67727273077,
+      "decodes_per_s": 7614.244124050823,
       "decoder_kind": "opencl",
       "distance": 11,
-      "speedup_vs_pymatching": 0.385
+      "speedup_vs_pymatching": 0.387
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -3823,7 +3845,7 @@
       "shots": 5000,
       "errors": 229,
       "unfaithful": 0,
-      "seconds": 0.4570128000341356,
+      "seconds": 0.3980479999445379,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3831,10 +3853,10 @@
       "ler": 0.0458,
       "ci95_lo": 0.0403459347002936,
       "ci95_hi": 0.051951445746923355,
-      "decodes_per_s": 10940.612603468733,
+      "decodes_per_s": 12561.299141552467,
       "decoder_kind": "opencl",
       "distance": 11,
-      "speedup_vs_pymatching": 0.538
+      "speedup_vs_pymatching": 0.594
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -3843,7 +3865,7 @@
       "shots": 10000,
       "errors": 440,
       "unfaithful": 0,
-      "seconds": 1.0720190999563783,
+      "seconds": 0.9387450000504032,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3851,10 +3873,10 @@
       "ler": 0.044,
       "ci95_lo": 0.040152272335686155,
       "ci95_hi": 0.04819793417853519,
-      "decodes_per_s": 9328.192007406315,
+      "decodes_per_s": 10652.52011937542,
       "decoder_kind": "opencl",
       "distance": 11,
-      "speedup_vs_pymatching": 0.48
+      "speedup_vs_pymatching": 0.499
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -3863,7 +3885,7 @@
       "shots": 50000,
       "errors": 2111,
       "unfaithful": 0,
-      "seconds": 0.9963261999655515,
+      "seconds": 0.9395243000471964,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3871,10 +3893,10 @@
       "ler": 0.04222,
       "ci95_lo": 0.04049227968572456,
       "ci95_hi": 0.04401805663118465,
-      "decodes_per_s": 50184.3673304273,
+      "decodes_per_s": 53218.42127711681,
       "decoder_kind": "opencl",
       "distance": 11,
-      "speedup_vs_pymatching": 2.664
+      "speedup_vs_pymatching": 2.464
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, weighted)",
@@ -3883,7 +3905,7 @@
       "shots": 1000,
       "errors": 10,
       "unfaithful": 0,
-      "seconds": 3.498916700016707,
+      "seconds": 2.954339800053276,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3891,10 +3913,10 @@
       "ler": 0.01,
       "ci95_lo": 0.0054407544447740265,
       "ci95_hi": 0.018309468872823392,
-      "decodes_per_s": 285.80274574562605,
+      "decodes_per_s": 338.4850991013176,
       "decoder_kind": "opencl_weighted",
       "distance": 11,
-      "speedup_vs_pymatching": 0.015
+      "speedup_vs_pymatching": 0.017
     },
     {
       "decoder": "PyMatching v2 (C++)",
@@ -3903,7 +3925,7 @@
       "shots": 1000,
       "errors": 7,
       "unfaithful": 0,
-      "seconds": 0.053810899960808456,
+      "seconds": 0.0507713999832049,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3911,7 +3933,7 @@
       "ler": 0.007,
       "ci95_lo": 0.0033948684004375083,
       "ci95_hi": 0.014378315468083977,
-      "decodes_per_s": 18583.595530428218,
+      "decodes_per_s": 19696.128141646645,
       "decoder_kind": "pymatching",
       "distance": 11,
       "speedup_vs_pymatching": 1.0
@@ -3923,7 +3945,7 @@
       "shots": 5000,
       "errors": 24,
       "unfaithful": 0,
-      "seconds": 0.24595510005019605,
+      "seconds": 0.23626090004108846,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3931,7 +3953,7 @@
       "ler": 0.0048,
       "ci95_lo": 0.0032277808786324493,
       "ci95_hi": 0.0071325511281087085,
-      "decodes_per_s": 20328.913687821758,
+      "decodes_per_s": 21163.044748963723,
       "decoder_kind": "pymatching",
       "distance": 11,
       "speedup_vs_pymatching": 1.0
@@ -3943,7 +3965,7 @@
       "shots": 10000,
       "errors": 77,
       "unfaithful": 0,
-      "seconds": 0.5142944999970496,
+      "seconds": 0.46870960004162043,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3951,7 +3973,7 @@
       "ler": 0.0077,
       "ci95_lo": 0.006165744042951168,
       "ci95_hi": 0.009612340752994393,
-      "decodes_per_s": 19444.11227430464,
+      "decodes_per_s": 21335.172138808382,
       "decoder_kind": "pymatching",
       "distance": 11,
       "speedup_vs_pymatching": 1.0
@@ -3963,7 +3985,7 @@
       "shots": 50000,
       "errors": 334,
       "unfaithful": 0,
-      "seconds": 2.6544374000513926,
+      "seconds": 2.3150497000897303,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3971,7 +3993,7 @@
       "ler": 0.00668,
       "ci95_lo": 0.006002924524003567,
       "ci95_hi": 0.0074328723912344295,
-      "decodes_per_s": 18836.383182000052,
+      "decodes_per_s": 21597.80846089914,
       "decoder_kind": "pymatching",
       "distance": 11,
       "speedup_vs_pymatching": 1.0
@@ -3983,7 +4005,7 @@
       "shots": 100000,
       "errors": 647,
       "unfaithful": 0,
-      "seconds": 5.03016550000757,
+      "seconds": 4.6488134999526665,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -3991,7 +4013,7 @@
       "ler": 0.00647,
       "ci95_lo": 0.005991681201443109,
       "ci95_hi": 0.0069862348454809,
-      "decodes_per_s": 19880.061600328958,
+      "decodes_per_s": 21510.865084395875,
       "decoder_kind": "pymatching",
       "distance": 11,
       "speedup_vs_pymatching": 1.0
@@ -4003,7 +4025,7 @@
       "shots": 1000,
       "errors": 3,
       "unfaithful": 0,
-      "seconds": 4.551867199945264,
+      "seconds": 3.4419702000450343,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4011,10 +4033,10 @@
       "ler": 0.003,
       "ci95_lo": 0.0010207838809026667,
       "ci95_hi": 0.008783014055517572,
-      "decodes_per_s": 219.69006477430295,
+      "decodes_per_s": 290.5312776929086,
       "decoder_kind": "blossom",
       "distance": 13,
-      "speedup_vs_pymatching": 0.029
+      "speedup_vs_pymatching": 0.028
     },
     {
       "decoder": "QECTOR Sparse Blossom (CPU)",
@@ -4023,7 +4045,7 @@
       "shots": 5000,
       "errors": 19,
       "unfaithful": 0,
-      "seconds": 22.06845180003438,
+      "seconds": 17.077653700020164,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4031,10 +4053,10 @@
       "ler": 0.0038,
       "ci95_lo": 0.002434138850635239,
       "ci95_hi": 0.005927728559996751,
-      "decodes_per_s": 226.56777400180877,
+      "decodes_per_s": 292.7802664129497,
       "decoder_kind": "blossom",
       "distance": 13,
-      "speedup_vs_pymatching": 0.024
+      "speedup_vs_pymatching": 0.025
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -4043,7 +4065,7 @@
       "shots": 1000,
       "errors": 11,
       "unfaithful": 0,
-      "seconds": 0.9384502000175416,
+      "seconds": 0.733114599948749,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4051,10 +4073,10 @@
       "ler": 0.011,
       "ci95_lo": 0.006153174097269186,
       "ci95_hi": 0.01958939570335354,
-      "decodes_per_s": 1065.5866448547913,
+      "decodes_per_s": 1364.0432206232267,
       "decoder_kind": "union_find",
       "distance": 13,
-      "speedup_vs_pymatching": 0.139
+      "speedup_vs_pymatching": 0.132
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -4063,7 +4085,7 @@
       "shots": 5000,
       "errors": 98,
       "unfaithful": 0,
-      "seconds": 3.0801081999670714,
+      "seconds": 2.7992523999419063,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4071,10 +4093,10 @@
       "ler": 0.0196,
       "ci95_lo": 0.016110299880591497,
       "ci95_hi": 0.02382730814856531,
-      "decodes_per_s": 1623.3195963873782,
+      "decodes_per_s": 1786.1911988014251,
       "decoder_kind": "union_find",
       "distance": 13,
-      "speedup_vs_pymatching": 0.175
+      "speedup_vs_pymatching": 0.152
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -4083,7 +4105,7 @@
       "shots": 10000,
       "errors": 140,
       "unfaithful": 0,
-      "seconds": 4.203910799929872,
+      "seconds": 3.8896265000803396,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4091,10 +4113,10 @@
       "ler": 0.014,
       "ci95_lo": 0.011876744048375621,
       "ci95_hi": 0.016496502368097143,
-      "decodes_per_s": 2378.737436618973,
+      "decodes_per_s": 2570.940937335102,
       "decoder_kind": "union_find",
       "distance": 13,
-      "speedup_vs_pymatching": 0.305
+      "speedup_vs_pymatching": 0.215
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -4103,7 +4125,7 @@
       "shots": 1000,
       "errors": 39,
       "unfaithful": 0,
-      "seconds": 0.3639881999697536,
+      "seconds": 0.31521929998416454,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4111,10 +4133,10 @@
       "ler": 0.039,
       "ci95_lo": 0.02865896090211533,
       "ci95_hi": 0.05286931042321611,
-      "decodes_per_s": 2747.34180966058,
+      "decodes_per_s": 3172.3945838666486,
       "decoder_kind": "cuda",
       "distance": 13,
-      "speedup_vs_pymatching": 0.358
+      "speedup_vs_pymatching": 0.306
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -4123,7 +4145,7 @@
       "shots": 5000,
       "errors": 201,
       "unfaithful": 0,
-      "seconds": 0.6307439000811428,
+      "seconds": 0.5491960999788716,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4131,10 +4153,10 @@
       "ler": 0.0402,
       "ci95_lo": 0.035099038251101694,
       "ci95_hi": 0.04600694045790393,
-      "decodes_per_s": 7927.147609920237,
+      "decodes_per_s": 9104.21614463824,
       "decoder_kind": "cuda",
       "distance": 13,
-      "speedup_vs_pymatching": 0.853
+      "speedup_vs_pymatching": 0.775
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -4143,7 +4165,7 @@
       "shots": 10000,
       "errors": 410,
       "unfaithful": 0,
-      "seconds": 1.5152146000182256,
+      "seconds": 1.3099535999353975,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4151,10 +4173,10 @@
       "ler": 0.041,
       "ci95_lo": 0.03728658973220061,
       "ci95_hi": 0.04506592077224588,
-      "decodes_per_s": 6599.725213761612,
+      "decodes_per_s": 7633.85817672715,
       "decoder_kind": "cuda",
       "distance": 13,
-      "speedup_vs_pymatching": 0.848
+      "speedup_vs_pymatching": 0.637
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, weighted)",
@@ -4163,7 +4185,7 @@
       "shots": 1000,
       "errors": 8,
       "unfaithful": 0,
-      "seconds": 8.10633570002392,
+      "seconds": 6.605762499966659,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4171,10 +4193,10 @@
       "ler": 0.008,
       "ci95_lo": 0.004059195818182691,
       "ci95_hi": 0.015706334533364105,
-      "decodes_per_s": 123.36029952436454,
+      "decodes_per_s": 151.3829781202469,
       "decoder_kind": "cuda_weighted",
       "distance": 13,
-      "speedup_vs_pymatching": 0.016
+      "speedup_vs_pymatching": 0.015
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -4183,7 +4205,7 @@
       "shots": 1000,
       "errors": 39,
       "unfaithful": 0,
-      "seconds": 0.24987759999930859,
+      "seconds": 0.21208910003770143,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4191,10 +4213,10 @@
       "ler": 0.039,
       "ci95_lo": 0.02865896090211533,
       "ci95_hi": 0.05286931042321611,
-      "decodes_per_s": 4001.9593593133877,
+      "decodes_per_s": 4714.999497014404,
       "decoder_kind": "opencl",
       "distance": 13,
-      "speedup_vs_pymatching": 0.521
+      "speedup_vs_pymatching": 0.456
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -4203,7 +4225,7 @@
       "shots": 5000,
       "errors": 201,
       "unfaithful": 0,
-      "seconds": 0.8151795000303537,
+      "seconds": 0.6991877999389544,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4211,10 +4233,10 @@
       "ler": 0.0402,
       "ci95_lo": 0.035099038251101694,
       "ci95_hi": 0.04600694045790393,
-      "decodes_per_s": 6133.618423689289,
+      "decodes_per_s": 7151.154525917853,
       "decoder_kind": "opencl",
       "distance": 13,
-      "speedup_vs_pymatching": 0.66
+      "speedup_vs_pymatching": 0.608
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -4223,7 +4245,7 @@
       "shots": 10000,
       "errors": 410,
       "unfaithful": 0,
-      "seconds": 0.4050173000432551,
+      "seconds": 0.38555010000709444,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4231,10 +4253,10 @@
       "ler": 0.041,
       "ci95_lo": 0.03728658973220061,
       "ci95_hi": 0.04506592077224588,
-      "decodes_per_s": 24690.303349837202,
+      "decodes_per_s": 25936.9664274915,
       "decoder_kind": "opencl",
       "distance": 13,
-      "speedup_vs_pymatching": 3.171
+      "speedup_vs_pymatching": 2.166
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, weighted)",
@@ -4243,7 +4265,7 @@
       "shots": 1000,
       "errors": 8,
       "unfaithful": 0,
-      "seconds": 7.276770500000566,
+      "seconds": 6.013641100027598,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4251,10 +4273,10 @@
       "ler": 0.008,
       "ci95_lo": 0.004059195818182691,
       "ci95_hi": 0.015706334533364105,
-      "decodes_per_s": 137.42360020835096,
+      "decodes_per_s": 166.28860674698572,
       "decoder_kind": "opencl_weighted",
       "distance": 13,
-      "speedup_vs_pymatching": 0.018
+      "speedup_vs_pymatching": 0.016
     },
     {
       "decoder": "PyMatching v2 (C++)",
@@ -4263,7 +4285,7 @@
       "shots": 1000,
       "errors": 3,
       "unfaithful": 0,
-      "seconds": 0.13022789999376982,
+      "seconds": 0.09660659998189658,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4271,7 +4293,7 @@
       "ler": 0.003,
       "ci95_lo": 0.0010207838809026667,
       "ci95_hi": 0.008783014055517572,
-      "decodes_per_s": 7678.846084808559,
+      "decodes_per_s": 10351.25964672593,
       "decoder_kind": "pymatching",
       "distance": 13,
       "speedup_vs_pymatching": 1.0
@@ -4283,7 +4305,7 @@
       "shots": 5000,
       "errors": 18,
       "unfaithful": 0,
-      "seconds": 0.537932200008072,
+      "seconds": 0.42545380000956357,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4291,7 +4313,7 @@
       "ler": 0.0036,
       "ci95_lo": 0.0022784407541724828,
       "ci95_hi": 0.005683733737237675,
-      "decodes_per_s": 9294.851655887065,
+      "decodes_per_s": 11752.15734325938,
       "decoder_kind": "pymatching",
       "distance": 13,
       "speedup_vs_pymatching": 1.0
@@ -4303,7 +4325,7 @@
       "shots": 10000,
       "errors": 37,
       "unfaithful": 0,
-      "seconds": 1.2842783998930827,
+      "seconds": 0.834993000025861,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4311,7 +4333,7 @@
       "ler": 0.0037,
       "ci95_lo": 0.002685648037550641,
       "ci95_hi": 0.005095508745361772,
-      "decodes_per_s": 7786.473712267145,
+      "decodes_per_s": 11976.148302668747,
       "decoder_kind": "pymatching",
       "distance": 13,
       "speedup_vs_pymatching": 1.0
@@ -4323,7 +4345,7 @@
       "shots": 50000,
       "errors": 221,
       "unfaithful": 0,
-      "seconds": 6.436082600033842,
+      "seconds": 4.139464300009422,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4331,7 +4353,7 @@
       "ler": 0.00442,
       "ci95_lo": 0.003875399352920444,
       "ci95_hi": 0.00504074480351685,
-      "decodes_per_s": 7768.7007932025435,
+      "decodes_per_s": 12078.857643460336,
       "decoder_kind": "pymatching",
       "distance": 13,
       "speedup_vs_pymatching": 1.0
@@ -4343,7 +4365,7 @@
       "shots": 100000,
       "errors": 445,
       "unfaithful": 0,
-      "seconds": 9.991527599981055,
+      "seconds": 8.267118499963544,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4351,7 +4373,7 @@
       "ler": 0.00445,
       "ci95_lo": 0.004056070691880444,
       "ci95_hi": 0.0048820005440184736,
-      "decodes_per_s": 10008.479584261931,
+      "decodes_per_s": 12096.113053229003,
       "decoder_kind": "pymatching",
       "distance": 13,
       "speedup_vs_pymatching": 1.0
@@ -4363,7 +4385,7 @@
       "shots": 1000,
       "errors": 2,
       "unfaithful": 0,
-      "seconds": 16.93080710002687,
+      "seconds": 13.664127000025474,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4371,10 +4393,10 @@
       "ler": 0.002,
       "ci95_lo": 0.0005486435879740442,
       "ci95_hi": 0.007262807865420884,
-      "decodes_per_s": 59.06392968108491,
+      "decodes_per_s": 73.18433149795342,
       "decoder_kind": "blossom",
       "distance": 15,
-      "speedup_vs_pymatching": 0.01
+      "speedup_vs_pymatching": 0.013
     },
     {
       "decoder": "QECTOR Union-Find (CPU)",
@@ -4383,7 +4405,7 @@
       "shots": 1000,
       "errors": 12,
       "unfaithful": 0,
-      "seconds": 3.155931600020267,
+      "seconds": 2.7060336000286043,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4391,10 +4413,30 @@
       "ler": 0.012,
       "ci95_lo": 0.006877647805525981,
       "ci95_hi": 0.02085726847812206,
-      "decodes_per_s": 316.8636481201234,
+      "decodes_per_s": 369.5445614531281,
       "decoder_kind": "union_find",
       "distance": 15,
-      "speedup_vs_pymatching": 0.053
+      "speedup_vs_pymatching": 0.064
+    },
+    {
+      "decoder": "QECTOR Union-Find (CPU)",
+      "code": "rotated_surface_d15_r15",
+      "physical_error_rate": 0.005,
+      "shots": 5000,
+      "errors": 72,
+      "unfaithful": 0,
+      "seconds": 9.784607600071467,
+      "seed": 1,
+      "n_logical_qubits": 1,
+      "noise_model": "circuit_level",
+      "rounds": 15,
+      "ler": 0.0144,
+      "ci95_lo": 0.011450945037863721,
+      "ci95_hi": 0.018094647091525428,
+      "decodes_per_s": 511.00669586008536,
+      "decoder_kind": "union_find",
+      "distance": 15,
+      "speedup_vs_pymatching": 0.099
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -4403,7 +4445,7 @@
       "shots": 1000,
       "errors": 41,
       "unfaithful": 0,
-      "seconds": 0.6045949999243021,
+      "seconds": 0.5168322999961674,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4411,10 +4453,10 @@
       "ler": 0.041,
       "ci95_lo": 0.03036497107996454,
       "ci95_hi": 0.05514799321141753,
-      "decodes_per_s": 1653.9997851871158,
+      "decodes_per_s": 1934.8635911637402,
       "decoder_kind": "cuda",
       "distance": 15,
-      "speedup_vs_pymatching": 0.276
+      "speedup_vs_pymatching": 0.336
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -4423,7 +4465,7 @@
       "shots": 5000,
       "errors": 170,
       "unfaithful": 0,
-      "seconds": 1.0460691000334918,
+      "seconds": 0.9476506999926642,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4431,10 +4473,10 @@
       "ler": 0.034,
       "ci95_lo": 0.029323626827702984,
       "ci95_hi": 0.039391871385425825,
-      "decodes_per_s": 4779.798963414478,
+      "decodes_per_s": 5276.205673713643,
       "decoder_kind": "cuda",
       "distance": 15,
-      "speedup_vs_pymatching": 0.826
+      "speedup_vs_pymatching": 1.022
     },
     {
       "decoder": "QECTOR CUDA Batch (GPU, unweighted)",
@@ -4443,7 +4485,7 @@
       "shots": 10000,
       "errors": 376,
       "unfaithful": 0,
-      "seconds": 2.5181438999716192,
+      "seconds": 2.273924299981445,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4451,10 +4493,10 @@
       "ler": 0.0376,
       "ci95_lo": 0.03404567324632605,
       "ci95_hi": 0.041509448447042276,
-      "decodes_per_s": 3971.1789306849005,
+      "decodes_per_s": 4397.68377517299,
       "decoder_kind": "cuda",
       "distance": 15,
-      "speedup_vs_pymatching": 0.579
+      "speedup_vs_pymatching": 0.805
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -4463,7 +4505,7 @@
       "shots": 1000,
       "errors": 41,
       "unfaithful": 0,
-      "seconds": 0.41461550001986325,
+      "seconds": 0.4019137000432238,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4471,10 +4513,10 @@
       "ler": 0.041,
       "ci95_lo": 0.03036497107996454,
       "ci95_hi": 0.05514799321141753,
-      "decodes_per_s": 2411.8731691219755,
+      "decodes_per_s": 2488.0963248887883,
       "decoder_kind": "opencl",
       "distance": 15,
-      "speedup_vs_pymatching": 0.402
+      "speedup_vs_pymatching": 0.432
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -4483,7 +4525,7 @@
       "shots": 5000,
       "errors": 170,
       "unfaithful": 0,
-      "seconds": 0.39359239989425987,
+      "seconds": 0.3543396999593824,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4491,10 +4533,10 @@
       "ler": 0.034,
       "ci95_lo": 0.029323626827702984,
       "ci95_hi": 0.039391871385425825,
-      "decodes_per_s": 12703.497327040028,
+      "decodes_per_s": 14110.75304453084,
       "decoder_kind": "opencl",
       "distance": 15,
-      "speedup_vs_pymatching": 2.196
+      "speedup_vs_pymatching": 2.734
     },
     {
       "decoder": "QECTOR OpenCL Batch (GPU, unweighted)",
@@ -4503,7 +4545,7 @@
       "shots": 10000,
       "errors": 376,
       "unfaithful": 0,
-      "seconds": 0.867200699984096,
+      "seconds": 0.6752685999963433,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4511,10 +4553,10 @@
       "ler": 0.0376,
       "ci95_lo": 0.03404567324632605,
       "ci95_hi": 0.041509448447042276,
-      "decodes_per_s": 11531.35600580511,
+      "decodes_per_s": 14808.92196091178,
       "decoder_kind": "opencl",
       "distance": 15,
-      "speedup_vs_pymatching": 1.68
+      "speedup_vs_pymatching": 2.71
     },
     {
       "decoder": "PyMatching v2 (C++)",
@@ -4523,7 +4565,7 @@
       "shots": 1000,
       "errors": 2,
       "unfaithful": 0,
-      "seconds": 0.16668379993643612,
+      "seconds": 0.1737479999428615,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4531,7 +4573,7 @@
       "ler": 0.002,
       "ci95_lo": 0.0005486435879740442,
       "ci95_hi": 0.007262807865420884,
-      "decodes_per_s": 5999.3832656883515,
+      "decodes_per_s": 5755.461935267505,
       "decoder_kind": "pymatching",
       "distance": 15,
       "speedup_vs_pymatching": 1.0
@@ -4543,7 +4585,7 @@
       "shots": 5000,
       "errors": 12,
       "unfaithful": 0,
-      "seconds": 0.8644358000019565,
+      "seconds": 0.9687723000533879,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4551,7 +4593,7 @@
       "ler": 0.0024,
       "ci95_lo": 0.0013734655562374029,
       "ci95_hi": 0.004190551419841756,
-      "decodes_per_s": 5784.1195378403845,
+      "decodes_per_s": 5161.171515457715,
       "decoder_kind": "pymatching",
       "distance": 15,
       "speedup_vs_pymatching": 1.0
@@ -4563,7 +4605,7 @@
       "shots": 10000,
       "errors": 44,
       "unfaithful": 0,
-      "seconds": 1.4571012000087649,
+      "seconds": 1.8298009000718594,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4571,7 +4613,7 @@
       "ler": 0.0044,
       "ci95_lo": 0.0032794410391770758,
       "ci95_hi": 0.005901178146016137,
-      "decodes_per_s": 6862.941297378554,
+      "decodes_per_s": 5465.0754623671255,
       "decoder_kind": "pymatching",
       "distance": 15,
       "speedup_vs_pymatching": 1.0
@@ -4583,7 +4625,7 @@
       "shots": 50000,
       "errors": 171,
       "unfaithful": 0,
-      "seconds": 7.382079700008035,
+      "seconds": 10.316393899964169,
       "seed": 1,
       "n_logical_qubits": 1,
       "noise_model": "circuit_level",
@@ -4591,27 +4633,7 @@
       "ler": 0.00342,
       "ci95_lo": 0.002945028661548833,
       "ci95_hi": 0.0039712691414368236,
-      "decodes_per_s": 6773.1590597627355,
-      "decoder_kind": "pymatching",
-      "distance": 15,
-      "speedup_vs_pymatching": 1.0
-    },
-    {
-      "decoder": "PyMatching v2 (C++)",
-      "code": "rotated_surface_d15_r15",
-      "physical_error_rate": 0.005,
-      "shots": 100000,
-      "errors": 314,
-      "unfaithful": 0,
-      "seconds": 14.878888999926858,
-      "seed": 1,
-      "n_logical_qubits": 1,
-      "noise_model": "circuit_level",
-      "rounds": 15,
-      "ler": 0.00314,
-      "ci95_lo": 0.0028118069321099717,
-      "ci95_hi": 0.0035063649461439606,
-      "decodes_per_s": 6720.931919076188,
+      "decodes_per_s": 4846.654798647583,
       "decoder_kind": "pymatching",
       "distance": 15,
       "speedup_vs_pymatching": 1.0
