@@ -88,16 +88,29 @@ jobs:
             --out dist
             --no-default-features
             --features abi3${{ matrix.features && format(',{0}', matrix.features) || '' }}
-          sccache: "true"
+          # sccache is disabled for the Linux aarch64 cross-build. Wrapping the
+          # cross-assembler breaks ring's .S files: `aarch64-unknown-linux-gnu-gcc`
+          # is invoked on chacha-armv8-linux64.S without __ARM_ARCH defined, and
+          # ring's asm_base.h then fails the build outright with
+          # `#error "ARM assembler must define __ARM_ARCH"`. Native aarch64
+          # (macos-14) is unaffected and keeps the cache.
+          sccache: ${{ !(matrix.os == 'ubuntu-latest' && matrix.target == 'aarch64') }}
 
       - name: Show built wheels
         shell: bash
         run: ls -la dist/
 
-      # Native-arch wheels only: an aarch64 wheel cannot be imported on an
-      # x86_64 runner, so skip the smoke test rather than fake it.
-      - name: Smoke test — import and version
-        if: matrix.target != 'aarch64' || matrix.os == 'macos-14'
+      # Only smoke-test wheels the runner can actually install. Two cases are
+      # excluded, and both previously failed here for that reason alone:
+      #   * aarch64 built on an x86_64 host - wrong architecture;
+      #   * musllinux built on a glibc host - the wheel builds correctly, then
+      #     pip rejects it with "not a supported wheel on this platform".
+      # Skipping is honest; faking a pass would not be. Both are still built,
+      # verified for platform tag, and uploaded.
+      - name: Smoke test — import and decode
+        if: >-
+          (matrix.target != 'aarch64' || matrix.os == 'macos-14')
+          && matrix.manylinux != 'musllinux_1_2'
         shell: bash
         run: |
           python -m pip install --upgrade pip
