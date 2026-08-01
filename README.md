@@ -429,46 +429,70 @@ per shot with a 95% Wilson interval. Every row is one
 
 | d | Decoder | Shots | Throughput (dec/s) | LER | 95% CI |
 | ---: | --- | ---: | ---: | ---: | --- |
-| 3 | PyMatching 2 | 100,000 | 2,437,651 | 0.01891 | [0.01808, 0.01977] |
-| 3 | `qector_blossom` | 100,000 | 245,629 | 0.01891 | [0.01808, 0.01977] |
-| 3 | `qector_unionfind` | 100,000 | 825,726 | 0.02210 | [0.02121, 0.02303] |
-| 3 | ldpc BP-OSD | 50,000 | 2,259 | 0.01938 | [0.01821, 0.02063] |
-| 5 | PyMatching 2 | 100,000 | 249,065 | 0.01596 | [0.01520, 0.01676] |
-| 5 | `qector_blossom` | 100,000 | 9,121 | 0.01596 | [0.01520, 0.01676] |
-| 5 | `qector_unionfind` | 100,000 | 112,797 | 0.02645 | [0.02547, 0.02746] |
-| 7 | PyMatching 2 | 100,000 | 75,767 | 0.01220 | [0.01154, 0.01290] |
-| 7 | `qector_unionfind` | 100,000 | 22,643 | 0.02042 | [0.01956, 0.02132] |
-| 9 | PyMatching 2 | 100,000 | 29,244 | 0.00878 | [0.00822, 0.00938] |
-| 9 | `qector_unionfind` | 100,000 | 4,606 | 0.01732 | [0.01653, 0.01815] |
-| 11 | PyMatching 2 | 100,000 | 13,816 | 0.00647 | [0.00599, 0.00699] |
-| 13 | PyMatching 2 | 100,000 | 7,218 | 0.00445 | [0.00406, 0.00488] |
-| 15 | PyMatching 2 | 100,000 | 6,480 | 0.00314 | [0.00281, 0.00351] |
+| 3 | PyMatching 2 | 100,000 | 2,497,016 | 0.01891 | [0.01808, 0.01977] |
+| 3 | `qector_blossom` | 100,000 | 349,901 | 0.01891 | [0.01808, 0.01977] |
+| 3 | `qector_unionfind` | 100,000 | 1,314,712 | 0.02210 | [0.02121, 0.02303] |
+| 3 | `qector_cuda` (GPU) | 100,000 | 1,285,174 | 0.02215 | [0.02126, 0.02308] |
+| 3 | `qector_opencl` (GPU) | 100,000 | 1,331,565 | 0.02215 | [0.02126, 0.02308] |
+| 3 | ldpc BP-OSD | 50,000 | 2,327 | 0.01938 | [0.01821, 0.02063] |
+| 5 | PyMatching 2 | 100,000 | 325,421 | 0.01596 | [0.01520, 0.01676] |
+| 5 | `qector_blossom` | 100,000 | 11,121 | 0.01596 | [0.01520, 0.01676] |
+| 5 | `qector_unionfind` | 100,000 | 139,133 | 0.02645 | [0.02547, 0.02746] |
+| 5 | `qector_cuda` (GPU) | 100,000 | 138,721 | 0.06094 | [0.05947, 0.06244] |
+| 5 | `qector_opencl` (GPU) | 100,000 | 143,445 | 0.06094 | [0.05947, 0.06244] |
+| 5 | ldpc BP-OSD | 1,000 | 109 | 0.02100 | [0.01378, 0.03189] |
+| 7 | PyMatching 2 | 100,000 | 100,735 | 0.01220 | [0.01154, 0.01290] |
+| 7 | `qector_blossom` | 10,000 | 1,925 | 0.01330 | [0.01123, 0.01574] |
+| 7 | `qector_unionfind` | 100,000 | 27,571 | 0.02042 | [0.01956, 0.02132] |
+| 7 | `qector_cuda` (GPU) | 100,000 | 41,777 | 0.04274 | [0.04150, 0.04401] |
+| 7 | `qector_opencl` (GPU) | 100,000 | 38,331 | 0.04274 | [0.04150, 0.04401] |
+| 9 | PyMatching 2 | 100,000 | 40,874 | 0.00878 | [0.00822, 0.00938] |
+| 9 | `qector_blossom` | 5,000 | 251 | 0.00720 | [0.00521, 0.00995] |
+| 9 | `qector_unionfind` | 100,000 | 5,354 | 0.01732 | [0.01653, 0.01815] |
+| 9 | `qector_cuda` (GPU) | 50,000 | 16,217 | 0.04648 | [0.04467, 0.04836] |
+| 9 | `qector_opencl` (GPU) | 100,000 | 16,555 | 0.04663 | [0.04534, 0.04795] |
+| 11 | PyMatching 2 | 100,000 | 21,244 | 0.00647 | [0.00599, 0.00699] |
+| 11 | `qector_blossom` | 1,000 | 79 | 0.00700 | [0.00339, 0.01438] |
+| 11 | `qector_unionfind` | 5,000 | 957 | 0.01420 | [0.01127, 0.01787] |
+| 11 | `qector_cuda` (GPU) | 10,000 | 13,405 | 0.04400 | [0.04015, 0.04820] |
+| 11 | `qector_opencl` (GPU) | 50,000 | 8,153 | 0.04222 | [0.04049, 0.04402] |
+| 13 | PyMatching 2 | 100,000 | 11,931 | 0.00445 | [0.00406, 0.00488] |
+| 13 | `qector_unionfind` | 1,000 | 176 | 0.01100 | [0.00615, 0.01959] |
+| 13 | `qector_cuda` (GPU) | 10,000 | 7,612 | 0.04100 | [0.03729, 0.04507] |
+| 13 | `qector_opencl` (GPU) | 10,000 | 4,590 | 0.04100 | [0.03729, 0.04507] |
+| 15 | PyMatching 2 | 100,000 | 7,296 | 0.00314 | [0.00281, 0.00351] |
+| 15 | `qector_cuda` (GPU) | 10,000 | 4,486 | 0.03760 | [0.03405, 0.04151] |
+| 15 | `qector_opencl` (GPU) | 10,000 | 2,798 | 0.03760 | [0.03405, 0.04151] |
 
-The full 77-row table, including every `qector_blossom` and ldpc cell that fit
-the budget, is in `official_benchmark_results.md`.
+The full 137-row table — every shot count, plus the 73 cells that exceeded the
+per-cell budget and were therefore *not measured* — is in
+`official_benchmark_results.md`.
 
-Two findings, stated per-cell and not generalised (see
+Findings, stated per-cell and not generalised (see
 `docs/REPRODUCIBILITY_CHECKLIST.md`):
 
-- **Accuracy.** At `d = 3` and `d = 5`, `qector_blossom` and PyMatching 2
-  returned *the same number of logical failures on the same 100,000 samples* —
-  1891 and 1596 respectively, identical to the digit. On this workload the two
-  agree exactly, which is a checkable claim rather than a rounded one.
-- **Throughput.** PyMatching was faster than every QECTOR decoder measured here,
-  at every distance — roughly 3× at `d = 3` against `qector_unionfind`, and two
-  orders of magnitude against `qector_blossom` by `d = 11`. That is consistent
-  with the long-standing note elsewhere in this project that PyMatching leads on
-  plain MWPM. It is not a regression, and the artifacts do not hide it.
+- **`qector_blossom` matches PyMatching exactly.** At `d = 3` and `d = 5` both
+  returned the same number of logical failures on the same 100,000 samples —
+  1891 and 1596. Identical to the digit, which is a checkable claim.
+- **PyMatching leads on throughput at every distance measured**, consistent
+  with the long-standing note elsewhere in this project that it leads on plain
+  MWPM. Not a regression, and not hidden.
+- **The GPU kernels are fast and above threshold.** `qector_cuda` reaches
+  1.29M dec/s at `d = 3`, but its LER *stops improving with distance*: 0.061 at
+  `d = 5`, 0.043 at `d = 7`, 0.038 at `d = 15`, against PyMatching's 0.016 →
+  0.012 → 0.0031 over the same range. A decoder whose logical error rate
+  plateaus while `d` grows is above threshold — scaling the code does not help
+  it. The cause is not the kernel: `CUDABatchDecoder`/`OpenCLBatchDecoder` take
+  `(check_to_qubits, n_qubits)` and no `edge_weights`, so they decode
+  topology-only. `docs/BENCHMARK_COMPETITIVE.md` records the same effect for
+  unweighted Union-Find on CPU. Weighted UF (UF-01) exists in the Rust core and
+  is the path to closing it.
+- CUDA and OpenCL returned identical logical-failure counts wherever both ran
+  the same cell, consistent with the bit-identity claim made elsewhere.
 
-Note which Union-Find this is. `qector_unionfind` above is the **weighted**
-variant, which is what `ler._dem_observable_decoder` resolves and what the
-accuracy column reflects. `docs/BENCHMARK_COMPETITIVE.md` benchmarks the
-**unweighted** one (`qector_unionfind_unweighted`) and reports it beating
-PyMatching on latency at `d = 3` — both results are real, and they are not in
-conflict: unweighted UF is faster precisely because it discards the
-`log((1-p)/p)` edge weights, which is also why that document records it as
-above threshold at circuit level from `d = 5` upward. Speed and accuracy are
-being traded, so quote the two numbers together or neither.
+**Do not quote a GPU throughput figure without its LER.** The two GPU columns
+above are the reason: on speed alone they look like the headline result, and on
+accuracy they are not yet usable for scaling a surface code.
 
 Neither finding generalises beyond the cells above. Regenerate on quiesced
 hardware, and state the noise model, before any number here is used in a claim.

@@ -102,7 +102,55 @@ def _build_matcher(kind: str, dem):
         return _UnionFindSinter(dem, weighted=False)
     if kind in ("bposd", "bp_osd", "bp-osd"):
         return _BpOsdSinter(dem)
+    if kind in ("cuda", "cuda_batch", "gpu"):
+        return _GpuBatchSinter(dem, "cuda")
+    if kind in ("cuda_weighted", "cuda_batch_weighted", "gpu_weighted"):
+        return _GpuBatchSinter(dem, "cuda", weighted=True)
+    if kind in ("opencl", "opencl_batch"):
+        return _GpuBatchSinter(dem, "opencl")
+    if kind in ("opencl_weighted", "opencl_batch_weighted"):
+        return _GpuBatchSinter(dem, "opencl", weighted=True)
     raise ValueError(f"unknown QECTOR sinter decoder kind: {kind!r}")
+
+
+class _GpuBatchSinter:
+    """CUDA / OpenCL batch decoder on a DEM, with observable-space output.
+
+    Exists so the GPU kernels can be measured through the *same* pipeline as
+    every other decoder - one DEM, one sample set, one ``decode_batch`` - rather
+    than being quoted from a separate harness. Historically the GPU throughput
+    figures in this project came from a different measurement than the LER
+    figures beside them, which is precisely the mismatch that got earlier
+    benchmark artifacts withdrawn.
+
+    ``weighted`` selects which of the two GPU paths is measured. The kernels do
+    accept ``edge_weights``; omitting it is a *choice*, and an expensive one -
+    an unweighted kernel cannot tell a ``p = 1e-4`` mechanism from a ``p = 1e-2``
+    one, so at circuit level its logical error rate stops improving as ``d``
+    grows. Both variants are exposed here so that trade is measurable rather
+    than asserted, and so the weighted GPU LER - which the README notes has
+    never been backed by a surviving artifact - can finally be produced.
+
+    Quote a GPU throughput figure together with its LER, never alone.
+    """
+
+    def __init__(self, dem, backend: str = "cuda", weighted: bool = False):
+        from . import CUDABatchDecoder, OpenCLBatchDecoder
+        from .dem import from_stim
+
+        model = from_stim(dem)
+        if model.is_graphlike:
+            model = model.collapse_to_graph()
+        self._L = model.observables_matrix()
+        cls = CUDABatchDecoder if backend == "cuda" else OpenCLBatchDecoder
+        if weighted:
+            self._dec = cls(model.check_to_qubits(), model.num_errors, model.weights().tolist())
+        else:
+            self._dec = cls(model.check_to_qubits(), model.num_errors)
+
+    def decode_batch(self, shots):
+        corr = np.asarray(self._dec.batch_decode(np.asarray(shots, np.uint8)), dtype=np.uint8)
+        return ((self._L @ corr.T) & 1).T.astype(np.uint8)
 
 
 class _UnionFindSinter:

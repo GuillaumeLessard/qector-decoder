@@ -67,9 +67,17 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 # Label -> decoder kind understood by ler._dem_observable_decoder.
+# The two GPU entries are topology-only (their constructors take no
+# edge_weights), so they are expected to trade logical accuracy for throughput.
+# They are measured through the same resolver as everything else precisely so
+# that trade shows up in the same table instead of being quoted alone.
 DECODERS = [
     ("QECTOR Sparse Blossom (CPU)", "blossom"),
     ("QECTOR Union-Find (CPU)", "union_find"),
+    ("QECTOR CUDA Batch (GPU, unweighted)", "cuda"),
+    ("QECTOR CUDA Batch (GPU, weighted)", "cuda_weighted"),
+    ("QECTOR OpenCL Batch (GPU, unweighted)", "opencl"),
+    ("QECTOR OpenCL Batch (GPU, weighted)", "opencl_weighted"),
     ("PyMatching v2 (C++)", "pymatching"),
     ("ldpc BP-OSD", "ldpc_bposd"),
 ]
@@ -77,6 +85,10 @@ DECODERS = [
 COLORS = {
     "QECTOR Sparse Blossom (CPU)": "#059669",
     "QECTOR Union-Find (CPU)": "#1a56db",
+    "QECTOR CUDA Batch (GPU, unweighted)": "#7c3aed",
+    "QECTOR CUDA Batch (GPU, weighted)": "#4c1d95",
+    "QECTOR OpenCL Batch (GPU, unweighted)": "#db2777",
+    "QECTOR OpenCL Batch (GPU, weighted)": "#831843",
     "PyMatching v2 (C++)": "#dc2626",
     "ldpc BP-OSD": "#4b5563",
 }

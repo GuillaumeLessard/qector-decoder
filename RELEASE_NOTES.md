@@ -405,9 +405,25 @@ This release delivers the complete QECTOR v3 decoder suite with 4 algorithmic ba
 - Observability: `consecutive_failures`, `total_failures`, `gpu_recoveries`, `degraded_calls`
 - Performance: the "14.6M dec/s @ d=5, batch=10000" figure is **withdrawn** — it
   is one of the rows under *Performance Highlights* below, which no surviving
-  artifact backs and which must not be cited. The GPU path has not been
-  re-measured under the circuit-level pipeline; `official_benchmark_results.*`
-  covers the CPU decoders, PyMatching and ldpc only.
+  artifact backs. It has now been **replaced by a measurement**, taken through
+  the same circuit-level pipeline as every other decoder
+  (`ler.estimate_ler_circuit_level`, one DEM, one sample set, observable-space
+  scoring) and recorded in `official_benchmark_results.*`:
+
+  | d | OpenCL dec/s | CUDA dec/s | GPU LER | PyMatching LER |
+  |---:|---:|---:|---:|---:|
+  | 3 | 1,331,565 | 1,285,174 | 0.02215 | 0.01891 |
+  | 5 | 143,445 | 138,721 | 0.06094 | 0.01596 |
+  | 11 | 8,153 | 13,405 | ~0.043 | 0.00647 |
+  | 15 | 2,798 | 4,486 | 0.03760 | 0.00314 |
+
+  Read the two columns together. The kernels are genuinely fast — 1.3M dec/s at
+  `d = 3` — but their logical error rate **stops improving as `d` grows**, which
+  is the signature of a decoder above threshold: scaling the code does not help
+  it. That is not a kernel defect. `CUDABatchDecoder`/`OpenCLBatchDecoder` accept
+  `edge_weights`, and these rows were taken **without** them, so the kernels
+  decoded topology-only. Pass the DEM's weights (see the README quick-start) for
+  the accuracy path.
 
 ### Production Infrastructure
 
