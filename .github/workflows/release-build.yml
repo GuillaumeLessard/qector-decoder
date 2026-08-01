@@ -392,9 +392,30 @@ jobs:
       - name: Collect distributions
         run: |
           mkdir -p dist
+          # Wheels only, per docs/RELEASING.md. An sdist for this project is
+          # unbuildable by design: `src/*` is gitignored, so the tarball carries
+          # Cargo.toml and build.rs but no .rs sources. Publishing one means any
+          # platform without a matching wheel falls back to it, attempts a source
+          # build, and fails with a confusing Rust error instead of a clean
+          # "no wheel available". PyPI holds 15 wheels and zero sdists for 0.6.8;
+          # this step is what keeps it that way.
+          #
+          # The sdist job still runs and still uploads its tarball as a workflow
+          # artifact for inspection. It simply never reaches dist/, and therefore
+          # never reaches PyPI.
           find artifacts -name '*.whl' -exec cp {} dist/ \;
-          find artifacts -name '*.tar.gz' -exec cp {} dist/ \;
           ls -la dist/
+
+          # Belt and braces: fail loudly rather than silently shipping the thing
+          # the policy exists to prevent.
+          if ls dist/*.tar.gz >/dev/null 2>&1; then
+            echo "::error::an sdist reached dist/ — refusing to publish (docs/RELEASING.md)"
+            exit 1
+          fi
+          if ! ls dist/*.whl >/dev/null 2>&1; then
+            echo "::error::no wheels were collected — refusing to publish an empty release"
+            exit 1
+          fi
 
       - name: Check metadata
         run: |
