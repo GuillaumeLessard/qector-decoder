@@ -58,6 +58,26 @@ def _reimport_without(module_name: str, blocked: list[str]):
     finally:
         sys.meta_path.remove(finder)
         sys.modules.update(saved)
+        # Restoring sys.modules is not enough. Importing `pkg.sub` also rebinds
+        # the fresh module onto its PARENT as `pkg.sub`, and nothing above undoes
+        # that - so the throwaway module outlives this helper as an attribute of
+        # the real package while sys.modules holds the original. The two then
+        # disagree, permanently, for the rest of the session:
+        #
+        #   sys.modules["qector_decoder_v3.gpu_backend"]  -> original
+        #   qector_decoder_v3.gpu_backend                 -> throwaway
+        #
+        # That broke test_routing.py's live-detection cases, and did so only in a
+        # full-suite run and only on a machine without a GPU, which is why it
+        # looked like a CI-only mystery. `routing` holds `from . import
+        # gpu_backend as _gb` (the original), while monkeypatch - by either
+        # spelling, since pytest's resolve() walks parents with getattr - reached
+        # the throwaway. The patch applied to a module nothing under test used.
+        for name, module in saved.items():
+            parent_name, _, child = name.rpartition(".")
+            parent = sys.modules.get(parent_name) if parent_name else None
+            if parent is not None and getattr(parent, child, None) is not module:
+                setattr(parent, child, module)
 
 
 @pytest.mark.parametrize(("module_name", "blocked"), OPTIONAL_IMPORT_MATRIX)

@@ -137,12 +137,18 @@ def test_code_object_is_classified_structurally():
 # ---------------------------------------------------------------------------
 @pytest.mark.parametrize("cuda_rust,gpu", [(False, False), (False, True), (True, True)])
 def test_detected_hardware_drives_huge_batch(monkeypatch, cuda_rust, gpu):
-    # Patch the canonical module by dotted path, NOT via `qd.gpu_backend`.
-    # `HardwareProfile.detect()` reads `routing._gb.has_cuda_rust()`, where `_gb`
-    # is `qector_decoder_v3.gpu_backend` bound from sys.modules. The package-level
-    # attribute `qd.gpu_backend` is not reliably that same object - in CI it is
-    # shadowed, so patching it left `detect()` reading the real hardware and these
-    # two cases failed on any machine without a GPU while passing on one with.
+    # `HardwareProfile.detect()` reads `routing._gb.<probe>()`, where `_gb` is the
+    # `qector_decoder_v3.gpu_backend` entry in sys.modules.
+    #
+    # Either spelling below works, but only because test_optional_import_degradation
+    # now restores the parent-package attribute it rebinds. Before that fix its
+    # re-import left `qector_decoder_v3.gpu_backend` pointing at a throwaway module
+    # while sys.modules kept the original, and monkeypatch - which resolves a dotted
+    # path with getattr on the parent, so both spellings land in the same place -
+    # patched the throwaway. `detect()` went on reading the real hardware, and these
+    # cases failed in a full-suite run while passing in isolation. Whichever cases
+    # failed depended on the machine's actual GPU, which is what made it look like a
+    # CI-only mystery rather than an ordering bug.
     monkeypatch.setattr("qector_decoder_v3.gpu_backend.has_cuda_rust", lambda: cuda_rust)
     monkeypatch.setattr("qector_decoder_v3.gpu_backend.gpu_available", lambda: gpu)
 
