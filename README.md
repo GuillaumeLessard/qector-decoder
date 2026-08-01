@@ -438,22 +438,21 @@ rather than estimated — is in `official_benchmark_results.md`.
 Findings apply to the cells listed above and are not generalised beyond them
 (see `docs/REPRODUCIBILITY_CHECKLIST.md`).
 
-**Accuracy parity with PyMatching.** At `d = 3` and `d = 5`, `qector_blossom`
-and PyMatching 2 recorded identical logical-failure counts on identical sample
-sets — 1891 and 1596 in 100,000 shots respectively.
+**Accuracy parity with PyMatching.** At the distances where both decoders were
+measured on identical sample sets, `qector_blossom` and PyMatching 2 recorded
+identical logical-failure counts. The counts live in the artifact; they are not
+restated here because this release publishes no performance figures.
 
-**Throughput.** PyMatching 2 leads at every distance measured here. This is
+**Throughput.** PyMatching 2 led at every distance measured in that run. This is
 consistent with the position recorded elsewhere in this project that PyMatching
 leads on plain MWPM.
 
 **GPU accuracy depends on whether matching weights are supplied.**
 `CUDABatchDecoder` and `OpenCLBatchDecoder` accept an optional `edge_weights`
-argument. Omitting it selects topology-only cluster growth, and the resulting
-logical error rate does not improve with code distance — 0.061 at `d = 5`,
-0.043 at `d = 7`, 0.038 at `d = 15` — which is the signature of operation above
-threshold. Supplying the DEM's `log((1-p)/p)` weights restores distance
-scaling: 0.026 at `d = 5`, 0.010 at `d = 9`, 0.007 at `d = 13`. The weighted
-weighted path costs more per shot than the unweighted one.
+argument. Omitting it selects topology-only cluster growth, whose logical error
+rate does not improve with code distance — the signature of operation above
+threshold. Supplying the DEM's `log((1-p)/p)` weights restores distance scaling.
+The weighted path costs more per shot than the unweighted one.
 `docs/BENCHMARK_COMPETITIVE.md` records the same effect for unweighted
 Union-Find on CPU. See the quick-start above for the weighted construction.
 
@@ -551,6 +550,42 @@ curl -X POST http://localhost:8000/decode \
 ```
 
 For local experiments and controlled deployments only. Not hardened for public SaaS.
+
+---
+
+## MCP server (stdio)
+
+The package ships an **MCP server** (JSON-RPC 2.0 over stdio) in every published
+wheel — no extra feature flag or install is needed:
+
+```bash
+python -c "import qector_decoder_v3; qector_decoder_v3.run_mcp_server()"
+```
+
+A ready-made client configuration lives in `mcp.json` at the repository root
+(it launches `python -c "import qector_decoder_v3; qector_decoder_v3.run_mcp_server()"`
+with `QECTOR_SILENT=1`). Point your MCP client at that file — e.g. Claude Code
+supports `mcp.add` with the `qector` server name. The server advertises 13
+tools, all verified on the released wheel:
+
+| Tool | Purpose |
+|---|---|
+| `decode_syndrome` | Decode a syndrome with any decoder family (Union-Find, Blossom, SparseBlossom, BP-OSD, Cascade, Hybrid, and more) |
+| `batch_decode` | Batch-decode multiple syndromes in parallel |
+| `decode_hyperedge` | Hyperedge / qLDPC decoding (bypasses graphlike Union-Find restrictions) |
+| `decode_syndrome_blossom` / `batch_decode_blossom` | Exact Blossom (MWPM) single and batch |
+| `decode_syndrome_cascade` | Hybrid cascading decoder (UF pre-filter escalating to Blossom) |
+| `benchmark_decoder` | Run a performance benchmark for a decoder family |
+| `run_ler_benchmark` | LER benchmark across code distances |
+| `get_decoder_info` | Decoder configuration, version info, family listing |
+| `get_backend_health` | Backend health status across the 7 fallback tiers |
+| `clear_decoder_cache` | Clear the decoder factory cache |
+| `get_server_env` | Effective QECTOR environment variables |
+| `recommend_decoder` | Decoder recommendation by code topology and priority |
+
+The stdio reader enforces a 10 MB content limit and validates syndrome lengths
+and decoder types, returning JSON-RPC errors instead of crashing. For local and
+controlled use; like REST/gRPC, it is not hardened for public SaaS exposure.
 
 ---
 

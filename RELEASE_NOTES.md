@@ -258,7 +258,7 @@ withdrawn rather than corrected, since there is nothing yet to correct it to.
 **Codename**: Lepton
 
 ### Fixed
-- **Blossom exactness at large distance**: `BlossomDecoder` now uses an adaptive candidate cap `k = max(12, 4·√n_defects)`, restoring exact-MWPM logical-error-rate parity with PyMatching through d=15.
+- **Blossom exactness at large distance**: `BlossomDecoder` now uses an adaptive candidate cap `k = max(12, 4·√n_defects)`, restoring exact-MWPM behaviour through d=15.
 
 ### Added
 - **QECTOR Workbench**: Headless, fully-tested controller for benchmark jobs and JSON/CSV/PDF report generation.
@@ -344,16 +344,13 @@ cross-validated against reference packages. See `docs/BEYOND_PYMATCHING.md`.
 > archived Zenodo datasets listed in `README.md`.
 
 - **`belief_matching.BeliefMatching`** — sum-product BP on the hyperedge detector
-  graph + QECTOR exact weighted MWPM on the edge graph (belief-matching). Achieves
-  a **lower logical error rate than PyMatching** on Stim circuit-level shots
-  (rotated surface, p=0.005): **25.5% LER reduction at d=5** (0.0062 vs 0.0083),
-  parity at d=3. Verified directly and through Sinter; cross-checked against the
-  reference `beliefmatching` package.
+  graph + QECTOR exact weighted MWPM on the edge graph (belief-matching).
+  Verified directly and through Sinter; cross-checked against the reference
+  `beliefmatching` package.
 - **`bposd.BpOsdDecoder`** — self-contained sum-product BP + ordered-statistics
   (OSD-0 / OSD-w) for arbitrary GF(2) / LDPC check matrices, plus LDPC code
-  families (`codes.bivariate_bicycle_code`, `codes.bicycle_code`). On the
-  `[[72,12]]` BB code its logical error rate is within ~10% of the reference `ldpc`
-  package (0.0370 vs 0.0340) and always syndrome-faithful.
+  families (`codes.bivariate_bicycle_code`, `codes.bicycle_code`). Always
+  syndrome-faithful, cross-validated against the reference `ldpc` package.
 - **`sinter_compat`** — `qector_blossom` / `qector_belief` / `qector_unionfind`
   exposed as `sinter.Decoder`s, so QECTOR drops into the community-standard
   Monte-Carlo harness used to benchmark PyMatching and fusion-blossom.
@@ -385,11 +382,11 @@ This release delivers the complete QECTOR v3 decoder suite with 4 algorithmic ba
 
 | Decoder | Status | Key Feature |
 |---------|--------|-------------|
-| `UnionFindDecoder` | Stable | Hot-path 1.6 µs, SIMD + pooled allocators |
+| `UnionFindDecoder` | Stable | SIMD + pooled allocators, hot-path optimised |
 | `BlossomDecoder` | Stable | Edmonds MWPM, exact for d≤7 |
 | `SparseBlossomDecoder` | Stable | Region-growing BFS, blossom contraction + shattering, exact DP n≤20 |
-| `BPOSDDecoder` | Stable | Belief propagation + ordered statistics, LER 0.086 @ d=5, p=0.05 |
-| `NeuralPredecoder` | Stable | MLP Xavier/ReLU, hybrid fallback 35-93% |
+| `BPOSDDecoder` | Stable | Belief propagation + ordered statistics (OSD-0/OSD-w) |
+| `NeuralPredecoder` | Stable | MLP Xavier/ReLU, hybrid fallback |
 | `GNNPredecoder` | Experimental | Message-passing + edge readout, forward pass OK |
 | `LookupTableDecoder` | Stable | Exact d=3,5,7 precomputed, SIMD fallback |
 | `HybridDecoder` | Stable | Auto-selection per syndrome difficulty |
@@ -405,25 +402,16 @@ This release delivers the complete QECTOR v3 decoder suite with 4 algorithmic ba
 - Observability: `consecutive_failures`, `total_failures`, `gpu_recoveries`, `degraded_calls`
 - Performance: the "14.6M dec/s @ d=5, batch=10000" figure is **withdrawn** — it
   is one of the rows under *Performance Highlights* below, which no surviving
-  artifact backs. It has now been **replaced by a measurement**, taken through
-  the same circuit-level pipeline as every other decoder
-  (`ler.estimate_ler_circuit_level`, one DEM, one sample set, observable-space
-  scoring) and recorded in `official_benchmark_results.*`:
-
-  | d | OpenCL dec/s | CUDA dec/s | GPU LER | PyMatching LER |
-  |---:|---:|---:|---:|---:|
-  | 3 | 1,331,565 | 1,285,174 | 0.02215 | 0.01891 |
-  | 5 | 143,445 | 138,721 | 0.06094 | 0.01596 |
-  | 11 | 8,153 | 13,405 | ~0.043 | 0.00647 |
-  | 15 | 2,798 | 4,486 | 0.03760 | 0.00314 |
-
-  Read the two columns together. The kernels are genuinely fast — 1.3M dec/s at
-  `d = 3` — but their logical error rate **stops improving as `d` grows**, which
-  is the signature of a decoder above threshold: scaling the code does not help
-  it. That is not a kernel defect. `CUDABatchDecoder`/`OpenCLBatchDecoder` accept
-  `edge_weights`, and these rows were taken **without** them, so the kernels
-  decoded topology-only. Pass the DEM's weights (see the README quick-start) for
-  the accuracy path.
+  artifact backs. **No measured replacement is published for v0.7.0**: the CUDA
+  kernel optimisation landed after the last benchmark run, so any figure taken
+  from that run would describe a different binary. What is documented instead is
+  behaviour: the kernels accept optional `edge_weights` (the DEM's
+  `log((1-p)/p)` matching weights), and the weighted configuration is the
+  accuracy path — pass the weights for the accuracy path (see the README
+  quick-start). The unweighted configuration is documented as operating above
+  threshold; it decodes topology-only and its logical error rate does not
+  improve with distance. No latency or throughput figure for either path is
+  published with this release.
 
 ### Production Infrastructure
 
@@ -456,19 +444,25 @@ This release delivers the complete QECTOR v3 decoder suite with 4 algorithmic ba
 > repeated rounds. Circuit-level LERs quoted elsewhere in this project, and every
 > number published by PyMatching, Stim, or Sinter, are a different quantity.
 > Placing the two in one table is the methodology error that caused the v0.7.0
-> benchmark withdrawal; these rows are retained as release history only. No
-> artifact backing them survives, and they must not be cited.
+> benchmark withdrawal. **No artifact backs any of the rows this section once
+> carried, and none of them may be cited — they are removed outright for
+> v0.7.0.** No performance figures are published with this release.
 
-| Metric | Value | Conditions |
-|--------|-------|------------|
-| Single-shot latency | 1.6 µs | CPU `decode()`, d=5 |
-| GPU batch throughput | 14.6M dec/s | d=5, batch=10000, OpenCL |
-| CPU batch throughput | 4.1M dec/s | d=5, batch=10000, SIMD |
-| BP-OSD LER | 0.086 | d=5, p=0.05, 10k shots |
-| UnionFind LER | 0.321 | d=5, p=0.05, 10k shots |
-| Blossom LER | 0.198 | d=5, p=0.05, 10k shots |
-| Sparse vs Blossom bit-perfect | 100% | d=5, ring code, 100k trials |
-| All tests pass | 260+ (Python) + 72 (Rust) | Default + `full` features |
+The decoder capabilities this section previously illustrated are:
+
+| Capability | Where it lives |
+|------------|----------------|
+| CPU single-shot `decode()` with SIMD and pooled allocators | `UnionFindDecoder`, `FastUnionFindDecoder` |
+| GPU batch decoding on CUDA and OpenCL, with optional `edge_weights` | `CUDABatchDecoder`, `OpenCLBatchDecoder` |
+| CPU parallel batch decoding | `BatchDecoder`, `CPUBatchDecoder` |
+| BP-OSD for LDPC/qLDPC check matrices, OSD-0/OSD-w | `BPOSDDecoder`, `BpOsdDecoder` |
+| Exact weighted MWPM | `BlossomDecoder` |
+| Region-growing sparse MWPM | `SparseBlossomDecoder` |
+| Sparse-vs-exact agreement (bit-identical on ring-code trials) | cross-decoder test suite |
+
+These are specifications of what the decoders do, not measurements of how fast
+they do it. Measure on your own hardware and archive the artifact before citing
+any figure.
 
 ---
 

@@ -46,4 +46,4 @@ quantum-control
 reproducibility
 
 ### SEO & AI Agent Discovery Keywords
-quantum error correction decoder, QEC decoder, quantum decoder Python, Rust quantum error correction, PyMatching compatible decoder, Stim decoder workflow, BP-OSD decoder, qLDPC decoder, LDPC quantum code, surface code decoder, reproducible QEC benchmarks, QECTOR Decoder v3, commercial quantum decoder license, lab QEC decoder pricing, source-available quantum error correction, ultra-low latency QEC decoding.
+quantum error correction decoder, QEC decoder, quantum decoder Python, Rust quantum error correction, PyMatching compatible decoder, Stim decoder workflow, BP-OSD decoder, qLDPC decoder, LDPC quantum code, surface code decoder, reproducible QEC benchmarks, QECTOR Decoder v3, commercial quantum decoder license, lab QEC decoder pricing, source-available quantum error correction.

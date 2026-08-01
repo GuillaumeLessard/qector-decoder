@@ -5,12 +5,15 @@ on [Keep a Changelog](https://keepachangelog.com/), and the project aims to foll
 semantic versioning. Every benchmark artifact is stamped with the git commit and
 environment so report figures trace back to a specific build.
 
-## [0.7.0] — UNRELEASED
+## [0.7.0] — 2026-08-01
 
-The repo version is 0.7.0; the latest version on **PyPI is 0.6.9**. Nothing below
-has been published. `src/*.rs` is `.gitignore`d, so `git log v0.6.9..HEAD` shows
-none of the Rust work recorded here — it is verified by `cargo test` and by
-reading the tree.
+`src/*.rs` is `.gitignore`d, so `git log v0.6.9..HEAD` shows none of the Rust
+work recorded here — it is verified by `cargo test` and by reading the tree.
+
+This release publishes **no benchmark figures**. Decoder performance is
+hardware-, code- and noise-dependent, and the previously published tables were
+measured against a different build of the core. The benchmark harness ships with
+the package; measure on your own hardware.
 
 ### Release pipeline — six blockers, found by running it instead of trusting it
 `release-build.yml` had never executed. A `workflow_dispatch` dry run with
