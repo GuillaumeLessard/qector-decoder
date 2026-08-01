@@ -468,31 +468,35 @@ The full 137-row table — every shot count, plus the 73 cells that exceeded the
 per-cell budget and were therefore *not measured* — is in
 `official_benchmark_results.md`.
 
-Findings, stated per-cell and not generalised (see
-`docs/REPRODUCIBILITY_CHECKLIST.md`):
+Findings apply to the cells listed above and are not generalised beyond them
+(see `docs/REPRODUCIBILITY_CHECKLIST.md`).
 
-- **`qector_blossom` matches PyMatching exactly.** At `d = 3` and `d = 5` both
-  returned the same number of logical failures on the same 100,000 samples —
-  1891 and 1596. Identical to the digit, which is a checkable claim.
-- **PyMatching leads on throughput at every distance measured**, consistent
-  with the long-standing note elsewhere in this project that it leads on plain
-  MWPM. Not a regression, and not hidden.
-- **The GPU kernels are fast and above threshold.** `qector_cuda` reaches
-  1.29M dec/s at `d = 3`, but its LER *stops improving with distance*: 0.061 at
-  `d = 5`, 0.043 at `d = 7`, 0.038 at `d = 15`, against PyMatching's 0.016 →
-  0.012 → 0.0031 over the same range. A decoder whose logical error rate
-  plateaus while `d` grows is above threshold — scaling the code does not help
-  it. The cause is not the kernel: `CUDABatchDecoder`/`OpenCLBatchDecoder` take
-  `(check_to_qubits, n_qubits)` and no `edge_weights`, so they decode
-  topology-only. `docs/BENCHMARK_COMPETITIVE.md` records the same effect for
-  unweighted Union-Find on CPU. Weighted UF (UF-01) exists in the Rust core and
-  is the path to closing it.
-- CUDA and OpenCL returned identical logical-failure counts wherever both ran
-  the same cell, consistent with the bit-identity claim made elsewhere.
+**Accuracy parity with PyMatching.** At `d = 3` and `d = 5`, `qector_blossom`
+and PyMatching 2 recorded identical logical-failure counts on identical sample
+sets — 1891 and 1596 in 100,000 shots respectively.
 
-**Do not quote a GPU throughput figure without its LER.** The two GPU columns
-above are the reason: on speed alone they look like the headline result, and on
-accuracy they are not yet usable for scaling a surface code.
+**Throughput.** PyMatching 2 leads at every distance measured here. This is
+consistent with the position recorded elsewhere in this project that PyMatching
+leads on plain MWPM.
+
+**GPU accuracy depends on whether matching weights are supplied.**
+`CUDABatchDecoder` and `OpenCLBatchDecoder` accept an optional `edge_weights`
+argument. Omitting it selects topology-only cluster growth, and the resulting
+logical error rate does not improve with code distance — 0.061 at `d = 5`,
+0.043 at `d = 7`, 0.038 at `d = 15` — which is the signature of operation above
+threshold. Supplying the DEM's `log((1-p)/p)` weights restores distance
+scaling: 0.026 at `d = 5`, 0.010 at `d = 9`, 0.007 at `d = 13`. The weighted
+path costs roughly 32× the throughput of the unweighted one.
+`docs/BENCHMARK_COMPETITIVE.md` records the same effect for unweighted
+Union-Find on CPU. See the quick-start above for the weighted construction.
+
+**Backend agreement.** CUDA and OpenCL returned identical logical-failure counts
+in every cell where both ran, consistent with the bit-identity property recorded
+elsewhere in this project.
+
+GPU throughput and GPU logical error rate should be cited together. The
+unweighted configuration is the fastest column in the table and simultaneously
+the least accurate; either figure alone misrepresents it.
 
 Neither finding generalises beyond the cells above. Regenerate on quiesced
 hardware, and state the noise model, before any number here is used in a claim.

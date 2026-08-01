@@ -20,11 +20,12 @@ reading the tree.
   the CPU backends — not from a separate harness. This produces the weighted-GPU
   logical error rate that the README previously recorded as unquotable for want
   of a surviving artifact.
-- **What the measurement says.** Unweighted GPU is fast and *above threshold*:
-  its LER stops improving as `d` grows (0.059 at `d = 5`, 0.048 at 9, 0.035 at
-  13), so scaling the code does not help it. Weighted GPU is below threshold —
-  0.026 → 0.010 → 0.007 over the same range — at roughly 32x the cost. Quote a
-  GPU throughput number together with its LER or not at all.
+- **Measured behaviour.** The unweighted configuration operates above threshold:
+  its logical error rate does not improve as `d` grows (0.059 at `d = 5`, 0.048
+  at 9, 0.035 at 13), so increasing code distance does not help it. The weighted
+  configuration is below threshold — 0.026 → 0.010 → 0.007 over the same range —
+  at roughly 32× the cost per shot. GPU throughput and GPU logical error rate
+  should be cited together.
 - **Weighted growth kernel: 1.40x–1.57x faster, bit-identical output.** Per round
   the weighted loop ran an O(n_checks) scan plus three O(E) sweeps for up to
   `E+N+2` rounds, and passes A and B each walked two parent chains per edge with
@@ -36,12 +37,13 @@ reading the tree.
   Verified by capturing every correction from the pre-change build across
   `d = 5/9/13` × 2048 shots and asserting byte-equality after: *bit-identical
   across 12 arrays*, with CUDA-vs-CPU agreement unchanged to the digit.
-- **Known and not hidden:** weighted GPU is *not* bit-identical to weighted CPU,
-  and diverges further with distance (67% → 14% → 0.24% shot agreement at
-  `d = 5/9/13`). The kernel grows in `f32` and `uf_core::grow_weighted` in `f64`,
-  so `dt` differences compound over thousands of rounds into different — often
-  equally valid — fusion orders. Pre-existing, unrelated to the optimisation
-  above, and stated here rather than left for a user to discover.
+- **Numerical divergence from the CPU path.** Weighted GPU output is not
+  bit-identical to weighted CPU, and the two diverge further with distance
+  (67% → 14% → 0.24% per-shot agreement at `d = 5/9/13`). The kernel grows in
+  `f32` and `uf_core::grow_weighted` in `f64`, so `dt` differences compound over
+  thousands of rounds into different — and frequently equally valid — fusion
+  orders. This behaviour pre-dates, and is unrelated to, the optimisation
+  described above.
 
 ### Benchmarks — corrected artifacts, and what they say
 - **`official_benchmark_results.{json,csv,md,pdf}` were regenerated.** The first
