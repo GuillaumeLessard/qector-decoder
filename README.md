@@ -423,7 +423,7 @@ python scripts/run_custom_comparison_benchmark.py \
 run at `p = 0.005`, `seed = 1`, `d ∈ {3..15}`, shots up to 100,000. Read it as
 indicative only: it was taken on a **developer workstation that was not
 quiesced**, and its provenance block records `git_tree_dirty: true`. A further
-63 cells exceeded the per-cell decode budget and are listed as *not measured*,
+93 cells exceeded the per-cell decode budget and are listed as *not measured*,
 carrying their measured probe rate and projected cost — no cell is extrapolated.
 
 Largest shot count measured per cell. Throughput is decode time only; LER is
@@ -432,57 +432,57 @@ per shot with a 95% Wilson interval. Every row is one
 
 | d | Decoder | Shots | Throughput (dec/s) | LER | 95% CI |
 | ---: | --- | ---: | ---: | ---: | --- |
-| 3 | PyMatching 2 | 100,000 | 2,488,546 | 0.01891 | [0.01808, 0.01977] |
-| 3 | `qector_blossom` | 100,000 | 2,259,953 | 0.01891 | [0.01808, 0.01977] |
-| 3 | `qector_unionfind` | 100,000 | 4,816,445 | 0.02210 | [0.02121, 0.02303] |
-| 3 | `qector_cuda` (GPU, unweighted) | 100,000 | 1,391,074 | 0.02215 | [0.02126, 0.02308] |
-| 3 | `qector_cuda` (GPU, weighted) | 100,000 | 1,252,127 | 0.02201 | [0.02112, 0.02294] |
-| 3 | `qector_opencl` (GPU, unweighted) | 100,000 | 1,186,666 | 0.02215 | [0.02126, 0.02308] |
-| 3 | `qector_opencl` (GPU, weighted) | 100,000 | 1,494,096 | 0.02201 | [0.02112, 0.02294] |
-| 3 | ldpc BP-OSD | 50,000 | 2,356 | 0.01938 | [0.01821, 0.02063] |
-| 5 | PyMatching 2 | 100,000 | 276,643 | 0.01596 | [0.01520, 0.01676] |
-| 5 | `qector_blossom` | 100,000 | 102,728 | 0.01596 | [0.01520, 0.01676] |
-| 5 | `qector_unionfind` | 100,000 | 630,493 | 0.02645 | [0.02547, 0.02746] |
-| 5 | `qector_cuda` (GPU, unweighted) | 100,000 | 157,099 | 0.06094 | [0.05947, 0.06244] |
-| 5 | `qector_cuda` (GPU, weighted) | 100,000 | 70,473 | 0.03182 | [0.03075, 0.03293] |
-| 5 | `qector_opencl` (GPU, unweighted) | 100,000 | 138,965 | 0.06094 | [0.05947, 0.06244] |
-| 5 | `qector_opencl` (GPU, weighted) | 100,000 | 51,241 | 0.03182 | [0.03075, 0.03293] |
-| 5 | ldpc BP-OSD | 1,000 | 103 | 0.02100 | [0.01378, 0.03189] |
-| 7 | PyMatching 2 | 100,000 | 101,498 | 0.01220 | [0.01154, 0.01290] |
-| 7 | `qector_blossom` | 100,000 | 17,018 | 0.01233 | [0.01166, 0.01303] |
-| 7 | `qector_unionfind` | 100,000 | 152,985 | 0.02042 | [0.01956, 0.02132] |
-| 7 | `qector_cuda` (GPU, unweighted) | 100,000 | 42,492 | 0.04274 | [0.04150, 0.04401] |
-| 7 | `qector_cuda` (GPU, weighted) | 10,000 | 12,680 | 0.01800 | [0.01557, 0.02080] |
-| 7 | `qector_opencl` (GPU, unweighted) | 100,000 | 237,312 | 0.04274 | [0.04150, 0.04401] |
-| 7 | `qector_opencl` (GPU, weighted) | 10,000 | 8,063 | 0.01800 | [0.01557, 0.02080] |
-| 9 | PyMatching 2 | 100,000 | 40,581 | 0.00878 | [0.00822, 0.00938] |
-| 9 | `qector_blossom` | 50,000 | 2,343 | 0.00906 | [0.00827, 0.00993] |
-| 9 | `qector_unionfind` | 100,000 | 42,073 | 0.01732 | [0.01653, 0.01815] |
-| 9 | `qector_cuda` (GPU, unweighted) | 50,000 | 15,442 | 0.04648 | [0.04467, 0.04836] |
-| 9 | `qector_cuda` (GPU, weighted) | 5,000 | 3,765 | 0.01140 | [0.00881, 0.01474] |
-| 9 | `qector_opencl` (GPU, unweighted) | 100,000 | 101,976 | 0.04663 | [0.04534, 0.04795] |
-| 9 | `qector_opencl` (GPU, weighted) | 5,000 | 1,984 | 0.01140 | [0.00881, 0.01474] |
-| 11 | PyMatching 2 | 100,000 | 19,880 | 0.00647 | [0.00599, 0.00699] |
-| 11 | `qector_blossom` | 10,000 | 757 | 0.00780 | [0.00625, 0.00972] |
-| 11 | `qector_unionfind` | 50,000 | 8,681 | 0.01678 | [0.01569, 0.01794] |
-| 11 | `qector_cuda` (GPU, unweighted) | 10,000 | 11,862 | 0.04400 | [0.04015, 0.04820] |
-| 11 | `qector_cuda` (GPU, weighted) | 1,000 | 277 | 0.01000 | [0.00544, 0.01831] |
-| 11 | `qector_opencl` (GPU, unweighted) | 50,000 | 50,184 | 0.04222 | [0.04049, 0.04402] |
-| 11 | `qector_opencl` (GPU, weighted) | 1,000 | 286 | 0.01000 | [0.00544, 0.01831] |
-| 13 | PyMatching 2 | 100,000 | 10,008 | 0.00445 | [0.00406, 0.00488] |
-| 13 | `qector_blossom` | 5,000 | 227 | 0.00380 | [0.00243, 0.00593] |
-| 13 | `qector_unionfind` | 10,000 | 2,379 | 0.01400 | [0.01188, 0.01650] |
-| 13 | `qector_cuda` (GPU, unweighted) | 10,000 | 6,600 | 0.04100 | [0.03729, 0.04507] |
-| 13 | `qector_cuda` (GPU, weighted) | 1,000 | 123 | 0.00800 | [0.00406, 0.01571] |
-| 13 | `qector_opencl` (GPU, unweighted) | 10,000 | 24,690 | 0.04100 | [0.03729, 0.04507] |
-| 13 | `qector_opencl` (GPU, weighted) | 1,000 | 137 | 0.00800 | [0.00406, 0.01571] |
-| 15 | PyMatching 2 | 100,000 | 6,721 | 0.00314 | [0.00281, 0.00351] |
-| 15 | `qector_blossom` | 1,000 | 59 | 0.00200 | [0.00055, 0.00726] |
-| 15 | `qector_unionfind` | 1,000 | 317 | 0.01200 | [0.00688, 0.02086] |
-| 15 | `qector_cuda` (GPU, unweighted) | 10,000 | 3,971 | 0.03760 | [0.03405, 0.04151] |
-| 15 | `qector_opencl` (GPU, unweighted) | 10,000 | 11,531 | 0.03760 | [0.03405, 0.04151] |
+| 3 | PyMatching 2 | 100,000 | 2,478,782 | 0.01891 | [0.01808, 0.01977] |
+| 3 | `qector_blossom` | 100,000 | 2,337,448 | 0.01891 | [0.01808, 0.01977] |
+| 3 | `qector_unionfind` | 100,000 | 4,953,928 | 0.02210 | [0.02121, 0.02303] |
+| 3 | `qector_cuda` (GPU, unweighted) | 100,000 | 1,446,123 | 0.02215 | [0.02126, 0.02308] |
+| 3 | `qector_cuda` (GPU, weighted) | 100,000 | 1,201,288 | 0.02201 | [0.02112, 0.02294] |
+| 3 | `qector_opencl` (GPU, unweighted) | 100,000 | 1,286,159 | 0.02215 | [0.02126, 0.02308] |
+| 3 | `qector_opencl` (GPU, weighted) | 100,000 | 1,554,014 | 0.02201 | [0.02112, 0.02294] |
+| 3 | ldpc BP-OSD | 50,000 | 2,399 | 0.01938 | [0.01821, 0.02063] |
+| 5 | PyMatching 2 | 100,000 | 340,202 | 0.01596 | [0.01520, 0.01676] |
+| 5 | `qector_blossom` | 100,000 | 111,843 | 0.01596 | [0.01520, 0.01676] |
+| 5 | `qector_unionfind` | 100,000 | 694,192 | 0.02645 | [0.02547, 0.02746] |
+| 5 | `qector_cuda` (GPU, unweighted) | 100,000 | 150,505 | 0.06094 | [0.05947, 0.06244] |
+| 5 | `qector_cuda` (GPU, weighted) | 100,000 | 69,156 | 0.03182 | [0.03075, 0.03293] |
+| 5 | `qector_opencl` (GPU, unweighted) | 100,000 | 144,886 | 0.06094 | [0.05947, 0.06244] |
+| 5 | `qector_opencl` (GPU, weighted) | 100,000 | 61,421 | 0.03182 | [0.03075, 0.03293] |
+| 5 | ldpc BP-OSD | 1,000 | 113 | 0.02100 | [0.01378, 0.03189] |
+| 7 | PyMatching 2 | 100,000 | 97,941 | 0.01220 | [0.01154, 0.01290] |
+| 7 | `qector_blossom` | 100,000 | 20,975 | 0.01233 | [0.01166, 0.01303] |
+| 7 | `qector_unionfind` | 100,000 | 173,669 | 0.02042 | [0.01956, 0.02132] |
+| 7 | `qector_cuda` (GPU, unweighted) | 100,000 | 45,353 | 0.04274 | [0.04150, 0.04401] |
+| 7 | `qector_cuda` (GPU, weighted) | 10,000 | 13,552 | 0.01800 | [0.01557, 0.02080] |
+| 7 | `qector_opencl` (GPU, unweighted) | 100,000 | 244,318 | 0.04274 | [0.04150, 0.04401] |
+| 7 | `qector_opencl` (GPU, weighted) | 10,000 | 8,693 | 0.01800 | [0.01557, 0.02080] |
+| 9 | PyMatching 2 | 100,000 | 42,295 | 0.00878 | [0.00822, 0.00938] |
+| 9 | `qector_blossom` | 50,000 | 2,649 | 0.00906 | [0.00827, 0.00993] |
+| 9 | `qector_unionfind` | 100,000 | 44,420 | 0.01732 | [0.01653, 0.01815] |
+| 9 | `qector_cuda` (GPU, unweighted) | 50,000 | 18,273 | 0.04648 | [0.04467, 0.04836] |
+| 9 | `qector_cuda` (GPU, weighted) | 10,000 | 3,382 | 0.01400 | [0.01188, 0.01650] |
+| 9 | `qector_opencl` (GPU, unweighted) | 100,000 | 107,529 | 0.04663 | [0.04534, 0.04795] |
+| 9 | `qector_opencl` (GPU, weighted) | 10,000 | 2,043 | 0.01400 | [0.01188, 0.01650] |
+| 11 | PyMatching 2 | 100,000 | 21,511 | 0.00647 | [0.00599, 0.00699] |
+| 11 | `qector_blossom` | 10,000 | 890 | 0.00780 | [0.00625, 0.00972] |
+| 11 | `qector_unionfind` | 50,000 | 9,722 | 0.01678 | [0.01569, 0.01794] |
+| 11 | `qector_cuda` (GPU, unweighted) | 10,000 | 13,621 | 0.04400 | [0.04015, 0.04820] |
+| 11 | `qector_cuda` (GPU, weighted) | 1,000 | 330 | 0.01000 | [0.00544, 0.01831] |
+| 11 | `qector_opencl` (GPU, unweighted) | 50,000 | 53,218 | 0.04222 | [0.04049, 0.04402] |
+| 11 | `qector_opencl` (GPU, weighted) | 1,000 | 338 | 0.01000 | [0.00544, 0.01831] |
+| 13 | PyMatching 2 | 100,000 | 12,096 | 0.00445 | [0.00406, 0.00488] |
+| 13 | `qector_blossom` | 5,000 | 293 | 0.00380 | [0.00243, 0.00593] |
+| 13 | `qector_unionfind` | 10,000 | 2,571 | 0.01400 | [0.01188, 0.01650] |
+| 13 | `qector_cuda` (GPU, unweighted) | 10,000 | 7,634 | 0.04100 | [0.03729, 0.04507] |
+| 13 | `qector_cuda` (GPU, weighted) | 1,000 | 151 | 0.00800 | [0.00406, 0.01571] |
+| 13 | `qector_opencl` (GPU, unweighted) | 10,000 | 25,937 | 0.04100 | [0.03729, 0.04507] |
+| 13 | `qector_opencl` (GPU, weighted) | 1,000 | 166 | 0.00800 | [0.00406, 0.01571] |
+| 15 | PyMatching 2 | 50,000 | 4,847 | 0.00342 | [0.00295, 0.00397] |
+| 15 | `qector_blossom` | 1,000 | 73 | 0.00200 | [0.00055, 0.00726] |
+| 15 | `qector_unionfind` | 5,000 | 511 | 0.01440 | [0.01145, 0.01809] |
+| 15 | `qector_cuda` (GPU, unweighted) | 10,000 | 4,398 | 0.03760 | [0.03405, 0.04151] |
+| 15 | `qector_opencl` (GPU, unweighted) | 10,000 | 14,809 | 0.03760 | [0.03405, 0.04151] |
 
-The complete 185-row table — every shot count, together with the 95 cells that
+The complete 187-row table — every shot count, together with the 93 cells that
 exceeded the per-cell decode budget and are therefore recorded as *not measured*
 rather than estimated — is in `official_benchmark_results.md`.
 

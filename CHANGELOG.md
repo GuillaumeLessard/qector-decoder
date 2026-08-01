@@ -12,7 +12,7 @@ has been published. `src/*.rs` is `.gitignore`d, so `git log v0.6.9..HEAD` shows
 none of the Rust work recorded here — it is verified by `cargo test` and by
 reading the tree.
 
-### Release pipeline — four blockers, found by running it instead of trusting it
+### Release pipeline — six blockers, found by running it instead of trusting it
 `release-build.yml` had never executed. A `workflow_dispatch` dry run with
 `publish: false` builds every wheel and runs the strict dependency gate without
 uploading anything; doing that surfaced four faults, each of which would have
@@ -33,12 +33,32 @@ fired on the first `v0.7.0` tag.
   wheel that compiles but decodes wrongly cannot reach PyPI.
 - **RUSTSEC-2026-0204** (`crossbeam-epoch` 0.9.18, invalid pointer dereference)
   hard-blocks publish under the release gate's `strict: true`. Updated to 0.9.20.
-- **aarch64 Linux never built, and musllinux never smoke-tested.** sccache
-  wrapping the cross-assembler breaks `ring`'s `.S` files (`#error "ARM
-  assembler must define __ARM_ARCH"`), so sccache is disabled for that one job.
-  Separately, musllinux built correctly and then failed trying to `pip install`
-  a musl wheel on a glibc runner; the smoke-test guard excluded aarch64 but not
-  musllinux. Both are now excluded from smoke-testing, still built and uploaded.
+- **aarch64 Linux never built, and musllinux never smoke-tested.** `ring`'s
+  `asm_base.h` hard-errors with `#error "ARM assembler must define __ARM_ARCH"`
+  because the manylinux cross-gcc does not predefine it; `__ARM_ARCH=8` is now
+  set for that target. (sccache was suspected first and ruled out — the failure
+  reproduced with the compiler invoked directly.) Fixing it exposed a second,
+  genuine portability bug underneath: `cuda_batch.rs` declared the
+  cuDeviceGetName buffer as `[0i8; 256]`, but `c_char` is signed on x86_64 and
+  **unsigned** on aarch64, so the build failed with two E0308s. Now uses
+  `std::os::raw::c_char`. Separately, musllinux built correctly and then failed
+  trying to `pip install` a musl wheel on a glibc runner; the smoke-test guard
+  excluded aarch64 but not musllinux. Both are now excluded from smoke-testing,
+  still built and uploaded.
+- **The publish job was eligible on a `publish=false` dispatch.** The gate read
+  `|| inputs.publish`; a workflow_dispatch input arrives as a string and every
+  non-empty string is truthy, so `publish=false` evaluated **true**. Only the
+  wheel builds failing kept 0.7.0 off PyPI — the dry runs were not dry. It
+  showed as `cancelled` rather than `skipped`, which is the tell. Now compares
+  against the literal `'true'`.
+- **`cargo deny` never ran.** In 0.18 `--config` belongs to the `check`
+  subcommand, so the invocation died at argument parsing with exit 2. Because
+  the step runs under `set +e` and only enforces when strict, non-strict runs
+  downgraded that to a warning and reported success — the licence/bans/sources
+  gate executed nothing for as long as it has existed. Fixed, and an exit > 1
+  (tool failed to run) is now a hard failure in every mode, since a gate that
+  cannot run must never look like a gate that passed. First green run reports
+  `bans ok, licenses ok, sources ok`.
 
 `tests.yml` also gained a concurrency group. Without one, every push spawned a
 fresh five-version matrix and superseded runs kept running, so several pushes in
@@ -94,7 +114,7 @@ paying for it to finish.
   `ler.estimate_ler_circuit_level` — one circuit, one decomposed DEM, one
   detector/observable sample set per cell, one `decode_batch` resolver for
   QECTOR, PyMatching and ldpc alike — and `ler.assert_comparable` gates the rows
-  before writing. Nothing is extrapolated: 63 cells that exceeded the per-cell
+  before writing. Nothing is extrapolated: 93 cells that exceeded the per-cell
   decode budget are recorded as *not measured*, with their probe rate and
   projected cost.
 - **The numbers, per-cell and not generalised.** `qector_blossom` and PyMatching
