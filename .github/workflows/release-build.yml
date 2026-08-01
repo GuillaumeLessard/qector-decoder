@@ -195,8 +195,9 @@ jobs:
       name: pypi
       url: https://pypi.org/p/qector-decoder-v3
     permissions:
-      id-token: write
+      id-token: write        # PyPI Trusted Publishing (OIDC) — no stored token
       contents: read
+      attestations: write    # build provenance, non-gating (see 49ba957)
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -251,8 +252,24 @@ jobs:
           pip install twine
           twine check dist/*.whl
 
-      - name: Publish
+      # Non-gating by design: commit 49ba957 ("artifact attestation must not gate
+      # publishing"). Provenance requires a public repo or GHAS, and on a private
+      # repo the API returns "Feature not available", which must not fail a
+      # release that is otherwise good.
+      - name: Generate artifact attestations
+        if: ${{ github.event.repository.private == false }}
+        continue-on-error: true
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: "dist/*"
+
+      - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist/
-          attestations: true
+          # Idempotent upload. PyPI rejects re-uploading a file that already
+          # exists, so without this a run that uploaded 9 of 15 wheels and then
+          # failed could never be retried - the retry would die on the first
+          # duplicate and the release would be stuck half-published. With it,
+          # a re-run completes the remaining wheels.
+          skip-existing: true
