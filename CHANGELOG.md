@@ -12,6 +12,37 @@ has been published. `src/*.rs` is `.gitignore`d, so `git log v0.6.9..HEAD` shows
 none of the Rust work recorded here — it is verified by `cargo test` and by
 reading the tree.
 
+### GPU — the weighted path measured, and made faster without changing its output
+- **Both GPU paths are now measurable through the standard pipeline.**
+  `sinter_compat._build_matcher` resolves `cuda` / `opencl` (topology-only) and
+  `cuda_weighted` / `opencl_weighted`, so the kernels are scored on the same DEM,
+  the same samples and the same `decode_batch` interface as PyMatching, ldpc and
+  the CPU backends — not from a separate harness. This produces the weighted-GPU
+  logical error rate that the README previously recorded as unquotable for want
+  of a surviving artifact.
+- **What the measurement says.** Unweighted GPU is fast and *above threshold*:
+  its LER stops improving as `d` grows (0.059 at `d = 5`, 0.048 at 9, 0.035 at
+  13), so scaling the code does not help it. Weighted GPU is below threshold —
+  0.026 → 0.010 → 0.007 over the same range — at roughly 32x the cost. Quote a
+  GPU throughput number together with its LER or not at all.
+- **Weighted growth kernel: 1.40x–1.57x faster, bit-identical output.** Per round
+  the weighted loop ran an O(n_checks) scan plus three O(E) sweeps for up to
+  `E+N+2` rounds, and passes A and B each walked two parent chains per edge with
+  B recomputing what A had just produced. The redundant scan is removed (pass A's
+  `any_growable` already detects the same termination condition) and pass A's
+  rate is cached for pass B (`parent` is mutated only by pass C, so the roots are
+  provably identical). The cache costs no memory: it reuses the u8 `support`
+  buffer, which belongs to the unweighted branch and is dead in this one.
+  Verified by capturing every correction from the pre-change build across
+  `d = 5/9/13` × 2048 shots and asserting byte-equality after: *bit-identical
+  across 12 arrays*, with CUDA-vs-CPU agreement unchanged to the digit.
+- **Known and not hidden:** weighted GPU is *not* bit-identical to weighted CPU,
+  and diverges further with distance (67% → 14% → 0.24% shot agreement at
+  `d = 5/9/13`). The kernel grows in `f32` and `uf_core::grow_weighted` in `f64`,
+  so `dt` differences compound over thousands of rounds into different — often
+  equally valid — fusion orders. Pre-existing, unrelated to the optimisation
+  above, and stated here rather than left for a user to discover.
+
 ### Benchmarks — corrected artifacts, and what they say
 - **`official_benchmark_results.{json,csv,md,pdf}` were regenerated.** The first
   v0.7.0 versions reproduced the defect that got six pre-v0.7.0 artifacts
