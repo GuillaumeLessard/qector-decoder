@@ -390,10 +390,20 @@ jobs:
     needs: [build, sdist, dependency-gate]
     runs-on: ubuntu-latest
     # Tag push and GitHub Release both publish; manual dispatch only when asked.
+    # `inputs.publish` alone is NOT safe here. A workflow_dispatch input arrives
+    # as a string, and every non-empty string is truthy in a GitHub expression -
+    # so `publish=false` evaluated TRUE and this job was eligible on a run that
+    # was explicitly asked not to publish. It showed as `cancelled` rather than
+    # `skipped`, which is how it was caught; a skipped job is one the `if`
+    # rejected, a cancelled one was live and waiting on `needs`. Only the wheel
+    # builds failing kept 0.7.0 off PyPI.
+    #
+    # Compare against the literal string instead. PyPI refuses re-uploads of a
+    # version, so an accidental publish is not recoverable.
     if: >-
       startsWith(github.ref, 'refs/tags/v')
       || github.event_name == 'release'
-      || inputs.publish
+      || github.event.inputs.publish == 'true'
     environment:
       name: pypi
       url: https://pypi.org/p/qector-decoder-v3
