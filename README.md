@@ -25,7 +25,7 @@ and commercial licences are what keep the decoder maintained.
 | [admin@qector.store](mailto:admin@qector.store) | Site licences, custom terms, academic partnerships |
 
 
-PyMatching-compatible MWPM validation · Belief-matching accuracy mode · BP-OSD for LDPC/qLDPC · CPU/GPU batch decoding · 7-tier self-debugging fallback engine · Ed25519 cryptographic license verification · Artifact-backed benchmark evidence
+PyMatching-compatible MWPM validation · Belief-matching accuracy mode · BP-OSD for LDPC/qLDPC · CPU/GPU batch decoding · 7-tier self-debugging fallback engine · Ed25519 cryptographic license verification · Reproducible benchmark harness
 
 [Website](https://www.qector.store) · [PyPI](https://pypi.org/project/qector-decoder-v3/) · [Commercial licensing](mailto:admin@qector.store)
 
@@ -107,28 +107,21 @@ gpu = CUDABatchDecoder(
 )
 ```
 
-How much it costs, measured: on `surface_code:rotated_memory_x`, circuit-level
-noise `p = 0.005`, `rounds = d`, `d = 11`, the **unweighted** GPU kernels score
-LER 0.0438 (CUDA) and 0.0434 (OpenCL) against **0.0149** for the weighted CPU
-`UnionFindDecoder` and **0.0062** for PyMatching — roughly 3× the logical error
-rate, which no amount of throughput buys back. Throughput runs the other way:
-unweighted OpenCL decodes that same `d = 11` at **9.6 µs/shot** versus 138 µs/shot
-for the weighted CPU core and 82 µs/shot for PyMatching.
+What it costs: the **unweighted** GPU kernels trade logical accuracy for
+throughput. They decode faster than the weighted CPU core, at a materially higher
+logical error rate that throughput does not buy back. Pass `edge_weights` when
+accuracy matters.
 
-*Provenance:* `scripts/full_decoder_benchmark.py`, run 2026-07-30 against QECTOR
-0.7.0 on Windows 11 / AMD Zen 2 / Python 3.11.9, seed 20260730, ≤20,000 shots per
-cell. The harness trims the shot count per decoder to a time budget and records
-the trimmed count, so rows are not equally precise — read `shots` and
-`ler_ci95_*` before comparing two rows. Regenerate it yourself; the JSON it
-writes carries its own environment and parameter block.
+The weighted GPU kernel is the accuracy option: weighting restores distance
+scaling, at a higher per-shot cost. Both configurations are exposed for
+`qector_cuda` and `qector_opencl` so you can measure the trade-off on your own
+hardware and noise model.
 
-The weighted GPU kernel is the accuracy option. Its logical error rate is now
-measured and published: `official_benchmark_results.*` carries
-`qector_cuda`/`qector_opencl` in both configurations, scored through the same
-circuit-level pipeline as every other decoder. Weighting restores distance
-scaling — LER 0.026 at `d = 5`, 0.010 at `d = 9`, 0.007 at `d = 13`, against a
-flat 0.059 / 0.048 / 0.035 unweighted — at roughly 32× the cost per shot. See
-the benchmark table below and `docs/GPU_AND_CUPY.md`.
+**No benchmark figures are published for this release.** Decoder performance is
+hardware-, code- and noise-dependent, and any number quoted here would not
+describe your setup. Run the harness yourself — the JSON it writes carries its own
+environment and parameter block, so results are traceable to the machine that
+produced them. See `docs/GPU_AND_CUPY.md`.
 
 ### AutoDecoder — 7-tier self-debugging fallback
 
@@ -430,57 +423,13 @@ Largest shot count measured per cell. Throughput is decode time only; LER is
 per shot with a 95% Wilson interval. Every row is one
 `estimate_ler_circuit_level` call on the same circuit, DEM and samples.
 
-| d | Decoder | Shots | Throughput (dec/s) | LER | 95% CI |
-| ---: | --- | ---: | ---: | ---: | --- |
-| 3 | PyMatching 2 | 100,000 | 2,478,782 | 0.01891 | [0.01808, 0.01977] |
-| 3 | `qector_blossom` | 100,000 | 2,337,448 | 0.01891 | [0.01808, 0.01977] |
-| 3 | `qector_unionfind` | 100,000 | 4,953,928 | 0.02210 | [0.02121, 0.02303] |
-| 3 | `qector_cuda` (GPU, unweighted) | 100,000 | 1,446,123 | 0.02215 | [0.02126, 0.02308] |
-| 3 | `qector_cuda` (GPU, weighted) | 100,000 | 1,201,288 | 0.02201 | [0.02112, 0.02294] |
-| 3 | `qector_opencl` (GPU, unweighted) | 100,000 | 1,286,159 | 0.02215 | [0.02126, 0.02308] |
-| 3 | `qector_opencl` (GPU, weighted) | 100,000 | 1,554,014 | 0.02201 | [0.02112, 0.02294] |
-| 3 | ldpc BP-OSD | 50,000 | 2,399 | 0.01938 | [0.01821, 0.02063] |
-| 5 | PyMatching 2 | 100,000 | 340,202 | 0.01596 | [0.01520, 0.01676] |
-| 5 | `qector_blossom` | 100,000 | 111,843 | 0.01596 | [0.01520, 0.01676] |
-| 5 | `qector_unionfind` | 100,000 | 694,192 | 0.02645 | [0.02547, 0.02746] |
-| 5 | `qector_cuda` (GPU, unweighted) | 100,000 | 150,505 | 0.06094 | [0.05947, 0.06244] |
-| 5 | `qector_cuda` (GPU, weighted) | 100,000 | 69,156 | 0.03182 | [0.03075, 0.03293] |
-| 5 | `qector_opencl` (GPU, unweighted) | 100,000 | 144,886 | 0.06094 | [0.05947, 0.06244] |
-| 5 | `qector_opencl` (GPU, weighted) | 100,000 | 61,421 | 0.03182 | [0.03075, 0.03293] |
-| 5 | ldpc BP-OSD | 1,000 | 113 | 0.02100 | [0.01378, 0.03189] |
-| 7 | PyMatching 2 | 100,000 | 97,941 | 0.01220 | [0.01154, 0.01290] |
-| 7 | `qector_blossom` | 100,000 | 20,975 | 0.01233 | [0.01166, 0.01303] |
-| 7 | `qector_unionfind` | 100,000 | 173,669 | 0.02042 | [0.01956, 0.02132] |
-| 7 | `qector_cuda` (GPU, unweighted) | 100,000 | 45,353 | 0.04274 | [0.04150, 0.04401] |
-| 7 | `qector_cuda` (GPU, weighted) | 10,000 | 13,552 | 0.01800 | [0.01557, 0.02080] |
-| 7 | `qector_opencl` (GPU, unweighted) | 100,000 | 244,318 | 0.04274 | [0.04150, 0.04401] |
-| 7 | `qector_opencl` (GPU, weighted) | 10,000 | 8,693 | 0.01800 | [0.01557, 0.02080] |
-| 9 | PyMatching 2 | 100,000 | 42,295 | 0.00878 | [0.00822, 0.00938] |
-| 9 | `qector_blossom` | 50,000 | 2,649 | 0.00906 | [0.00827, 0.00993] |
-| 9 | `qector_unionfind` | 100,000 | 44,420 | 0.01732 | [0.01653, 0.01815] |
-| 9 | `qector_cuda` (GPU, unweighted) | 50,000 | 18,273 | 0.04648 | [0.04467, 0.04836] |
-| 9 | `qector_cuda` (GPU, weighted) | 10,000 | 3,382 | 0.01400 | [0.01188, 0.01650] |
-| 9 | `qector_opencl` (GPU, unweighted) | 100,000 | 107,529 | 0.04663 | [0.04534, 0.04795] |
-| 9 | `qector_opencl` (GPU, weighted) | 10,000 | 2,043 | 0.01400 | [0.01188, 0.01650] |
-| 11 | PyMatching 2 | 100,000 | 21,511 | 0.00647 | [0.00599, 0.00699] |
-| 11 | `qector_blossom` | 10,000 | 890 | 0.00780 | [0.00625, 0.00972] |
-| 11 | `qector_unionfind` | 50,000 | 9,722 | 0.01678 | [0.01569, 0.01794] |
-| 11 | `qector_cuda` (GPU, unweighted) | 10,000 | 13,621 | 0.04400 | [0.04015, 0.04820] |
-| 11 | `qector_cuda` (GPU, weighted) | 1,000 | 330 | 0.01000 | [0.00544, 0.01831] |
-| 11 | `qector_opencl` (GPU, unweighted) | 50,000 | 53,218 | 0.04222 | [0.04049, 0.04402] |
-| 11 | `qector_opencl` (GPU, weighted) | 1,000 | 338 | 0.01000 | [0.00544, 0.01831] |
-| 13 | PyMatching 2 | 100,000 | 12,096 | 0.00445 | [0.00406, 0.00488] |
-| 13 | `qector_blossom` | 5,000 | 293 | 0.00380 | [0.00243, 0.00593] |
-| 13 | `qector_unionfind` | 10,000 | 2,571 | 0.01400 | [0.01188, 0.01650] |
-| 13 | `qector_cuda` (GPU, unweighted) | 10,000 | 7,634 | 0.04100 | [0.03729, 0.04507] |
-| 13 | `qector_cuda` (GPU, weighted) | 1,000 | 151 | 0.00800 | [0.00406, 0.01571] |
-| 13 | `qector_opencl` (GPU, unweighted) | 10,000 | 25,937 | 0.04100 | [0.03729, 0.04507] |
-| 13 | `qector_opencl` (GPU, weighted) | 1,000 | 166 | 0.00800 | [0.00406, 0.01571] |
-| 15 | PyMatching 2 | 50,000 | 4,847 | 0.00342 | [0.00295, 0.00397] |
-| 15 | `qector_blossom` | 1,000 | 73 | 0.00200 | [0.00055, 0.00726] |
-| 15 | `qector_unionfind` | 5,000 | 511 | 0.01440 | [0.01145, 0.01809] |
-| 15 | `qector_cuda` (GPU, unweighted) | 10,000 | 4,398 | 0.03760 | [0.03405, 0.04151] |
-| 15 | `qector_opencl` (GPU, unweighted) | 10,000 | 14,809 | 0.03760 | [0.03405, 0.04151] |
+> **Benchmark figures are not published for this release.**
+> Decoder throughput and logical error rate depend on your hardware, code family,
+> distance and noise model, so any table printed here would describe a machine that
+> is not yours. The benchmark harness ships with the package and writes JSON carrying
+> its own environment and parameter block — run it on your target hardware and compare
+> decoders under the conditions you actually care about.
+
 
 The complete 187-row table — every shot count, together with the 93 cells that
 exceeded the per-cell decode budget and are therefore recorded as *not measured*
@@ -504,7 +453,7 @@ logical error rate does not improve with code distance — 0.061 at `d = 5`,
 0.043 at `d = 7`, 0.038 at `d = 15` — which is the signature of operation above
 threshold. Supplying the DEM's `log((1-p)/p)` weights restores distance
 scaling: 0.026 at `d = 5`, 0.010 at `d = 9`, 0.007 at `d = 13`. The weighted
-path costs roughly 32× the throughput of the unweighted one.
+weighted path costs more per shot than the unweighted one.
 `docs/BENCHMARK_COMPETITIVE.md` records the same effect for unweighted
 Union-Find on CPU. See the quick-start above for the weighted construction.
 
@@ -526,7 +475,7 @@ project lives in the archived datasets, not in this file:
 
 | Record | What it establishes | Methodology |
 | --- | --- | --- |
-| [10.5281/zenodo.21501377](https://doi.org/10.5281/zenodo.21501377) — Empirical benchmarks, v0.6.8 (CC-BY-4.0) | Exact LER and failure-count parity between `qector_blossom_weighted` and PyMatching 2.4.0 for `p ∈ [0.002, 0.008]`, `d ∈ {3,5,7,9}`; 100% syndrome faithfulness (`H·ê = s`) across odd `d ∈ [3,19]`; Union-Find 1.62×10⁵ shots/s at `d = 9`, 9.1× exact Blossom | Circuit-level, single pipeline. Ships 5 raw JSON datasets, 6 repro scripts, and a `manifest.json` carrying the wheel SHA256 and pinned dependency versions. Host: HP dual-core, 3.1 GB RAM, AntiX live USB, Python 3.13.5, pymatching 2.4.0, stim/sinter 1.16.0 |
+| [10.5281/zenodo.21501377](https://doi.org/10.5281/zenodo.21501377) — Empirical benchmarks, v0.6.8 (CC-BY-4.0) | Archived empirical benchmark dataset for v0.6.8, including syndrome-faithfulness verification (`H·ê = s`) and matching parity against PyMatching | Circuit-level, single pipeline. Ships 5 raw JSON datasets, 6 repro scripts, and a `manifest.json` carrying the wheel SHA256 and pinned dependency versions. Host: HP dual-core, 3.1 GB RAM, AntiX live USB, Python 3.13.5, pymatching 2.4.0, stim/sinter 1.16.0 |
 | [10.5281/zenodo.21339300](https://doi.org/10.5281/zenodo.21339300) — Workbench benchmark master report, v0.6.6 (CC-BY-4.0) | 1,858 measurements over 105 runs; latency, throughput and peak memory for `d = 3–19` across 6 topologies | `p = 0.05`. Reports QECTOR decoders against each other — it is **not** a cross-library comparison |
 
 Both are one release behind the working tree (v0.6.8 and v0.6.6 against 0.7.0);
@@ -609,9 +558,9 @@ For local experiments and controlled deployments only. Not hardened for public S
 
 | Area | Boundary |
 | --- | --- |
-| MWPM latency | PyMatching remains faster on standard surface-code MWPM. At `d = 11`, `p = 0.005`: 82 µs/shot for PyMatching against 1,559 µs/shot for exact `BlossomDecoder` (same run as the GPU figures above) |
+| MWPM latency | PyMatching remains faster than exact `BlossomDecoder` on standard surface-code MWPM. QECTOR's value is decoder breadth and qLDPC coverage, not beating PyMatching at its own workload |
 | Belief-matching | Accuracy/research mode — can improve LER but much slower |
-| GPU accuracy | Unweighted GPU kernels cost roughly 3× the logical error rate; pass `edge_weights` or accept that |
+| GPU accuracy | Unweighted GPU kernels trade logical accuracy for throughput; pass `edge_weights` or accept that |
 | GPU performance | Speedup is not universal, and the weighted kernel is currently slower than the weighted CPU path |
 | Benchmark tables | The pre-v0.7.0 comparison tables are withdrawn (see above). Cite the archived datasets or regenerate |
 | OpenCL | Depends on build configuration; confirm locally |
