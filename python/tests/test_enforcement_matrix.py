@@ -165,6 +165,26 @@ def _native_cap_cell(tier: str, side: str) -> None:
             "asserted in Rust (grpc_server.rs / mcp_server.rs)."
         )
     os.environ.pop("QECTOR_LICENSE_KEY", None)
+    # Popping the variable is not sufficient once the process has resolved a
+    # licence. The native LicenseManager latches the first tier it sees and
+    # exposes no way back - `set_license_key("")` raises ValueError, and
+    # `get_license_info()` keeps reporting the latched tier - so on a machine
+    # running under dev.bat (Enterprise token) the cap below simply does not
+    # fire and `pytest.raises(PermissionError)` fails.
+    #
+    # It only reproduced in a specific order: the latch is set by whichever test
+    # first calls get_license_info(), which is test_rest_api_auth's authorised
+    # /api/license/info request. Alone, this file passed; after that file, it
+    # failed. Skip rather than assert something the process can no longer be put
+    # into. CI runs unlicensed, so the tier is Community there and these cells
+    # execute exactly as before - the coverage that matters is not lost.
+    latched = str((q.get_license_info() or {}).get("tier", "Community"))
+    if latched != "Community":
+        pytest.skip(
+            f"process has already latched tier {latched!r}; the native LicenseManager "
+            "caches the first licence it resolves and cannot be returned to Community "
+            "in-process. Run without QECTOR_LICENSE_KEY (as CI does) to exercise this."
+        )
     d = STRADDLE[tier][side]
     if _expect(tier, side):
         with pytest.raises(PermissionError):

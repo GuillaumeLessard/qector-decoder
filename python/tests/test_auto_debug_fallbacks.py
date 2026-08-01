@@ -31,14 +31,21 @@ def test_auto_debug_fallback_recovery_on_exception():
             def batch_decode(self, _syn):
                 raise RuntimeError("Simulated CUDA OOM Error")
 
-        real_get_decoder = ad._get_decoder
+        # Patch the CLASS, not the instance. AutoDecoder defines __slots__, and
+        # unpatching an instance attribute on a slotted object fails on exit with
+        # "'AutoDecoder' object attribute '_get_decoder' is read-only" - so the
+        # test blew up in teardown rather than testing anything. It went unnoticed
+        # because CI has no GPU: `_get_cuda()` returns None there, this whole block
+        # is skipped, and the test passes without exercising the fallback at all.
+        # It only ran, and only failed, on a machine with CUDA.
+        real_get_decoder = AutoDecoder._get_decoder
 
-        def _patched_get_decoder(backend):
+        def _patched_get_decoder(self, backend):
             if backend == Backend.CUDA:
                 return _RaisingCuda()
-            return real_get_decoder(backend)
+            return real_get_decoder(self, backend)
 
-        with patch.object(ad, "_get_decoder", new=_patched_get_decoder):
+        with patch.object(AutoDecoder, "_get_decoder", _patched_get_decoder):
             syns = (np.random.default_rng(42).random((32, code.n_checks)) < 0.08).astype(np.uint8)
 
             # The auto-debug engine should catch the CUDA exception and gracefully fall back to CPU_RAYON / CPU_SINGLE

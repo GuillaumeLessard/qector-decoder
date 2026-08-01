@@ -35,6 +35,18 @@ def test_native_auto_decoder_routing_d5():
 
 @pytest.mark.skipif(not hasattr(qd, "NativeAutoDecoder"), reason="NativeAutoDecoder not available")
 def test_native_auto_decoder_rejects_qldpc_if_license(monkeypatch):
+    # Read the real tier BEFORE the monkeypatch below shadows it. Faking
+    # `qd.get_license_info` only moves the Python shim; NativeAutoDecoder asks
+    # the Rust LicenseManager, which latches the first licence the process
+    # resolves and offers no way back to Community. Under dev.bat's Enterprise
+    # token the constructor is therefore allowed and this raises nothing.
+    # CI runs unlicensed, so the tier is Community and the assertion holds.
+    latched = str((qd.get_license_info() or {}).get("tier", "Community"))
+    if latched != "Community":
+        pytest.skip(
+            f"process has latched tier {latched!r}; the native licence gate cannot be "
+            "forced back to Community from Python. Run without QECTOR_LICENSE_KEY."
+        )
     monkeypatch.setenv("QECTOR_ENFORCE", "1")
     monkeypatch.setattr(qd, "get_license_info", lambda: {"tier": "Community", "max_distance": 7})
     code = codes.rotated_surface_code(5)
