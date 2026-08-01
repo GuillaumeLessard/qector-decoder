@@ -1,4 +1,4 @@
-name: release-build
+name: Build
 
 # Restored from the workflow that actually published v0.6.5 -> v0.6.9
 # (preserved at the v0.6.9 checkout). The v0.7.0 prep commit 3d332eb replaced
@@ -29,8 +29,9 @@ name: release-build
 
 on:
   push:
-    tags:
-      - "v*"
+    branches: [main, master]
+    tags: ["v*", "ci-*", "test-*"]
+  pull_request: {}
   workflow_dispatch: {}
 
 permissions:
@@ -170,6 +171,11 @@ jobs:
   # RUSTSEC-2026-0204 before it could ship.
   dependency-gate:
     name: Dependency + licence gate
+    # Tag pushes only. dependency-audit.yml already runs non-strict on every
+    # push as its own check; running it again here would duplicate that on every
+    # commit for no benefit. It matters at release time, where strict turns an
+    # advisory into a hard block - which is what stopped RUSTSEC-2026-0204.
+    if: startsWith(github.ref, 'refs/tags/v')
     uses: ./.github/workflows/dependency-audit.yml
     with:
       strict: true
