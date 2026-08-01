@@ -35,7 +35,7 @@ import hashlib
 import logging
 import time
 import uuid
-from typing import Any
+from typing import Any, Optional
 
 import numpy as np
 
@@ -123,7 +123,14 @@ if _FRAMEWORK == "fastapi":
     class DecodeRequest(BaseModel):
         check_to_qubits: list[list[int]]
         syndrome: list[int]
-        n_qubits: int | None = None
+        # `Optional[int]`, not `int | None`. Pydantic resolves model annotations
+        # at runtime with `get_type_hints`, and `from __future__ import
+        # annotations` only makes that worse here: the annotation reaches
+        # pydantic as the *string* "int | None", which it then eval()s, and on
+        # 3.9 that raises. It surfaced as six errors telling us to install
+        # `eval_type_backport`. `list[list[int]]` above is fine — PEP 585
+        # builtin subscripting landed in 3.9; only PEP 604 unions did not.
+        n_qubits: Optional[int] = None
         use_batch: bool = False
 
     class DecodeResponse(BaseModel):

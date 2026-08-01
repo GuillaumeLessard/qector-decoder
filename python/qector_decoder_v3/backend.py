@@ -295,11 +295,19 @@ class AutoDecoder:
     def _get_cpu_rayon(self) -> BatchDecoder:
         return cast(BatchDecoder, self._get_decoder(Backend.CPU_RAYON))
 
+    # The cast targets are quoted deliberately. `from __future__ import
+    # annotations` stringifies *annotations*, but an argument to `cast()` is an
+    # ordinary runtime expression, so a bare `X | None` here is evaluated on
+    # import and raises TypeError on 3.9, where `type.__or__` does not exist.
+    # `requires-python` is >=3.9, and this made the whole package unimportable
+    # there. ruff's FA102 cannot see it precisely because the file already has
+    # the future import. `cast` never evaluates its first argument, so a string
+    # is both correct at runtime and understood by type checkers.
     def _get_cuda(self) -> CUDABatchDecoder | None:
-        return cast(CUDABatchDecoder | None, self._get_decoder(Backend.CUDA))
+        return cast("CUDABatchDecoder | None", self._get_decoder(Backend.CUDA))
 
     def _get_opencl(self) -> OpenCLBatchDecoder | None:
-        return cast(OpenCLBatchDecoder | None, self._get_decoder(Backend.OPENCL))
+        return cast("OpenCLBatchDecoder | None", self._get_decoder(Backend.OPENCL))
 
     # -- native auto decoder ------------------------------------------------
     def _try_native_auto(self, syndromes: np.ndarray) -> np.ndarray | None:
