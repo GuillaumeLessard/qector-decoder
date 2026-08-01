@@ -103,10 +103,34 @@ jobs:
           python -m pip install --upgrade pip
           pip install dist/*.whl --force-reinstall
           python - <<'PY'
+          import numpy as np
           import qector_decoder_v3 as qd
+
           print("version:", qd.__version__)
-          from qector_decoder_v3 import get_decoder_info
-          print("decoder info:", get_decoder_info())
+
+          # Actually decode. Importing proves the extension loads; it does not
+          # prove the compiled core works. Check syndrome faithfulness
+          # (H @ c == s, mod 2), the property every decoder in this project must
+          # satisfy, so a wheel that builds but decodes wrongly cannot reach PyPI.
+          # Kept strictly ASCII: this heredoc is fed to `python -` on stdin, and
+          # on the Windows runner that is decoded with the system codepage, where
+          # a stray non-ASCII byte is a decode error rather than cosmetic.
+          c2q = [[0, 1], [1, 2], [2, 3], [3, 4]]
+          n_qubits = 5
+          syndrome = np.array([0, 1, 0, 0], dtype=np.uint8)
+
+          H = np.zeros((len(c2q), n_qubits), dtype=np.uint8)
+          for i, check in enumerate(c2q):
+              for q in check:
+                  H[i, q] ^= 1
+
+          for name in ("UnionFindDecoder", "BlossomDecoder"):
+              dec = getattr(qd, name)(c2q, n_qubits)
+              corr = np.asarray(dec.decode(syndrome), dtype=np.uint8).reshape(-1)
+              assert corr.shape == (n_qubits,), f"{name}: got shape {corr.shape}"
+              assert (((H @ corr) % 2) == syndrome).all(), f"{name} is not syndrome-faithful"
+              print(f"{name}: H@c == s  OK")
+
           qd.set_license_key("QECT-COMM-smoke")
           info = qd.get_license_info()
           assert isinstance(info, dict), f"expected dict, got {type(info)}"
