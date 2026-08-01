@@ -111,9 +111,23 @@ jobs:
           STRICT: ${{ inputs.strict == true }}
         run: |
           set +e
-          cargo deny --all-features --config .github/deny.toml check licenses bans sources
+          # `--config` belongs to the `check` subcommand in cargo-deny 0.18;
+          # `--all-features` stays global. It used to sit before `check`, which
+          # 0.18 rejects with "unexpected argument '--config' found" and exit 2.
+          cargo deny --all-features check --config .github/deny.toml licenses bans sources
           rc=$?
           set -e
+
+          # Exit 2 is clap: cargo deny never ran. That is NOT a policy warning,
+          # and downgrading it to one is how a broken invocation went unnoticed -
+          # non-strict runs reported success while the licence gate executed
+          # nothing at all. A gate that cannot run is always a hard failure,
+          # in every mode; only an actual policy violation (exit 1) is subject
+          # to `strict`.
+          if [ "$rc" -gt 1 ]; then
+            echo "::error title=cargo deny::cargo deny failed to execute (exit $rc) - the licence/bans/sources gate did NOT run. This is never downgraded to a warning."
+            exit "$rc"
+          fi
           if [ "$rc" -ne 0 ]; then
             if [ "$STRICT" = "true" ]; then
               echo "::error title=cargo deny::Licence/source policy violation. Release blocked. Update .github/deny.toml AND NOTICE.md only after a deliberate legal review."
@@ -128,10 +142,17 @@ jobs:
       - name: cargo deny (informational advisories, never blocking)
         run: |
           set +e
-          cargo deny --all-features --config .github/deny.toml check advisories
+          # Same 0.18 flag-position fix as the gating step above.
+          cargo deny --all-features check --config .github/deny.toml advisories
           rc=$?
           set -e
-          if [ "$rc" -ne 0 ]; then
+          # This leg never blocks, by design. But distinguish "advisories found"
+          # from "the scan did not run": the latter reported a clean warning for
+          # as long as the invocation was malformed, which is indistinguishable
+          # from good news in the log.
+          if [ "$rc" -gt 1 ]; then
+            echo "::warning title=cargo deny advisories::cargo deny failed to execute (exit $rc) - the informational advisory scan did NOT run. Not blocking, but the absence of findings below means nothing."
+          elif [ "$rc" -ne 0 ]; then
             echo "::warning title=cargo deny advisories::Informational RustSec advisories present (unmaintained/unsound/notice). Advisory only — never blocks. Triage at the quarterly review."
           fi
 

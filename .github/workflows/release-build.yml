@@ -88,12 +88,15 @@ jobs:
             --out dist
             --no-default-features
             --features abi3${{ matrix.features && format(',{0}', matrix.features) || '' }}
-          # sccache is disabled for the Linux aarch64 cross-build. Wrapping the
-          # cross-assembler breaks ring's .S files: `aarch64-unknown-linux-gnu-gcc`
-          # is invoked on chacha-armv8-linux64.S without __ARM_ARCH defined, and
-          # ring's asm_base.h then fails the build outright with
-          # `#error "ARM assembler must define __ARM_ARCH"`. Native aarch64
-          # (macos-14) is unaffected and keeps the cache.
+          # Linux aarch64 cross-build: ring 0.17's asm_base.h hard-errors with
+          # `#error "ARM assembler must define __ARM_ARCH"` because the
+          # cross-gcc in the manylinux container does not predefine it when
+          # assembling chacha-armv8-linux64.S. Define it explicitly for that one
+          # target. (sccache was suspected first and ruled out - the failure
+          # reproduced with the compiler invoked directly.) ring is already at
+          # its newest version compatible with this tree, so there is nothing to
+          # bump instead.
+          docker-options: ${{ (matrix.os == 'ubuntu-latest' && matrix.target == 'aarch64') && '-e CFLAGS_aarch64_unknown_linux_gnu=-D__ARM_ARCH=8 -e CC_aarch64_unknown_linux_gnu=aarch64-unknown-linux-gnu-gcc' || '' }}
           sccache: ${{ !(matrix.os == 'ubuntu-latest' && matrix.target == 'aarch64') }}
 
       - name: Show built wheels
