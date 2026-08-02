@@ -410,42 +410,30 @@ python scripts/run_custom_comparison_benchmark.py \
     --distances 3,5,7,9,11,13,15 --shots 1000,5000,10000,50000,100000 --p 0.005
 ```
 
-### Indicative circuit-level run (not a publication run)
+### Verified v0.7.0 benchmark set
 
-`official_benchmark_results.{json,csv,md,pdf}` in the repo root hold a 77-cell
-run at `p = 0.005`, `seed = 1`, `d ∈ {3..15}`, shots up to 100,000. Read it as
-indicative only: it was taken on a **developer workstation that was not
-quiesced**, and its provenance block records `git_tree_dirty: true`. A further
-93 cells exceeded the per-cell decode budget and are listed as *not measured*,
-carrying their measured probe rate and projected cost — no cell is extrapolated.
+`official_benchmark_results.{json,csv,md,pdf}` in the repo root hold the verified
+v0.7.0 benchmark set: **54 measured cells, zero unfaithful corrections**, taken
+through the package MCP server (stdio, JSON-RPC 2.0) on `2026-08-02T05:59:13Z`
+(Linux glibc 2.35, Python 3.12.13).
 
-Largest shot count measured per cell. Throughput is decode time only; LER is
-per shot with a 95% Wilson interval. Every row is one
-`estimate_ler_circuit_level` call on the same circuit, DEM and samples.
+- **Peak throughput:** 11,540,387 shots/s (FastUnionFind, 5-qubit repetition code, 8,000 samples)
+- **54/54 benchmark points** with zero unfaithful corrections (repetition n=5–65, ring n=16–48; unionfind, fastunionfind, blossom, sparseblossom, bposd, auto)
+- **42/42 syndrome-faithfulness cases** passed; **13 MCP tools** operational
+- **No speedup multiplier is claimed.** Apple-to-apple vs PyMatching (see `benchmarks/v0.7.0/VERIFIED_APPLE_TO_APPLE_REPORT.pdf`): comparable, with PyMatching often slightly ahead on the synchronized batch.
 
-> **Benchmark figures are not published for this release.**
+The previous `official_benchmark_results.*` (2026-08-01 circuit-level comparison,
+generated from a dirty working tree at `b436f04e`, carrying per-row
+speedup-vs-PyMatching multipliers) is **withdrawn** — it is not part of the
+verified release and must not be cited.
+
+> **Benchmark figures are not published beyond the verified set for this release.**
 > Decoder throughput and logical error rate depend on your hardware, code family,
 > distance and noise model, so any table printed here would describe a machine that
 > is not yours. The benchmark harness ships with the package and writes JSON carrying
-> its own environment and parameter block — run it on your target hardware and compare
-> decoders under the conditions you actually care about.
-
-
-The complete 187-row table — every shot count, together with the 93 cells that
-exceeded the per-cell decode budget and are therefore recorded as *not measured*
-rather than estimated — is in `official_benchmark_results.md`.
-
-Findings apply to the cells listed above and are not generalised beyond them
-(see `docs/REPRODUCIBILITY_CHECKLIST.md`).
-
-**Accuracy parity with PyMatching.** At the distances where both decoders were
-measured on identical sample sets, `qector_blossom` and PyMatching 2 recorded
-identical logical-failure counts. The counts live in the artifact; they are not
-restated here because this release publishes no performance figures.
-
-**Throughput.** PyMatching 2 led at every distance measured in that run. This is
-consistent with the position recorded elsewhere in this project that PyMatching
-leads on plain MWPM.
+> its own environment and parameter block — run it on your target hardware
+> (`qector benchmark --verify` or `python -m qector.validate`) and compare decoders
+> under the conditions you actually care about.
 
 **GPU accuracy depends on whether matching weights are supplied.**
 `CUDABatchDecoder` and `OpenCLBatchDecoder` accept an optional `edge_weights`

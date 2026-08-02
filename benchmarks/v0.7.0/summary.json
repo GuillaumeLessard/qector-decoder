@@ -1,0 +1,12 @@
+{
+  "package": "qector-decoder-v3",
+  "version": "0.7.0",
+  "transport": "MCP stdio JSON-RPC 2.0",
+  "timestamp_utc": "2026-08-02T05:59:13.294039+00:00",
+  "tools_count": 13,
+  "correctness_cases": 42,
+  "correctness_faithful_all": true,
+  "benchmark_points": 54,
+  "zero_unfaithful_in_benchmarks": true,
+  "peak_throughput_shots_per_s": 11540387
+}
