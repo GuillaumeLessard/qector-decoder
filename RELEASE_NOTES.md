@@ -2,12 +2,28 @@
 
 All notable changes to QECTOR Decoder will be documented in this file.
 
-## [0.7.0] — UNRELEASED
-**Repo version is 0.7.0; the latest version on PyPI is 0.6.9.** Everything below
-is on `main` in the working tree and has not been published. Note that `src/*.rs`
-is `.gitignore`d, so `git log v0.6.9..HEAD` shows none of the Rust work described
-here — the Rust changes are verified by `cargo test` and by reading the tree, not
-by the commit log.
+## [0.7.1] — 2026-08-04
+
+Patch release fixing three defects found by independent black-box verification
+of the published 0.7.0 wheel (120-test external suite, both license tiers, live
+MCP stdio probe, double-run, zero flaky):
+
+- **CLI `qector decode` no longer crashes.** `cli.py` imported the nonexistent
+  `BeliefMatchingDecoder`; every invocation died with `ImportError`. Also
+  converts the loaded dense check matrix to adjacency form for graph decoders
+  and builds the belief-matching decoder via `BeliefMatching.from_numpy_h`.
+  All seven `--decoder` choices verified end-to-end.
+- **MCP server implements `ping`** (empty-object result) — required by the
+  protocol for client keepalive.
+- **MCP server no longer responds to notifications.** The spurious
+  `{"id":null,"result":null}` after `notifications/initialized` desynchronized
+  strict in-order clients; notifications are now silent per JSON-RPC 2.0.
+
+## [0.7.0] — 2026-08-01
+**Published to PyPI.** Note that `src/*.rs` is `.gitignore`d, so
+`git log v0.6.9..HEAD` shows none of the Rust work described here — the Rust
+changes are verified by `cargo test` and by reading the tree, not by the commit
+log.
 
 **Focus**: usability at the edges — a CLI and a diagnostic, real ecosystem entry
 points, three new decoder families, weighted Union-Find on the GPU, and six

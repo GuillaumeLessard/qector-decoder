@@ -48,7 +48,7 @@ def _create_token(receipt_id: str, email: str = "", key=None) -> str:
 
 
 def test_1_version_and_exports():
-    assert qd.__version__ == "0.7.0"
+    assert qd.__version__ == "0.7.1"
     assert hasattr(qd, "verify_license_token")
     assert hasattr(qd, "MAX_WORKERS")
     assert qd.__license__ == "LicenseRef-QECTOR-Source-Available"

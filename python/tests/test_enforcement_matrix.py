@@ -149,7 +149,7 @@ def test_rest_enforcement(tier, side, python_tier, rest_client):
 # ---------------------------------------------------------------------------
 # Surface 3/4 — gRPC (shared native primitive, grpc_server.rs:183-184)
 # ---------------------------------------------------------------------------
-def _native_cap_cell(tier: str, side: str) -> None:
+def _native_cap_cell(tier: str, side: str, monkeypatch) -> None:
     """Assert the native cap primitive both servers call.
 
     Only Community is reachable natively: the Rust LicenseManager requires a
@@ -164,7 +164,11 @@ def _native_cap_cell(tier: str, side: str) -> None:
             "LicenseManager rejects unsigned keys by design. Transport wiring is "
             "asserted in Rust (grpc_server.rs / mcp_server.rs)."
         )
-    os.environ.pop("QECTOR_LICENSE_KEY", None)
+    # monkeypatch, not os.environ.pop: a raw pop permanently stripped the key
+    # from the pytest process, so every later test spawning a licensed
+    # subprocess (e.g. test_examples.py's CUDABatchDecoder) failed on
+    # Community-tier licensing - an ordering-dependent suite failure.
+    monkeypatch.delenv("QECTOR_LICENSE_KEY", raising=False)
     # Popping the variable is not sufficient once the process has resolved a
     # licence. The native LicenseManager latches the first tier it sees and
     # exposes no way back - `set_license_key("")` raises ValueError, and
@@ -195,8 +199,8 @@ def _native_cap_cell(tier: str, side: str) -> None:
 
 @pytest.mark.parametrize("tier", TIERS)
 @pytest.mark.parametrize("side", SIDES)
-def test_grpc_enforcement(tier, side):
-    _native_cap_cell(tier, side)
+def test_grpc_enforcement(tier, side, monkeypatch):
+    _native_cap_cell(tier, side, monkeypatch)
 
 
 # ---------------------------------------------------------------------------
@@ -204,8 +208,8 @@ def test_grpc_enforcement(tier, side):
 # ---------------------------------------------------------------------------
 @pytest.mark.parametrize("tier", TIERS)
 @pytest.mark.parametrize("side", SIDES)
-def test_mcp_enforcement(tier, side):
-    _native_cap_cell(tier, side)
+def test_mcp_enforcement(tier, side, monkeypatch):
+    _native_cap_cell(tier, side, monkeypatch)
 
 
 # ---------------------------------------------------------------------------

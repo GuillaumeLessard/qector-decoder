@@ -1,6 +1,6 @@
 [package]
 name = "qector_decoder_v3"
-version = "0.7.0"
+version = "0.7.1"
 edition = "2021"
 authors = ["Guillaume Lessard / iD01t Productions <admin@qector.store>"]
 description = "Proprietary Rust QEC decoder core (Copyright (c) 2026 Guillaume Lessard. All Rights Reserved) with source-available Python suite, Union-Find, exact Blossom, Sparse Blossom, BP-OSD, and CPU/CUDA/OpenCL batch acceleration."

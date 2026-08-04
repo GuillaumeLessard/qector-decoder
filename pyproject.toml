@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "qector-decoder-v3"
-version = "0.7.0"
+version = "0.7.1"
 description = "Production-grade Rust/Python quantum error correction decoder. 25+ decoder families: MWPM Blossom, Union-Find (weighted), BP-OSD, Relay-BP for LDPC/qLDPC, belief-matching, colour-code, correlated two-stage matching, ambiguity clustering, CUDA/GPU batch decoding, 7-tier AutoDecoder fallback. PyMatching/Stim/Sinter/qiskit-qec compatible. Ed25519 license verification."
 readme = "README.md"
 requires-python = ">=3.9"

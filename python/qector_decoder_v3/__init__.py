@@ -409,7 +409,7 @@ import numpy as _np
 # wheel). We never overwrite a real compiled ``__version__`` with it - doing so
 # would falsely claim a version the loaded binary is not - so after a version bump
 # ``__version__`` keeps reporting the *built* value until the Rust wheel is rebuilt.
-__fallback_version__ = "0.7.0"
+__fallback_version__ = "0.7.1"
 
 try:
     __version__ = _native_module.__version__
@@ -2729,6 +2729,21 @@ for _name in ("os", "sys", "subprocess"):
 # v0.6.9 release notes (public)
 # ===========================================================================
 __changelog__ = {
+    "0.7.1": [
+        (
+            "Fix: CLI `qector decode` no longer crashes - cli.py imported the "
+            "nonexistent `BeliefMatchingDecoder`; the loaded dense check matrix "
+            "is now converted to adjacency form for graph decoders, and the "
+            "belief_match branch uses BeliefMatching.from_numpy_h. All seven "
+            "--decoder choices verified end-to-end."
+        ),
+        ("Fix: MCP server implements `ping` (empty-object result), required by the protocol for client keepalive."),
+        (
+            "Fix: MCP server no longer responds to notifications - messages "
+            "without an `id` (e.g. notifications/initialized) are now silent "
+            "per JSON-RPC 2.0, keeping strict in-order clients synchronized."
+        ),
+    ],
     "0.7.0": [
         (
             "Security: real Ed25519 license verification in the Rust core "

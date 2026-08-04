@@ -615,7 +615,7 @@ QECTOR Decoder v3 is **source-available** under the **PolyForm Noncommercial Lic
   author  = {Guillaume Lessard},
   title   = {{QECTOR Decoder v3}: Rust/Python Quantum Error Correction Decoding Platform},
   year    = {2026},
-  version = {0.7.0},
+  version = {0.7.1},
   url     = {https://www.qector.store},
   note    = {Source-available under PolyForm Noncommercial 1.0.0. Commercial license required for commercial use.}
 }

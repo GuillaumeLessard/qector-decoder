@@ -5,6 +5,32 @@ on [Keep a Changelog](https://keepachangelog.com/), and the project aims to foll
 semantic versioning. Every benchmark artifact is stamped with the git commit and
 environment so report figures trace back to a specific build.
 
+## [0.7.1] — 2026-08-04
+
+Patch release: three defects found by independent black-box verification of the
+published 0.7.0 wheel (120-test external suite, run on both license tiers plus a
+live MCP stdio probe, double-run with zero flaky results). No API changes.
+
+### Fixed
+- **CLI `qector decode` crashed on every invocation.** `cli.py` imported
+  `BeliefMatchingDecoder`, a name that has never existed in the package (the
+  export is `BeliefMatching`), unconditionally at the top of `cmd_decode` — so
+  the subcommand died with `ImportError` regardless of `--decoder`. Also fixed
+  two latent bugs behind it: the loaded dense check matrix (`.npy`) was passed
+  straight to decoders expecting `check_to_qubits` adjacency form (now
+  converted), and the `belief_match` branch called the nonexistent class with a
+  nonexistent signature (now `BeliefMatching.from_numpy_h(H)`, which returns a
+  per-qubit correction like the graph decoders). All seven `--decoder` choices
+  verified end-to-end with syndrome-validating corrections.
+- **MCP server did not implement `ping`.** Returned `-32601 Method not found`.
+  MCP-conformant clients (mcp SDK, Claude Desktop, Cursor) ping to keep
+  sessions alive. `ping` now returns an empty-object result.
+- **MCP server responded to notifications.** Every message without an `id` —
+  including `notifications/initialized` — produced a spurious
+  `{"id":null,"result":null}` response, shifting every subsequent response by
+  one for strict in-order clients. Notifications are now processed silently per
+  JSON-RPC 2.0 (a response is only written when the request carries an `id`).
+
 ## [0.7.0] — 2026-08-01
 
 `src/*.rs` is `.gitignore`d, so `git log v0.6.9..HEAD` shows none of the Rust

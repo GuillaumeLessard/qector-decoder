@@ -51,7 +51,7 @@ def cmd_decode(args: argparse.Namespace) -> None:
 
     from . import (
         AutoDecoder,
-        BeliefMatchingDecoder,
+        BeliefMatching,
         BlossomDecoder,
         BPOSDDecoder,
         FastUnionFindDecoder,
@@ -65,7 +65,10 @@ def cmd_decode(args: argparse.Namespace) -> None:
     if syndromes.ndim == 1:
         syndromes = syndromes.reshape(1, -1)
 
-    c2q = np.load(args.check_to_qubits)
+    # --check-to-qubits is a dense 0/1 check matrix (.npy). Graph decoders take
+    # the check_to_qubits adjacency form; convert once here.
+    H = np.asarray(np.load(args.check_to_qubits), dtype=np.uint8)
+    c2q = [sorted(int(q) for q in np.nonzero(row)[0]) for row in H]
     nq = args.n_qubits
 
     decoder_map = {
@@ -78,9 +81,9 @@ def cmd_decode(args: argparse.Namespace) -> None:
     if args.decoder in decoder_map:
         dec = decoder_map[args.decoder](c2q, nq)
     elif args.decoder == "belief_match":
-        from .dem import from_stim
-
-        dec = BeliefMatchingDecoder(c2q, nq, dem_model=from_stim)
+        # from_numpy_h returns a per-qubit correction, same contract as the
+        # graph decoders above.
+        dec = BeliefMatching.from_numpy_h(H, error_rate=0.05)
     elif args.decoder == "auto":
         dec = AutoDecoder(c2q, nq)
     else:
