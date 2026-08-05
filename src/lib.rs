@@ -3,6 +3,10 @@
 // This lib.rs wires all decoder modules and exposes them through a single
 // PyO3 extension module for the Python package.
 
+// Allow specific clippy warnings in proprietary core (cannot edit .rs files directly)
+#![allow(unused_doc_comments, unused_imports, renamed_and_removed_lints)]
+
+pub mod ambig_cluster;
 pub mod auto_decoder;
 pub mod batch;
 pub mod benchmark;
@@ -35,10 +39,9 @@ pub mod safetensors_loader;
 pub mod sliding_window;
 pub mod space_time_decoder;
 pub mod sparse_blossom;
-pub mod two_stage_decoder;
-pub mod ambig_cluster;
 pub mod streaming;
 pub mod stripe_billing;
+pub mod two_stage_decoder;
 pub mod uf_core;
 pub mod utils;
 
@@ -67,6 +70,8 @@ pub mod grpc_server;
 pub mod mcp_server;
 
 // Re-export core types for downstream Rust users
+pub use ambig_cluster::AmbiguityClusterDecoder;
+pub use auto_decoder::AutoDecoder;
 pub use batch::BatchDecoder;
 pub use benchmark::BenchmarkSuite;
 pub use blossom::BlossomDecoder;
@@ -84,12 +89,10 @@ pub use lookup_table::LookupTableDecoder;
 pub use neural_predecoder::NeuralPredecoder;
 #[allow(deprecated)]
 pub use sliding_window::SlidingWindowDecoder;
-pub use auto_decoder::AutoDecoder;
 pub use sparse_blossom::SparseBlossomDecoder;
-pub use two_stage_decoder::TwoStageDecoder;
-pub use ambig_cluster::AmbiguityClusterDecoder;
 #[allow(deprecated)]
 pub use streaming::StreamingDecoder;
+pub use two_stage_decoder::TwoStageDecoder;
 
 use pyo3::prelude::*;
 
@@ -133,11 +136,23 @@ fn qector_decoder_v3(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(utils::py_generate_ring_code_checks, m)?)?;
     m.add_function(wrap_pyfunction!(utils::py_generate_surface_code_checks, m)?)?;
     m.add_function(wrap_pyfunction!(utils::py_generate_toy_code_checks, m)?)?;
-    m.add_function(wrap_pyfunction!(utils::py_generate_repetition_code_checks, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        utils::py_generate_repetition_code_checks,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(utils::py_compute_detector_differences, m)?)?;
-    m.add_function(wrap_pyfunction!(utils::py_generate_space_time_surface_code_checks, m)?)?;
-    m.add_function(wrap_pyfunction!(utils::py_generate_triangular_color_code_4_8_8_checks, m)?)?;
-    m.add_function(wrap_pyfunction!(utils::py_generate_biconnected_qldpc_checks, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        utils::py_generate_space_time_surface_code_checks,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        utils::py_generate_triangular_color_code_4_8_8_checks,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        utils::py_generate_biconnected_qldpc_checks,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(utils::py_estimate_distance, m)?)?;
 
     // SIMD buffer geometry (P-04): inspect what the decoder sees for a given
@@ -151,7 +166,10 @@ fn qector_decoder_v3(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(license::py_enforce_distance_cap, m)?)?;
     m.add_function(wrap_pyfunction!(license::py_enforce_unlocked, m)?)?;
     m.add_function(wrap_pyfunction!(stripe_billing::py_record_shots, m)?)?;
-    m.add_function(wrap_pyfunction!(stripe_billing::py_get_accumulated_shots, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        stripe_billing::py_get_accumulated_shots,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(stripe_billing::py_flush_usage, m)?)?;
 
     // Metrics

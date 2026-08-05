@@ -214,9 +214,7 @@ def _decode_impl(check_to_qubits: Any, syndrome: Any, n_qubits: Any, use_batch: 
     # ValueError subclass so BOTH the fastapi and the flask endpoint arms can
     # map it to a client-error status without NameError.
     if syndrome_arr.size and int(syndrome_arr.max()) > 1:
-        raise _SyndromeValueError(
-            f"syndrome values must be binary (0/1); found {int(syndrome_arr.max())}"
-        )
+        raise _SyndromeValueError(f"syndrome values must be binary (0/1); found {int(syndrome_arr.max())}")
     correction = dec_any.parallel_batch_decode(syndrome_arr)[0] if use_batch else dec_any.decode(syndrome_arr)
     return {
         "correction": correction.tolist(),

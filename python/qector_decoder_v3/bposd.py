@@ -259,13 +259,13 @@ class BpOsdDecoder:
             return x0
         lam = self.osd_lambda if self.osd_lambda is not None else 24
         lam = min(int(lam), free.size)
-        sweep = free[np.argsort(rel[free], kind='stable')[:lam]]
+        sweep = free[np.argsort(rel[free], kind="stable")[:lam]]
         depth = min(self.osd_order, 8)
 
         target = self.prior_llr
         best = x0
         best_key = (float(target @ x0), int(x0.sum()))
-        
+
         # Formal combination_sweep and OSD-E logic without itertools brute force
         def combination_sweep(elements, k):
             if k == 0:

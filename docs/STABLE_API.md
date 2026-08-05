@@ -1,6 +1,6 @@
 # QECTOR v1.0.0 — Stable Public API
 
-> **Status of this document:** Scaffold for the v1.0.0 release.
+> **Status of this document:** Release contract for v1.0.0.
 > **Cross-references:** `docs/API_STABILITY.md` (the long-form stability policy), `docs/API_SURFACES.md` (the per-symbol status table).
 > **Audience:** Users picking a QECTOR version, and the v1.0.0 release reviewer who needs to confirm the stability promises before tagging.
 
@@ -147,7 +147,7 @@ These are documented in the API but explicitly **not** in the v1.0.0 Stable tier
 |---|---|---|
 | `q.AmbiguityClusterDecoder` | **Provisional** | On the path to Stable. Tested; the cluster-DFS implementation is correct. Defaults may be tuned. |
 | `q.TwoStageDecoder` | **Provisional** | Requires `check_types`. Behaviour on hyperedge codes is correct; default stage-pair selection may shift. |
-| `q.ColourCodeDecoder` | **Provisional** | BP-OSD on the **undecomposed** hypergraph DEM. **`method` default needs to be reconciled with the v0.7.x changelog before v1.0.0 ships** — see `docs/unreleased_audit.md`. |
+| `q.ColourCodeDecoder` | **Provisional** | BP-OSD on the **undecomposed** hypergraph DEM. `method="bposd"` remains the accuracy-first default; `cluster_bposd` is opt-in. |
 | `q.GNNBeliefMatcher` | **Provisional** | GNN-guided MWPM. Requires a trained checkpoint; training is out of scope for v1.0.0. |
 | `q.NeuralPredecoder` / `q.HybridCascadeDecoder` | **Provisional** | Pre-decoder; the Cascade fix in v0.7.0 made the weights thread through; behaviour may be tuned. |
 | `q.Workbench` | **Provisional** | Local-validation workstation. Not a hosted service. |
@@ -158,7 +158,7 @@ These are explicitly **Provisional** in 1.0.0 and will not be promoted to **Stab
 
 - REST service (`qector serve`, default `127.0.0.1`)
 - gRPC service (optional, `--features grpc`)
-- MCP server (stdio JSON-RPC, 9 real tools as of v0.7.0)
+- MCP server (stdio JSON-RPC; inspect `tools/list` for the current supported tool set)
 - Prometheus metrics exporter (default `127.0.0.1:9090`)
 
 ---
@@ -212,9 +212,9 @@ To promote a symbol from §4 to §3 in a future 1.x release:
 
 Before tagging v1.0.0, confirm:
 
-- [x] The `ColourCodeDecoder` default-method question is resolved (see `docs/unreleased_audit.md`). — default stays `method="bposd"` (accuracy-first); `cluster_bposd` remains opt-in, matching the code docstring.
+- [x] The `ColourCodeDecoder` default-method question is resolved. — default stays `method="bposd"` (accuracy-first); `cluster_bposd` remains opt-in, matching the code docstring.
 - [x] The `CUDABpOsdDecoder.decode` single-shot convenience is either implemented or cut from the changelog. — implemented (`src/cuda_python.rs:194-211`).
-- [x] All `0.7.x` strings in the repo are bumped to `1.0.0` (per the checklist in `docs/unreleased_audit.md`). — `__fallback_version__ = "1.0.0"`, Cargo/pyproject/CITATION/codemeta all 1.0.0, `rust_core.sha256` refreshed to the SEC-02 repack.
+- [x] Public metadata is version-aligned at `1.0.0`. — `__fallback_version__`, Cargo, pyproject, CITATION, and CodeMeta agree; `rust_core.sha256` is refreshed with the release source bundle.
 - [ ] The two pre-publish fixes (bench_community.json hygiene, the 9-warning spam) are applied and the report regenerated.
 - [ ] The verification harness passes 2×2 with 0 failures and 0 flaky.
 - [ ] `cargo test --no-default-features` and `cargo test --features full` both green.

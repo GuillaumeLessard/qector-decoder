@@ -783,6 +783,7 @@ class UnionFindDecoder:
     @property
     def n_checks(self):
         return self._inner.n_checks
+
     def decode_correction(self, syndrome):
         """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
         return self.decode(syndrome)
@@ -884,6 +885,7 @@ class FastUnionFindDecoder:
     @property
     def n_checks(self):
         return self._inner.n_checks
+
     def decode_correction(self, syndrome):
         """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
         return self.decode(syndrome)
@@ -962,6 +964,7 @@ class BlossomDecoder:
     @property
     def edges(self):
         return self._inner.edges
+
     def decode_correction(self, syndrome):
         """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
         return self.decode(syndrome)
@@ -1048,6 +1051,7 @@ class SlidingWindowDecoder:
     @property
     def current_round(self):
         return self._inner.current_round
+
     def decode_correction(self, syndrome):
         """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
         return self.decode(syndrome)
@@ -1140,6 +1144,7 @@ class StreamingDecoder:
     @property
     def n_checks(self):
         return self._inner.n_checks
+
     def decode_correction(self, syndrome):
         """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
         return self.decode(syndrome)
@@ -1194,6 +1199,7 @@ class BatchDecoder:
     @property
     def n_checks(self):
         return self._inner.n_checks
+
     def decode_correction(self, syndrome):
         """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
         return self.decode(syndrome)
@@ -1331,6 +1337,7 @@ except (ImportError, AttributeError):
                 "OpenCLBatchDecoder not available in CUDA-only wheel. "
                 "Build from source: maturin develop --features opencl"
             )
+
     def decode_correction(self, syndrome):
         """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
         return self.decode(syndrome)
@@ -1422,6 +1429,7 @@ class SparseBlossomDecoder:
     @property
     def n_checks(self):
         return self._inner.n_checks
+
     def decode_correction(self, syndrome):
         """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
         return self.decode(syndrome)
@@ -1543,6 +1551,7 @@ class BPOSDDecoder:
     @property
     def n_checks(self):
         return self._inner.n_checks
+
     def decode_correction(self, syndrome):
         """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
         return self.decode(syndrome)
@@ -1623,6 +1632,7 @@ class TwoStageDecoder:
     @property
     def n_checks(self):
         return self._inner.n_checks
+
     def decode_correction(self, syndrome):
         """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
         return self.decode(syndrome)
@@ -1683,6 +1693,7 @@ class AmbiguityClusterDecoder:
     @property
     def n_checks(self):
         return self._inner.n_checks
+
     def decode_correction(self, syndrome):
         """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
         return self.decode(syndrome)
@@ -1800,6 +1811,7 @@ class HybridCascadeDecoder:
     def prefilter_hit_rate(self):
         """Fraction of decoded syndromes resolved by the pre-filter."""
         return self._inner.prefilter_hit_rate
+
     def decode_correction(self, syndrome):
         """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
         return self.decode(syndrome)
@@ -1856,6 +1868,7 @@ class NeuralPredecoder:
     @property
     def n_hidden2(self):
         return self._inner.n_hidden2
+
     def decode_correction(self, syndrome):
         """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
         return self.decode(syndrome)
@@ -2275,6 +2288,7 @@ class HybridDecoder:
     @property
     def n_checks(self):
         return self._inner.n_checks
+
     def decode_correction(self, syndrome):
         """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
         return self.decode(syndrome)
@@ -2558,6 +2572,7 @@ def generate_biconnected_qldpc_checks(n_qubits, degree):
         if len(check) >= 2:
             check_to_qubits.append(check)
     return check_to_qubits, n
+
     def decode_correction(self, syndrome):
         """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
         return self.decode(syndrome)

@@ -1,6 +1,0 @@
-   Compiling pyo3-ffi v0.29.0
-   Compiling pyo3 v0.29.0
-   Compiling numpy v0.29.0
-   Compiling qector_decoder_v3 v1.0.0 (C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone)
-warning: qector_decoder_v3@1.0.0: Using vendored protoc: C:\Users\Clinque du Batiment\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\protoc-bin-vendored-win32-3.2.0\bin\protoc.exe
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 9.33s

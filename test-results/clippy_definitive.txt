@@ -1,5 +1,0 @@
-[dev.bat] Enterprise dev token loaded from ent_license.key.
-[dev.bat]   sub=local-gpu-benchmark  tier-claim=gpu_enabled:True  max_distance=63
-[dev.bat]   Token valid, expires in 1,7 days (2026-08-06 16:06 UTC).
-[dev.bat] Running: cargo clippy --features cuda -- -D warnings
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.27s

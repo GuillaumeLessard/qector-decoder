@@ -1,9 +1,0 @@
-﻿[dev.bat] Enterprise dev token loaded from ent_license.key.
-[dev.bat]   sub=local-gpu-benchmark  tier-claim=gpu_enabled:True  max_distance=63
-[dev.bat]   Token valid, expires in 1,8 days (2026-08-06 16:06 UTC).
-[dev.bat] Running: cargo clippy --features cuda -- -D warnings
-   Compiling pyo3-ffi v0.29.0
-   Compiling qector_decoder_v3 v1.0.0 (C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone)
-   Compiling pyo3 v0.29.0
-   Compiling numpy v0.29.0
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 10.10s

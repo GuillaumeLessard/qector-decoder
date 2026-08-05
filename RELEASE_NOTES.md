@@ -1,6 +1,17 @@
-# Changelog
+# Release Notes
 
-All notable changes to QECTOR Decoder will be documented in this file.
+## [1.0.0] — 2026-08-05
+
+QECTOR Decoder v3 enters its 1.x line. The public API contract is defined in
+[`docs/STABLE_API.md`](docs/STABLE_API.md); stable symbols are supported across
+1.x, while optional GPU, network, and research interfaces remain provisional.
+
+This release ships wheels only (no source distribution), supports CPython 3.9
+through 3.13 on Windows x64, Linux x86_64, and macOS arm64, and includes the
+Rust/Python decoder core, CLI, and interoperability entry points documented in
+the README. See [`CHANGELOG.md`](CHANGELOG.md) for detailed technical history.
+
+---
 
 ## [0.7.1] — 2026-08-04
 

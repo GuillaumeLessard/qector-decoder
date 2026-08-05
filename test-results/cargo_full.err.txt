@@ -1,5 +1,0 @@
-   Compiling qector_decoder_v3 v1.0.0 (C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone)
-warning: qector_decoder_v3@1.0.0: Using vendored protoc: C:\Users\Clinque du Batiment\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\protoc-bin-vendored-win32-3.2.0\bin\protoc.exe
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 27.23s
-     Running unittests src\lib.rs (target\debug\deps\qector_decoder_v3-3731cab6f7db42a4.exe)
-error: test failed, to rerun pass `--lib`

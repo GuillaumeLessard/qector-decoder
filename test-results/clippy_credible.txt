@@ -1,9 +1,0 @@
-    Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on build directory
-    Checking pyo3-ffi v0.29.0
-   Compiling qector_decoder_v3 v1.0.0 (C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone)
-    Checking pyo3 v0.29.0
-    Checking numpy v0.29.0
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 49.50s

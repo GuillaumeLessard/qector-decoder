@@ -1,2 +1,0 @@
-   Compiling qector_decoder_v3 v1.0.0 (C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 10.34s

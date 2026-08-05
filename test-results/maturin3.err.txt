@@ -1,5 +1,0 @@
-🍹 Building a mixed python/rust project
-🐍 Found CPython 3.11 at C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\.venv\Scripts\python.exe
-🔗 Found pyo3 bindings
-    Finished `release` profile [optimized] target(s) in 0.50s
-📦 Built wheel for CPython 3.11 to dist\qector_decoder_v3-1.0.0-cp311-cp311-win_amd64.whl

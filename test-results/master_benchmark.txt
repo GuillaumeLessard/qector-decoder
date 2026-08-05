@@ -1,8 +1,0 @@
-[dev.bat] Enterprise dev token loaded from ent_license.key.
-[dev.bat]   sub=local-gpu-benchmark  tier-claim=gpu_enabled:True  max_distance=63
-[dev.bat]   Token valid, expires in 1,7 days (2026-08-06 16:06 UTC).
-[dev.bat] Running: .venv\Scripts\python.exe scripts\master_full_benchmark.py
-
-thread '<unnamed>' (23712) panicked at src\sparse_blossom.rs:1374:31:
-RefCell already borrowed
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

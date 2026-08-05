@@ -23,7 +23,7 @@ environment so report figures trace back to a specific build.
   - `export_report.py` reports run-1 summary + flaky count per tier in the markdown,
     JSON, PDF and chart, and adds an LER cross-check disclosure section.
 - **External LER gate tightened.** `test_12_benchmark_xcheck.py` now seeds the
-  sampler (12 000 shots) and asserts the real dev2todo §1.1 acceptance
+  sampler (12 000 shots) and asserts the release acceptance
   `ler_qector <= ler_pymatching + 1e-3` (measured delta 0.00075 on rep-d3 p=0.01),
   replacing the old 4096-unseeded-shot check with a meaningless `+0.02` bound.
 

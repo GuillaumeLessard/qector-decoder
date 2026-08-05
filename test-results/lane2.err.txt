@@ -1,4 +1,0 @@
-[QECTOR v1.0.0] Source-available QEC decoder - Rust/PyO3 core.
-[QECTOR v1.0.0] Free for academic, personal and non-commercial research.
-[QECTOR v1.0.0] Commercial use requires a licence: https://qector.store/pricing
-[QECTOR v1.0.0] 60-day commercial evaluation (creditable): https://qector.store/pricing | Set QECTOR_SILENT=1 to hide this.

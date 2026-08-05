@@ -14,7 +14,7 @@ sources**, so `cargo build` inside it fails.
 Consequence if uploaded: on any platform without a matching wheel, pip falls back
 to the sdist, attempts a source build, and fails with a confusing Rust error
 instead of a clean "no wheel available". PyPI currently holds 15 wheels and zero
-sdists for 0.6.8 — keep it that way.
+sdists — keep it that way.
 
 Verify before every upload:
 
@@ -69,7 +69,7 @@ If you build locally with plain `maturin develop`, cargo's defaults apply and yo
 get **both** CUDA and OpenCL — which is why a locally built extension can expose
 `OpenCLBatchDecoder` while a PyPI wheel does not.
 
-### OpenCL distribution decision (v1, dev2todo §3.2)
+### OpenCL distribution decision (v1)
 
 **Decision: no OpenCL side-wheel for v1.** PyPI wheels ship CUDA only (as above);
 OpenCL stays a documented source build:
@@ -86,11 +86,13 @@ issue count / support requests). Revisit at the next minor release.
 ## Pre-flight checklist
 
 ```bash
-cargo test --no-default-features        # expect 303 passed, 0 failed
-cargo clippy --no-default-features --all-targets   # expect 0 warnings
+cargo test --no-default-features
+cargo test --features full
+cargo clippy --no-default-features --all-targets -- -D warnings
+cargo clippy --features full --all-targets -- -D warnings
 ruff check python/                      # expect 0 errors
 ruff format --check python/             # expect no reformatting needed
-dev.bat python -m pytest python/tests -q           # see test-results/pytest.txt
+dev.bat python -m pytest python/tests -q
 ```
 
 **Run pytest through `dev.bat`, never bare.** `dev.bat` exports the Enterprise token that
@@ -112,7 +114,7 @@ byte-identical to `license.py::create_license_token_v2`. If the token format eve
 drifts, every paying customer receives a token their installed package rejects,
 and nothing else in the stack would catch it.
 
-## Version and changelog
+## Version, documentation, and changelog
 
 Bump in **both** `Cargo.toml` and `pyproject.toml` — they are separate fields and
 a mismatch ships a wheel whose `__version__` disagrees with its metadata.

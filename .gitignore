@@ -38,6 +38,7 @@ share/python-wheels/
 MANIFEST
 
 # --- Secrets (never commit live keys) ---
+.secrets/
 .env
 .env.local
 .env.*.local
@@ -78,6 +79,7 @@ desktop.ini
 benchmark_results/
 
 # --- Testing ---
+test-results/
 .pytest_cache/
 .coverage
 htmlcov/
