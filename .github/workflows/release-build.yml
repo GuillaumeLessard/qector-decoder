@@ -253,6 +253,42 @@ jobs:
               print(f"{name}: H@c == s  OK")
           PY
 
+      # The ImportError class of bug (v0.7.1's `qector decode` failure) is only
+      # catchable by invoking the installed *console script*, which the wheel
+      # smoke above cannot do. Run every script that docs/RELEASING.md lists.
+      - name: Smoke-test console scripts
+        run: |
+          set -euo pipefail
+          /tmp/smoke/bin/qector --help >/dev/null
+          /tmp/smoke/bin/python - <<'PY'
+          import numpy as np
+          H = np.zeros((4, 5), dtype=np.uint8)
+          for i, ch in enumerate([[0, 1], [1, 2], [2, 3], [3, 4]]):
+              for q in ch:
+                  H[i, q] ^= 1
+          np.save("cli_H.npy", H)
+          np.save("cli_syn.npy", np.array([[0, 1, 0, 0]], dtype=np.uint8))
+          PY
+          /tmp/smoke/bin/qector decode cli_syn.npy \
+              --check-to-qubits cli_H.npy --n-qubits 5 --decoder blossom \
+              --output cli_corr.npy
+          /tmp/smoke/bin/python - <<'PY'
+          import numpy as np
+          corr = np.asarray(np.load("cli_corr.npy"), dtype=np.uint8).reshape(-1)
+          H = np.asarray(np.load("cli_H.npy"), dtype=np.uint8)
+          syn = np.asarray(np.load("cli_syn.npy"), dtype=np.uint8)[0]
+          assert corr.shape == (5,), f"correction shape {corr.shape}"
+          assert (((H @ corr) % 2) == syn).all(), "CLI correction is not syndrome-faithful"
+          print("qector decode: console-script round-trip OK")
+          PY
+          /tmp/smoke/bin/qector decode cli_syn.npy \
+              --check-to-qubits cli_H.npy --n-qubits 5 --decoder union_find \
+              >/dev/null
+          /tmp/smoke/bin/qector decode cli_syn.npy \
+              --check-to-qubits cli_H.npy --n-qubits 5 --decoder bposd \
+              >/dev/null
+          echo "qector decode: blossom + union_find + bposd all OK"
+
       - name: Check metadata
         run: |
           pip install twine

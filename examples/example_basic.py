@@ -15,13 +15,14 @@ if hasattr(sys.stdout, "reconfigure"):
 
 import numpy as np
 from qector_decoder_v3 import (
-    UnionFindDecoder,
     BlossomDecoder,
-    SparseBlossomDecoder,
     BPOSDDecoder,
     HybridDecoder,
+    SparseBlossomDecoder,
+    UnionFindDecoder,
     generate_ring_code_checks,
 )
+
 
 def main():
     # Generate checks and number of qubits for a ring code of distance 5

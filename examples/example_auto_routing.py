@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-example_auto_routing.py — QECTOR Decoder v3 (v0.6.8) decoder auto-routing
+example_auto_routing.py — QECTOR Decoder v3 (v1.0.0) decoder auto-routing
 
 Demonstrates ``qector_decoder_v3.routing``:
 
@@ -23,13 +23,12 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 import numpy as np
-
 from qector_decoder_v3 import codes, routing
 
 
 def main():
     print("=" * 70)
-    print("QECTOR v3 (0.6.8) — Decoder Auto-Routing")
+    print("QECTOR v3 (1.0.0) — Decoder Auto-Routing")
     print("=" * 70)
     hw = routing.detect_hardware()
     print(f"\nDetected hardware: cuda_rust={hw.cuda_rust}  gpu(cupy)={hw.gpu}")
@@ -37,13 +36,13 @@ def main():
     # ---- 1. Pure-metadata recommendations --------------------------------
     print("\n1. recommend_decoder(...) — pure policy by family / priority / batch:")
     scenarios = [
-        dict(code_family="surface", distance=5, priority="accuracy"),
-        dict(code_family="surface", distance=21, priority="accuracy"),
-        dict(code_family="repetition", distance=9, priority="speed"),
-        dict(code_family="surface", distance=11, batch_size=100_000, priority="speed"),
-        dict(code_family="qldpc", batch_size=4096, priority="balanced"),
-        dict(code_family="bivariate_bicycle", batch_size=1, priority="accuracy"),
-        dict(code_family="hypergraph_product", priority="accuracy"),
+        {"code_family": "surface", "distance": 5, "priority": "accuracy"},
+        {"code_family": "surface", "distance": 21, "priority": "accuracy"},
+        {"code_family": "repetition", "distance": 9, "priority": "speed"},
+        {"code_family": "surface", "distance": 11, "batch_size": 100_000, "priority": "speed"},
+        {"code_family": "qldpc", "batch_size": 4096, "priority": "balanced"},
+        {"code_family": "bivariate_bicycle", "batch_size": 1, "priority": "accuracy"},
+        {"code_family": "hypergraph_product", "priority": "accuracy"},
     ]
     for sc in scenarios:
         name = routing.recommend_decoder(**sc)

@@ -41,9 +41,9 @@ def demo_bposd():
 
 def demo_belief_matching():
     try:
+        import pymatching
         import stim  # noqa: F401
         from qector_decoder_v3.belief_matching import BeliefMatching
-        import pymatching
     except Exception:
         print("\n(stim/pymatching not installed — skipping belief-matching demo)")
         return

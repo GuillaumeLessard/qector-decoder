@@ -15,7 +15,6 @@ if hasattr(sys.stdout, "reconfigure"):
 import numpy as np
 from qector_decoder_v3 import dem
 
-
 DEM_TEXT = """
 error(0.05) D0 L0
 error(0.05) D0 D1

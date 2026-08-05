@@ -69,6 +69,20 @@ If you build locally with plain `maturin develop`, cargo's defaults apply and yo
 get **both** CUDA and OpenCL — which is why a locally built extension can expose
 `OpenCLBatchDecoder` while a PyPI wheel does not.
 
+### OpenCL distribution decision (v1, dev2todo §3.2)
+
+**Decision: no OpenCL side-wheel for v1.** PyPI wheels ship CUDA only (as above);
+OpenCL stays a documented source build:
+
+```bash
+.\.venv\Scripts\python.exe -m maturin develop --release --no-default-features --features opencl
+.\.venv\Scripts\python.exe -m pytest python/tests/test_opencl_cpu_bit_identical.py -q --tb=short
+```
+
+A `qector-decoder-v3-opencl` side-wheel or an OpenCL leg in `release-build.yml`
+is deferred *unless* user demand for non-NVIDIA devices materializes (GitHub
+issue count / support requests). Revisit at the next minor release.
+
 ## Pre-flight checklist
 
 ```bash

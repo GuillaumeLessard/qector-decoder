@@ -14,12 +14,14 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 import time
+
 import numpy as np
 from qector_decoder_v3 import (
-    StreamingDecoder,
     SlidingWindowDecoder,
+    StreamingDecoder,
     generate_ring_code_checks,
 )
+
 
 def main():
     # Use distance 5 ring code
