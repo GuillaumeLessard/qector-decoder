@@ -1,6 +1,7 @@
-import stim
 import numpy as np
+import stim
 from qector_decoder_v3 import SpaceTimeDecoder
+
 
 def run_instrumentation():
     d = 5

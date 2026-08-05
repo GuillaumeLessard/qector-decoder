@@ -24,6 +24,10 @@ COPY src/ ./src/
 COPY proto/ ./proto/
 COPY python/ ./python/
 COPY pyproject.toml README.md ./
+COPY scripts/pack_rust_core.py ./scripts/pack_rust_core.py
+COPY rust_core.sha256 ./
+COPY rust_core_chunks/ ./rust_core_chunks/
+RUN python scripts/pack_rust_core.py unpack
 
 # The pure-Python ecosystem layer (codes/dem/result/backend/pymatching_compat/
 # benchmarking) lives under python/qector_decoder_v3/ and is bundled into the
@@ -57,6 +61,10 @@ RUN pip install --no-cache-dir pytest hypothesis stim pymatching sinter ldpc bel
 COPY python/tests/ ./python/tests/
 COPY scripts/ ./scripts/
 COPY pyproject.toml README.md ./
+COPY scripts/pack_rust_core.py ./scripts/pack_rust_core.py
+COPY rust_core.sha256 ./
+COPY rust_core_chunks/ ./rust_core_chunks/
+RUN python scripts/pack_rust_core.py unpack
 
 EXPOSE 8000
 

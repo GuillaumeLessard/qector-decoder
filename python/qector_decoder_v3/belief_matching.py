@@ -318,6 +318,45 @@ class BeliefMatching:
         corr = np.asarray(self._blossom.decode(s), dtype=np.uint8).reshape(-1)
         return (self._m.edge_obs @ corr) & 1
 
+    def decode_correction(self, syndrome) -> np.ndarray:
+        """Decode and return the **physical edge-graph correction**.
+
+        Returns the raw matching-stage correction: length ``num_edges`` of the
+        graphlike decomposition (the columns of ``edge_check``), one bit per
+        graph edge flipped. For a raw check matrix built via
+        :meth:`from_numpy_h` each graph edge is a single qubit, so this equals
+        the length-``n_qubits`` correction satisfying ``H @ corr == syndrome``
+        (same as ``decode``). For a DEM, the edge representation is a
+        decomposition of the error mechanisms; use :meth:`decode_observables`
+        for logical-error prediction on DEMs.
+        """
+        s: np.ndarray = prepare_syndromes(syndrome)
+        if s.shape[0] < self.n_checks:
+            s = np.concatenate([s, np.zeros(self.n_checks - s.shape[0], np.uint8)])
+        posterior = sum_product_bp(
+            self._hic,
+            self._hie,
+            self.n_checks,
+            self._n_hyper,
+            self._prior_llr,
+            s,
+            self.max_iter,
+        )
+        p_h = 1.0 / (1.0 + np.exp(np.clip(posterior, -60, 60)))
+        p_e = self._m.hyper_to_edge @ p_h
+        p_e = np.clip(p_e, 1e-14, 1 - 1e-14)
+        self._blossom.set_edge_weights(-np.log(p_e))
+        return np.asarray(self._blossom.decode(s), dtype=np.uint8).reshape(-1)
+
+    def decode_observables(self, syndrome) -> np.ndarray:
+        """Decode and return **logical-observable predictions**.
+
+        Same result as :meth:`decode` for DEM-constructed instances (length
+        ``num_observables``), spelled explicitly so callers never rely on the
+        inferred convention.
+        """
+        return self.decode(syndrome)
+
     def decode_batch(self, shots) -> np.ndarray:
         # C-contiguous rows: every per-shot slice below is then a borrowable
         # flat run rather than a strided gather.

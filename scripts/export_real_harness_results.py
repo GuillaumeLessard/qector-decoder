@@ -12,7 +12,6 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
-
 ROOT = Path(r"C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone")
 HARNESS = ROOT / "benchmarks_session" / "harnesses"
 LOGDIR = HARNESS / "run_logs_20260730_143625"

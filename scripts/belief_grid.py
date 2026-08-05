@@ -21,7 +21,6 @@ _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_REPO, "python"))
 
 import numpy as np  # noqa: E402
-
 from qector_decoder_v3 import benchmarking as bm  # noqa: E402
 from qector_decoder_v3.belief_matching import BeliefMatching  # noqa: E402
 
@@ -45,8 +44,8 @@ def main() -> int:
     ap.add_argument("--out", default="benchmark_results/belief_grid")
     args = ap.parse_args()
 
-    import stim
     import pymatching
+    import stim
 
     env = bm.capture_environment()
     env["command"] = " ".join(sys.argv)

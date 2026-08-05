@@ -69,3 +69,5 @@ def test_belief_latency_cost_characterization():
     # non-negative time. No absolute wall-clock thresholds (cheatsheet rule 8).
     assert belief_seconds >= 0.0
     assert belief_seconds > 0.0  # decoding N>0 shots takes measurable time
+
+    print("END OF TEST REACHED!")

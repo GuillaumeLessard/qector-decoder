@@ -18,7 +18,7 @@ import argparse
 import json
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 
 import matplotlib
 
@@ -377,7 +377,7 @@ def main() -> int:
     S.append(HRFlowable(width="100%", color=colors.HexColor(GRID), thickness=0.8))
     S.append(Paragraph(
         f"Source data: <font face='Courier'>{os.path.relpath(args.src, _REPO)}</font> · "
-        f"rendered {datetime.now().strftime('%Y-%m-%d %H:%M')} · no measurement is performed by "
+        f"rendered {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')} · no measurement is performed by "
         f"this report generator.", small))
 
     doc.build(S)

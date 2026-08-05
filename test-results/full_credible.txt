@@ -1,0 +1,260 @@
+[dev.bat] Enterprise dev token loaded from ent_license.key.
+[dev.bat]   sub=local-gpu-benchmark  tier-claim=gpu_enabled:True  max_distance=63
+[dev.bat]   Token valid, expires in 1,6 days (2026-08-06 16:06 UTC).
+[dev.bat] Running: .venv\Scripts\python.exe -m pytest python/tests -q -p no:cacheprovider
+........................................................................ [  3%]
+........................................................................ [  7%]
+......s................................................................. [ 11%]
+........................................................................ [ 14%]
+...........................................ssss.....s................... [ 18%]
+........................................................................ [ 22%]
+........................................................................ [ 25%]
+........................................................................ [ 29%]
+........................................................................ [ 33%]
+...............................ssssssssssss............................. [ 36%]
+........................................................................ [ 40%]
+........................................................................ [ 44%]
+.......................................sssssssssssssssssss.............. [ 47%]
+.....sssssssssssssssssss................................................ [ 51%]
+........................................................................ [ 55%]
+........................................................................ [ 59%]
+........................................................................ [ 62%]
+........................................................................ [ 66%]
+........................................................................ [ 70%]
+........................................................................ [ 73%]
+........................................................................ [ 77%]
+........................................................................ [ 81%]
+........................................................................ [ 84%]
+........................................................................ [ 88%]
+..............s......................................................... [ 92%]
+.....................................ssssssss........................... [ 95%]
+........................................................................ [ 99%]
+.......                                                                  [100%]
+============================== warnings summary ===============================
+python/tests/test_auto_debug_fallbacks.py::test_auto_debug_fallback_recovery_on_exception
+python/tests/test_auto_decoder_calibrate.py::test_calibrate_keys_routing_and_faithfulness
+python/tests/test_backend.py::test_gpu_path_faithful_if_available
+python/tests/test_backend.py::test_calibrate_sets_threshold_and_diagnostics
+python/tests/test_gpu_fallback.py::test_force_cuda_matches_cpu_exactly
+python/tests/test_gpu_no_silent_slowdown.py::test_routing_matches_threshold_and_gpu_never_diverges
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\qector_decoder_v3\backend.py:265: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    dec = CUDABatchDecoder(self._c2q, self._nq)
+
+python/tests/test_bulletproof.py::TestGPUBackends::test_cuda_resilience_fields_initial
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_bulletproof.py:137: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    dec = qd.CUDABatchDecoder(checks, n_qubits)
+
+python/tests/test_bulletproof.py::TestGPUBackends::test_cuda_reset_clears_counters
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_bulletproof.py:149: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    dec = qd.CUDABatchDecoder(checks, n_qubits)
+
+python/tests/test_bulletproof.py::TestGPUBackends::test_cuda_rejects_wrong_shape
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_bulletproof.py:158: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    dec = qd.CUDABatchDecoder(checks, n_qubits)
+
+python/tests/test_bulletproof.py::TestGPUBackends::test_cuda_matches_cpu
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_bulletproof.py:166: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    cuda = qd.CUDABatchDecoder(checks, n_qubits)
+
+python/tests/test_bulletproof.py::TestBoundaryValidation::test_all_reject_wrong_dtype
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_bulletproof.py:429: DeprecationWarning: StreamingDecoder without check_types/p_data/p_meas uses the deprecated legacy OR accumulation (temporal correlations lost). Pass check_types, p_data, and p_meas together for exact 3D space-time decoding. OR accumulation will be removed in v1.0.
+    "streaming": qd.StreamingDecoder(checks, n_qubits),
+
+python/tests/test_bulletproof.py: 1 warning
+python/tests/test_decoders.py: 4 warnings
+python/tests/test_streaming_batch_equivalence.py: 126 warnings
+python/tests/test_streaming_flush.py: 52 warnings
+python/tests/test_streaming_history_size.py: 9 warnings
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\qector_decoder_v3\__init__.py:1072: DeprecationWarning: StreamingDecoder without check_types/p_data/p_meas uses deprecated OR accumulation; pass them together (or use SpaceTimeDecoder) for fault-tolerant temporal decoding
+    self._inner = _RustStreamingDecoder(c2q, nq, history_size, check_types, p_data, p_meas)
+
+python/tests/test_correctness_audit_commands.py::test_cuda_batch_bit_identical_to_cpu[3]
+python/tests/test_correctness_audit_commands.py::test_cuda_batch_bit_identical_to_cpu[5]
+python/tests/test_correctness_audit_commands.py::test_cuda_batch_bit_identical_to_cpu[7]
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_correctness_audit_commands.py:76: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    cuda = qd.CUDABatchDecoder(code.check_to_qubits, code.n_qubits)
+
+python/tests/test_cuda_cpu_bit_identical.py: 16 warnings
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_cuda_cpu_bit_identical.py:34: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    cuda = qd.CUDABatchDecoder(code.check_to_qubits, code.n_qubits)
+
+python/tests/test_cuda_f64_precision.py::test_precision_defaults_to_f32
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_cuda_f64_precision.py:58: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    dec = qd.CUDABatchDecoder(_ring_c2q(8), 8)
+
+python/tests/test_decoders.py::TestStreamingDecoder::test_multi_round
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_decoders.py:157: DeprecationWarning: StreamingDecoder without check_types/p_data/p_meas uses the deprecated legacy OR accumulation (temporal correlations lost). Pass check_types, p_data, and p_meas together for exact 3D space-time decoding. OR accumulation will be removed in v1.0.
+    dec = qd.StreamingDecoder(checks, n_qubits, history_size=5)
+
+python/tests/test_decoders.py::TestStreamingDecoder::test_flush
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_decoders.py:168: DeprecationWarning: StreamingDecoder without check_types/p_data/p_meas uses the deprecated legacy OR accumulation (temporal correlations lost). Pass check_types, p_data, and p_meas together for exact 3D space-time decoding. OR accumulation will be removed in v1.0.
+    dec = qd.StreamingDecoder(checks, n_qubits, history_size=5)
+
+python/tests/test_decoders.py::TestStreamingDecoder::test_decode_without_history
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_decoders.py:176: DeprecationWarning: StreamingDecoder without check_types/p_data/p_meas uses the deprecated legacy OR accumulation (temporal correlations lost). Pass check_types, p_data, and p_meas together for exact 3D space-time decoding. OR accumulation will be removed in v1.0.
+    dec = qd.StreamingDecoder(checks, n_qubits, history_size=5)
+
+python/tests/test_decoders.py::TestStreamingDecoder::test_n_qubits_property
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_decoders.py:183: DeprecationWarning: StreamingDecoder without check_types/p_data/p_meas uses the deprecated legacy OR accumulation (temporal correlations lost). Pass check_types, p_data, and p_meas together for exact 3D space-time decoding. OR accumulation will be removed in v1.0.
+    dec = qd.StreamingDecoder(checks, n_qubits, history_size=5)
+
+python/tests/test_decoders.py::TestCUDABatchDecoder::test_cuda_available_and_device_metadata
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_decoders.py:232: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    dec = qd.CUDABatchDecoder(checks, n_qubits)
+
+python/tests/test_decoders.py::TestCUDABatchDecoder::test_cuda_matches_cpu
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_decoders.py:244: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    cuda = qd.CUDABatchDecoder(checks, n_qubits)
+
+python/tests/test_decoders.py::TestCUDABatchDecoder::test_cuda_rejects_wrong_shape
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_decoders.py:256: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    dec = qd.CUDABatchDecoder(checks, n_qubits)
+
+python/tests/test_dem.py::test_stim_compat_reroute_matches_dem
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_dem.py:115: DeprecationWarning: stim_compat is deprecated since v0.6.4. Use qector_decoder_v3.dem.from_stim() instead. See the migration guide at https://qector.store/docs/migration-v0.6.4
+    c2q, nq = stim_compat.from_stim_detector_error_model(REP_DEM)
+
+python/tests/test_ecosystem.py::test_qiskit_plugin_integration
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_ecosystem.py:13: UserWarning: Qiskit is not installed. Integration works in 'raw dict' mode. For full usage: pip install qiskit
+    out = decode_qiskit_result(raw, code_distance=3)
+
+python/tests/test_ecosystem.py::test_stim_compat_integration
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_ecosystem.py:25: DeprecationWarning: stim_compat is deprecated since v0.6.4. Use qector_decoder_v3.dem.from_stim() instead. See the migration guide at https://qector.store/docs/migration-v0.6.4
+    decoder = to_stim_decoder(c2q)
+
+python/tests/test_gpu_memory_bounded.py::test_gpu_memory_bounded
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_gpu_memory_bounded.py:46: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    dec = qd.CUDABatchDecoder(c2q, nq)
+
+python/tests/test_gpu_memory_profile.py::test_cuda_repeated_batch_no_leak_and_identical
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_gpu_memory_profile.py:36: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    cuda = qd.CUDABatchDecoder(c2q, nq)
+
+python/tests/test_gpu_no_silent_slowdown.py::test_direct_cuda_4096_matches_cpu
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_gpu_no_silent_slowdown.py:84: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    cuda = qd.CUDABatchDecoder(c2q, nq)
+
+python/tests/test_max_capacity.py: 19 warnings
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_max_capacity.py:434: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    dec = qd.CUDABatchDecoder(checks, nq)
+
+python/tests/test_new_modules.py: 7 warnings
+python/tests/test_sliding_window.py: 3 warnings
+python/tests/test_sliding_window_rounds.py: 4 warnings
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\qector_decoder_v3\__init__.py:978: DeprecationWarning: SlidingWindowDecoder without check_types/p_data/p_meas uses deprecated decay accumulation; pass them together (or use SpaceTimeDecoder) for fault-tolerant temporal decoding
+    self._inner = _RustSlidingWindowDecoder(c2q, nq, window_size, decay_factor, check_types, p_data, p_meas)
+
+python/tests/test_new_modules.py::TestQiskitPlugin::test_dict_raw_mode
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_new_modules.py:184: UserWarning: Qiskit is not installed. Integration works in 'raw dict' mode. For full usage: pip install qiskit
+    out = qd.qiskit_plugin.decode_qiskit_result(raw, code_distance=3)
+
+python/tests/test_new_modules.py::TestQiskitPlugin::test_empty_counts
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_new_modules.py:192: UserWarning: Qiskit is not installed. Integration works in 'raw dict' mode. For full usage: pip install qiskit
+    out = qd.qiskit_plugin.decode_qiskit_result(raw, code_distance=3)
+
+python/tests/test_new_modules.py::TestQiskitPlugin::test_create_decoder_factory
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\qector_decoder_v3\qiskit_plugin.py:224: UserWarning: Qiskit is not installed. Integration works in 'raw dict' mode. For full usage: pip install qiskit
+    return decode_qiskit_result(
+
+python/tests/test_new_modules.py::TestQiskitPlugin::test_hex_to_syndrome
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_new_modules.py:204: UserWarning: Qiskit is not installed. Integration works in 'raw dict' mode. For full usage: pip install qiskit
+    out = qd.qiskit_plugin.decode_qiskit_result(raw, code_distance=3)
+
+python/tests/test_new_modules.py::TestStimCompat::test_to_stim_decoder
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_new_modules.py:213: DeprecationWarning: stim_compat is deprecated since v0.6.4. Use qector_decoder_v3.dem.from_stim() instead. See the migration guide at https://qector.store/docs/migration-v0.6.4
+    decoder = qd.stim_compat.to_stim_decoder(checks, n_qubits)
+
+python/tests/test_new_modules.py::TestStimCompat::test_stim_decoder_with_batch
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_new_modules.py:220: DeprecationWarning: stim_compat is deprecated since v0.6.4. Use qector_decoder_v3.dem.from_stim() instead. See the migration guide at https://qector.store/docs/migration-v0.6.4
+    decoder = qd.stim_compat.to_stim_decoder(checks, n_qubits, use_batch=True)
+
+python/tests/test_new_modules.py::TestStimCompat::test_stim_decoder_repr
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_new_modules.py:227: DeprecationWarning: stim_compat is deprecated since v0.6.4. Use qector_decoder_v3.dem.from_stim() instead. See the migration guide at https://qector.store/docs/migration-v0.6.4
+    decoder = qd.stim_compat.to_stim_decoder(checks, n_qubits)
+
+python/tests/test_new_modules.py::TestStimCompat::test_from_stim_dem_raises
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_new_modules.py:234: DeprecationWarning: stim_compat is deprecated since v0.6.4. Use qector_decoder_v3.dem.from_stim() instead. See the migration guide at https://qector.store/docs/migration-v0.6.4
+    qd.stim_compat.from_stim_detector_error_model(None)
+
+python/tests/test_new_modules.py::TestStimCompat::test_stim_decoder_from_dem_raises
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_new_modules.py:238: DeprecationWarning: stim_compat is deprecated since v0.6.4. Use qector_decoder_v3.dem.from_stim() instead. See the migration guide at https://qector.store/docs/migration-v0.6.4
+    qd.stim_compat.stim_decoder_from_dem(None)
+
+python/tests/test_new_modules.py::TestStimCompat::test_stim_decoder_from_dem_raises
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\qector_decoder_v3\stim_compat.py:148: DeprecationWarning: stim_compat is deprecated since v0.6.4. Use qector_decoder_v3.dem.from_stim() instead. See the migration guide at https://qector.store/docs/migration-v0.6.4
+    c2q, nq = from_stim_detector_error_model(dem)
+
+python/tests/test_streaming_batch_equivalence.py::test_streaming_decode_is_syndrome_faithful[repetition_d7]
+python/tests/test_streaming_batch_equivalence.py::test_streaming_decode_is_syndrome_faithful[ring_n7]
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_streaming_batch_equivalence.py:33: DeprecationWarning: StreamingDecoder without check_types/p_data/p_meas uses the deprecated legacy OR accumulation (temporal correlations lost). Pass check_types, p_data, and p_meas together for exact 3D space-time decoding. OR accumulation will be removed in v1.0.
+    dec = qd.StreamingDecoder(code.check_to_qubits, nq, history_size=10)
+
+python/tests/test_streaming_batch_equivalence.py::test_flushed_update_equals_fresh_decode[repetition_d7]
+python/tests/test_streaming_batch_equivalence.py::test_flushed_update_equals_fresh_decode[ring_n7]
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_streaming_batch_equivalence.py:59: DeprecationWarning: StreamingDecoder without check_types/p_data/p_meas uses the deprecated legacy OR accumulation (temporal correlations lost). Pass check_types, p_data, and p_meas together for exact 3D space-time decoding. OR accumulation will be removed in v1.0.
+    dec = qd.StreamingDecoder(code.check_to_qubits, nq, history_size=8)
+
+python/tests/test_streaming_batch_equivalence.py: 120 warnings
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_streaming_batch_equivalence.py:67: DeprecationWarning: StreamingDecoder without check_types/p_data/p_meas uses the deprecated legacy OR accumulation (temporal correlations lost). Pass check_types, p_data, and p_meas together for exact 3D space-time decoding. OR accumulation will be removed in v1.0.
+    fresh = qd.StreamingDecoder(code.check_to_qubits, nq, history_size=8)
+
+python/tests/test_streaming_batch_equivalence.py::test_decode_is_stateless_under_prior_updates
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_streaming_batch_equivalence.py:80: DeprecationWarning: StreamingDecoder without check_types/p_data/p_meas uses the deprecated legacy OR accumulation (temporal correlations lost). Pass check_types, p_data, and p_meas together for exact 3D space-time decoding. OR accumulation will be removed in v1.0.
+    dirty = qd.StreamingDecoder(code.check_to_qubits, nq, history_size=10)
+
+python/tests/test_streaming_batch_equivalence.py::test_decode_is_stateless_under_prior_updates
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_streaming_batch_equivalence.py:81: DeprecationWarning: StreamingDecoder without check_types/p_data/p_meas uses the deprecated legacy OR accumulation (temporal correlations lost). Pass check_types, p_data, and p_meas together for exact 3D space-time decoding. OR accumulation will be removed in v1.0.
+    clean = qd.StreamingDecoder(code.check_to_qubits, nq, history_size=10)
+
+python/tests/test_streaming_flush.py::test_flush_clears_stale_state
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_streaming_flush.py:23: DeprecationWarning: StreamingDecoder without check_types/p_data/p_meas uses the deprecated legacy OR accumulation (temporal correlations lost). Pass check_types, p_data, and p_meas together for exact 3D space-time decoding. OR accumulation will be removed in v1.0.
+    dec = qd.StreamingDecoder(code.check_to_qubits, nq, history_size=6)
+
+python/tests/test_streaming_flush.py: 50 warnings
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_streaming_flush.py:37: DeprecationWarning: StreamingDecoder without check_types/p_data/p_meas uses the deprecated legacy OR accumulation (temporal correlations lost). Pass check_types, p_data, and p_meas together for exact 3D space-time decoding. OR accumulation will be removed in v1.0.
+    ref = qd.StreamingDecoder(code.check_to_qubits, nq, history_size=6)
+
+python/tests/test_streaming_flush.py::test_flush_reproducibility_across_repeated_flush
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_streaming_flush.py:49: DeprecationWarning: StreamingDecoder without check_types/p_data/p_meas uses the deprecated legacy OR accumulation (temporal correlations lost). Pass check_types, p_data, and p_meas together for exact 3D space-time decoding. OR accumulation will be removed in v1.0.
+    dec = qd.StreamingDecoder(code.check_to_qubits, nq, history_size=5)
+
+python/tests/test_streaming_history_size.py::test_decode_faithful_regardless_of_history_size[1]
+python/tests/test_streaming_history_size.py::test_decode_faithful_regardless_of_history_size[5]
+python/tests/test_streaming_history_size.py::test_decode_faithful_regardless_of_history_size[20]
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_streaming_history_size.py:26: DeprecationWarning: StreamingDecoder without check_types/p_data/p_meas uses the deprecated legacy OR accumulation (temporal correlations lost). Pass check_types, p_data, and p_meas together for exact 3D space-time decoding. OR accumulation will be removed in v1.0.
+    dec = qd.StreamingDecoder(code.check_to_qubits, nq, history_size=history_size)
+
+python/tests/test_streaming_history_size.py::test_update_usable_for_every_history_size[1]
+python/tests/test_streaming_history_size.py::test_update_usable_for_every_history_size[5]
+python/tests/test_streaming_history_size.py::test_update_usable_for_every_history_size[20]
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_streaming_history_size.py:44: DeprecationWarning: StreamingDecoder without check_types/p_data/p_meas uses the deprecated legacy OR accumulation (temporal correlations lost). Pass check_types, p_data, and p_meas together for exact 3D space-time decoding. OR accumulation will be removed in v1.0.
+    dec = qd.StreamingDecoder(code.check_to_qubits, nq, history_size=history_size)
+
+python/tests/test_streaming_history_size.py::test_per_syndrome_decode_independent_of_history_size
+python/tests/test_streaming_history_size.py::test_per_syndrome_decode_independent_of_history_size
+python/tests/test_streaming_history_size.py::test_per_syndrome_decode_independent_of_history_size
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_streaming_history_size.py:59: DeprecationWarning: StreamingDecoder without check_types/p_data/p_meas uses the deprecated legacy OR accumulation (temporal correlations lost). Pass check_types, p_data, and p_meas together for exact 3D space-time decoding. OR accumulation will be removed in v1.0.
+    decs = {h: qd.StreamingDecoder(code.check_to_qubits, nq, history_size=h) for h in (1, 5, 20)}
+
+python/tests/test_syndrome_faithfulness.py::test_cuda_bit_identical_and_faithful[repetition d=7]
+python/tests/test_syndrome_faithfulness.py::test_cuda_bit_identical_and_faithful[repetition d=15]
+python/tests/test_syndrome_faithfulness.py::test_cuda_bit_identical_and_faithful[ring n=12]
+python/tests/test_syndrome_faithfulness.py::test_cuda_bit_identical_and_faithful[ring n=24]
+python/tests/test_syndrome_faithfulness.py::test_cuda_bit_identical_and_faithful[rotated surface d=5]
+python/tests/test_syndrome_faithfulness.py::test_cuda_bit_identical_and_faithful[rotated surface d=7]
+python/tests/test_syndrome_faithfulness.py::test_cuda_bit_identical_and_faithful[unrotated surface d=4]
+python/tests/test_syndrome_faithfulness.py::test_cuda_bit_identical_and_faithful[unrotated surface d=5]
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_syndrome_faithfulness.py:161: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    cuda = qd.CUDABatchDecoder(c2q, n)
+
+python/tests/test_workbench_backend_detection.py: 3 warnings
+python/tests/test_workbench_cancel_job.py: 1 warning
+python/tests/test_workbench_environment_snapshot.py: 3 warnings
+python/tests/test_workbench_export_csv_json.py: 3 warnings
+python/tests/test_workbench_export_pdf.py: 3 warnings
+python/tests/test_workbench_run_benchmark.py: 3 warnings
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\qector_decoder_v3\workbench.py:203: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    info["cuda_device"] = qd.CUDABatchDecoder([[0]], 1).device_name
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1886 passed, 65 skipped, 490 warnings in 1079.33s (0:17:59)

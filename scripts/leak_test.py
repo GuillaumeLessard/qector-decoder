@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import argparse
 import gc
+import itertools
+import math
 import os
 import sys
 import time
@@ -21,7 +23,6 @@ _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_REPO, "python"))
 
 import numpy as np  # noqa: E402
-
 import qector_decoder_v3 as qd  # noqa: E402
 from qector_decoder_v3 import benchmarking as bm  # noqa: E402
 from qector_decoder_v3 import codes  # noqa: E402
@@ -87,9 +88,10 @@ def main() -> int:
         pool = (rng.random((256, nq)) < args.error_rate).astype(np.uint8)
         syns = ((pool @ H.T) & 1).astype(np.uint8)
 
-        def step(_i=[0]):
-            dec.decode(syns[_i[0] % 256])
-            _i[0] += 1
+        _counter = itertools.count()
+
+        def step():
+            dec.decode(syns[next(_counter) % 256])
 
     # warmup
     for _ in range(min(50, args.iterations)):
@@ -108,7 +110,7 @@ def main() -> int:
     gc.collect()
     final = _rss_mib()
 
-    rss_arr = np.array([x for x in rss if x == x], dtype=np.float64)
+    rss_arr = np.array([x for x in rss if not math.isnan(x)], dtype=np.float64)
     q = max(1, len(rss_arr) // 4)
     early = float(rss_arr[:q].mean()) if len(rss_arr) else float("nan")
     late = float(rss_arr[-q:].mean()) if len(rss_arr) else float("nan")

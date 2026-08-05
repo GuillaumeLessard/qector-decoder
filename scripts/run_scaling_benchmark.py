@@ -1,8 +1,10 @@
 import time
 import tracemalloc
+
 import numpy as np
 from pymatching import Matching
 from qector_decoder_v3 import BlossomDecoder
+
 
 def rotated_surface_code(d):
     checks = []

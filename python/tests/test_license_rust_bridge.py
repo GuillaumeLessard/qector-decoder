@@ -32,6 +32,15 @@ TIER_CAPS = {"Community": 7, "Pro": 19, "Enterprise": 63}
 @pytest.fixture
 def no_native(monkeypatch):
     """Force the pure-Python fallback these tests are written against."""
+    import tempfile
+
+    # Mask the per-user license store (~/.qector/license.key). Without this,
+    # the fallback's _configured_key() re-reads the machine's profile-level
+    # Enterprise token even after QECTOR_LICENSE_KEY is cleared, so
+    # test_get_license_info_community_default saw Enterprise on developer boxes.
+    fake_home = tempfile.mkdtemp(prefix="qector-bridge-no-home-")
+    monkeypatch.setenv("HOME", fake_home)
+    monkeypatch.setenv("USERPROFILE", fake_home)
     monkeypatch.setattr(qd, "_native_module", None)
     monkeypatch.delenv("QECTOR_LICENSE_KEY", raising=False)
 

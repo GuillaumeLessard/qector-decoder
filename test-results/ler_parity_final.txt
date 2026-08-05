@@ -1,0 +1,24 @@
+﻿[dev.bat] Enterprise dev token loaded from ent_license.key.
+[dev.bat]   sub=local-gpu-benchmark  tier-claim=gpu_enabled:True  max_distance=63
+[dev.bat]   Token valid, expires in 1,7 days (2026-08-06 16:06 UTC).
+[dev.bat] Running: .venv\Scripts\python.exe -m pytest python\tests\test_ler_parity_regression.py -v
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'default'
+qector_decoder_v3 resolved from: C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\qector_decoder_v3\__init__.py  [repo source]
+rootdir: C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone
+configfile: pyproject.toml
+plugins: anyio-4.14.2, hypothesis-6.164.0, cov-7.1.0, timeout-2.4.0
+collecting ... collected 8 items
+
+python/tests/test_ler_parity_regression.py::test_ler_parity_within_1e3[0.01-3-repetition] PASSED [ 12%]
+python/tests/test_ler_parity_regression.py::test_ler_parity_within_1e3[0.01-3-surface] PASSED [ 25%]
+python/tests/test_ler_parity_regression.py::test_ler_parity_within_1e3[0.01-5-repetition] PASSED [ 37%]
+python/tests/test_ler_parity_regression.py::test_ler_parity_within_1e3[0.01-5-surface] PASSED [ 50%]
+python/tests/test_ler_parity_regression.py::test_ler_parity_within_1e3[0.001-3-repetition] PASSED [ 62%]
+python/tests/test_ler_parity_regression.py::test_ler_parity_within_1e3[0.001-3-surface] PASSED [ 75%]
+python/tests/test_ler_parity_regression.py::test_ler_parity_within_1e3[0.001-5-repetition] PASSED [ 87%]
+python/tests/test_ler_parity_regression.py::test_ler_parity_within_1e3[0.001-5-surface] PASSED [100%]
+
+============================== 8 passed in 4.89s ==============================

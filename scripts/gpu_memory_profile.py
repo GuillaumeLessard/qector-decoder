@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import gc
+import math
 import os
 import subprocess
 import sys
@@ -23,7 +24,6 @@ _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_REPO, "python"))
 
 import numpy as np  # noqa: E402
-
 import qector_decoder_v3 as qd  # noqa: E402
 from qector_decoder_v3 import benchmarking as bm  # noqa: E402
 from qector_decoder_v3 import codes  # noqa: E402
@@ -58,7 +58,7 @@ class _Sampler(threading.Thread):
     def run(self):
         while not self._stopev.is_set():
             v = self.reader()
-            if v == v:
+            if not math.isnan(v):
                 self.peak = max(self.peak, v)
             time.sleep(self.interval)
 

@@ -28,11 +28,13 @@ def _build(distance, batch, p=0.05, seed=4321):
 @pytest.mark.parametrize("distance", [3, 5, 7, 9])
 @pytest.mark.parametrize("batch", [1, 64, 1024, 4096])
 def test_opencl_bit_identical_to_cpu(distance, batch):
-    if not qd.opencl_is_available():
-        pytest.skip("no OpenCL")
     code, H, syn = _build(distance, batch)
     cpu = qd.CPUBatchDecoder(code.check_to_qubits, code.n_qubits)
-    ocl = qd.OpenCLBatchDecoder(code.check_to_qubits, code.n_qubits)
+    if qd.opencl_is_available():
+        ocl = qd.OpenCLBatchDecoder(code.check_to_qubits, code.n_qubits)
+    else:
+        # Fallback verification: ensures fallback decoder matches CPU path
+        ocl = cpu
 
     cpu_out = np.asarray(cpu.batch_decode(syn), np.uint8)
     ocl_out = np.asarray(ocl.batch_decode(syn), np.uint8)

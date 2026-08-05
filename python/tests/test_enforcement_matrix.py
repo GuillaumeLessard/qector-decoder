@@ -68,7 +68,18 @@ def python_tier(monkeypatch):
     """Force the Python enforcement layer onto its documented prefix fallback.
 
     Yields a setter; call it with a tier name before exercising a surface.
+
+    HOME/USERPROFILE are remapped to an empty temp dir so the pure-Python
+    fallback (``license._configured_key``) cannot rediscover the machine's
+    ``~/.qector/license.key``. On a dev box with a profile-level Enterprise
+    token, that file was auto-read even after ``QECTOR_LICENSE_KEY`` was
+    removed, latching Community cells to Enterprise and falsifying the matrix.
     """
+    import tempfile
+
+    fake_home = tempfile.mkdtemp(prefix="qector-enf-no-home-")
+    monkeypatch.setenv("HOME", fake_home)
+    monkeypatch.setenv("USERPROFILE", fake_home)
     monkeypatch.setattr(lic, "_native_module", lambda: None)
     monkeypatch.delenv("QECTOR_API_KEY", raising=False)
     monkeypatch.delenv("QECTOR_ENFORCE", raising=False)

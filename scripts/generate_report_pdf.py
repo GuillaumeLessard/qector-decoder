@@ -16,6 +16,7 @@ import os
 import sys
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib.backends.backend_pdf import PdfPages  # noqa: E402
@@ -37,12 +38,13 @@ def _build_fingerprint():
     except Exception:
         pass
     try:
-        import hashlib
         import glob
+        import hashlib
         pyds = sorted(glob.glob(os.path.join(
             _REPO, "python", "qector_decoder_v3", "*.pyd")))
         if pyds:
-            h = hashlib.sha256(open(pyds[0], "rb").read()).hexdigest()[:12]
+            with open(pyds[0], "rb") as fh:
+                h = hashlib.sha256(fh.read()).hexdigest()[:12]
             return "pyd-sha256:" + h
     except Exception:
         pass
@@ -56,7 +58,8 @@ def load_stim_ler():
     path = os.path.join(_REPO, "benchmark_results", "competitive_stim_ler.json")
     rows = []
     try:
-        data = json.load(open(path, encoding="utf-8"))
+        with open(path, encoding="utf-8") as fh:
+            data = json.load(fh)
         for r in data["results"]:
             rows.append((
                 r["distance"],
@@ -77,7 +80,8 @@ def load_belief():
     artifact if complete, else Sinter-verified + direct-run values."""
     path = os.path.join(_REPO, "benchmark_results", "competitive_belief.json")
     try:
-        data = json.load(open(path, encoding="utf-8"))
+        with open(path, encoding="utf-8") as fh:
+            data = json.load(fh)
         rows = [(r["distance"], r["pymatching"]["ler"], r["qector_belief"]["ler"])
                 for r in data["results"]]
         if rows:
@@ -414,7 +418,7 @@ def _memory_scaling_section(comp):
         if d in seen:
             continue
         seen.add(d)
-        L.append(f"{d:>3} {r['n_qubits']:>9} {r['n_checks']:>9} {str(edges.get(d, '-')):>6} "
+        L.append(f"{d:>3} {r['n_qubits']:>9} {r['n_checks']:>9} {edges.get(d, '-')!s:>6} "
                  f"{float(r['peak_python_alloc_kib']):>16.1f}")
     L += ["", "Peak Python allocation is ~flat (~156 KiB) across d=3..11: the hot path",
           "does not grow Python memory (only the native Rust side scales) -> no leak.",
@@ -444,7 +448,8 @@ def _artifact_manifest_section():
          "-" * 62]
     for f in files:
         try:
-            b = open(_bench(f), "rb").read()
+            with open(_bench(f), "rb") as fh:
+                b = fh.read()
             L.append(f"{f:<32} {len(b) / 1024:>8.1f}  {hashlib.sha256(b).hexdigest()[:16]}")
         except Exception:
             L.append(f"{f:<32} {'--':>8}  (not present)")
@@ -1261,7 +1266,7 @@ def main():
     ap.add_argument("--stamp", default="")
     args = ap.parse_args()
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
-    stamp = args.stamp or datetime.date.today().isoformat()
+    stamp = args.stamp or datetime.datetime.now(datetime.timezone.utc).date().isoformat()
     path = build(args.out, stamp)
     print("wrote", path)
     return 0

@@ -1,0 +1,48 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'default'
+qector_decoder_v3 resolved from: C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\.venv\Lib\site-packages\qector_decoder_v3\__init__.py  [installed (native)]
+rootdir: C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone
+configfile: pyproject.toml
+plugins: anyio-4.14.2, hypothesis-6.164.0, cov-7.1.0, timeout-2.4.0
+timeout: 600.0s
+timeout method: thread
+timeout func_only: False
+collecting ... collected 25 items
+
+python/tests/test_colour_code_ler_lane.py::test_colour_code_ler_lane[3-1500] 
+color_code d=3 p=0.003 rounds=3 shots=1500: LER cluster_bposd=0.0240 bposd=0.0240 trivial=0.0427
+PASSED
+python/tests/test_colour_code_ler_lane.py::test_colour_code_ler_lane[5-1500] 
+color_code d=5 p=0.003 rounds=5 shots=1500: LER cluster_bposd=0.0413 bposd=0.0227 trivial=0.1440
+PASSED
+python/tests/test_colour_code_ler_lane.py::test_colour_code_ler_lane[7-600] 
+color_code d=7 p=0.003 rounds=7 shots=600: LER cluster_bposd=0.0250 bposd=0.0217 trivial=0.2467
+PASSED
+python/tests/test_colour_code_ler_lane.py::test_belief_matching_is_measurably_worse_at_d3 
+color_code d=3: belief-match LER=0.0440 vs bposd=0.0233
+PASSED
+python/tests/test_colour_code_ler_lane.py::test_d7_faithfulness PASSED
+python/tests/test_colour_cluster_expansion.py::test_cluster_stage_exact_on_graphlike_line PASSED
+python/tests/test_colour_cluster_expansion.py::test_cluster_stage_rolls_back_unspannable_hyperedge_component PASSED
+python/tests/test_colour_cluster_expansion.py::test_cluster_then_bposd_solves_the_rolled_back_component PASSED
+python/tests/test_colour_cluster_expansion.py::test_cluster_bposd_syndrome_faithful[3] PASSED
+python/tests/test_colour_cluster_expansion.py::test_cluster_bposd_syndrome_faithful[5] PASSED
+python/tests/test_colour_cluster_expansion.py::test_cluster_bposd_single_matches_batch PASSED
+python/tests/test_colour_cluster_expansion.py::test_bposd_method_matches_legacy_path PASSED
+python/tests/test_colour_cluster_expansion.py::test_cluster_bposd_accuracy_not_worse_than_bposd_only PASSED
+python/tests/test_colour_cluster_expansion.py::test_method_validation PASSED
+python/tests/test_colour_code.py::test_shapes_match_the_dem PASSED
+python/tests/test_colour_code.py::test_decode_batch_shape PASSED
+python/tests/test_colour_code.py::test_rejects_oversized_syndrome PASSED
+python/tests/test_colour_code.py::test_rejects_non_2d_batch PASSED
+python/tests/test_colour_code.py::test_alias_constructor_still_works PASSED
+python/tests/test_colour_code.py::test_observable_matrix_is_not_all_zero PASSED
+python/tests/test_colour_code.py::test_prediction_is_not_constant_zero PASSED
+python/tests/test_colour_code.py::test_beats_trivial_predictor[3] PASSED
+python/tests/test_colour_code.py::test_beats_trivial_predictor[5] PASSED
+python/tests/test_colour_code.py::test_single_and_batch_agree PASSED
+python/tests/test_colour_code.py::test_matching_cannot_decompose_colour_code_at_d5 PASSED
+
+============================= 25 passed in 31.91s =============================

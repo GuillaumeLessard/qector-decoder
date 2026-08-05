@@ -39,6 +39,27 @@ except ImportError:  # pragma: no cover
     _HAS_QISKIT = False
 
 
+def from_qiskit_parity_check(H: Any) -> list[list[int]]:
+    """Convert a Qiskit or dense binary parity check matrix H to check_to_qubits list."""
+    arr = np.asarray(H, dtype=np.uint8)
+    return [sorted(int(c) for c in np.nonzero(arr[r])[0]) for r in range(arr.shape[0])]
+
+
+def decode_qiskit_syndrome(H: Any, syndrome: Any, decoder: str = "blossom") -> np.ndarray:
+    """Decode a raw Qiskit syndrome vector using the specified QECTOR decoder."""
+    arr_h = np.asarray(H, dtype=np.uint8)
+    syn = np.asarray(syndrome, dtype=np.uint8)
+    c2q = from_qiskit_parity_check(arr_h)
+    nq = arr_h.shape[1]
+    if decoder.lower() == "blossom":
+        dec = BlossomDecoder(c2q, n_qubits=nq)
+    else:
+        from . import FastUnionFindDecoder
+
+        dec = FastUnionFindDecoder(c2q, n_qubits=nq)
+    return dec.decode(syn)
+
+
 def _normalize_counts(result: Any) -> dict[str, int]:
     """Extract raw counts from a Qiskit Result or a dict."""
     if isinstance(result, dict):

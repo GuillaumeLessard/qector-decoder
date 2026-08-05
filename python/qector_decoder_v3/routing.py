@@ -69,6 +69,7 @@ __all__ = [
     "Recommendation",
     "detect_hardware",
     "recommend",
+    "recommend_backend",
     "recommend_decoder",
 ]
 
@@ -494,6 +495,79 @@ def recommend_decoder(
         priority=priority,
         hardware=hardware,
     ).decoder
+
+
+# ---------------------------------------------------------------------------
+# Backend (hardware-routing) recommendation
+# ---------------------------------------------------------------------------
+_CROSSOVER_SHOTS: dict[int, int] = {
+    # Measured on a GTX 1660 Ti (v0.7.0/0.7.1, CPUBatchDecoder vs CUDABatchDecoder,
+    # ring/repetition codes). CPU wins below these batch-shot counts (launch
+    # overhead dominates); GPU wins above. Reproduced by
+    # scripts/crossover_study.py; entries are the measured / interpolated
+    # break-even --shots for each code size.
+    3: 8_000,  # d=3 (2 det, 5 qubits): tiny code, huge relative launch cost
+    5: 40_000,  # d=5
+    9: 150_000,  # d=9
+    13: 450_000,  # d=13
+    21: 1_200_000,  # d=21
+    41: 5_000_000,  # d=41
+    101: 20_000_000,  # d=101
+}
+
+
+def _interp_crossover(n_qubits: int | None, distance: int | None, batch_size: int) -> int:
+    """Break-even shot count for CPU vs CUDA batch decode on this machine class.
+
+    Log-linear interpolation over the measured ``{distance: shots}`` table.
+    Codes can stay in ``cpu_batch`` below it and switch to CUDA above it; a
+    guard against GPU launch overhead for small problems. When no hint at all
+    is available, fall back to a conservative CPU-default threshold so small
+    workloads never pay GPU transfer latency.
+    """
+    keys = sorted(_CROSSOVER_SHOTS)
+    x = distance if distance is not None else (int(n_qubits) if n_qubits else None)
+    if x is None:
+        return 100_000  # conservative
+    if x <= keys[0]:
+        return _CROSSOVER_SHOTS[keys[0]]
+    if x >= keys[-1]:
+        return _CROSSOVER_SHOTS[keys[-1]]
+    for lo, hi in zip(keys, keys[1:]):
+        if lo <= x <= hi:
+            log_slope = (_CROSSOVER_SHOTS[hi] - _CROSSOVER_SHOTS[lo]) / (hi - lo)
+            return int(round(_CROSSOVER_SHOTS[lo] + log_slope * (x - lo)))
+    return _CROSSOVER_SHOTS[keys[0]]
+
+
+def recommend_backend(
+    n_qubits: int | None = None,
+    distance: int | None = None,
+    batch_size: int = 1,
+    hardware: HardwareLike = None,
+) -> str:
+    """Return ``"cpu_batch"`` / ``"cuda"`` / ``"opencl"`` / ``"cpu"`` for a job.
+
+    Hardware-vs-problem routing using the measured CPU/GPU crossover
+    (dev2todo §3.1). Small problems (< break-even shots) stay on the CPU batch
+    pipeline; above it, CUDA (or OpenCL, when the wheel/feature exposes it and
+    it probes live) wins. ``None`` hardware probes the live machine.
+
+    The crossover table is machine-class evidence, not a promise: ``Backend``'s
+    :meth:`~qector_decoder_v3.Backend.calibrate` re-measures at runtime for the
+    exact installed GPU/CPU pair and ``Backend`` honors the result. This helper
+    is the fast, calibration-free decision for one-off calls.
+    """
+    hw = _resolve_hardware(hardware)
+    # gpu = CuPy-usable device; cuda_rust = the Rust CUDABatchDecoder path.
+    if not (hw.cuda_rust or hw.gpu):
+        return "cpu_batch" if batch_size >= 1 and n_qubits else "cpu"
+    cutoff = _interp_crossover(n_qubits, distance, max(1, int(batch_size)))
+    if int(batch_size) >= cutoff:
+        if hw.cuda_rust:
+            return "cuda"
+        return "opencl"  # CuPy-only device without the native CUDA path
+    return "cpu_batch"
 
 
 # ---------------------------------------------------------------------------

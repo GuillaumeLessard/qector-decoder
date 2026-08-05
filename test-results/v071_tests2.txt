@@ -1,0 +1,172 @@
+[dev.bat] Enterprise dev token loaded from ent_license.key.
+[dev.bat]   sub=local-gpu-benchmark  tier-claim=gpu_enabled:True  max_distance=63
+[dev.bat]   Token valid, expires in 1,6 days (2026-08-06 16:06 UTC).
+[dev.bat] Running: .venv\Scripts\python.exe -m pytest "C:\Users\Clinque du Batiment\Desktop\v0.7.1\tests" -v
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'default'
+rootdir: C:\Users\Clinque du Batiment
+plugins: anyio-4.14.2, hypothesis-6.164.0, cov-7.1.0, timeout-2.4.0
+collecting ... collected 120 items
+
+..\..\Desktop\v0.7.1\tests\test_01_smoke_api.py::test_version_is_071 PASSED [  0%]
+..\..\Desktop\v0.7.1\tests\test_01_smoke_api.py::test_native_module_present PASSED [  1%]
+..\..\Desktop\v0.7.1\tests\test_01_smoke_api.py::test_expected_public_exports_exist PASSED [  2%]
+..\..\Desktop\v0.7.1\tests\test_01_smoke_api.py::test_known_nonexistent_symbol_absent PASSED [  3%]
+..\..\Desktop\v0.7.1\tests\test_01_smoke_api.py::test_import_fresh_interpreter_no_crash PASSED [  4%]
+..\..\Desktop\v0.7.1\tests\test_01_smoke_api.py::test_console_scripts_installed PASSED [  5%]
+..\..\Desktop\v0.7.1\tests\test_01_smoke_api.py::test_submodules_importable PASSED [  5%]
+..\..\Desktop\v0.7.1\tests\test_02_core_decoders.py::TestUnionFind::test_decode_zero_syndrome PASSED [  6%]
+..\..\Desktop\v0.7.1\tests\test_02_core_decoders.py::TestUnionFind::test_all_16_syndromes_valid PASSED [  7%]
+..\..\Desktop\v0.7.1\tests\test_02_core_decoders.py::TestUnionFind::test_weight_never_exceeds_optimal_plus_margin PASSED [  8%]
+..\..\Desktop\v0.7.1\tests\test_02_core_decoders.py::TestUnionFind::test_decode_batch_matches_single PASSED [  9%]
+..\..\Desktop\v0.7.1\tests\test_02_core_decoders.py::TestBlossomOptimality::test_blossom_is_min_weight_all_syndromes PASSED [ 10%]
+..\..\Desktop\v0.7.1\tests\test_02_core_decoders.py::TestBlossomOptimality::test_blossom_matches_pymatching PASSED [ 10%]
+..\..\Desktop\v0.7.1\tests\test_02_core_decoders.py::TestBlossomOptimality::test_blossom_weighted_prefers_low_probability_edges PASSED [ 11%]
+..\..\Desktop\v0.7.1\tests\test_02_core_decoders.py::TestFastUnionFind::test_all_syndromes_valid PASSED [ 12%]
+..\..\Desktop\v0.7.1\tests\test_02_core_decoders.py::TestSparseBlossom::test_all_syndromes_valid PASSED [ 13%]
+..\..\Desktop\v0.7.1\tests\test_02_core_decoders.py::TestSparseBlossom::test_matches_blossom_weights PASSED [ 14%]
+..\..\Desktop\v0.7.1\tests\test_03_bposd_ldpc.py::TestBPOSD::test_construct_default PASSED [ 15%]
+..\..\Desktop\v0.7.1\tests\test_03_bposd_ldpc.py::TestBPOSD::test_all_syndromes_valid PASSED [ 15%]
+..\..\Desktop\v0.7.1\tests\test_03_bposd_ldpc.py::TestBPOSD::test_zero_syndrome PASSED [ 16%]
+..\..\Desktop\v0.7.1\tests\test_03_bposd_ldpc.py::TestBPOSD::test_bp_modes PASSED [ 17%]
+..\..\Desktop\v0.7.1\tests\test_03_bposd_ldpc.py::TestBpOsdAlias::test_construct PASSED [ 18%]
+..\..\Desktop\v0.7.1\tests\test_03_bposd_ldpc.py::TestBpOsdAlias::test_rejects_adjacency_list_with_helpful_error PASSED [ 19%]
+..\..\Desktop\v0.7.1\tests\test_03_bposd_ldpc.py::TestBpOsdAlias::test_all_syndromes_valid PASSED [ 20%]
+..\..\Desktop\v0.7.1\tests\test_03_bposd_ldpc.py::TestBpOsdAlias::test_agrees_with_BPOSDDecoder_on_rep PASSED [ 20%]
+..\..\Desktop\v0.7.1\tests\test_03_bposd_ldpc.py::TestOsdOrders::test_osd_order_sweep PASSED [ 21%]
+..\..\Desktop\v0.7.1\tests\test_04_advanced_decoders.py::TestBeliefMatching::test_construct_and_decode PASSED [ 22%]
+..\..\Desktop\v0.7.1\tests\test_04_advanced_decoders.py::TestBeliefMatching::test_sampled_syndromes_valid PASSED [ 23%]
+..\..\Desktop\v0.7.1\tests\test_04_advanced_decoders.py::TestColourCode::test_triangular_488_generator PASSED [ 24%]
+..\..\Desktop\v0.7.1\tests\test_04_advanced_decoders.py::TestColourCode::test_decode_colour_code_dem PASSED [ 25%]
+..\..\Desktop\v0.7.1\tests\test_04_advanced_decoders.py::TestTwoStage::test_x_then_z PASSED [ 25%]
+..\..\Desktop\v0.7.1\tests\test_04_advanced_decoders.py::TestAmbiguityCluster::test_decode_valid PASSED [ 26%]
+..\..\Desktop\v0.7.1\tests\test_04_advanced_decoders.py::TestLookupTable::test_small_code_exact PASSED [ 27%]
+..\..\Desktop\v0.7.1\tests\test_04_advanced_decoders.py::TestAutoDecoder::test_auto_picks_and_decodes PASSED [ 28%]
+..\..\Desktop\v0.7.1\tests\test_04_advanced_decoders.py::TestAutoDecoder::test_auto_on_surface PASSED [ 29%]
+..\..\Desktop\v0.7.1\tests\test_05_batch.py::TestBatchDecoder::test_parallel_batch_decode_shape PASSED [ 30%]
+..\..\Desktop\v0.7.1\tests\test_05_batch.py::TestBatchDecoder::test_dtype_uint8 PASSED [ 30%]
+..\..\Desktop\v0.7.1\tests\test_05_batch.py::TestBatchDecoder::test_batch_deterministic PASSED [ 31%]
+..\..\Desktop\v0.7.1\tests\test_05_batch.py::TestBatchDecoder::test_single_shot_row PASSED [ 32%]
+..\..\Desktop\v0.7.1\tests\test_05_batch.py::TestBatchDecoder::test_empty_batch PASSED [ 33%]
+..\..\Desktop\v0.7.1\tests\test_05_batch.py::TestCPUBatchDecoder::test_matches_batch_decoder PASSED [ 34%]
+..\..\Desktop\v0.7.1\tests\test_06_gpu_locked.py::TestCommunityTier::test_license_info_reports_tier PASSED [ 35%]
+..\..\Desktop\v0.7.1\tests\test_06_gpu_locked.py::TestCommunityTier::test_cuda_ctor_locked_or_unavailable PASSED [ 35%]
+..\..\Desktop\v0.7.1\tests\test_06_gpu_locked.py::TestCommunityTier::test_opencl_ctor_locked_or_unavailable SKIPPED [ 36%]
+..\..\Desktop\v0.7.1\tests\test_06_gpu_locked.py::TestCommunityTier::test_cpu_still_works_on_community PASSED [ 37%]
+..\..\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py::TestEnterpriseTier::test_tier_is_enterprise PASSED [ 38%]
+..\..\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py::TestEnterpriseTier::test_gpu_claim_enabled PASSED [ 39%]
+..\..\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py::TestCudaBatch::test_cuda_available PASSED [ 40%]
+..\..\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py::TestCudaBatch::test_construct PASSED [ 40%]
+..\..\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py::TestCudaBatch::test_batch_shape_and_dtype PASSED [ 41%]
+..\..\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py::TestCudaBatch::test_all_corrections_valid PASSED [ 42%]
+..\..\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py::TestCudaBatch::test_cuda_cpu_bit_identical_unweighted PASSED [ 43%]
+..\..\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py::TestCudaBatch::test_weighted_path_runs_and_valid PASSED [ 44%]
+..\..\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py::TestCudaBatch::test_weighted_prefers_cheap_edges PASSED [ 45%]
+..\..\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py::TestCudaBatch::test_gpu_deterministic PASSED [ 45%]
+..\..\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py::TestCudaBatch::test_large_batch_memory PASSED [ 46%]
+..\..\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py::TestCudaBpOsd::test_ctor_and_decode PASSED [ 47%]
+..\..\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py::TestOpenCL::test_opencl_path SKIPPED [ 48%]
+..\..\Desktop\v0.7.1\tests\test_08_dem_stim_sinter.py::TestDem::test_from_stim PASSED [ 49%]
+..\..\Desktop\v0.7.1\tests\test_08_dem_stim_sinter.py::TestDem::test_collapse_to_graph PASSED [ 50%]
+..\..\Desktop\v0.7.1\tests\test_08_dem_stim_sinter.py::TestDem::test_weights_finite PASSED [ 50%]
+..\..\Desktop\v0.7.1\tests\test_08_dem_stim_sinter.py::TestDem::test_decode_sampled_syndromes PASSED [ 51%]
+..\..\Desktop\v0.7.1\tests\test_08_dem_stim_sinter.py::TestSinterEntryPoints::test_entry_points_registered PASSED [ 52%]
+..\..\Desktop\v0.7.1\tests\test_08_dem_stim_sinter.py::TestSinterEntryPoints::test_sinter_decoder_decodes PASSED [ 53%]
+..\..\Desktop\v0.7.1\tests\test_08_dem_stim_sinter.py::TestCodes::test_surface_code_generator PASSED [ 54%]
+..\..\Desktop\v0.7.1\tests\test_08_dem_stim_sinter.py::TestCodes::test_repetition_generator PASSED [ 55%]
+..\..\Desktop\v0.7.1\tests\test_08_dem_stim_sinter.py::TestCodes::test_parity_check_matrix PASSED [ 55%]
+..\..\Desktop\v0.7.1\tests\test_09_cli_doctor.py::TestCLI::test_help PASSED [ 56%]
+..\..\Desktop\v0.7.1\tests\test_09_cli_doctor.py::TestCLI::test_decode_subcommand PASSED [ 57%]
+..\..\Desktop\v0.7.1\tests\test_09_cli_doctor.py::TestCLI::test_bench_subcommand PASSED [ 58%]
+..\..\Desktop\v0.7.1\tests\test_09_cli_doctor.py::TestDoctor::test_doctor_runs PASSED [ 59%]
+..\..\Desktop\v0.7.1\tests\test_09_cli_doctor.py::TestDoctor::test_doctor_no_traceback PASSED [ 60%]
+..\..\Desktop\v0.7.1\tests\test_10_errors_edge.py::TestWrongShapes::test_syndrome_wrong_length PASSED [ 60%]
+..\..\Desktop\v0.7.1\tests\test_10_errors_edge.py::TestWrongShapes::test_syndrome_too_long PASSED [ 61%]
+..\..\Desktop\v0.7.1\tests\test_10_errors_edge.py::TestWrongShapes::test_syndrome_non_binary PASSED [ 62%]
+..\..\Desktop\v0.7.1\tests\test_10_errors_edge.py::TestWrongShapes::test_float_syndrome PASSED [ 63%]
+..\..\Desktop\v0.7.1\tests\test_10_errors_edge.py::TestBadConstruction::test_empty_checks PASSED [ 64%]
+..\..\Desktop\v0.7.1\tests\test_10_errors_edge.py::TestBadConstruction::test_qubit_index_out_of_range PASSED [ 65%]
+..\..\Desktop\v0.7.1\tests\test_10_errors_edge.py::TestBadConstruction::test_negative_qubit_index PASSED [ 65%]
+..\..\Desktop\v0.7.1\tests\test_10_errors_edge.py::TestChildProcessSafety::test_no_host_abort[uf_bad_syndrome] PASSED [ 66%]
+..\..\Desktop\v0.7.1\tests\test_10_errors_edge.py::TestChildProcessSafety::test_no_host_abort[blossom_bad_syndrome] PASSED [ 67%]
+..\..\Desktop\v0.7.1\tests\test_10_errors_edge.py::TestChildProcessSafety::test_no_host_abort[bposd_bad_syndrome] PASSED [ 68%]
+..\..\Desktop\v0.7.1\tests\test_10_errors_edge.py::TestChildProcessSafety::test_no_host_abort[batch_ragged] PASSED [ 69%]
+..\..\Desktop\v0.7.1\tests\test_10_errors_edge.py::TestChildProcessSafety::test_no_host_abort[negative_index_ctor] PASSED [ 70%]
+..\..\Desktop\v0.7.1\tests\test_10_errors_edge.py::TestEdgeSyndromes::test_all_zeros PASSED [ 70%]
+..\..\Desktop\v0.7.1\tests\test_10_errors_edge.py::TestEdgeSyndromes::test_all_ones PASSED [ 71%]
+..\..\Desktop\v0.7.1\tests\test_10_errors_edge.py::TestEdgeSyndromes::test_single_check_code PASSED [ 72%]
+..\..\Desktop\v0.7.1\tests\test_10_errors_edge.py::TestEdgeSyndromes::test_self_loop_check PASSED [ 73%]
+..\..\Desktop\v0.7.1\tests\test_11_result_api.py::TestDecodeResult::test_decode_returns_array_like PASSED [ 74%]
+..\..\Desktop\v0.7.1\tests\test_11_result_api.py::TestDecodeResult::test_decode_with_diagnostics PASSED [ 75%]
+..\..\Desktop\v0.7.1\tests\test_11_result_api.py::TestHelpers::test_check_to_edges PASSED [ 75%]
+..\..\Desktop\v0.7.1\tests\test_11_result_api.py::TestHelpers::test_estimate_distance PASSED [ 76%]
+..\..\Desktop\v0.7.1\tests\test_11_result_api.py::TestHelpers::test_get_decoder_factory PASSED [ 77%]
+..\..\Desktop\v0.7.1\tests\test_11_result_api.py::TestHelpers::test_license_info_structure PASSED [ 78%]
+..\..\Desktop\v0.7.1\tests\test_11_result_api.py::TestStreaming::test_streaming_decoder_rounds PASSED [ 79%]
+..\..\Desktop\v0.7.1\tests\test_12_benchmark_xcheck.py::TestThroughput::test_cpu_batch_throughput PASSED [ 80%]
+..\..\Desktop\v0.7.1\tests\test_12_benchmark_xcheck.py::TestThroughput::test_single_decode_latency PASSED [ 80%]
+..\..\Desktop\v0.7.1\tests\test_12_benchmark_xcheck.py::TestThroughput::test_gpu_throughput_if_licensed PASSED [ 81%]
+..\..\Desktop\v0.7.1\tests\test_12_benchmark_xcheck.py::TestThroughput::test_blossom_scaling PASSED [ 82%]
+..\..\Desktop\v0.7.1\tests\test_12_benchmark_xcheck.py::TestLogicalAccuracyXCheck::test_ler_matches_pymatching PASSED [ 83%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestHandshake::test_initialize_server_info PASSED [ 84%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestHandshake::test_tools_inventory PASSED [ 85%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestDecodeViaMcp::test_decode_syndrome PASSED [ 85%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestDecodeViaMcp::test_decode_syndrome_blossom PASSED [ 86%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestDecodeViaMcp::test_batch_decode PASSED [ 87%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestDecodeViaMcp::test_recommend_decoder PASSED [ 88%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestDecodeViaMcp::test_health_and_env PASSED [ 89%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestMcpDecoderHints::test_decoder_type_hint[UnionFind] PASSED [ 90%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestMcpDecoderHints::test_decoder_type_hint[FastUnionFind] PASSED [ 90%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestMcpDecoderHints::test_decoder_type_hint[Blossom] PASSED [ 91%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestMcpDecoderHints::test_decoder_type_hint[SparseBlossom] PASSED [ 92%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestMcpDecoderHints::test_decoder_type_hint[bposd] PASSED [ 93%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestMcpDecoderHints::test_decoder_type_hint[LookupTable] PASSED [ 94%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestMcpDecoderHints::test_decoder_type_hint[SlidingWindow] PASSED [ 95%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestMcpDecoderHints::test_decoder_type_hint[Streaming] PASSED [ 95%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestMcpDecoderHints::test_benchmark_decoder_tool PASSED [ 96%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestMcpDecoderHints::test_get_decoder_info_payload PASSED [ 97%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestProtocolConformance::test_ping_supported PASSED [ 98%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestProtocolConformance::test_no_response_to_notifications PASSED [ 99%]
+..\..\Desktop\v0.7.1\tests\test_13_mcp_server.py::TestProtocolConformance::test_stdout_clean_of_banner PASSED [100%]
+
+============================== warnings summary ===============================
+Desktop/v0.7.1/tests/test_06_gpu_locked.py::TestCommunityTier::test_cuda_ctor_locked_or_unavailable
+  C:\Users\Clinque du Batiment\Desktop\v0.7.1\tests\test_06_gpu_locked.py:32: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    d = q.CUDABatchDecoder(REP5_CHECKS, REP5_N_QUBITS)
+
+Desktop/v0.7.1/tests/test_07_gpu_enterprise.py::TestCudaBatch::test_construct
+  C:\Users\Clinque du Batiment\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py:43: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    d = q.CUDABatchDecoder(REP5_CHECKS, REP5_N_QUBITS)
+
+Desktop/v0.7.1/tests/test_07_gpu_enterprise.py::TestCudaBatch::test_batch_shape_and_dtype
+  C:\Users\Clinque du Batiment\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py:47: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    d = q.CUDABatchDecoder(REP5_CHECKS, REP5_N_QUBITS)
+
+Desktop/v0.7.1/tests/test_07_gpu_enterprise.py::TestCudaBatch::test_all_corrections_valid
+  C:\Users\Clinque du Batiment\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py:54: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    d = q.CUDABatchDecoder(REP5_CHECKS, REP5_N_QUBITS)
+
+Desktop/v0.7.1/tests/test_07_gpu_enterprise.py::TestCudaBatch::test_cuda_cpu_bit_identical_unweighted
+  C:\Users\Clinque du Batiment\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py:62: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    gpu = np.asarray(q.CUDABatchDecoder(REP5_CHECKS, REP5_N_QUBITS)
+
+Desktop/v0.7.1/tests/test_07_gpu_enterprise.py::TestCudaBatch::test_weighted_prefers_cheap_edges
+  C:\Users\Clinque du Batiment\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py:89: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    du = q.CUDABatchDecoder(REP5_CHECKS, REP5_N_QUBITS)
+
+Desktop/v0.7.1/tests/test_07_gpu_enterprise.py::TestCudaBatch::test_gpu_deterministic
+  C:\Users\Clinque du Batiment\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py:98: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    d = q.CUDABatchDecoder(REP5_CHECKS, REP5_N_QUBITS)
+
+Desktop/v0.7.1/tests/test_07_gpu_enterprise.py::TestCudaBatch::test_large_batch_memory
+  C:\Users\Clinque du Batiment\Desktop\v0.7.1\tests\test_07_gpu_enterprise.py:105: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    d = q.CUDABatchDecoder(REP5_CHECKS, REP5_N_QUBITS)
+
+Desktop/v0.7.1/tests/test_12_benchmark_xcheck.py::TestThroughput::test_gpu_throughput_if_licensed
+  C:\Users\Clinque du Batiment\Desktop\v0.7.1\tests\test_12_benchmark_xcheck.py:78: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    d = q.CUDABatchDecoder(REP5_CHECKS, REP5_N_QUBITS)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================= 118 passed, 2 skipped, 9 warnings in 26.53s =================

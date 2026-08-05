@@ -1,0 +1,105 @@
+﻿[dev.bat] Enterprise dev token loaded from ent_license.key.
+[dev.bat]   sub=local-gpu-benchmark  tier-claim=gpu_enabled:True  max_distance=63
+[dev.bat]   Token valid, expires in 1,7 days (2026-08-06 16:06 UTC).
+[dev.bat] Running: .venv\Scripts\python.exe -m pytest python\tests\test_bulletproof.py::TestGPUBackends python\tests\test_batch_guards.py python\tests\test_explicit_api_protocols.py python\tests\test_api_consistency_v1.py python\tests\test_bposd_cs_osd.py python\tests\test_cuda_f64_precision.py python\tests\test_gpu_weights_required.py python\tests\test_cuda_cpu_bit_identical.py -v
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'default'
+qector_decoder_v3 resolved from: C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\qector_decoder_v3\__init__.py  [repo source]
+rootdir: C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone
+configfile: pyproject.toml
+plugins: anyio-4.14.2, hypothesis-6.164.0, cov-7.1.0, timeout-2.4.0
+collecting ... collected 63 items
+
+python/tests/test_bulletproof.py::TestGPUBackends::test_cuda_is_available_bool PASSED [  1%]
+python/tests/test_bulletproof.py::TestGPUBackends::test_opencl_is_available_bool PASSED [  3%]
+python/tests/test_bulletproof.py::TestGPUBackends::test_cuda_resilience_fields_initial PASSED [  4%]
+python/tests/test_bulletproof.py::TestGPUBackends::test_cuda_reset_clears_counters PASSED [  6%]
+python/tests/test_bulletproof.py::TestGPUBackends::test_cuda_rejects_wrong_shape PASSED [  7%]
+python/tests/test_bulletproof.py::TestGPUBackends::test_cuda_matches_cpu PASSED [  9%]
+python/tests/test_bulletproof.py::TestGPUBackends::test_opencl_resilience_fields_initial SKIPPED [ 11%]
+python/tests/test_bulletproof.py::TestGPUBackends::test_opencl_reset SKIPPED [ 12%]
+python/tests/test_bulletproof.py::TestGPUBackends::test_opencl_matches_cpu SKIPPED [ 14%]
+python/tests/test_bulletproof.py::TestGPUBackends::test_opencl_rejects_wrong_shape SKIPPED [ 15%]
+python/tests/test_batch_guards.py::test_batch_output_dtype_uint8 PASSED  [ 17%]
+python/tests/test_batch_guards.py::test_batch_decode_deterministic PASSED [ 19%]
+python/tests/test_batch_guards.py::test_batch_single_shot_row PASSED     [ 20%]
+python/tests/test_batch_guards.py::test_batch_empty PASSED               [ 22%]
+python/tests/test_batch_guards.py::test_batch_one_million_shots PASSED   [ 23%]
+python/tests/test_batch_guards.py::test_batch_matches_single_decode PASSED [ 25%]
+python/tests/test_explicit_api_protocols.py::test_blossom_explicit_api PASSED [ 26%]
+python/tests/test_explicit_api_protocols.py::test_fast_uf_explicit_api PASSED [ 28%]
+python/tests/test_explicit_api_protocols.py::test_matrix_bposd_explicit_api PASSED [ 30%]
+python/tests/test_explicit_api_protocols.py::test_belief_matching_explicit_api PASSED [ 31%]
+python/tests/test_explicit_api_protocols.py::test_two_stage_explicit_api PASSED [ 33%]
+python/tests/test_api_consistency_v1.py::test_clear_name_aliases_are_distinct_constructors PASSED [ 34%]
+python/tests/test_api_consistency_v1.py::test_graph_bposd_alias_decodes_adjacency PASSED [ 36%]
+python/tests/test_api_consistency_v1.py::test_matrix_bposd_alias_decodes_dense_h PASSED [ 38%]
+python/tests/test_api_consistency_v1.py::test_belief_matching_explicit_return_convention PASSED [ 39%]
+python/tests/test_api_consistency_v1.py::test_belief_matching_from_numpy_h_correction_length PASSED [ 41%]
+python/tests/test_api_consistency_v1.py::test_streaming_partial_params_is_hard_error PASSED [ 42%]
+python/tests/test_api_consistency_v1.py::test_streaming_legacy_accumulation_deprecated PASSED [ 44%]
+python/tests/test_api_consistency_v1.py::test_streaming_full_params_no_warning PASSED [ 46%]
+python/tests/test_api_consistency_v1.py::test_two_stage_accepts_x_z_strings PASSED [ 47%]
+python/tests/test_api_consistency_v1.py::test_recommend_backend_exported_and_monotone PASSED [ 49%]
+python/tests/test_api_consistency_v1.py::test_recommend_backend_crossover_boundaries PASSED [ 50%]
+python/tests/test_api_consistency_v1.py::test_recommend_backend_without_size_hint PASSED [ 52%]
+python/tests/test_bposd_cs_osd.py::test_cs_osd_faithful_and_hamming_monotone_uniform_priors PASSED [ 53%]
+python/tests/test_bposd_cs_osd.py::test_cs_osd_uses_prior_weighted_metric PASSED [ 55%]
+python/tests/test_bposd_cs_osd.py::test_cs_osd_sweep_attains_metric_optimum_on_small_code PASSED [ 57%]
+python/tests/test_bposd_cs_osd.py::test_damping_validation PASSED        [ 58%]
+python/tests/test_bposd_cs_osd.py::test_damping_changes_messages_and_stays_faithful PASSED [ 60%]
+python/tests/test_bposd_cs_osd.py::test_damping_zero_is_backward_compatible PASSED [ 61%]
+python/tests/test_cuda_f64_precision.py::test_precision_validation_rejects_unknown_value PASSED [ 63%]
+python/tests/test_cuda_f64_precision.py::test_precision_defaults_to_f32 PASSED [ 65%]
+python/tests/test_cuda_f64_precision.py::test_f64_weighted_kernel_is_syndrome_faithful PASSED [ 66%]
+python/tests/test_cuda_f64_precision.py::test_f64_vs_f32_both_faithful_on_same_batch PASSED [ 68%]
+python/tests/test_cuda_f64_precision.py::test_f64_weighted_ler_matches_cpu_weighted_within_noise_d13 PASSED [ 69%]
+python/tests/test_gpu_weights_required.py::test_weights_required_without_weights_is_a_hard_error PASSED [ 71%]
+python/tests/test_gpu_weights_required.py::test_unweighted_construction_warns_once PASSED [ 73%]
+python/tests/test_gpu_weights_required.py::test_weights_required_with_weights_constructs PASSED [ 74%]
+python/tests/test_cuda_cpu_bit_identical.py::test_cuda_bit_identical_to_cpu[1-3] PASSED [ 76%]
+python/tests/test_cuda_cpu_bit_identical.py::test_cuda_bit_identical_to_cpu[1-5] PASSED [ 77%]
+python/tests/test_cuda_cpu_bit_identical.py::test_cuda_bit_identical_to_cpu[1-7] PASSED [ 79%]
+python/tests/test_cuda_cpu_bit_identical.py::test_cuda_bit_identical_to_cpu[1-9] PASSED [ 80%]
+python/tests/test_cuda_cpu_bit_identical.py::test_cuda_bit_identical_to_cpu[64-3] PASSED [ 82%]
+python/tests/test_cuda_cpu_bit_identical.py::test_cuda_bit_identical_to_cpu[64-5] PASSED [ 84%]
+python/tests/test_cuda_cpu_bit_identical.py::test_cuda_bit_identical_to_cpu[64-7] PASSED [ 85%]
+python/tests/test_cuda_cpu_bit_identical.py::test_cuda_bit_identical_to_cpu[64-9] PASSED [ 87%]
+python/tests/test_cuda_cpu_bit_identical.py::test_cuda_bit_identical_to_cpu[1024-3] PASSED [ 88%]
+python/tests/test_cuda_cpu_bit_identical.py::test_cuda_bit_identical_to_cpu[1024-5] PASSED [ 90%]
+python/tests/test_cuda_cpu_bit_identical.py::test_cuda_bit_identical_to_cpu[1024-7] PASSED [ 92%]
+python/tests/test_cuda_cpu_bit_identical.py::test_cuda_bit_identical_to_cpu[1024-9] PASSED [ 93%]
+python/tests/test_cuda_cpu_bit_identical.py::test_cuda_bit_identical_to_cpu[4096-3] PASSED [ 95%]
+python/tests/test_cuda_cpu_bit_identical.py::test_cuda_bit_identical_to_cpu[4096-5] PASSED [ 96%]
+python/tests/test_cuda_cpu_bit_identical.py::test_cuda_bit_identical_to_cpu[4096-7] PASSED [ 98%]
+python/tests/test_cuda_cpu_bit_identical.py::test_cuda_bit_identical_to_cpu[4096-9] PASSED [100%]
+
+============================== warnings summary ===============================
+python/tests/test_bulletproof.py::TestGPUBackends::test_cuda_resilience_fields_initial
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_bulletproof.py:137: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    dec = qd.CUDABatchDecoder(checks, n_qubits)
+
+python/tests/test_bulletproof.py::TestGPUBackends::test_cuda_reset_clears_counters
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_bulletproof.py:149: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    dec = qd.CUDABatchDecoder(checks, n_qubits)
+
+python/tests/test_bulletproof.py::TestGPUBackends::test_cuda_rejects_wrong_shape
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_bulletproof.py:158: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    dec = qd.CUDABatchDecoder(checks, n_qubits)
+
+python/tests/test_bulletproof.py::TestGPUBackends::test_cuda_matches_cpu
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_bulletproof.py:166: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    cuda = qd.CUDABatchDecoder(checks, n_qubits)
+
+python/tests/test_cuda_f64_precision.py::test_precision_defaults_to_f32
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_cuda_f64_precision.py:58: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    dec = qd.CUDABatchDecoder(_ring_c2q(8), 8)
+
+python/tests/test_cuda_cpu_bit_identical.py: 16 warnings
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_cuda_cpu_bit_identical.py:34: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    cuda = qd.CUDABatchDecoder(code.check_to_qubits, code.n_qubits)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================= 59 passed, 4 skipped, 21 warnings in 21.88s =================

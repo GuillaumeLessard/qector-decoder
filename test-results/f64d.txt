@@ -1,0 +1,28 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'default'
+qector_decoder_v3 resolved from: C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\.venv\Lib\site-packages\qector_decoder_v3\__init__.py  [installed (native)]
+rootdir: C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone
+configfile: pyproject.toml
+plugins: anyio-4.14.2, hypothesis-6.164.0, cov-7.1.0, timeout-2.4.0
+timeout: 600.0s
+timeout method: thread
+timeout func_only: False
+collecting ... collected 5 items
+
+python/tests/test_cuda_f64_precision.py::test_precision_validation_rejects_unknown_value PASSED
+python/tests/test_cuda_f64_precision.py::test_precision_defaults_to_f32 PASSED
+python/tests/test_cuda_f64_precision.py::test_f64_weighted_kernel_is_syndrome_faithful PASSED
+python/tests/test_cuda_f64_precision.py::test_f64_vs_f32_both_faithful_on_same_batch PASSED
+python/tests/test_cuda_f64_precision.py::test_f64_weighted_ler_matches_cpu_weighted_within_noise_d13 
+d=13 circuit-level p=0.003, 3000 shots: LER cpu_weighted=0.00033 gpu_f64=0.00033 (3-sigma=0.00141), prediction agreement=1.0000
+PASSED
+
+============================== warnings summary ===============================
+python/tests/test_cuda_f64_precision.py::test_precision_defaults_to_f32
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_cuda_f64_precision.py:62: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    dec = qd.CUDABatchDecoder(_ring_c2q(8), 8)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 5 passed, 1 warning in 8.68s =========================

@@ -33,9 +33,8 @@ _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_REPO, "python"))
 
 import numpy as np  # noqa: E402
-
 import qector_decoder_v3 as qd  # noqa: E402
-from qector_decoder_v3 import pymatching_compat, dem  # noqa: E402
+from qector_decoder_v3 import dem, pymatching_compat  # noqa: E402
 
 
 def percentile(data: np.ndarray, p: float) -> float:
@@ -66,8 +65,8 @@ def main() -> int:
     )
     args = ap.parse_args()
 
-    import stim
     import pymatching
+    import stim
 
     env = {}
     env["platform"] = os.uname()._asdict() if hasattr(os, "uname") else {}
@@ -114,10 +113,10 @@ def main() -> int:
         }
 
         for label, dec_fn in [
-            ("qector_blossom", lambda s: np.asarray(qm.decode(s), dtype=np.uint8)),
+            ("qector_blossom", lambda s, _qm=qm: np.asarray(_qm.decode(s), dtype=np.uint8)),
             ("qector_unionfind",
-             lambda s: np.asarray(uf.decode(s), dtype=np.uint8)),
-            ("pymatching", lambda s: pm.decode(s)),
+             lambda s, _uf=uf: np.asarray(_uf.decode(s), dtype=np.uint8)),
+            ("pymatching", lambda s, _pm=pm: _pm.decode(s)),
         ]:
             latencies = np.empty(n_shots, dtype=np.float64)
             for i in range(n_shots):

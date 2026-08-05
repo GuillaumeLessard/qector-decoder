@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 QECTOR v0.7.0 — PARITY SWEEP: unweighted UF vs weighted UF vs BPOSD vs PyMatching
 
@@ -14,12 +13,12 @@ Usage::
 from __future__ import annotations
 
 import argparse
+import json
+import logging
 import math
 import os
 import time
-import json
-import logging
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 
 logging.basicConfig(
     level=logging.INFO,
@@ -29,13 +28,11 @@ logging.basicConfig(
 logger = logging.getLogger("PARITY_SWEEP")
 
 import numpy as np
-import stim
 import pymatching
-
 import qector_decoder_v3 as qd
-from qector_decoder_v3.qector_memory_align import aligned_stride
+import stim
 from qector_decoder_v3 import codes
-
+from qector_decoder_v3.qector_memory_align import aligned_stride
 
 P_NOISE = 0.005
 

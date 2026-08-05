@@ -45,6 +45,7 @@ import numpy as np
 __all__ = [
     "TELEMETRY",
     "GpuBackend",
+    "allocate_pinned_array",
     "asnumpy",
     "get_array_module",
     "get_backend",
@@ -265,6 +266,38 @@ def to_host(a: Any) -> np.ndarray:
 def asnumpy(a: Any) -> np.ndarray:
     """Alias for :func:`to_host` - mirrors ``cupy.asnumpy``."""
     return to_host(a)
+
+
+def allocate_pinned_array(shape: Any, dtype: Any = np.uint8) -> np.ndarray:
+    """Allocate a NumPy array backed by CUDA pinned (page-locked) host memory.
+
+    If the GPU is available and policy allows it, this uses ``cupy.cuda.alloc_pinned_memory``
+    to allocate non-pageable RAM, wrapped transparently in a standard NumPy array.
+    Using this array for H2D/D2H transfers enables true asynchronous DMA pipelining.
+
+    If the GPU is absent or disabled, falls back to standard pageable ``np.empty``.
+    """
+    cp = _cupy()
+    if gpu_available() and _PREFER_GPU and cp is not None:
+        import operator
+
+        if isinstance(shape, int):
+            size = shape
+        else:
+            size = functools.reduce(operator.mul, shape, 1)
+
+        dtype_obj = np.dtype(dtype)
+        num_bytes = size * dtype_obj.itemsize
+
+        try:
+            pinned_mem = cp.cuda.alloc_pinned_memory(num_bytes)
+            return np.ndarray(shape, dtype=dtype, buffer=pinned_mem)
+        except Exception:
+            note_fallback()
+            return np.empty(shape, dtype=dtype)
+
+    note_fallback()
+    return np.empty(shape, dtype=dtype)
 
 
 # ---------------------------------------------------------------------------

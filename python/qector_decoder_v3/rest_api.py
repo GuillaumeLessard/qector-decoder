@@ -177,6 +177,11 @@ def _check_api_auth(authorization: str | None) -> str | None:
     return "Invalid API key. Check your Authorization: Bearer header."
 
 
+class _SyndromeValueError(ValueError):
+    """Client-supplied syndrome is not binary. Mapped to 422 (fastapi) / 400
+    (flask) by the /decode endpoint arms."""
+
+
 def _decode_impl(check_to_qubits: Any, syndrome: Any, n_qubits: Any, use_batch: bool) -> dict[str, Any]:
     # Licence enforcement (A6-03): hard-gate on missing/invalid key when
     # QECTOR_ENFORCE=1; then check the distance cap.
@@ -202,6 +207,16 @@ def _decode_impl(check_to_qubits: Any, syndrome: Any, n_qubits: Any, use_batch: 
 
     dec_any = _DECODER_CACHE[cache_key]
     syndrome_arr = np.array([syndrome], dtype=np.uint8) if use_batch else np.array(syndrome, dtype=np.uint8)
+    # SEC-02 trust-boundary hardening (same as the MCP layer): a uint8 value
+    # like 2 parses fine but is not a valid detector outcome. Accepting it
+    # would silently decode a different syndrome than the caller intended, so
+    # reject non-binary input before any decoder touches it. Raised as a plain
+    # ValueError subclass so BOTH the fastapi and the flask endpoint arms can
+    # map it to a client-error status without NameError.
+    if syndrome_arr.size and int(syndrome_arr.max()) > 1:
+        raise _SyndromeValueError(
+            f"syndrome values must be binary (0/1); found {int(syndrome_arr.max())}"
+        )
     correction = dec_any.parallel_batch_decode(syndrome_arr)[0] if use_batch else dec_any.decode(syndrome_arr)
     return {
         "correction": correction.tolist(),
@@ -263,6 +278,9 @@ def _create_fastapi_app() -> FastAPI:
             # authorisation failure, not a server fault. Without this arm the
             # PermissionError escapes as an unhandled 500.
             raise HTTPException(status_code=403, detail=str(exc))
+        except _SyndromeValueError as exc:
+            # Non-binary syndrome is a client error (unprocessable entity).
+            raise HTTPException(status_code=422, detail=str(exc))
         except (RuntimeError, ValueError) as exc:
             raise HTTPException(status_code=500, detail=f"Decode error: {exc}")
 
@@ -346,6 +364,9 @@ def _create_flask_app() -> Flask:
         except PermissionError as exc:
             # A6-04: same licence gate as the FastAPI branch — 403, not 500.
             return jsonify({"error": str(exc)}), 403
+        except _SyndromeValueError as exc:
+            # Non-binary syndrome is a client error (bad request).
+            return jsonify({"error": str(exc)}), 400
         except (RuntimeError, ValueError) as exc:
             return jsonify({"error": f"Decode error: {exc}"}), 500
 

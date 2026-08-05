@@ -5,10 +5,11 @@ QECTOR Decoder v3 Extended Smoke Test Suite
 
 import sys
 import time
+
 import numpy as np
 from qector_decoder_v3 import (
-    BlossomDecoder,
     BatchDecoder,
+    BlossomDecoder,
     CUDABatchDecoder,
     FastUnionFindDecoder,
     NativeAutoDecoder,
@@ -18,6 +19,7 @@ from qector_decoder_v3 import (
     set_license_key,
 )
 from qector_decoder_v3 import __version__ as qector_version
+
 
 def main():
     print("=== QECTOR Decoder v3 Extended Smoke Test ===")

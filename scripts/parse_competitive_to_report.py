@@ -33,7 +33,7 @@ def main():
         "> **Direct Empirical Benchmark**: Comparison of QECTOR decoders vs PyMatching v2.4 "
         "on an identical circuit-level Stim pipeline (A1 methodology).",
         "",
-        "| Distance ($d$) | Qubits ($n$) | Shots | Rank | Decoder & Implementation | LER ($p=0.005$) | Throughput (dec/s) | Latency ($\mu$s/dec) | **Speedup vs PyMatching** |",
+        r"| Distance ($d$) | Qubits ($n$) | Shots | Rank | Decoder & Implementation | LER ($p=0.005$) | Throughput (dec/s) | Latency ($\mu$s/dec) | **Speedup vs PyMatching** |",
         "| :---: | :---: | :---: | :---: | :--- | :---: | :---: | :---: | :---: |",
     ]
 

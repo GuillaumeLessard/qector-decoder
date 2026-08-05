@@ -32,8 +32,8 @@ def main() -> int:
     ap.add_argument("--seed", type=int, default=20260622)
     args = ap.parse_args()
 
-    import stim
     import pymatching
+    import stim
 
     # Pre-build problems + reference (independent of the multiplier).
     probs = {}

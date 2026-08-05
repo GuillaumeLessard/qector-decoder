@@ -113,8 +113,12 @@ CONSTRUCTOR_SPECS: dict[str, str] = {
     "TwoStageDecoder": "check_to_qubits, check_types, n_qubits=, x_decoder=, z_decoder=",
     "AmbiguityClusterDecoder": ("check_to_qubits, n_qubits=, error_rate=, ambig_threshold=, max_cluster_size="),
     "BeliefMatching": "matrices, max_iter=, bp_shortcut=",
+    # v1.0 additive: `damping` (LLR message damping) and `osd_lambda` (CS-OSD
+    # sweep-set size) are optional keyword args appended at the end; every
+    # pre-1.0 call site keeps working unchanged.
     "BpOsdDecoder": (
-        "H, error_rate=, priors=, max_iter=, ms_scale=, osd_order=, bp_method=, use_gpu=, max_latency_ms="
+        "H, error_rate=, priors=, max_iter=, ms_scale=, osd_order=, bp_method=, use_gpu=, max_latency_ms=, "
+        "damping=, osd_lambda="
     ),
     "PredecodedDecoder": "check_to_qubits, n_qubits=, backend=",
     "AutoDecoder": "check_to_qubits, n_qubits=, config=",
@@ -553,7 +557,9 @@ def test_matching_shim_and_top_level_name_are_the_same_class():
 
 
 COLOUR_CODE_SURFACE = {
-    "__init__": "dem, max_iter=, osd_order=",
+    # v1.0 additive: `method` (cluster_bposd / bposd) is an optional keyword arg
+    # appended at the end; every pre-1.0 call site keeps working unchanged.
+    "__init__": "dem, max_iter=, osd_order=, method=",
     "from_stim_circuit": "circuit, max_iter=, osd_order=",
     "decode": "syndrome",
     "decode_batch": "syndromes",

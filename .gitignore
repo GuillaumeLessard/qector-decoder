@@ -232,3 +232,12 @@ scripts/temp_stripe_sync.py
 
 # Internal planning ledgers - working docs, not release artifacts
 todo*.md
+
+# Scratch and audit files
+*.log
+vs.py
+_probe_*.py
+audit_*.ps1
+test_out.txt
+update_versions.py
+

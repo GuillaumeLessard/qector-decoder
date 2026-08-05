@@ -1,0 +1,58 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'default'
+qector_decoder_v3 resolved from: C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\.venv\Lib\site-packages\qector_decoder_v3\__init__.py  [installed (native)]
+rootdir: C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone
+configfile: pyproject.toml
+plugins: anyio-4.14.2, hypothesis-6.164.0, cov-7.1.0, timeout-2.4.0
+timeout: 600.0s
+timeout method: thread
+timeout func_only: False
+collecting ... collected 1 item
+
+python/tests/test_cuda_f64_precision.py::test_f64_weighted_ler_matches_cpu_weighted_within_noise_d13 FAILED
+
+================================== FAILURES ===================================
+_________ test_f64_weighted_ler_matches_cpu_weighted_within_noise_d13 _________
+
+    def test_f64_weighted_ler_matches_cpu_weighted_within_noise_d13():
+        """d=13 rotated-surface memory experiment, circuit-level noise.
+    
+        Both decoders consume the *same* collapsed DEM (same graph, same
+        log((1-p)/p) weights, same samples). The f64 GPU LER must land within 3\u03c3
+        (plus a 1e-3 floor for near-zero rates) of the weighted CPU reference.
+        """
+        circuit = stim.Circuit.generated(
+            "surface_code:rotated_memory_x",
+            distance=13,
+            rounds=13,
+            after_clifford_depolarization=0.003,
+            before_measure_flip_probability=0.003,
+            after_reset_flip_probability=0.003,
+        )
+        dem = circuit.detector_error_model(decompose_errors=True)
+    
+        from qector_decoder_v3.dem import from_stim
+    
+        model = from_stim(dem)
+        assert model.is_graphlike, "test premise: rotated surface DEM must be graphlike"
+        model = model.collapse_to_graph()
+        c2q = model.check_to_qubits()
+        nq = model.num_errors
+        weights = model.weights().tolist()
+        L = np.asarray(model.observables_matrix(), dtype=np.uint8)
+    
+        n_shots = 3000
+        det, obs = circuit.compile_detector_sampler(seed=20260804).sample(n_shots, separate_observables=True)
+        det = np.ascontiguousarray(det.astype(np.uint8))
+        assert det.shape[1] == len(c2q)
+    
+>       cpu = qd.CPUBatchDecoder(c2q, nq, edge_weights=weights)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: CPUBatchDecoder.__init__() got an unexpected keyword argument 'edge_weights'
+
+python\tests\test_cuda_f64_precision.py:150: TypeError
+=========================== short test summary info ===========================
+FAILED python/tests/test_cuda_f64_precision.py::test_f64_weighted_ler_matches_cpu_weighted_within_noise_d13
+============================== 1 failed in 2.23s ==============================

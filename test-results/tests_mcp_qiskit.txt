@@ -1,0 +1,23 @@
+﻿[dev.bat] Enterprise dev token loaded from ent_license.key.
+[dev.bat]   sub=local-gpu-benchmark  tier-claim=gpu_enabled:True  max_distance=63
+[dev.bat]   Token valid, expires in 1,8 days (2026-08-06 16:06 UTC).
+[dev.bat] Running: .venv\Scripts\python.exe -m pytest python\tests\test_independent_mcp_cli.py python\tests\test_qiskit_integration.py -v
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'default'
+qector_decoder_v3 resolved from: C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\qector_decoder_v3\__init__.py  [repo source]
+rootdir: C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone
+configfile: pyproject.toml
+plugins: anyio-4.14.2, hypothesis-6.164.0, cov-7.1.0, timeout-2.4.0
+collecting ... collected 7 items
+
+python/tests/test_independent_mcp_cli.py::test_cli_decode_subcommand_exits_zero PASSED [ 14%]
+python/tests/test_independent_mcp_cli.py::test_cli_doctor_exits_zero PASSED [ 28%]
+python/tests/test_independent_mcp_cli.py::test_cli_bench_quick_exits_zero PASSED [ 42%]
+python/tests/test_independent_mcp_cli.py::test_mcp_ping_conformance PASSED [ 57%]
+python/tests/test_independent_mcp_cli.py::test_mcp_notification_silence PASSED [ 71%]
+python/tests/test_qiskit_integration.py::test_qiskit_plugin_exports PASSED [ 85%]
+python/tests/test_qiskit_integration.py::test_qiskit_parity_check_decoding PASSED [100%]
+
+============================== 7 passed in 7.66s ==============================

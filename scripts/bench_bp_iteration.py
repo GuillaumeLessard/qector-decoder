@@ -15,9 +15,7 @@ import argparse
 import time
 
 import numpy as np
-
-from qector_decoder_v3 import BPOSDDecoder
-from qector_decoder_v3 import codes
+from qector_decoder_v3 import BPOSDDecoder, codes
 from qector_decoder_v3.dem import from_stim
 
 

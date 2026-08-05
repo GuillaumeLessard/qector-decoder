@@ -95,7 +95,7 @@ def main(argv: list[str] | None = None) -> int:
     cells = len(args.distances) * len(args.decoders)
     total_shots = cells * args.shots
     print("=== competitive benchmark regeneration ===")
-    print(f"  methodology : circuit_level (all decoders, one pipeline)")
+    print("  methodology : circuit_level (all decoders, one pipeline)")
     print(f"  p           : {args.p}")
     print(f"  shots/cell  : {args.shots:,}")
     print(f"  distances   : {list(args.distances)}")

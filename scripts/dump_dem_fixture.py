@@ -25,6 +25,7 @@ Format (whitespace separated, one section after another):
 """
 import os
 import sys
+
 os.environ.setdefault("QECTOR_SILENT", "1")
 import numpy as np
 import stim
@@ -54,8 +55,7 @@ def main():
 
     with open(out, "w") as fh:
         fh.write(f"{len(c2q)} {model.num_errors} {shots}\n")
-        for row in c2q:
-            fh.write(f"{len(row)} " + " ".join(map(str, row)) + "\n")
+        fh.writelines(f"{len(row)} " + " ".join(map(str, row)) + "\n" for row in c2q)
         fh.write(" ".join(f"{x:.9g}" for x in w) + "\n")
         for s in det:
             idx = np.flatnonzero(s)

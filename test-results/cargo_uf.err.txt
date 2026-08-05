@@ -1,0 +1,92 @@
+    Blocking waiting for file lock on package cache
+   Compiling qector_decoder_v3 v1.0.0 (C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone)
+warning: unused variable: `n_checks`
+   --> src\blossom.rs:188:30
+    |
+188 |     pub fn ensure(&mut self, n_checks: usize, n_qubits: usize, aug_len: usize) {
+    |                              ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_n_checks`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: value assigned to `pinned_syn_ptr` is never read
+   --> src\cuda_workspace.rs:119:34
+    |
+119 |         let mut pinned_syn_ptr = std::ptr::null_mut();
+    |                                  ^^^^^^^^^^^^^^^^^^^^ this value is reassigned later and never used
+...
+123 |             Ok(ptr) => pinned_syn_ptr = ptr,
+    |                        -------------------- `pinned_syn_ptr` is overwritten here before the previous value is read
+    |
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: value assigned to `pinned_corr_ptr` is never read
+   --> src\cuda_workspace.rs:120:35
+    |
+120 |         let mut pinned_corr_ptr = std::ptr::null_mut();
+    |                                   ^^^^^^^^^^^^^^^^^^^^ this value is reassigned later and never used
+...
+132 |             Ok(ptr) => pinned_corr_ptr = ptr,
+    |                        --------------------- `pinned_corr_ptr` is overwritten here before the previous value is read
+
+warning: type `SptScratch` is more private than the item `BlossomScratch::spt`
+   --> src\blossom.rs:174:5
+    |
+174 |     pub spt: SptScratch,
+    |     ^^^^^^^^^^^^^^^^^^^ field `BlossomScratch::spt` is reachable at visibility `pub(crate)`
+    |
+note: but type `SptScratch` is only usable at visibility `pub(self)`
+   --> src\blossom.rs:121:1
+    |
+121 | struct SptScratch {
+    | ^^^^^^^^^^^^^^^^^
+    = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `CudaPrecision` is more private than the item `CUDABatchDecoder::new_weighted_precision`
+   --> src\cuda_batch.rs:122:5
+    |
+122 | /     pub fn new_weighted_precision(
+123 | |         check_to_qubits: Vec<Vec<u32>>,
+124 | |         n_qubits: Option<usize>,
+125 | |         edge_weights: Option<Vec<f64>>,
+126 | |         precision: CudaPrecision,
+127 | |     ) -> Result<Self, String> {
+    | |_____________________________^ associated function `CUDABatchDecoder::new_weighted_precision` is reachable at visibility `pub`
+    |
+note: but type `CudaPrecision` is only usable at visibility `pub(crate)`
+   --> src\cuda_batch.rs:29:1
+    |
+ 29 | pub(crate) enum CudaPrecision {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `CudaPrecision` is more private than the item `CUDABatchDecoder::new_with_device_weighted_prec`
+   --> src\cuda_batch.rs:158:5
+    |
+158 | /     pub fn new_with_device_weighted_prec(
+159 | |         check_to_qubits: Vec<Vec<u32>>,
+160 | |         n_qubits: Option<usize>,
+161 | |         device_id: usize,
+162 | |         edge_weights: Option<Vec<f64>>,
+163 | |         precision: CudaPrecision,
+164 | |     ) -> Result<Self, String> {
+    | |_____________________________^ associated function `CUDABatchDecoder::new_with_device_weighted_prec` is reachable at visibility `pub`
+    |
+note: but type `CudaPrecision` is only usable at visibility `pub(crate)`
+   --> src\cuda_batch.rs:29:1
+    |
+ 29 | pub(crate) enum CudaPrecision {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field `bytes` is never read
+  --> src\cuda_workspace.rs:22:9
+   |
+20 | pub(crate) struct HostBuffer {
+   |                   ---------- field in this struct
+21 |     pub ptr: *mut std::os::raw::c_void,
+22 |     pub bytes: usize,
+   |         ^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `qector_decoder_v3` (lib test) generated 7 warnings (run `cargo fix --lib -p qector_decoder_v3 --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 13.50s
+     Running unittests src\lib.rs (target\debug\deps\qector_decoder_v3-0b528d8fa29b7f0d.exe)

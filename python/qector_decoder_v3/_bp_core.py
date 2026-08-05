@@ -16,6 +16,20 @@ def build_incidence(H: np.ndarray):
     return ic.astype(np.int64), ie.astype(np.int64)
 
 
+def _check_damping(damping: float) -> float:
+    """Validate a BP message-damping factor; return it as a float.
+
+    Damping blends each new check-to-variable message with the previous one,
+    ``m <- (1 - d) * m_new + d * m_old``, which suppresses the oscillations
+    min-sum/sum-product exhibit on loopy (q)LDPC Tanner graphs. ``0`` disables
+    it (the historical behaviour); values must lie in ``[0, 1)``.
+    """
+    d = float(damping)
+    if not 0.0 <= d < 1.0:
+        raise ValueError(f"damping must be in [0, 1), got {damping!r}")
+    return d
+
+
 def min_sum_bp(
     ic: np.ndarray,
     ie: np.ndarray,
@@ -25,11 +39,16 @@ def min_sum_bp(
     syndrome: np.ndarray,
     max_iter: int,
     ms_scale: float = 1.0,
+    damping: float = 0.0,
 ) -> np.ndarray:
     """Run normalised min-sum BP; return the posterior LLR per edge (length n_edges).
 
     Negative posterior LLR ⇒ that bit is likely 1 (an error).
+
+    ``damping`` (default 0) applies standard LLR message damping
+    ``m <- (1-d)*m_new + d*m_old`` to the check-to-variable messages.
     """
+    d = _check_damping(damping)
     M = ic.shape[0]
     inc_idx = np.arange(M)
     synd_sign = np.where(syndrome[ic] == 1, -1.0, 1.0)
@@ -64,8 +83,13 @@ def min_sum_bp(
         total_sign = np.where(negcount % 2 == 0, 1.0, -1.0)
         loo_sign = total_sign[ic] * sgn
 
-        c2v = ms_scale * loo_sign * synd_sign * np.minimum(loo, 1e6)
-        np.clip(c2v, -1e6, 1e6, out=c2v)
+        new_c2v = ms_scale * loo_sign * synd_sign * np.minimum(loo, 1e6)
+        np.clip(new_c2v, -1e6, 1e6, out=new_c2v)
+        if d:
+            # LLR damping: blend with the previous message to damp oscillation.
+            c2v = (1.0 - d) * new_c2v + d * c2v
+        else:
+            c2v = new_c2v
 
     S_e.fill(0.0)
     np.add.at(S_e, ie, c2v)
@@ -80,12 +104,17 @@ def sum_product_bp(
     prior_llr: np.ndarray,
     syndrome: np.ndarray,
     max_iter: int,
+    damping: float = 0.0,
 ) -> np.ndarray:
     """Vectorised sum-product (belief-propagation) in the LLR domain.
 
     Uses the log-magnitude + sign form of the box-plus check update so the
     leave-one-out product is numerically stable. Returns posterior LLR per edge.
+
+    ``damping`` (default 0) applies standard LLR message damping
+    ``m <- (1-d)*m_new + d*m_old`` to the check-to-variable messages.
     """
+    d = _check_damping(damping)
     M = ic.shape[0]
     synd_sign = np.where(syndrome[ic] == 1, -1.0, 1.0)
     c2v = np.zeros(M, dtype=np.float64)
@@ -116,8 +145,13 @@ def sum_product_bp(
         loo_sign = total_sign[ic] * sgn
         loo = loo_sign * np.exp(np.clip(loo_log, -60.0, 0.0))
         loo = np.clip(loo, -1.0 + eps, 1.0 - eps)
-        c2v = synd_sign * 2.0 * np.arctanh(loo)
-        np.clip(c2v, -1e6, 1e6, out=c2v)
+        new_c2v = synd_sign * 2.0 * np.arctanh(loo)
+        np.clip(new_c2v, -1e6, 1e6, out=new_c2v)
+        if d:
+            # LLR damping: blend with the previous message to damp oscillation.
+            c2v = (1.0 - d) * new_c2v + d * c2v
+        else:
+            c2v = new_c2v
 
     S_e.fill(0.0)
     np.add.at(S_e, ie, c2v)
@@ -132,12 +166,17 @@ def batch_sum_product_bp(
     prior_llr: np.ndarray,
     syndromes: np.ndarray,
     max_iter: int,
+    damping: float = 0.0,
 ) -> np.ndarray:
     """Batch sum-product BP — same as :func:`sum_product_bp` but processes
     ``B = len(syndromes)`` syndromes in parallel using numpy vectorisation.
 
     Returns posterior LLRs of shape ``(B, n_edges)``.
+
+    ``damping`` (default 0) applies standard LLR message damping
+    ``m <- (1-d)*m_new + d*m_old`` to the check-to-variable messages.
     """
+    d = _check_damping(damping)
     B = syndromes.shape[0]
     M = ic.shape[0]
     synd_sign = np.where(syndromes[:, ic] == 1, -1.0, 1.0)
@@ -166,8 +205,13 @@ def batch_sum_product_bp(
         loo_sign = total_sign[:, ic] * sgn
         loo = loo_sign * np.exp(np.clip(loo_log, -60.0, 0.0))
         loo = np.clip(loo, -1.0 + eps, 1.0 - eps)
-        c2v = synd_sign * 2.0 * np.arctanh(loo)
-        np.clip(c2v, -1e6, 1e6, out=c2v)
+        new_c2v = synd_sign * 2.0 * np.arctanh(loo)
+        np.clip(new_c2v, -1e6, 1e6, out=new_c2v)
+        if d:
+            # LLR damping: blend with the previous message to damp oscillation.
+            c2v = (1.0 - d) * new_c2v + d * c2v
+        else:
+            c2v = new_c2v
 
     S_e.fill(0.0)
     np.add.at(S_e, (slice(None), ie), c2v)

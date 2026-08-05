@@ -1,0 +1,19 @@
+
+== SparseBlossomDecoder (zero-alloc SbScratch) batch throughput ==
+  d=3 SparseBlossom    2057190 shots/s  faithful=True
+  d=3 UnionFind        4132232 shots/s  faithful=True
+  d=3 Blossom          6133087 shots/s  faithful=True
+  d=5 SparseBlossom    1029442 shots/s  faithful=True
+  d=5 UnionFind        1936483 shots/s  faithful=True
+  d=5 Blossom          2457607 shots/s  faithful=True
+  d=7 SparseBlossom     444889 shots/s  faithful=True
+  d=7 UnionFind        1474383 shots/s  faithful=True
+  d=7 Blossom           787092 shots/s  faithful=True
+
+== ColourCodeDecoder cluster_bposd vs bposd (latency + LER) ==
+  d=3   cluster_bposd:   5711 shots/s, LER=0.0250   bposd:   7677 shots/s, LER=0.0217
+  d=5   cluster_bposd:    422 shots/s, LER=0.0433   bposd:    889 shots/s, LER=0.0267
+
+== CUDABatchDecoder f32 vs f64 throughput (weighted) ==
+  f32:     56846 shots/s (17.59 us/shot)
+  f64:     55232 shots/s (18.11 us/shot)

@@ -351,7 +351,15 @@ def check_cuda(qd: Any) -> Check:
     except Exception as exc:
         detail, remedy = _classify_gpu_error(exc)
         return Check("cuda", WARN, f"CUDA device detected, {detail}", remedy)
-    return Check("cuda", PASS, "CUDA device detected and CUDABatchDecoder constructs")
+    return Check(
+        "cuda",
+        PASS,
+        "CUDA device detected and CUDABatchDecoder constructs",
+        "Note: constructed without edge_weights the GPU runs *unweighted* growth "
+        "(~3x the weighted LER on circuit-level noise). Pass the DEM's log((1-p)/p) "
+        'weights for production; precision="f64" selects the double-precision '
+        "weighted kernel for wide-dynamic-range DEMs.",
+    )
 
 
 def check_opencl(qd: Any) -> Check:

@@ -17,6 +17,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import math
 import os
 import sys
 
@@ -38,8 +39,8 @@ def main() -> int:
     ap.add_argument("--out", default="benchmark_results/threshold")
     args = ap.parse_args()
 
-    import stim
     import sinter
+    import stim
     from qector_decoder_v3.sinter_compat import qector_sinter_decoders
 
     tasks = []
@@ -80,7 +81,7 @@ def main() -> int:
     crossing = None
     for p in args.probs:
         lers = [grid.get((d, p), (float("nan"),))[0] for d in args.distances]
-        if all(x == x for x in lers) and not _strictly_decreasing(lers):
+        if all(not math.isnan(x) for x in lers) and not _strictly_decreasing(lers):
             crossing = p
             break
     print(f"\nApprox. threshold (first p where larger d stops helping): "

@@ -28,7 +28,6 @@ _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_REPO, "python"))
 
 import numpy as np  # noqa: E402
-
 from qector_decoder_v3 import dem  # noqa: E402
 
 EPS = 1e-6

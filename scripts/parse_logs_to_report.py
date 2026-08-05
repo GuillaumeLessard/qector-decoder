@@ -45,7 +45,7 @@ def parse_logs():
 
 def build_markdown_table(records):
     lines = [
-        "| Distance ($d$) | Qubits ($n$) | Shots | Decoder Family | LER ($p=0.005$) | Faithfulness % | Decodes / sec | Latency ($\mu$s/dec) |",
+        r"| Distance ($d$) | Qubits ($n$) | Shots | Decoder Family | LER ($p=0.005$) | Faithfulness % | Decodes / sec | Latency ($\mu$s/dec) |",
         "| :---: | :---: | :---: | :--- | :---: | :---: | :---: | :---: |",
     ]
     for r in records:

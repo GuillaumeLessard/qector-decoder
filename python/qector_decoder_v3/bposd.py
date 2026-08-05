@@ -4,8 +4,11 @@ qector_decoder_v3.bposd - belief propagation + ordered-statistics decoding.
 A self-contained Python BP-OSD for general (LDPC / non-graphlike) CSS codes,
 built on the shared vectorised min-sum BP. When BP alone explains the syndrome it
 returns immediately; otherwise an **exact GF(2) ordered-statistics** post-process
-(OSD-0, with an optional small combination sweep OSD-w) produces a guaranteed
-syndrome-consistent correction using BP's reliabilities.
+produces a guaranteed syndrome-consistent correction using BP's reliabilities:
+OSD-0 when ``osd_order=0``, and a formal **combination-sweep CS-OSD(λ, w)**
+(Panteleev & Kalachev, arXiv:1904.02703; same sweep structure as the reference
+``ldpc`` package's ``osd_cs``) when ``osd_order >= 1``. BP supports optional LLR
+message **damping** (``damping`` parameter) against loopy-graph oscillation.
 
 This is the path for codes matching cannot handle - bivariate-bicycle,
 hypergraph-product, bicycle. It is cross-validated against the reference ``ldpc``
@@ -26,15 +29,23 @@ from typing import Any, cast
 
 import numpy as np
 
+from . import BPOSDDecoder as GraphBPOSDDecoder
 from . import gpu_backend as _gb
-from ._bp_core import build_incidence, min_sum_bp, sum_product_bp
+from ._bp_core import _check_damping, build_incidence, min_sum_bp, sum_product_bp
 from .codes import _to_dense_binary
 
-__all__ = ["BpOsdDecoder"]
+__all__ = ["BpOsdDecoder", "GraphBPOSDDecoder", "MatrixBPOSDDecoder"]
 
 
 class BpOsdDecoder:
-    """BP + ordered-statistics decoder for general GF(2) check matrices."""
+    """BP + ordered-statistics decoder for general GF(2) check matrices.
+
+    Takes a **dense GF(2) parity-check matrix** ``H`` (shape ``(n_checks,
+    n_qubits)``). For the adjacency-list variant see
+    :class:`~qector_decoder_v3.GraphBPOSDDecoder` (native Rust, check-to-qubits
+    list). The near-identical spelling of the two names is a known trap; prefer
+    :class:`MatrixBPOSDDecoder` (this class) going forward.
+    """
 
     def __init__(
         self,
@@ -47,6 +58,8 @@ class BpOsdDecoder:
         bp_method: str = "sum_product",
         use_gpu: Any = None,
         max_latency_ms: float | None = None,
+        damping: float = 0.0,
+        osd_lambda: Any = None,
     ):
         self.H = _to_dense_binary(H)
         if self.H.ndim != 2:
@@ -67,6 +80,11 @@ class BpOsdDecoder:
         if bp_method not in ("sum_product", "min_sum", "relay"):
             raise ValueError("bp_method must be 'sum_product', 'min_sum', or 'relay'")
         self.bp_method = bp_method
+        self.damping = _check_damping(damping)
+        if osd_lambda is None:
+            self.osd_lambda: int | None = None
+        else:
+            self.osd_lambda = max(1, int(osd_lambda))
         self.max_latency_ms = float(max_latency_ms) if max_latency_ms is not None else None
         # GPU batched-BP policy. ``None`` -> auto (use the GPU iff one is usable);
         # ``True``/``False`` force the choice. The single-shot ``decode`` path is
@@ -103,6 +121,7 @@ class BpOsdDecoder:
                 self.prior_llr,
                 s,
                 actual_iter,
+                damping=self.damping,
             )
         else:
             posterior = min_sum_bp(
@@ -114,6 +133,7 @@ class BpOsdDecoder:
                 s,
                 actual_iter,
                 self.ms_scale,
+                damping=self.damping,
             )
 
         if self.max_latency_ms is not None and (_time.perf_counter() - t_start) > max_seconds:
@@ -127,6 +147,18 @@ class BpOsdDecoder:
         if np.array_equal((self.H @ hard) & 1, s):
             return hard
         return self._osd(s, posterior)
+
+    def decode_correction(self, syndrome) -> np.ndarray:
+        """Explicit API: decode syndrome into physical correction vector of length n_qubits."""
+        return self.decode(syndrome)
+
+    def decode_observables(self, syndrome, observables_matrix: Any = None) -> np.ndarray:
+        """Explicit API: decode syndrome into logical observable prediction vector."""
+        corr = self.decode(syndrome)
+        if observables_matrix is not None:
+            L = np.asarray(observables_matrix, dtype=np.uint8)
+            return (L @ corr.T) % 2
+        return corr
 
     def batch_decode(self, syndromes) -> np.ndarray:
         """Decode a stack of syndromes ``[batch, n_checks]`` to ``[batch, n_qubits]``.
@@ -204,29 +236,61 @@ class BpOsdDecoder:
         # the bits BP is least sure about, so the syndrome's residual errors land
         # there; the most-reliable bits are "free" and kept at BP's hard decision.
         order = np.argsort(rel)
-        x0, _pivots = _gf2_osd_solve(self.H, s, order, hard)
+        x0, pivot_cols = _gf2_osd_solve(self.H, s, order, hard)
         if self.osd_order <= 0:
             return x0
-        # OSD-w (greedy combination sweep over the least-reliable bits): force
-        # small combinations on and re-solve, keeping the lowest-weight result.
-        best, best_w = x0, int(x0.sum())
-        cand = order[: min(len(order), max(self.osd_order * 3, 10))]
+        return self._cs_osd_sweep(s, order, hard, rel, x0, pivot_cols)
+
+    def _cs_osd_sweep(
+        self,
+        s: np.ndarray,
+        order: np.ndarray,
+        hard: np.ndarray,
+        rel: np.ndarray,
+        x0: np.ndarray,
+        pivot_cols: np.ndarray,
+    ) -> np.ndarray:
+        # Formal combination_sweep OSD-E (CS-OSD) implementation
+        n = self.n_qubits
+        is_pivot = np.zeros(n, dtype=bool)
+        is_pivot[np.asarray(pivot_cols, dtype=np.int64)] = True
+        free = np.nonzero(~is_pivot)[0]
+        if free.size == 0:
+            return x0
+        lam = self.osd_lambda if self.osd_lambda is not None else 24
+        lam = min(int(lam), free.size)
+        sweep = free[np.argsort(rel[free], kind='stable')[:lam]]
         depth = min(self.osd_order, 8)
-        import itertools
+
+        target = self.prior_llr
+        best = x0
+        best_key = (float(target @ x0), int(x0.sum()))
+        
+        # Formal combination_sweep and OSD-E logic without itertools brute force
+        def combination_sweep(elements, k):
+            if k == 0:
+                yield []
+            else:
+                stack = [(0, [])]
+                while stack:
+                    idx, current = stack.pop()
+                    if len(current) == k:
+                        yield current
+                    elif len(current) + len(elements) - idx >= k:
+                        stack.append((idx + 1, current))
+                        stack.append((idx + 1, current + [elements[idx]]))
 
         for r in range(1, depth + 1):
             improved = False
-            for combo in itertools.combinations(cand, r):
-                forced = np.zeros(self.n_qubits, np.uint8)
-                forced[list(combo)] = 1
-                s_eff = (s ^ ((self.H @ forced) & 1)) & 1
-                x, _ = _gf2_osd_solve(self.H, s_eff, order, hard)
-                x = (x ^ forced).astype(np.uint8)
+            for combo in combination_sweep(sweep.tolist(), r):
+                flipped = hard.copy()
+                flipped[combo] ^= 1
+                x, _ = _gf2_osd_solve(self.H, s, order, flipped)
                 if not np.array_equal((self.H @ x) & 1, s):
                     continue
-                w = int(x.sum())
-                if w < best_w:
-                    best_w, best, improved = w, x, True
+                key = (float(target @ x), int(x.sum()))
+                if key < best_key:
+                    best_key, best, improved = key, x, True
             if not improved:
                 break
         return best
@@ -298,3 +362,14 @@ def _gf2_osd_solve(H: np.ndarray, s: np.ndarray, order: np.ndarray, hard: np.nda
     x[order] = x_perm
     pivot_cols = order[pivots_perm]
     return x, pivot_cols
+
+
+class MatrixBPOSDDecoder(BpOsdDecoder):
+    """Clear-name alias for :class:`BpOsdDecoder` (dense GF(2) check matrix).
+
+    Prefer this name over ``BpOsdDecoder``: it distinguishes the dense-matrix
+    constructor from the native :class:`~qector_decoder_v3.GraphBPOSDDecoder`
+    (check-to-qubits adjacency list), which differ wildly (matrix vs graph
+    wiring) while spelling nearly identically. ``BpOsdDecoder`` remains
+    importable unchanged.
+    """

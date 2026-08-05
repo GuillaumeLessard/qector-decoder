@@ -25,9 +25,9 @@ _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_REPO, "python"))
 
 import numpy as np  # noqa: E402
-
 import qector_decoder_v3 as qd  # noqa: E402
-from qector_decoder_v3 import codes, benchmarking as bm  # noqa: E402
+from qector_decoder_v3 import benchmarking as bm
+from qector_decoder_v3 import codes  # noqa: E402
 
 
 def _time(fn, reps):
@@ -86,7 +86,7 @@ def main() -> int:
 
             # warmup
             cpu.batch_decode(syn)
-            c_corr, c_us = _time(lambda: np.asarray(cpu.batch_decode(syn), np.uint8), args.reps)
+            c_corr, c_us = _time(lambda _cpu=cpu, _syn=syn: np.asarray(_cpu.batch_decode(_syn), np.uint8), args.reps)
             c_faithful = bool(np.array_equal((c_corr @ H.T) & 1, syn))
 
             row = {"distance": d, "n_qubits": nq, "n_checks": code.n_checks,
@@ -95,7 +95,7 @@ def main() -> int:
 
             if cu is not None:
                 cu.batch_decode(syn)
-                g_corr, g_us = _time(lambda: np.asarray(cu.batch_decode(syn), np.uint8), args.reps)
+                g_corr, g_us = _time(lambda _cu=cu, _syn=syn: np.asarray(_cu.batch_decode(_syn), np.uint8), args.reps)
                 row["cuda_us_per_shot"] = g_us / B * 1e6
                 row["cuda_bit_identical"] = bool(np.array_equal(g_corr, c_corr))
                 row["cuda_faithful"] = bool(np.array_equal((g_corr @ H.T) & 1, syn))
@@ -104,7 +104,7 @@ def main() -> int:
                     crossover["cuda"][d] = B
             if ocl is not None:
                 ocl.batch_decode(syn)
-                o_corr, o_us = _time(lambda: np.asarray(ocl.batch_decode(syn), np.uint8), args.reps)
+                o_corr, o_us = _time(lambda _ocl=ocl, _syn=syn: np.asarray(_ocl.batch_decode(_syn), np.uint8), args.reps)
                 row["opencl_us_per_shot"] = o_us / B * 1e6
                 row["opencl_bit_identical"] = bool(np.array_equal(o_corr, c_corr))
                 row["opencl_faithful"] = bool(np.array_equal((o_corr @ H.T) & 1, syn))

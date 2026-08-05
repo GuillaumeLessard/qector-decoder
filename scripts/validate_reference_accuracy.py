@@ -20,8 +20,8 @@ _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_REPO, "python"))
 
 import numpy as np
-import stim
 import pymatching
+import stim
 from qector_decoder_v3 import dem as dem_module
 
 

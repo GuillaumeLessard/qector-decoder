@@ -28,7 +28,6 @@ _SCRIPTS = os.path.join(_REPO, "scripts")
 sys.path.insert(0, os.path.join(_REPO, "python"))
 
 import numpy as np  # noqa: E402
-
 import qector_decoder_v3 as qd  # noqa: E402
 from qector_decoder_v3 import benchmarking as bm  # noqa: E402
 from qector_decoder_v3 import codes  # noqa: E402

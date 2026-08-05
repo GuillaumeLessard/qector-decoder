@@ -24,7 +24,6 @@ _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_REPO, "python"))
 
 import numpy as np  # noqa: E402
-
 from qector_decoder_v3 import benchmarking as bm  # noqa: E402
 from qector_decoder_v3.belief_matching import BeliefMatching  # noqa: E402
 from qector_decoder_v3.pymatching_compat import Matching as QMatching  # noqa: E402
@@ -55,8 +54,8 @@ def main() -> int:
                     help="skip the reference beliefmatching package (much faster at large d)")
     args = ap.parse_args()
 
-    import stim
     import pymatching
+    import stim
 
     if args.no_ref:
         have_ref = False
@@ -94,10 +93,10 @@ def main() -> int:
         row = {"distance": d, "noise": args.noise, "shots": args.shots,
                "detectors": sdem.num_detectors}
         for name, fn in [
-            ("pymatching", lambda x: pm.decode_batch(x)),
-            ("qector_mwpm", lambda x: qpm.decode_batch(x)),
-            ("qector_belief", lambda x: qbm.decode_batch(x)),
-        ] + ([("ref_belief", lambda x: RefBM.from_detector_error_model(sdem).decode_batch(x))]
+            ("pymatching", lambda x, _pm=pm: _pm.decode_batch(x)),
+            ("qector_mwpm", lambda x, _qpm=qpm: _qpm.decode_batch(x)),
+            ("qector_belief", lambda x, _qbm=qbm: _qbm.decode_batch(x)),
+        ] + ([("ref_belief", lambda x, _sdem=sdem: RefBM.from_detector_error_model(_sdem).decode_batch(x))]
              if have_ref else []):
             t0 = time.perf_counter()
             k = ler_count(fn, det, obs)

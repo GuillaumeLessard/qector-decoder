@@ -40,7 +40,6 @@ sys.path.insert(0, os.path.join(_REPO, "python"))
 os.environ.setdefault("QECTOR_SILENT", "1")
 
 import numpy as np  # noqa: E402
-
 import qector_decoder_v3 as qd  # noqa: E402
 from qector_decoder_v3 import dem as demmod  # noqa: E402
 
@@ -366,8 +365,7 @@ def main() -> int:
                "faithful_frac", "latency_us", "throughput_shots_s", "error"]
     with open(csv_path, "w", encoding="utf-8", newline="") as fh:
         fh.write(",".join(columns) + "\n")
-        for r in rows:
-            fh.write(",".join(str(r.get(c, "")).replace(",", ";") for c in columns) + "\n")
+        fh.writelines(",".join(str(r.get(c, "")).replace(",", ";") for c in columns) + "\n" for r in rows)
 
     ok = sum(1 for r in rows if r["status"] == "ok")
     print(f"\n{ok}/{len(rows)} measurements succeeded")

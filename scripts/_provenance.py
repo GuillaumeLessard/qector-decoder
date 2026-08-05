@@ -10,6 +10,7 @@ Use :func:`write_artifact` from every generator script so that failure mode cann
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import platform
@@ -151,5 +152,17 @@ def write_artifact(
         "results": rows,
     }
     out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(artifact, indent=2), encoding="utf-8")
+    # Self-contained SHA-256 stamp so the published bytes can be verified
+    # without trusting a filename or the git history (dev2todo §3.4).
+    # The digest covers the artifact *without* the sha256 key itself; recompute
+    # by dropping "sha256" from provenance and dumps(..., sort_keys=True).
+    verifiable = json.dumps(
+        {"provenance": {k: v for k, v in artifact["provenance"].items() if k != "sha256"}, "results": rows},
+        indent=2,
+        sort_keys=True,
+    )
+    h = hashlib.sha256(verifiable.encode("utf-8")).hexdigest()
+    artifact.setdefault("provenance", {})["sha256"] = h
     out.write_text(json.dumps(artifact, indent=2), encoding="utf-8")
     return out

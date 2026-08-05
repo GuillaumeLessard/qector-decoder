@@ -14,9 +14,10 @@ _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_REPO, "python"))
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-
+from qector_decoder_v3.ler import run_competitive_suite
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -31,8 +32,6 @@ from reportlab.platypus import (
     Table,
     TableStyle,
 )
-
-from qector_decoder_v3.ler import run_competitive_suite
 
 PDF_FILENAME = "QECTOR_v3_Empirical_Benchmark_Report.pdf"
 OUT_PDF_PATH = os.path.join(_REPO, PDF_FILENAME)
@@ -77,10 +76,10 @@ def generate_charts(comp_data):
     pymatching_v24 = []
 
     for d in distances:
-        def get_val(dec_name):
+        def get_val(dec_name, _d=d):
             for item in comp_data:
                 d_match = item["distance"] if "distance" in item else item.get("distance")
-                if d_match == d and item.get("shots") == shots and dec_name in item.get("decoder", ""):
+                if d_match == _d and item.get("shots") == shots and dec_name in item.get("decoder", ""):
                     return item.get("dec_per_s") or item.get("decodes_per_s", 0)
             return 0
 

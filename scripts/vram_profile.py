@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import subprocess
 import sys
@@ -19,7 +20,6 @@ _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_REPO, "python"))
 
 import numpy as np  # noqa: E402
-
 import qector_decoder_v3 as qd  # noqa: E402
 from qector_decoder_v3 import codes  # noqa: E402
 
@@ -44,7 +44,7 @@ class _VramSampler(threading.Thread):
     def run(self):
         while not self._stopev.is_set():
             v = _vram_used_mib()
-            if v == v:  # not NaN
+            if not math.isnan(v):
                 self.peak = max(self.peak, v)
             time.sleep(self.interval)
 

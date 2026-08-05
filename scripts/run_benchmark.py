@@ -45,8 +45,9 @@ def run_full_benchmark():
 
     # Benchmark 3: BatchDecoder parallel throughput (ring code d=10)
     batch_dec = qd.BatchDecoder(ring_checks, ring_n_qubits)
-    import numpy as np
     import time
+
+    import numpy as np
     n_batch = 10000
     batch_syndromes = np.random.randint(0, 2, size=(n_batch, len(ring_checks)), dtype=np.uint8)
     # Warmup

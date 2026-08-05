@@ -1,0 +1,21 @@
+﻿[dev.bat] Enterprise dev token loaded from ent_license.key.
+[dev.bat]   sub=local-gpu-benchmark  tier-claim=gpu_enabled:True  max_distance=63
+[dev.bat]   Token valid, expires in 1,7 days (2026-08-06 16:06 UTC).
+[dev.bat] Running: .venv\Scripts\python.exe scripts\_cpu_gpu_bench.py
+=== CPU vs GPU Benchmark (Enterprise, dev.bat) ===
+GPU available: True
+
+--- d=5 surface (p=0.01, shots=5000) ---
+  CPU: 30.3 ms (165021 fps) LER=0.08160
+  GPU: 86.3 ms (57966 fps) LER=0.08180
+  Speedup: 0.35x
+
+--- d=9 surface (p=0.005, shots=2000) ---
+  CPU: 187.9 ms (10644 fps) LER=0.00600
+  GPU: 581.6 ms (3439 fps) LER=0.00350
+  Speedup: 0.32x
+
+--- d=13 surface (p=0.003, shots=1000) ---
+  CPU: 436.3 ms (2292 fps) LER=0.00100
+  GPU: 1084.6 ms (922 fps) LER=0.00000
+  Speedup: 0.40x

@@ -1,0 +1,51 @@
+[dev.bat] Enterprise dev token loaded from ent_license.key.
+[dev.bat]   sub=local-gpu-benchmark  tier-claim=gpu_enabled:True  max_distance=63
+[dev.bat]   Token valid, expires in 1,6 days (2026-08-06 16:06 UTC).
+[dev.bat] Running: .venv\Scripts\python.exe -m pytest python\tests\test_enforcement_matrix.py python\tests\test_license_rust_bridge.py -v
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'default'
+qector_decoder_v3 resolved from: C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\qector_decoder_v3\__init__.py  [repo source]
+rootdir: C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone
+configfile: pyproject.toml
+plugins: anyio-4.14.2, hypothesis-6.164.0, cov-7.1.0, timeout-2.4.0
+collecting ... collected 35 items
+
+python/tests/test_enforcement_matrix.py::test_python_api_enforcement[under-Community] PASSED [  2%]
+python/tests/test_enforcement_matrix.py::test_python_api_enforcement[under-Pro] PASSED [  5%]
+python/tests/test_enforcement_matrix.py::test_python_api_enforcement[under-Enterprise] PASSED [  8%]
+python/tests/test_enforcement_matrix.py::test_python_api_enforcement[over-Community] PASSED [ 11%]
+python/tests/test_enforcement_matrix.py::test_python_api_enforcement[over-Pro] PASSED [ 14%]
+python/tests/test_enforcement_matrix.py::test_python_api_enforcement[over-Enterprise] PASSED [ 17%]
+python/tests/test_enforcement_matrix.py::test_rest_enforcement[under-Community] PASSED [ 20%]
+python/tests/test_enforcement_matrix.py::test_rest_enforcement[under-Pro] PASSED [ 22%]
+python/tests/test_enforcement_matrix.py::test_rest_enforcement[under-Enterprise] PASSED [ 25%]
+python/tests/test_enforcement_matrix.py::test_rest_enforcement[over-Community] PASSED [ 28%]
+python/tests/test_enforcement_matrix.py::test_rest_enforcement[over-Pro] PASSED [ 31%]
+python/tests/test_enforcement_matrix.py::test_rest_enforcement[over-Enterprise] PASSED [ 34%]
+python/tests/test_enforcement_matrix.py::test_grpc_enforcement[under-Community] PASSED [ 37%]
+python/tests/test_enforcement_matrix.py::test_grpc_enforcement[under-Pro] SKIPPED [ 40%]
+python/tests/test_enforcement_matrix.py::test_grpc_enforcement[under-Enterprise] SKIPPED [ 42%]
+python/tests/test_enforcement_matrix.py::test_grpc_enforcement[over-Community] PASSED [ 45%]
+python/tests/test_enforcement_matrix.py::test_grpc_enforcement[over-Pro] SKIPPED [ 48%]
+python/tests/test_enforcement_matrix.py::test_grpc_enforcement[over-Enterprise] SKIPPED [ 51%]
+python/tests/test_enforcement_matrix.py::test_mcp_enforcement[under-Community] PASSED [ 54%]
+python/tests/test_enforcement_matrix.py::test_mcp_enforcement[under-Pro] SKIPPED [ 57%]
+python/tests/test_enforcement_matrix.py::test_mcp_enforcement[under-Enterprise] SKIPPED [ 60%]
+python/tests/test_enforcement_matrix.py::test_mcp_enforcement[over-Community] PASSED [ 62%]
+python/tests/test_enforcement_matrix.py::test_mcp_enforcement[over-Pro] SKIPPED [ 65%]
+python/tests/test_enforcement_matrix.py::test_mcp_enforcement[over-Enterprise] SKIPPED [ 68%]
+python/tests/test_enforcement_matrix.py::test_matrix_covers_every_cap_boundary PASSED [ 71%]
+python/tests/test_license_rust_bridge.py::test_set_license_key_updates_env PASSED [ 74%]
+python/tests/test_license_rust_bridge.py::test_set_license_key_rejects_invalid_key PASSED [ 77%]
+python/tests/test_license_rust_bridge.py::test_get_license_info_returns_dict PASSED [ 80%]
+python/tests/test_license_rust_bridge.py::test_get_license_info_community_default PASSED [ 82%]
+python/tests/test_license_rust_bridge.py::test_get_license_info_pro PASSED [ 85%]
+python/tests/test_license_rust_bridge.py::test_get_license_info_enterprise PASSED [ 88%]
+python/tests/test_license_rust_bridge.py::test_max_distance_is_always_an_int[Community] PASSED [ 91%]
+python/tests/test_license_rust_bridge.py::test_max_distance_is_always_an_int[Pro] PASSED [ 94%]
+python/tests/test_license_rust_bridge.py::test_max_distance_is_always_an_int[Enterprise] PASSED [ 97%]
+python/tests/test_license_rust_bridge.py::test_native_path_also_reports_int_max_distance PASSED [100%]
+
+======================== 27 passed, 8 skipped in 1.37s ========================

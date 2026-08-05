@@ -53,11 +53,12 @@ _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_REPO, "python"))
 
 import numpy as np  # noqa: E402
-
 import qector_decoder_v3 as qd  # noqa: E402
-from qector_decoder_v3 import dem  # noqa: E402
 from qector_decoder_v3 import benchmarking as bm  # noqa: E402
-from qector_decoder_v3 import pymatching_compat  # noqa: E402
+from qector_decoder_v3 import (
+    dem,  # noqa: E402
+    pymatching_compat,  # noqa: E402
+)
 
 # Threshold for switching to out-of-core decode_mmap (2 GB of syndrome data).
 _OOC_THRESHOLD_BYTES = 2 << 30  # 2 GB
@@ -199,8 +200,8 @@ def main() -> int:
     )
     args = ap.parse_args()
 
-    import stim
     import pymatching
+    import stim
 
     env = bm.capture_environment()
     env["timestamp_unix"] = int(time.time())

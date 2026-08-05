@@ -1,0 +1,10 @@
+........................................................................ [ 40%]
+........................................................................ [ 80%]
+....................................                                     [100%]
+============================== warnings summary ===============================
+python/tests/test_cuda_f64_precision.py::test_precision_defaults_to_f32
+  C:\Users\Clinque du Batiment\Downloads\qector-decoder-clone\python\tests\test_cuda_f64_precision.py:58: UserWarning: CUDABatchDecoder constructed WITHOUT edge_weights: the GPU falls back to unweighted cluster growth, which is bit-identical to the CPU UnionFindDecoder and costs roughly 3x the logical error rate of the weighted path on circuit-level noise (0.059/0.048/0.035 at d=5/9/13 vs weighted below threshold). Pass the DEM's per-mechanism weights log((1-p)/p) for production use.
+    dec = qd.CUDABatchDecoder(_ring_c2q(8), 8)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+180 passed, 1 warning in 50.68s

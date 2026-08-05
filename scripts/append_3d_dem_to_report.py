@@ -39,7 +39,7 @@ def main():
         "",
         "> **Rigorous 3D Detector Error Model (DEM) Benchmark**: Full circuit-level decoding with detector defects and measurement errors spanning $r=d$ rounds of rotated surface code memory Z.",
         "",
-        "| Distance ($d$) | Rounds ($r$) | Detectors | Shots | Decoder Implementation | LER ($p=0.005$) | Throughput (dec/s) | Latency ($\mu$s/dec) | **Speedup vs Fusion Blossom v0.2** |",
+        r"| Distance ($d$) | Rounds ($r$) | Detectors | Shots | Decoder Implementation | LER ($p=0.005$) | Throughput (dec/s) | Latency ($\mu$s/dec) | **Speedup vs Fusion Blossom v0.2** |",
         "| :---: | :---: | :---: | :---: | :--- | :---: | :---: | :---: | :---: |",
     ]
 

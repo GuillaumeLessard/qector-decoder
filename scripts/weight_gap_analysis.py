@@ -25,7 +25,6 @@ _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_REPO, "python"))
 
 import numpy as np  # noqa: E402
-
 from qector_decoder_v3 import dem, pymatching_compat  # noqa: E402
 
 
@@ -40,8 +39,8 @@ def main() -> int:
     ap.add_argument("--out", default="benchmark_results/weight_gap_analysis")
     args = ap.parse_args()
 
-    import stim
     import pymatching
+    import stim
 
     out = {"basis": args.basis, "noise": args.noise, "shots": args.shots,
            "seed": args.seed, "per_distance": []}
