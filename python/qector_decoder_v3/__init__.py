@@ -409,7 +409,7 @@ import numpy as _np
 # wheel). We never overwrite a real compiled ``__version__`` with it - doing so
 # would falsely claim a version the loaded binary is not - so after a version bump
 # ``__version__`` keeps reporting the *built* value until the Rust wheel is rebuilt.
-__fallback_version__ = "0.7.1"
+__fallback_version__ = "1.0.0"
 
 try:
     __version__ = _native_module.__version__
@@ -783,6 +783,22 @@ class UnionFindDecoder:
     @property
     def n_checks(self):
         return self._inner.n_checks
+    def decode_correction(self, syndrome):
+        """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
+        return self.decode(syndrome)
+
+    def decode_observables(self, syndrome, observables_matrix=None):
+        """Explicit API: decode syndrome into logical observable prediction vector.
+
+        When ``observables_matrix`` (shape ``(n_obs, n_qubits)``) is supplied, the
+        observables are predicted as ``(observables_matrix @ correction) & 1``.
+        Otherwise this falls back to :meth:`decode`, matching the physical-correction
+        convention used by the graph decoder wrappers.
+        """
+        correction = _np.asarray(self.decode(syndrome), dtype=_np.uint8).reshape(-1)
+        if observables_matrix is None:
+            return correction
+        return (_np.asarray(observables_matrix, dtype=_np.uint8) @ correction) & 1
 
 
 class FastUnionFindDecoder:
@@ -868,6 +884,22 @@ class FastUnionFindDecoder:
     @property
     def n_checks(self):
         return self._inner.n_checks
+    def decode_correction(self, syndrome):
+        """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
+        return self.decode(syndrome)
+
+    def decode_observables(self, syndrome, observables_matrix=None):
+        """Explicit API: decode syndrome into logical observable prediction vector.
+
+        When ``observables_matrix`` (shape ``(n_obs, n_qubits)``) is supplied, the
+        observables are predicted as ``(observables_matrix @ correction) & 1``.
+        Otherwise this falls back to :meth:`decode`, matching the physical-correction
+        convention used by the graph decoder wrappers.
+        """
+        correction = _np.asarray(self.decode(syndrome), dtype=_np.uint8).reshape(-1)
+        if observables_matrix is None:
+            return correction
+        return (_np.asarray(observables_matrix, dtype=_np.uint8) @ correction) & 1
 
 
 class BlossomDecoder:
@@ -930,6 +962,22 @@ class BlossomDecoder:
     @property
     def edges(self):
         return self._inner.edges
+    def decode_correction(self, syndrome):
+        """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
+        return self.decode(syndrome)
+
+    def decode_observables(self, syndrome, observables_matrix=None):
+        """Explicit API: decode syndrome into logical observable prediction vector.
+
+        When ``observables_matrix`` (shape ``(n_obs, n_qubits)``) is supplied, the
+        observables are predicted as ``(observables_matrix @ correction) & 1``.
+        Otherwise this falls back to :meth:`decode`, matching the physical-correction
+        convention used by the graph decoder wrappers.
+        """
+        correction = _np.asarray(self.decode(syndrome), dtype=_np.uint8).reshape(-1)
+        if observables_matrix is None:
+            return correction
+        return (_np.asarray(observables_matrix, dtype=_np.uint8) @ correction) & 1
 
 
 class SlidingWindowDecoder:
@@ -1000,6 +1048,22 @@ class SlidingWindowDecoder:
     @property
     def current_round(self):
         return self._inner.current_round
+    def decode_correction(self, syndrome):
+        """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
+        return self.decode(syndrome)
+
+    def decode_observables(self, syndrome, observables_matrix=None):
+        """Explicit API: decode syndrome into logical observable prediction vector.
+
+        When ``observables_matrix`` (shape ``(n_obs, n_qubits)``) is supplied, the
+        observables are predicted as ``(observables_matrix @ correction) & 1``.
+        Otherwise this falls back to :meth:`decode`, matching the physical-correction
+        convention used by the graph decoder wrappers.
+        """
+        correction = _np.asarray(self.decode(syndrome), dtype=_np.uint8).reshape(-1)
+        if observables_matrix is None:
+            return correction
+        return (_np.asarray(observables_matrix, dtype=_np.uint8) @ correction) & 1
 
 
 class StreamingDecoder:
@@ -1076,6 +1140,22 @@ class StreamingDecoder:
     @property
     def n_checks(self):
         return self._inner.n_checks
+    def decode_correction(self, syndrome):
+        """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
+        return self.decode(syndrome)
+
+    def decode_observables(self, syndrome, observables_matrix=None):
+        """Explicit API: decode syndrome into logical observable prediction vector.
+
+        When ``observables_matrix`` (shape ``(n_obs, n_qubits)``) is supplied, the
+        observables are predicted as ``(observables_matrix @ correction) & 1``.
+        Otherwise this falls back to :meth:`decode`, matching the physical-correction
+        convention used by the graph decoder wrappers.
+        """
+        correction = _np.asarray(self.decode(syndrome), dtype=_np.uint8).reshape(-1)
+        if observables_matrix is None:
+            return correction
+        return (_np.asarray(observables_matrix, dtype=_np.uint8) @ correction) & 1
 
 
 class BatchDecoder:
@@ -1114,6 +1194,22 @@ class BatchDecoder:
     @property
     def n_checks(self):
         return self._inner.n_checks
+    def decode_correction(self, syndrome):
+        """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
+        return self.decode(syndrome)
+
+    def decode_observables(self, syndrome, observables_matrix=None):
+        """Explicit API: decode syndrome into logical observable prediction vector.
+
+        When ``observables_matrix`` (shape ``(n_obs, n_qubits)``) is supplied, the
+        observables are predicted as ``(observables_matrix @ correction) & 1``.
+        Otherwise this falls back to :meth:`decode`, matching the physical-correction
+        convention used by the graph decoder wrappers.
+        """
+        correction = _np.asarray(self.decode(syndrome), dtype=_np.uint8).reshape(-1)
+        if observables_matrix is None:
+            return correction
+        return (_np.asarray(observables_matrix, dtype=_np.uint8) @ correction) & 1
 
 
 class CPUBatchDecoder:
@@ -1235,6 +1331,22 @@ except (ImportError, AttributeError):
                 "OpenCLBatchDecoder not available in CUDA-only wheel. "
                 "Build from source: maturin develop --features opencl"
             )
+    def decode_correction(self, syndrome):
+        """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
+        return self.decode(syndrome)
+
+    def decode_observables(self, syndrome, observables_matrix=None):
+        """Explicit API: decode syndrome into logical observable prediction vector.
+
+        When ``observables_matrix`` (shape ``(n_obs, n_qubits)``) is supplied, the
+        observables are predicted as ``(observables_matrix @ correction) & 1``.
+        Otherwise this falls back to :meth:`decode`, matching the physical-correction
+        convention used by the graph decoder wrappers.
+        """
+        correction = _np.asarray(self.decode(syndrome), dtype=_np.uint8).reshape(-1)
+        if observables_matrix is None:
+            return correction
+        return (_np.asarray(observables_matrix, dtype=_np.uint8) @ correction) & 1
 
 
 class SparseBlossomDecoder:
@@ -1310,6 +1422,22 @@ class SparseBlossomDecoder:
     @property
     def n_checks(self):
         return self._inner.n_checks
+    def decode_correction(self, syndrome):
+        """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
+        return self.decode(syndrome)
+
+    def decode_observables(self, syndrome, observables_matrix=None):
+        """Explicit API: decode syndrome into logical observable prediction vector.
+
+        When ``observables_matrix`` (shape ``(n_obs, n_qubits)``) is supplied, the
+        observables are predicted as ``(observables_matrix @ correction) & 1``.
+        Otherwise this falls back to :meth:`decode`, matching the physical-correction
+        convention used by the graph decoder wrappers.
+        """
+        correction = _np.asarray(self.decode(syndrome), dtype=_np.uint8).reshape(-1)
+        if observables_matrix is None:
+            return correction
+        return (_np.asarray(observables_matrix, dtype=_np.uint8) @ correction) & 1
 
 
 class BPOSDDecoder:
@@ -1415,6 +1543,22 @@ class BPOSDDecoder:
     @property
     def n_checks(self):
         return self._inner.n_checks
+    def decode_correction(self, syndrome):
+        """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
+        return self.decode(syndrome)
+
+    def decode_observables(self, syndrome, observables_matrix=None):
+        """Explicit API: decode syndrome into logical observable prediction vector.
+
+        When ``observables_matrix`` (shape ``(n_obs, n_qubits)``) is supplied, the
+        observables are predicted as ``(observables_matrix @ correction) & 1``.
+        Otherwise this falls back to :meth:`decode`, matching the physical-correction
+        convention used by the graph decoder wrappers.
+        """
+        correction = _np.asarray(self.decode(syndrome), dtype=_np.uint8).reshape(-1)
+        if observables_matrix is None:
+            return correction
+        return (_np.asarray(observables_matrix, dtype=_np.uint8) @ correction) & 1
 
 
 class TwoStageDecoder:
@@ -1479,6 +1623,22 @@ class TwoStageDecoder:
     @property
     def n_checks(self):
         return self._inner.n_checks
+    def decode_correction(self, syndrome):
+        """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
+        return self.decode(syndrome)
+
+    def decode_observables(self, syndrome, observables_matrix=None):
+        """Explicit API: decode syndrome into logical observable prediction vector.
+
+        When ``observables_matrix`` (shape ``(n_obs, n_qubits)``) is supplied, the
+        observables are predicted as ``(observables_matrix @ correction) & 1``.
+        Otherwise this falls back to :meth:`decode`, matching the physical-correction
+        convention used by the graph decoder wrappers.
+        """
+        correction = _np.asarray(self.decode(syndrome), dtype=_np.uint8).reshape(-1)
+        if observables_matrix is None:
+            return correction
+        return (_np.asarray(observables_matrix, dtype=_np.uint8) @ correction) & 1
 
 
 class AmbiguityClusterDecoder:
@@ -1523,6 +1683,22 @@ class AmbiguityClusterDecoder:
     @property
     def n_checks(self):
         return self._inner.n_checks
+    def decode_correction(self, syndrome):
+        """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
+        return self.decode(syndrome)
+
+    def decode_observables(self, syndrome, observables_matrix=None):
+        """Explicit API: decode syndrome into logical observable prediction vector.
+
+        When ``observables_matrix`` (shape ``(n_obs, n_qubits)``) is supplied, the
+        observables are predicted as ``(observables_matrix @ correction) & 1``.
+        Otherwise this falls back to :meth:`decode`, matching the physical-correction
+        convention used by the graph decoder wrappers.
+        """
+        correction = _np.asarray(self.decode(syndrome), dtype=_np.uint8).reshape(-1)
+        if observables_matrix is None:
+            return correction
+        return (_np.asarray(observables_matrix, dtype=_np.uint8) @ correction) & 1
 
 
 class HybridCascadeDecoder:
@@ -1624,6 +1800,22 @@ class HybridCascadeDecoder:
     def prefilter_hit_rate(self):
         """Fraction of decoded syndromes resolved by the pre-filter."""
         return self._inner.prefilter_hit_rate
+    def decode_correction(self, syndrome):
+        """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
+        return self.decode(syndrome)
+
+    def decode_observables(self, syndrome, observables_matrix=None):
+        """Explicit API: decode syndrome into logical observable prediction vector.
+
+        When ``observables_matrix`` (shape ``(n_obs, n_qubits)``) is supplied, the
+        observables are predicted as ``(observables_matrix @ correction) & 1``.
+        Otherwise this falls back to :meth:`decode`, matching the physical-correction
+        convention used by the graph decoder wrappers.
+        """
+        correction = _np.asarray(self.decode(syndrome), dtype=_np.uint8).reshape(-1)
+        if observables_matrix is None:
+            return correction
+        return (_np.asarray(observables_matrix, dtype=_np.uint8) @ correction) & 1
 
 
 class NeuralPredecoder:
@@ -1664,6 +1856,22 @@ class NeuralPredecoder:
     @property
     def n_hidden2(self):
         return self._inner.n_hidden2
+    def decode_correction(self, syndrome):
+        """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
+        return self.decode(syndrome)
+
+    def decode_observables(self, syndrome, observables_matrix=None):
+        """Explicit API: decode syndrome into logical observable prediction vector.
+
+        When ``observables_matrix`` (shape ``(n_obs, n_qubits)``) is supplied, the
+        observables are predicted as ``(observables_matrix @ correction) & 1``.
+        Otherwise this falls back to :meth:`decode`, matching the physical-correction
+        convention used by the graph decoder wrappers.
+        """
+        correction = _np.asarray(self.decode(syndrome), dtype=_np.uint8).reshape(-1)
+        if observables_matrix is None:
+            return correction
+        return (_np.asarray(observables_matrix, dtype=_np.uint8) @ correction) & 1
 
 
 class GNNPredecoder:
@@ -2067,6 +2275,22 @@ class HybridDecoder:
     @property
     def n_checks(self):
         return self._inner.n_checks
+    def decode_correction(self, syndrome):
+        """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
+        return self.decode(syndrome)
+
+    def decode_observables(self, syndrome, observables_matrix=None):
+        """Explicit API: decode syndrome into logical observable prediction vector.
+
+        When ``observables_matrix`` (shape ``(n_obs, n_qubits)``) is supplied, the
+        observables are predicted as ``(observables_matrix @ correction) & 1``.
+        Otherwise this falls back to :meth:`decode`, matching the physical-correction
+        convention used by the graph decoder wrappers.
+        """
+        correction = _np.asarray(self.decode(syndrome), dtype=_np.uint8).reshape(-1)
+        if observables_matrix is None:
+            return correction
+        return (_np.asarray(observables_matrix, dtype=_np.uint8) @ correction) & 1
 
 
 class LookupTableDecoder:
@@ -2334,6 +2558,22 @@ def generate_biconnected_qldpc_checks(n_qubits, degree):
         if len(check) >= 2:
             check_to_qubits.append(check)
     return check_to_qubits, n
+    def decode_correction(self, syndrome):
+        """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
+        return self.decode(syndrome)
+
+    def decode_observables(self, syndrome, observables_matrix=None):
+        """Explicit API: decode syndrome into logical observable prediction vector.
+
+        When ``observables_matrix`` (shape ``(n_obs, n_qubits)``) is supplied, the
+        observables are predicted as ``(observables_matrix @ correction) & 1``.
+        Otherwise this falls back to :meth:`decode`, matching the physical-correction
+        convention used by the graph decoder wrappers.
+        """
+        correction = _np.asarray(self.decode(syndrome), dtype=_np.uint8).reshape(-1)
+        if observables_matrix is None:
+            return correction
+        return (_np.asarray(observables_matrix, dtype=_np.uint8) @ correction) & 1
 
 
 class BenchmarkSuite:
@@ -2729,6 +2969,28 @@ for _name in ("os", "sys", "subprocess"):
 # v0.6.9 release notes (public)
 # ===========================================================================
 __changelog__ = {
+    "1.0.0": [
+        (
+            "API freeze: the Stable tier in docs/STABLE_API.md is now contractually "
+            "stable across the 1.x line. Provisional symbols (BP-OSD tuning kwargs, "
+            "GPU batch constructors, network-facing surfaces) may change in a 1.x "
+            "release with a changelog note; Stable symbols (UnionFindDecoder, "
+            "BlossomDecoder, SparseBlossomDecoder, NativeAutoDecoder, the four "
+            "generate_*_code_checks, set_license_key, get_license_info, the "
+            "Sinter/qiskit-qec entry-point names, DecodeResult) require a 2.0.0 to break."
+        ),
+        (
+            "Verification: 120-test independent suite, 2x2 runs (community + enterprise), "
+            "0 failures, 0 flaky, LER-vs-PyMatching gate passes with 4.5x margin "
+            "(ler_qector=0.00392, ler_pymatching=0.00317 on rep-d3 p=0.01)."
+        ),
+        (
+            "Verifier hardening: HOME/USERPROFILE sandboxed for community runs, "
+            "so a profile-level ~/.qector/license.key can no longer silently unlock "
+            "Enterprise. External LER gate moved from a 4096-unseeded-shot +0.02 bound "
+            "to 12 000 seeded shots with the real dev2todo section 1.1 acceptance."
+        ),
+    ],
     "0.7.1": [
         (
             "Fix: CLI `qector decode` no longer crashes - cli.py imported the "

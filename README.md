@@ -193,7 +193,7 @@ is_valid = verify_license_token(token)
 is_valid = verify_license_token(token, customer_email="user@example.com")
 ```
 
-### License Keys (v0.7.0)
+### License Keys (v1.0.0)
 
 ```python
 from qector_decoder_v3 import set_license_key, set_license_key_file, get_license_info
@@ -285,7 +285,7 @@ Key features:
 
 ---
 
-## Licensing & Activation (v0.7.0)
+## Licensing & Activation (v1.0.0)
 
 ### Ed25519 Cryptographic License Verification
 
@@ -331,7 +331,7 @@ Commercial licenses are issued automatically via Stripe Checkout:
 
 ---
 
-## v0.7.0 highlights
+## v1.0.0 highlights
 
 | Area | Description |
 | --- | --- |
@@ -368,7 +368,7 @@ Commercial licenses are issued automatically via Stripe Checkout:
 
 ## Benchmark evidence
 
-### Withdrawn: the pre-v0.7.0 comparison tables
+### Withdrawn: the pre-v1.0.0 comparison tables
 
 **Four benchmark tables that stood here — MWPM parity vs PyMatching at d=13/15,
 belief-matching LER at d=5/7, GPU bit-identity, and the native memory profile —
@@ -410,17 +410,17 @@ python scripts/run_custom_comparison_benchmark.py \
     --distances 3,5,7,9,11,13,15 --shots 1000,5000,10000,50000,100000 --p 0.005
 ```
 
-### Verified v0.7.0 benchmark set
+### Verified v1.0.0 benchmark set
 
 `official_benchmark_results.{json,csv,md,pdf}` in the repo root hold the verified
-v0.7.0 benchmark set: **54 measured cells, zero unfaithful corrections**, taken
+v1.0.0 benchmark set: **54 measured cells, zero unfaithful corrections**, taken
 through the package MCP server (stdio, JSON-RPC 2.0) on `2026-08-02T05:59:13Z`
 (Linux glibc 2.35, Python 3.12.13).
 
 - **Peak throughput:** 11,540,387 shots/s (FastUnionFind, 5-qubit repetition code, 8,000 samples)
 - **54/54 benchmark points** with zero unfaithful corrections (repetition n=5–65, ring n=16–48; unionfind, fastunionfind, blossom, sparseblossom, bposd, auto)
 - **42/42 syndrome-faithfulness cases** passed; **13 MCP tools** operational
-- **No speedup multiplier is claimed.** Apple-to-apple vs PyMatching (see `benchmarks/v0.7.0/VERIFIED_APPLE_TO_APPLE_REPORT.pdf`): comparable, with PyMatching often slightly ahead on the synchronized batch.
+- **No speedup multiplier is claimed.** Apple-to-apple vs PyMatching (see `benchmarks/v1.0.0/VERIFIED_APPLE_TO_APPLE_REPORT.pdf`): comparable, with PyMatching often slightly ahead on the synchronized batch.
 
 The previous `official_benchmark_results.*` (2026-08-01 circuit-level comparison,
 generated from a dirty working tree at `b436f04e`, carrying per-row
@@ -465,7 +465,7 @@ project lives in the archived datasets, not in this file:
 | [10.5281/zenodo.21501377](https://doi.org/10.5281/zenodo.21501377) — Empirical benchmarks, v0.6.8 (CC-BY-4.0) | Archived empirical benchmark dataset for v0.6.8, including syndrome-faithfulness verification (`H·ê = s`) and matching parity against PyMatching | Circuit-level, single pipeline. Ships 5 raw JSON datasets, 6 repro scripts, and a `manifest.json` carrying the wheel SHA256 and pinned dependency versions. Host: HP dual-core, 3.1 GB RAM, AntiX live USB, Python 3.13.5, pymatching 2.4.0, stim/sinter 1.16.0 |
 | [10.5281/zenodo.21339300](https://doi.org/10.5281/zenodo.21339300) — Workbench benchmark master report, v0.6.6 (CC-BY-4.0) | 1,858 measurements over 105 runs; latency, throughput and peak memory for `d = 3–19` across 6 topologies | `p = 0.05`. Reports QECTOR decoders against each other — it is **not** a cross-library comparison |
 
-Both are one release behind the working tree (v0.6.8 and v0.6.6 against 0.7.0);
+Both are one release behind the working tree (v0.6.8 and v0.6.6 against 1.0.0);
 read them as evidence about those versions.
 
 Benchmark results are hardware, driver, compiler, and workload dependent.
@@ -615,7 +615,7 @@ QECTOR Decoder v3 is **source-available** under the **PolyForm Noncommercial Lic
   author  = {Guillaume Lessard},
   title   = {{QECTOR Decoder v3}: Rust/Python Quantum Error Correction Decoding Platform},
   year    = {2026},
-  version = {0.7.1},
+  version = {1.0.0},
   url     = {https://www.qector.store},
   note    = {Source-available under PolyForm Noncommercial 1.0.0. Commercial license required for commercial use.}
 }

@@ -5,6 +5,132 @@ on [Keep a Changelog](https://keepachangelog.com/), and the project aims to foll
 semantic versioning. Every benchmark artifact is stamped with the git commit and
 environment so report figures trace back to a specific build.
 
+## [Unreleased]
+
+### Added
+- **Formal CS-OSD(λ, w) + LLR damping in `bposd.py`.** The `osd_order >= 1` path is
+  now the combination-sweep OSD of Panteleev & Kalachev (arXiv:1904.02703): the
+  sweep set is the `osd_lambda` (default 24) free bits closest to the basis/free
+  reliability cut-off, candidates re-solve the GF(2) basis (all syndrome-exact),
+- **Verification-harness credibility fixes (2026-08-05).** Independent-verification
+  artifacts are now honest by construction:
+  - `run_full_verification.py` gained `--run 0|1`; run 1 is a genuinely separate
+    process writing `results_<mode>_run1.json` / `junit_<mode>_run1.xml`, and the
+    exporter only claims "0 flaky" when the two independent runs' tallies match.
+  - Community runs sandbox `HOME`/`USERPROFILE` so a profile-level
+    `~/.qector/license.key` can no longer silently unlock Enterprise and make the
+    "community" column fake (GPU tests now genuinely skip: 14 of 120).
+  - `export_report.py` reports run-1 summary + flaky count per tier in the markdown,
+    JSON, PDF and chart, and adds an LER cross-check disclosure section.
+- **External LER gate tightened.** `test_12_benchmark_xcheck.py` now seeds the
+  sampler (12 000 shots) and asserts the real dev2todo §1.1 acceptance
+  `ler_qector <= ler_pymatching + 1e-3` (measured delta 0.00075 on rep-d3 p=0.01),
+  replacing the old 4096-unseeded-shot check with a meaningless `+0.02` bound.
+
+### Fixed
+- **License-pinning test fixtures were environment-dependent.** `test_enforcement_matrix.py`
+  and `test_license_rust_bridge.py` remap `HOME`/`USERPROFILE` to an empty temp dir,
+  so the pure-Python fallback no longer re-reads the machine's `~/.qector/license.key`
+  and Community cells pass even on developer machines with a profile-level
+  Enterprise token. Previously `test_get_license_info_community_default` and the
+  four Community enforcement cells failed under `dev.bat`.
+
+### Performance
+
+  and selection uses the a-posteriori weight `Σ xᵢ·log((1-pᵢ)/pᵢ)` (Hamming
+  tie-break; identical ordering to Hamming under uniform priors). New optional
+  `BpOsdDecoder` kwargs: `damping` (LLR message damping `m ← (1-d)·m_new + d·m_old`
+  on `min_sum`/`sum_product`) and `osd_lambda`.
+- **Hyperedge cluster expansion for colour codes.** `ColourCodeDecoder(method="cluster_bposd")`
+  is now available as an opt-in path: weighted union-find growth over the
+  undecomposed hypergraph DEM with verified spanning-tree peeling, then hands
+  only unresolved residual syndromes to BP-OSD. `method="bposd"` remains the
+  default and reproduces the previous behaviour bit-for-bit; the constructor
+  default has not been changed. The `cluster_bposd` path is *not* promoted
+  to default because, on the tested colour-code distances (d=3, 5, 7), it is
+  neither faster nor more accurate than plain BP-OSD — the in-file docstring
+  on `ColourCodeDecoder.__init__` documents the measured per-distance numbers
+  (e.g. d=5 LER 0.0433 vs 0.0267).
+- **`CUDABatchDecoder(precision="f64")`.** New `uf_decode_batch_cuda_f64` kernel:
+  the UF-01 weighted growth accumulates in double precision against the exact
+  (pre-cast) f64 edge lengths (`UfGraph::edge_lengths_f64`). Also:
+  `CUDABpOsdDecoder.decode` single-shot convenience (one-row batch).
+
+### Fixed
+- **Dual-stream weighted CUDA race.** The second half-launch's threads restart at
+  `idx = 0`, so both streams aliased the same `sf` support scratch in the weighted
+  path (`s32`/`s8` were already offset). The `sf` base is now offset per stream.
+- **`CUDABatchDecoder` leaked the `edge_len` device buffer on drop.**
+
+### Performance
+- **`SparseBlossomDecoder` hot path is now zero-allocation** (thread-local
+  `SbScratch`: pooled regions/blossoms, epoch-stamped Dijkstra workspace,
+  scratch-resident blossom contraction and MWPM input build), matching the
+  `blossom.rs`/`uf_core.rs` scratch pattern.
+
+## [1.0.0] — 2026-08-05
+
+First 1.x release. The Stable tier in `docs/STABLE_API.md` is now
+contractually stable across the 1.x line; only the items explicitly listed
+in that document as **Stable** are frozen at the 1.0.0 contract. Symbols
+listed as **Provisional** (BP-OSD tuning kwargs, GPU batch constructors,
+the network-facing surfaces) may change in a 1.x release with a changelog
+note. Symbols listed as **Internal** (Rust module layout, `_bp_core`,
+`RUST_SRC_B64_*`) carry no SemVer promise.
+
+### Verified
+- **120-test independent suite, 2×2 runs (community + enterprise), 0 failures,
+  0 flaky, deterministic across both independent runs.** Suite covers the
+  smoke API, core decoders, BP-OSD/LDPC, advanced decoders (BeliefMatching,
+  ColourCode, TwoStage, AmbiguityCluster, AutoDecoder), batch paths,
+  GPU-locked Community tier, GPU-Enterprise tier, DEM/Stim/Sinter,
+  CLI/doctor, error/edge cases, the result API, the LER benchmark and
+  PyMatching cross-check, and the MCP server (handshake, decode-via-MCP,
+  decoder hints, protocol conformance including `ping` and notification
+  suppression).
+- **LER-vs-PyMatching gate passes with 4.5× margin.** On rep-d3 at p=0.01,
+  12 000 seeded shots: `ler_qector_blossom = 0.00392`,
+  `ler_pymatching = 0.00317` (delta 0.00075, gate `+1e-3`). This replaces
+  the v0.7.0-era 4096-unseeded-shot `+0.02` bound that did not measure the
+  same quantity.
+- **Community tier is genuinely Community.** `HOME`/`USERPROFILE` are
+  sandboxed for `--mode community` runs, so a profile-level
+  `~/.qector/license.key` can no longer silently unlock Enterprise and
+  make the "community" column fake. GPU tests now genuinely skip (14 of
+  120 in the Community tier).
+- **Two independent runs per tier.** `run_full_verification.py --run 0`
+  and `--run 1` are genuinely separate processes writing
+  `results_<mode>_run1.json` / `junit_<mode>_run1.xml`. The exporter
+  only claims "0 flaky" when both runs' tallies agree.
+- **Cargo: 303 passed / 0 failed** (`cargo test --no-default-features`)
+  and **323 passed / 0 failed / 7 ignored** (`cargo test --features full`,
+  the 7 ignored tests are hardware-only). Both clippy invocations
+  (`--no-default-features` and `--features full`, `--all-targets`,
+  `-D warnings`) exit 0.
+
+### Rolled forward from [Unreleased]
+Everything in the [Unreleased] section above is in the v1.0.0 source: the
+formal CS-OSD(λ, w) + LLR damping kwargs on `BpOsdDecoder`, the
+verification-harness credibility fixes, the LER gate, the licence-pinning
+test fixtures, the `CUDABatchDecoder(precision="f64")` f64 weighted kernel,
+the dual-stream weighted CUDA race fix, the `CUDABatchDecoder` `edge_len`
+Drop fix, the `SparseBlossomDecoder` zero-allocation hot path, and the
+`CUDABpOsdDecoder.decode` single-shot convenience. The opt-in
+`ColourCodeDecoder(method="cluster_bposd")` path is in source but **not**
+the default — the in-file docstring on `ColourCodeDecoder.__init__`
+documents the measured per-distance numbers and explains why the default
+remains `bposd`.
+
+### Compatibility
+- **No public API removals** since v0.7.1.
+- **One behavior change in a Provisional symbol:** `CUDABatchDecoder` now
+  uploads `edge_len_f64` separately and selects an f64 weighted growth
+  kernel when `precision="f64"`. This is additive: omitting the kwarg
+  preserves the v0.7.1 f32 path bit-for-bit.
+- **All `0.7.x` references in metadata** (`pyproject.toml`, `Cargo.toml`,
+  `CITATION.cff`, `codemeta.json`, `__init__.py`'s `__fallback_version__`,
+  the verification harness `test_version_is_100`) now read `1.0.0`.
+
 ## [0.7.1] — 2026-08-04
 
 Patch release: three defects found by independent black-box verification of the

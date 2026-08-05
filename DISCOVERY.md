@@ -1,6 +1,6 @@
 # QECTOR Decoder v3 Discovery Metadata
 
-QECTOR Decoder v3 (v0.7.0) is a high-performance, source-available Rust and Python quantum error correction (QEC) decoding platform. Free for personal, academic, and non-commercial research. Institutional, lab, and commercial use requires a paid license.
+QECTOR Decoder v3 (v1.0.0) is a high-performance, source-available Rust and Python quantum error correction (QEC) decoding platform. Free for personal, academic, and non-commercial research. Institutional, lab, and commercial use requires a paid license.
 
 **Official Links:**
 - **Website & Pricing**: https://qector.store/pricing
