@@ -5,12 +5,12 @@
 [![Python](https://img.shields.io/pypi/pyversions/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/)
 [![License](https://img.shields.io/badge/License-PolyForm_Noncommercial_1.0.0-blue)](https://github.com/GuillaumeLessard/qector-decoder/blob/main/LICENSE)
 
-**Production-grade quantum error correction decoding library — Python + Rust.**  
+**Production-grade quantum error correction decoding library, Python + Rust.**  
 *Copyright © 2026 Guillaume Lessard / iD01t Productions. All Rights Reserved.*
 
 ## 🚀 Support QECTOR Development
 
-QECTOR is source-available and developed independently. Non-commercial use is free — sponsorship
+QECTOR is source-available and developed independently. Non-commercial use is free; sponsorship
 and commercial licences are what keep the decoder maintained.
 
 [![Sponsor qectorlab](https://img.shields.io/badge/GitHub_Sponsors-qectorlab-ea4aaa?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/qectorlab)
@@ -20,7 +20,7 @@ and commercial licences are what keep the decoder maintained.
 | Channel | Who it's for |
 |---|---|
 | [GitHub Sponsors](https://github.com/sponsors/qectorlab) | Individuals and companies funding ongoing development |
-| [Commercial licence](https://www.qector.store/pricing) | Required for company, SaaS, OEM or funded institutional use — see [COMMERCIAL.md](https://github.com/GuillaumeLessard/qector-decoder/blob/main/COMMERCIAL.md) |
+| [Commercial licence](https://www.qector.store/pricing) | Required for company, SaaS, OEM or funded institutional use, see [COMMERCIAL.md](https://github.com/GuillaumeLessard/qector-decoder/blob/main/COMMERCIAL.md) |
 | [Direct purchase](https://buy.stripe.com/6oU00l77Xc8ifsegEqeUU07) | Immediate Stripe checkout, licence issued automatically |
 | [admin@qector.store](mailto:admin@qector.store) | Site licences, custom terms, academic partnerships |
 
@@ -37,10 +37,10 @@ PyMatching-compatible MWPM validation · Belief-matching accuracy mode · BP-OSD
 pip install qector-decoder-v3
 ```
 
-Supported: **Python 3.9–3.13** (`requires-python = ">=3.9"`) on Linux x86_64,
+Supported: **Python 3.9-3.13** (`requires-python = ">=3.9"`) on Linux x86_64,
 Windows x64, and macOS arm64.
 
-Each release publishes **15 binary wheels** — CPython 3.9/3.10/3.11/3.12/3.13 ×
+Each release publishes **15 binary wheels**: CPython 3.9/3.10/3.11/3.12/3.13 ×
 `win_amd64` / `manylinux_2_17_x86_64` / `macosx_11_0_arm64`. There is **no sdist
 and no aarch64, musllinux, or macOS x86_64 wheel**, so `pip install` on any other
 platform will fail rather than fall back to a source build. Those targets need a
@@ -91,7 +91,7 @@ if CUDABatchDecoder.is_available():
 
 **Pass the DEM's weights to the GPU.** Without `edge_weights` the GPU kernels run
 unweighted cluster growth, which cannot distinguish a `p = 1e-4` mechanism from a
-`p = 1e-2` one — on circuit-level noise that costs several times the logical
+`p = 1e-2` one; on circuit-level noise that costs several times the logical
 error rate, no matter how fast the GPU is:
 
 ```python
@@ -119,11 +119,11 @@ hardware and noise model.
 
 **No benchmark figures are published for this release.** Decoder performance is
 hardware-, code- and noise-dependent, and any number quoted here would not
-describe your setup. Run the harness yourself — the JSON it writes carries its own
+describe your setup. Run the harness yourself: the JSON it writes carries its own
 environment and parameter block, so results are traceable to the machine that
 produced them. See `docs/GPU_AND_CUPY.md`.
 
-### AutoDecoder — 7-tier self-debugging fallback
+### AutoDecoder: 7-tier self-debugging fallback
 
 ```python
 from qector_decoder_v3 import AutoDecoder
@@ -153,7 +153,7 @@ decoder = BlossomDecoder(checks, n_qubits)
 ```
 
 `DemModel.make_decoder` builds any shipped decoder family straight from the
-model, already carrying its weights — enumerate them with
+model, already carrying its weights. Enumerate them with
 `DemModel.DECODER_KINDS`:
 
 ```python
@@ -207,7 +207,7 @@ print(f"Tier: {info['tier']}  status: {info['key_status']}")
 
 The core also resolves a key on its own, in this order: `QECTOR_LICENSE_KEY`,
 then `QECTOR_LICENSE_FILE`, then `~/.qector/license.key`. Prefer a file in
-deployments — the key then never appears in a process listing or shell history.
+deployments: the key then never appears in a process listing or shell history.
 Check `info["key_status"] == "valid"`, not just the tier: a `QECTOR_LICENSE_FILE`
 that is set but unreadable is reported as an *invalid* key rather than silently
 falling back to Community.
@@ -303,13 +303,13 @@ QECTOR uses **offline Ed25519 signature verification** for license tokens. No ne
 ## Tuning environment variables
 
 These change decoder behaviour at construction time. Two of them affect
-**matching quality**, and therefore logical error rate — set them deliberately,
+**matching quality**, and therefore logical error rate; set them deliberately,
 and record them alongside any benchmark you publish.
 
 | Variable | Default | Effect |
 | --- | --- | --- |
 | `QECTOR_BLOSSOM_K_MULT` | `2.0` | Candidate-neighbour multiplier for sparse MWPM: `k = max(12, ceil(mult · sqrt(n_defects)))`. **Affects accuracy.** Lowering it reduces latency but can exclude the optimal partner on dense instances, producing a heavier (sub-optimal) matching. `2.0` is the tuned minimum that preserved exact-MWPM parity at d ≥ 15. |
-| `QECTOR_BLOSSOM_INTRA_PAR` | auto | Force intra-decode parallelism for candidate discovery. `0` disables, `1` forces. Unset selects automatically when the graph has ≥ 64 nodes (roughly d ≥ 9 for rotated surface codes). Performance only — output is bit-identical either way. |
+| `QECTOR_BLOSSOM_INTRA_PAR` | auto | Force intra-decode parallelism for candidate discovery. `0` disables, `1` forces. Unset selects automatically when the graph has ≥ 64 nodes (roughly d ≥ 9 for rotated surface codes). Performance only; output is bit-identical either way. |
 | `QECTOR_BLOSSOM_INTRA_THREADS` | unset | Size a dedicated Rayon pool for candidate discovery, independent of the global batch pool. Unset or `< 1` uses the global pool. Performance only. |
 | `QECTOR_CUDA_DEVICE_ID` | `0` | Which CUDA device the native batch/BP-OSD decoders bind to. |
 | `QECTOR_OPENCL_DEVICE_ALLOW` | unset | Comma-separated substrings matched case-insensitively against OpenCL device names, e.g. `nvidia,geforce`. Unset accepts any device. Use it to avoid selecting an integrated GPU on multi-device hosts. |
@@ -335,16 +335,16 @@ Commercial licenses are issued automatically via Stripe Checkout:
 
 | Area | Description |
 | --- | --- |
-| **`qector` CLI** | `qector decode` / `bench` / `serve`, plus `qector-doctor` — a 15-check environment diagnostic that tells you *why* a decoder is unavailable instead of failing at decode time |
+| **`qector` CLI** | `qector decode` / `bench` / `serve`, plus `qector-doctor`, a 15-check environment diagnostic that tells you *why* a decoder is unavailable instead of failing at decode time |
 | **Ecosystem entry points** | Five Sinter decoders and the qiskit-qec plugin are now registered entry points, so `sinter.collect(decoders=["qector_blossom", ...])` works without `custom_decoders=` |
-| **`pymatching` shim** | `from qector_decoder_v3.pymatching import Matching` — the submodule spelling, not only the attribute |
-| **New decoder families** | `AmbiguityClusterDecoder` (BP + \|LLR\| partition + exact per-cluster enumeration), `TwoStageDecoder` (X sector, propagate, Z sector), `ColourCodeDecoder` (BP-OSD on the *undecomposed* hypergraph — matching is not a correct colour-code decoder) |
+| **`pymatching` shim** | `from qector_decoder_v3.pymatching import Matching`, the submodule spelling, not only the attribute |
+| **New decoder families** | `AmbiguityClusterDecoder` (BP + \|LLR\| partition + exact per-cluster enumeration), `TwoStageDecoder` (X sector, propagate, Z sector), `ColourCodeDecoder` (BP-OSD on the *undecomposed* hypergraph; matching is not a correct colour-code decoder) |
 | **Relay-BP** | Layered serial BP schedule for qLDPC (`bp_method="relay"`); each check sees the freshest messages |
 | **Weighted Union-Find on the GPU** | `CUDABatchDecoder` and `OpenCLBatchDecoder` accept `edge_weights` and run adaptive weighted growth; both kernels agree, which is the cross-check that the port is faithful |
-| **`DemModel.make_decoder`** | Covers all nine shipped families, not five — a DEM is the entry point real circuit-level workloads use |
-| **Belief matching** | `from_numpy_h` decoders no longer return empty corrections — output is a faithful length-`n_qubits` vector (`H @ corr == syndrome`) |
+| **`DemModel.make_decoder`** | Covers all nine shipped families, not five; a DEM is the entry point real circuit-level workloads use |
+| **Belief matching** | `from_numpy_h` decoders no longer return empty corrections; output is a faithful length-`n_qubits` vector (`H @ corr == syndrome`) |
 | **BP-OSD accuracy** | Exact log-domain sum-product BP by default; true combination-sweep OSD-1/2 via `osd_order` |
-| **Rust core: crash safety** | Six panic-to-abort paths removed — gRPC and CUDA mutex-poison propagation, swallowed CUDA async errors, `Bernoulli::new` unwrap, cascade-decoder `expect`. Under `panic = "abort"` each of these killed the host process |
+| **Rust core: crash safety** | Six panic-to-abort paths removed: gRPC and CUDA mutex-poison propagation, swallowed CUDA async errors, `Bernoulli::new` unwrap, cascade-decoder `expect`. Under `panic = "abort"` each of these killed the host process |
 | **Licence hardening** | Malformed tokens return `False` instead of raising; v2 tokens carry tier + expiry inside the signature; `QECTOR_LICENSE_FILE` and `~/.qector/license.key` are read, and an unreadable file reports *invalid* rather than silently dropping to Community |
 | **Benchmark honesty** | The pre-v0.7.0 comparison tables are withdrawn; `ler.assert_comparable` now blocks cross-noise-model comparisons at the source |
 
@@ -370,8 +370,8 @@ Commercial licenses are issued automatically via Stripe Checkout:
 
 ### Withdrawn: the pre-v1.0.0 comparison tables
 
-**Four benchmark tables that stood here — MWPM parity vs PyMatching at d=13/15,
-belief-matching LER at d=5/7, GPU bit-identity, and the native memory profile —
+**Four benchmark tables that stood here: MWPM parity vs PyMatching at d=13/15,
+belief-matching LER at d=5/7, GPU bit-identity, and the native memory profile,
 are withdrawn. Do not cite them.**
 
 Two independent reasons, either sufficient:
@@ -382,7 +382,7 @@ Two independent reasons, either sufficient:
    so the "parity" the tables reported was an artifact of the harness, not a
    property of the decoders.
 2. **The artifacts are unobtainable.** Each table cited a file under
-   `benchmark_results/` — a path that is in `.gitignore` and has never been part
+   `benchmark_results/`, a path that is in `.gitignore` and has never been part
    of any published commit or wheel. The files are also no longer on disk. Nobody
    could have checked the numbers even when they were displayed.
 
@@ -394,9 +394,9 @@ cannot recur silently.
 
 **What replaces them:** `scripts/regenerate_benchmark_artifacts.py` and
 `scripts/run_custom_comparison_benchmark.py` both drive every decoder through
-one circuit-level pipeline — `ler.estimate_ler_circuit_level`, one Stim circuit,
+one circuit-level pipeline: `ler.estimate_ler_circuit_level`, one Stim circuit,
 one decomposed DEM, one detector/observable sample set per cell, one
-`decode_batch` resolver, scored against the circuit's own logical observables —
+`decode_batch` resolver, scored against the circuit's own logical observables;
 and stamp the result with its methodology, git commit, tree-dirty flag,
 parameters and dependency versions. `ler.assert_comparable` gates the rows
 before they are written.
@@ -418,27 +418,27 @@ through the package MCP server (stdio, JSON-RPC 2.0) on `2026-08-02T05:59:13Z`
 (Linux glibc 2.35, Python 3.12.13).
 
 - **Peak throughput:** 11,540,387 shots/s (FastUnionFind, 5-qubit repetition code, 8,000 samples)
-- **54/54 benchmark points** with zero unfaithful corrections (repetition n=5–65, ring n=16–48; unionfind, fastunionfind, blossom, sparseblossom, bposd, auto)
+- **54/54 benchmark points** with zero unfaithful corrections (repetition n=5-65, ring n=16-48; unionfind, fastunionfind, blossom, sparseblossom, bposd, auto)
 - **42/42 syndrome-faithfulness cases** passed; **13 MCP tools** operational
 - **No speedup multiplier is claimed.** Apple-to-apple vs PyMatching (see `benchmarks/v1.0.0/VERIFIED_APPLE_TO_APPLE_REPORT.pdf`): comparable, with PyMatching often slightly ahead on the synchronized batch.
 
 The previous `official_benchmark_results.*` (2026-08-01 circuit-level comparison,
 generated from a dirty working tree at `b436f04e`, carrying per-row
-speedup-vs-PyMatching multipliers) is **withdrawn** — it is not part of the
+speedup-vs-PyMatching multipliers) is **withdrawn**: it is not part of the
 verified release and must not be cited.
 
 > **Benchmark figures are not published beyond the verified set for this release.**
 > Decoder throughput and logical error rate depend on your hardware, code family,
 > distance and noise model, so any table printed here would describe a machine that
 > is not yours. The benchmark harness ships with the package and writes JSON carrying
-> its own environment and parameter block — run it on your target hardware
+> its own environment and parameter block; run it on your target hardware
 > (`qector benchmark --verify` or `python -m qector.validate`) and compare decoders
 > under the conditions you actually care about.
 
 **GPU accuracy depends on whether matching weights are supplied.**
 `CUDABatchDecoder` and `OpenCLBatchDecoder` accept an optional `edge_weights`
 argument. Omitting it selects topology-only cluster growth, whose logical error
-rate does not improve with code distance — the signature of operation above
+rate does not improve with code distance: the signature of operation above
 threshold. Supplying the DEM's `log((1-p)/p)` weights restores distance scaling.
 The weighted path costs more per shot than the unweighted one.
 `docs/BENCHMARK_COMPETITIVE.md` records the same effect for unweighted
@@ -462,14 +462,14 @@ project lives in the archived datasets, not in this file:
 
 | Record | What it establishes | Methodology |
 | --- | --- | --- |
-| [10.5281/zenodo.21501377](https://doi.org/10.5281/zenodo.21501377) — Empirical benchmarks, v0.6.8 (CC-BY-4.0) | Archived empirical benchmark dataset for v0.6.8, including syndrome-faithfulness verification (`H·ê = s`) and matching parity against PyMatching | Circuit-level, single pipeline. Ships 5 raw JSON datasets, 6 repro scripts, and a `manifest.json` carrying the wheel SHA256 and pinned dependency versions. Host: HP dual-core, 3.1 GB RAM, AntiX live USB, Python 3.13.5, pymatching 2.4.0, stim/sinter 1.16.0 |
-| [10.5281/zenodo.21339300](https://doi.org/10.5281/zenodo.21339300) — Workbench benchmark master report, v0.6.6 (CC-BY-4.0) | 1,858 measurements over 105 runs; latency, throughput and peak memory for `d = 3–19` across 6 topologies | `p = 0.05`. Reports QECTOR decoders against each other — it is **not** a cross-library comparison |
+| [10.5281/zenodo.21501377](https://doi.org/10.5281/zenodo.21501377): Empirical benchmarks, v0.6.8 (CC-BY-4.0) | Archived empirical benchmark dataset for v0.6.8, including syndrome-faithfulness verification (`H·ê = s`) and matching parity against PyMatching | Circuit-level, single pipeline. Ships 5 raw JSON datasets, 6 repro scripts, and a `manifest.json` carrying the wheel SHA256 and pinned dependency versions. Host: HP dual-core, 3.1 GB RAM, AntiX live USB, Python 3.13.5, pymatching 2.4.0, stim/sinter 1.16.0 |
+| [10.5281/zenodo.21339300](https://doi.org/10.5281/zenodo.21339300): Workbench benchmark master report, v0.6.6 (CC-BY-4.0) | 1,858 measurements over 105 runs; latency, throughput and peak memory for `d = 3-19` across 6 topologies | `p = 0.05`. Reports QECTOR decoders against each other; it is **not** a cross-library comparison |
 
 Both are one release behind the working tree (v0.6.8 and v0.6.6 against 1.0.0);
 read them as evidence about those versions.
 
 Benchmark results are hardware, driver, compiler, and workload dependent.
-Regenerate before quoting performance numbers, and state the noise model —
+Regenerate before quoting performance numbers, and state the noise model:
 code-capacity and circuit-level LERs are different quantities.
 
 ---
@@ -497,7 +497,7 @@ python scripts/gpu_extensive_test.py --distances 3 5 7 9 11 13 --batches 1 64 10
 python scripts/native_memory_profile.py --distances 5 9 13 --batch 16384
 ```
 
-These write into `benchmark_results/`, which is `.gitignore`d — the output stays
+These write into `benchmark_results/`, which is `.gitignore`d; the output stays
 on the machine that produced it and is never committed. If you intend to publish
 a number, publish the artifact alongside it.
 
@@ -544,7 +544,7 @@ For local experiments and controlled deployments only. Not hardened for public S
 ## MCP server (stdio)
 
 The package ships an **MCP server** (JSON-RPC 2.0 over stdio) in every published
-wheel — no extra feature flag or install is needed:
+wheel, no extra feature flag or install is needed:
 
 ```bash
 python -c "import qector_decoder_v3; qector_decoder_v3.run_mcp_server()"
@@ -552,7 +552,7 @@ python -c "import qector_decoder_v3; qector_decoder_v3.run_mcp_server()"
 
 A ready-made client configuration lives in `mcp.json` at the repository root
 (it launches `python -c "import qector_decoder_v3; qector_decoder_v3.run_mcp_server()"`
-with `QECTOR_SILENT=1`). Point your MCP client at that file — e.g. Claude Code
+with `QECTOR_SILENT=1`). Point your MCP client at that file, e.g. Claude Code
 supports `mcp.add` with the `qector` server name. The server advertises 13
 tools, all verified on the released wheel:
 
@@ -582,12 +582,12 @@ controlled use; like REST/gRPC, it is not hardened for public SaaS exposure.
 | Area | Boundary |
 | --- | --- |
 | MWPM latency | PyMatching remains faster than exact `BlossomDecoder` on standard surface-code MWPM. QECTOR's value is decoder breadth and qLDPC coverage, not beating PyMatching at its own workload |
-| Belief-matching | Accuracy/research mode — can improve LER but much slower |
+| Belief-matching | Accuracy/research mode; can improve LER but much slower |
 | GPU accuracy | Unweighted GPU kernels trade logical accuracy for throughput; pass `edge_weights` or accept that |
 | GPU performance | Speedup is not universal, and the weighted kernel is currently slower than the weighted CPU path |
 | Benchmark tables | The pre-v0.7.0 comparison tables are withdrawn (see above). Cite the archived datasets or regenerate |
 | OpenCL | Depends on build configuration; confirm locally |
-| SparseBlossom | Near-optimal, not exact MWPM — use `BlossomDecoder` for exact |
+| SparseBlossom | Near-optimal, not exact MWPM; use `BlossomDecoder` for exact |
 | UnionFind | Fast approximate path; not universal for arbitrary graphs |
 | REST/gRPC/MCP | Not hardened as public SaaS without separate security review |
 
@@ -607,7 +607,7 @@ QECTOR Decoder v3 is **source-available** under the **PolyForm Noncommercial Lic
 - Performance benchmarks (v0.6.6): [10.5281/zenodo.21339300](https://doi.org/10.5281/zenodo.21339300)
 - Architecture whitepaper: [10.5281/zenodo.21320543](https://doi.org/10.5281/zenodo.21320543)
 - Empirical edge-hardware benchmarks (v0.6.8): [10.5281/zenodo.21501377](https://doi.org/10.5281/zenodo.21501377)
-- Workbench GUI v3.5.0: [10.5281/zenodo.21360433](https://doi.org/10.5281/zenodo.21360433)
+- Workbench GUI v0.5.3: [10.5281/zenodo.21360433](https://doi.org/10.5281/zenodo.21360433)
 - Provenance archive (restricted): [10.5281/zenodo.20825980](https://doi.org/10.5281/zenodo.20825980)
 
 ```bibtex
