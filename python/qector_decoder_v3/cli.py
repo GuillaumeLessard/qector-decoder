@@ -12,7 +12,11 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     sub = p.add_subparsers(dest="command")
 
-    d = sub.add_parser("decode", help="Decode a syndrome file")
+    d = sub.add_parser(
+        "decode",
+        help="Decode a syndrome file",
+        description="Decode syndromes from a file using the specified decoder.",
+    )
     d.add_argument("input", help="Path to syndrome file (numpy .npy or CSV)")
     d.add_argument("--check-to-qubits", "-c", required=True, help="Check matrix file (.npy)")
     d.add_argument("--n-qubits", "-n", type=int, required=True)
