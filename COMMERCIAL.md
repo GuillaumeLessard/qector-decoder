@@ -23,27 +23,26 @@ Prices are in US dollars; applicable tax is added at checkout. Every plan has a
 14-day money-back guarantee on the first payment. Subscriptions renew
 automatically and can be cancelled at any time.
 
-| Plan | Price | Users | Includes |
-| --- | --- | --- | --- |
-| Free commercial trial | $0 for 14 days | Up to 5 | Pro features for evaluation. No card required; one trial per e-mail per year |
-| Pro | $79 / month or $790 / year | 1 named user | All decoders, GPU (CUDA/OpenCL) batch decoding, internal production use, e-mail support |
-| Pro Perpetual | $1,990 one-time | 1 named user | Pro rights for every 3.x release, 12 months of support |
-| Team | $3,900 / year | Up to 10 | Everything in Pro, priority support, onboarding call |
-| Lab | $9,900 / year | Up to 25 | Everything in Team, code-distance tier 63, support SLA, one Validation Report |
-| Pilot | $1,500 one-time | Team | 60-day evaluation licence with an integration call; creditable toward Team or Lab within 90 days |
-| Enterprise | From $25,000 / year | Unlimited | SaaS / hosted API and OEM options, named support engineer, signed agreement |
+| Plan | Price | Includes |
+| --- | --- | --- |
+| Pro | $79 / month or $790 / year | Pro licence tier (code distance 19). All decoders, GPU (CUDA/OpenCL) batch decoding, internal production use, e-mail support |
+| Pro Perpetual | $1,990 one-time | Pro rights for every 3.x release, 12 months of support |
+| Lab | $9,900 / year | Enterprise licence tier (code distance 63), priority support with SLA, onboarding call, one Validation Report |
+| Pilot | $1,500 one-time | 60-day evaluation licence with an integration call; creditable toward Lab within 90 days |
+| Enterprise | From $25,000 / year | SaaS / hosted API and OEM options, named support engineer, signed agreement |
 
 Academic institutions that want a paid plan, for support or to pass commercial
-rights to an industry partner, receive 40% off Team and Lab.
+rights to an industry partner, receive 40% off Lab.
 
-Licences bought under earlier plans (Evaluation, Solo/Indie, Startup/Growth,
-Professional) keep their original terms.
+Licences cover the buying organisation's internal use and are verified offline
+(air-gapped); there are no seat counts. Licences bought under earlier plans
+(Evaluation, Solo/Indie, Startup/Growth, Professional, Team) keep their original terms.
 
 ## Professional services
 
 | Service | Price | Scope |
 | --- | --- | --- |
-| Validation Sprint | $3,750 one-time | 10–20 business days. A 60-day Pilot licence for up to 3 users, up to 3 of your workloads run with QECTOR, a reproducible artefact bundle (environment, input hashes, results, manifest), and a 60-minute review call |
+| Validation Sprint | $3,750 one-time | 10–20 business days. A 60-day Pilot licence, up to 3 of your workloads run with QECTOR, a reproducible artefact bundle (environment, input hashes, results, manifest), and a 60-minute review call |
 | Validation Report | $5,000 one-time | Independent review of your decoding setup and its reproducibility (one included with Lab) |
 | Workflow integration | $7,500–$12,000, scoped | Engineering to integrate QECTOR into your pipeline or custom LDPC/qLDPC code families |
 | Priority support | $5,000 / year | Private support channel and priority bug review |

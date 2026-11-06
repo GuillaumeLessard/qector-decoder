@@ -202,7 +202,7 @@ QECTOR Decoder v3 is source-available under the
   it free whatever their source of funding.
 - **Commercial licence required:** use by or for a company, including company
   work under a research contract, hosted or SaaS deployment, OEM integration and
-  redistribution. Plans start at $79/month, with a free 14-day trial:
+  redistribution. Plans start at $79/month, with a 14-day money-back guarantee:
   [qector.store/pricing](https://qector.store/pricing/).
 
 ### Activating a licence
@@ -223,7 +223,7 @@ A key file also works: `QECTOR_LICENSE_FILE=/path/to/license.key`, or
 | Tier | Plans | GPU batch decoders | Code-distance tier |
 | --- | --- | --- | --- |
 | Community | no token | not available | 7 |
-| Pro | Trial, Pro, Pro Perpetual, Team, Pilot | available | 19 |
+| Pro | Pro, Pro Perpetual, Pilot | available | 19 |
 | Enterprise | Lab, Enterprise | available | 63 |
 
 CPU decoding is never blocked. Distance tiers are advisory unless
