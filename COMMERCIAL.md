@@ -1,151 +1,83 @@
 # Commercial Licensing
 
-QECTOR Decoder v3 is source-available under the **PolyForm Noncommercial License 1.0.0** for personal, academic, educational, and non-commercial research use (see the `LICENSE` file for the full text).
+QECTOR Decoder v3 is source-available under the
+**PolyForm Noncommercial License 1.0.0** (see `LICENSE`). Personal, academic,
+educational and other non-commercial use is free. Universities, public research
+organisations, charities and government institutions may use it free whatever
+their source of funding.
 
-Commercial use requires a paid commercial license.
+A paid licence is required for commercial use, including:
 
-Commercial use includes, but is not limited to:
+- use by or for a company or startup, including internal R&D and operations;
+- company work on government, defence or university contracts;
+- paid consulting that uses QECTOR;
+- hosted, SaaS or API deployments;
+- OEM embedding, product integration and redistribution.
 
-- company use
-- startup use
-- commercial R&D
-- company work on government, defence or university contracts
-- paid consulting
-- SaaS use
-- hosted API use
-- OEM embedding
-- product integration
-- redistribution
-- internal business operations
-- commercial benchmarking
-- revenue-generating use
-- fundraising or investor validation
+Plans and checkout: **[qector.store/pricing](https://qector.store/pricing/)**.
+Questions: **[admin@qector.store](mailto:admin@qector.store)**.
 
-## Commercial Pricing Position
+## Plans
 
-QECTOR is positioned as a source-available Rust/Python QEC R&D platform focused on decoder diversity, reproducible benchmark packaging, BP-OSD / LDPC workflows, CPU/GPU batch paths, and commercial legal clarity.
+Prices are in US dollars; applicable tax is added at checkout. Every plan has a
+14-day money-back guarantee on the first payment. Subscriptions renew
+automatically and can be cancelled at any time.
 
-QECTOR is not positioned as the universal fastest MWPM decoder. PyMatching remains the reference for exact MWPM latency on standard surface-code workloads. Commercial value derives from integrated multi-decoder experimentation, LDPC/qLDPC coverage, reproducible artifact workflows, and clear licensing for revenue-linked or institutional use.
+| Plan | Price | Users | Includes |
+| --- | --- | --- | --- |
+| Free commercial trial | $0 for 14 days | Up to 5 | Pro features for evaluation. No card required; one trial per e-mail per year |
+| Pro | $79 / month or $790 / year | 1 named user | All decoders, GPU (CUDA/OpenCL) batch decoding, internal production use, e-mail support |
+| Pro Perpetual | $1,990 one-time | 1 named user | Pro rights for every 3.x release, 12 months of support |
+| Team | $3,900 / year | Up to 10 | Everything in Pro, priority support, onboarding call |
+| Lab | $9,900 / year | Up to 25 | Everything in Team, code-distance tier 63, support SLA, one Validation Report |
+| Pilot | $1,500 one-time | Team | 60-day evaluation licence with an integration call; creditable toward Team or Lab within 90 days |
+| Enterprise | From $25,000 / year | Unlimited | SaaS / hosted API and OEM options, named support engineer, signed agreement |
 
-## Why License QECTOR When PyMatching and Stim Are Free?
+Academic institutions that want a paid plan, for support or to pass commercial
+rights to an industry partner, receive 40% off Team and Lab.
 
-PyMatching and Stim provide excellent free baselines. QECTOR is the appropriate commercial choice when a team requires:
+Licences bought under earlier plans (Evaluation, Solo/Indie, Startup/Growth,
+Professional) keep their original terms.
 
-| Need                              | QECTOR Value                                                                 |
-|-----------------------------------|-----------------------------------------------------------------------------|
-| Multi-decoder experimentation     | Union-Find, Blossom, Sparse Blossom, BP-OSD, batch, streaming, and hybrid workflows in a single source-available platform |
-| LDPC / qLDPC coverage             | BP-OSD and LDPC workflows beyond standard graph-like MWPM                   |
-| Reproducible evidence             | Benchmark artifacts, environment snapshots, reproducibility scripts, and Workbench report bundles |
-| Commercial permission             | Written license terms for company, product, hosted, or revenue-generating use |
-| Rapid proof of workflow value     | Productized Validation Sprints that deliver customer-specific, reproducible results within weeks |
+## Professional services
 
-The commercial pitch centers on workflow velocity, reproducible proof, legal clarity, and decoder breadth. QECTOR is not offered as a universal replacement for PyMatching on pure latency.
+| Service | Price | Scope |
+| --- | --- | --- |
+| Validation Sprint | $3,750 one-time | 10–20 business days. A 60-day Pilot licence for up to 3 users, up to 3 of your workloads run with QECTOR, a reproducible artefact bundle (environment, input hashes, results, manifest), and a 60-minute review call |
+| Validation Report | $5,000 one-time | Independent review of your decoding setup and its reproducibility (one included with Lab) |
+| Workflow integration | $7,500–$12,000, scoped | Engineering to integrate QECTOR into your pipeline or custom LDPC/qLDPC code families |
+| Priority support | $5,000 / year | Private support channel and priority bug review |
+| Integration support | $10,000 / year | Installation, configuration and integration guidance |
+| Custom engineering | $150 / hour | Fixes, scripts, reports and workflow adaptation |
+| Technical advisory | $2,000 / day | Architecture review and QEC workflow consulting |
 
-## Public Pricing Tiers
+## Rights not included by default
 
-All paid tiers grant internal commercial use rights. Prices are in USD; tax is added at checkout. Every plan carries a 14-day money-back guarantee on the first payment. Holders of earlier Evaluation, Solo/Indie, Startup/Growth or Professional licences keep their original terms.
+Unless a written agreement grants them, no plan includes redistribution,
+sublicensing, OEM, hosted API or SaaS rights, trademark or patent rights,
+exclusivity, warranty or indemnification.
 
-| Tier                              | Price                                      | Scope                                                                 | Notes |
-|-----------------------------------|--------------------------------------------|-----------------------------------------------------------------------|-------|
-| Personal / Academic               | Free                                       | Personal, academic, educational, and non-commercial research use under the repository license | No commercial rights included |
-| Free Commercial Trial             | $0 for 14 days                             | Pro features for up to 5 internal users. Evaluation only, no card. One per e-mail per year | Self-serve at qector.store/pricing |
-| Pro                               | $79 USD / month or $790 USD / year         | One named user. Full decoder suite, GPU (CUDA/OpenCL) batch decoding, internal production use, priority e-mail support | Renews automatically; cancel any time |
-| Pro Perpetual                     | $1,990 USD one-time                        | One named user. Pro rights for every 3.x release; a major version such as 4.0 is a new licence | 12 months of support included |
-| Team                              | $3,900 USD / year                          | Up to 10 named users. Everything in Pro, priority support, onboarding call | Renews automatically; 40% academic discount for academic institutions |
-| Lab                               | $9,900 USD / year                          | Up to 25 named users. Everything in Team, code distances up to 63, support SLA, one Validation Report | Renews automatically; 40% academic discount |
-| Pilot                             | $1,500 USD one-time                        | 60-day evaluation licence for larger teams, with an integration call | 100% creditable toward Team or Lab within 90 days |
-| Enterprise R&D                    | From $25,000 USD / year                    | Unlimited seats, SaaS/hosted API and OEM options, named support engineer | Contact sales |
-| SaaS / Hosted API                 | Contact sales                              | Rights for production hosted API or SaaS deployment. Requires demonstrated production infrastructure, support processes, and hosted-value proof | Contact sales. Currently in beta review phase |
-| OEM / Embedded                    | Contact sales                              | Rights for embedding QECTOR in hardware products or platforms, including redistribution. Requires validated hardware/platform integration and redistribution terms | Contact sales. Reserved for established hardware or platform partners |
-| Strategic Partnership             | Custom                                     | Custom terms for significant IP alignment, joint development, or acquisition-related discussions | Contact sales. No public pricing floor |
+## Licence delivery and activation
 
-## High-Velocity Professional Services
+Licences are delivered by e-mail as Ed25519-signed tokens, usually within
+minutes of payment. Tokens are verified offline against a public key in the
+package, with no licence server and no network access. Activation steps are in
+the [README](README.md#activating-a-licence).
 
-To accelerate time-to-value and generate rapid revenue, the following productized services are offered. These services deliver measurable workflow proof on compressed timelines and naturally convert into longer-term licensing relationships.
+## Metered billing (Enterprise)
 
-### QECTOR Validation Sprint (Primary Quick-Conversion Offering)
-**Price:** $3,750 USD (one-time)  
-**Delivery:** 10–20 business days
-
-**Scope:**
-- 60-day Commercial Evaluation License for a team of up to 3 named users
-- Execution of up to 3 customer-specified or standard benchmark workloads using QECTOR
-- Delivery of complete reproducible artifact bundles (environment snapshots, input hashes, LER curves, timing data, manifest)
-- Comparative analysis against PyMatching / Stim baselines where applicable
-- 60-minute results review call with the customer team
-
-**Purpose:** Directly addresses pilot success criteria with customer-owned, reproducible evidence. High gross margin, rapid delivery, and strong conversion to annual licenses (full credit applied).
-
-This service is the recommended fast-track entry point for teams seeking immediate, defensible proof of workflow value.
-
-### Additional Professional Services
-| Service                        | Price                  | Scope |
-|--------------------------------|------------------------|-------|
-| Custom Workflow Integration    | $7,500–$12,000 (scoped)| License plus targeted engineering to embed QECTOR into existing pipelines or custom LDPC/qLDPC code families |
-| Priority Support (add-on)      | $5,000 / year          | Private email support and priority bug review for licensed users |
-| Integration Support            | $10,000 / year         | Benchmark review, install support, and integration guidance |
-| Validation Report Package      | $5,000 one-time        | Independent review of customer benchmark setup and reproducibility package (one included with Lab) |
-| Custom Engineering             | $150 / hour            | Private fixes, special reports, scripts, or workflow adaptation |
-| Technical Advisory             | $2,000 / day           | Architecture review and QEC workflow consulting |
-
-## Evaluation & Pilot Success Criteria
-
-Commercial engagements are evaluated on measurable workflow value.
-
-**Recommended proof points for Evaluation Licenses and Validation Sprints:**
-- Successful installation on the buyer’s target environment(s)
-- At least one reproduced benchmark artifact bundle with full manifest, hashes, and environment snapshot
-- One QECTOR vs. PyMatching / Stim comparison run (where relevant)
-- One BP-OSD / LDPC workflow execution (if within scope)
-- Documented time savings or insight velocity versus the buyer’s existing workflow
-- Clear attribution of results to QECTOR components
-
-Success is measured by the production of reproducible, customer-owned artifacts that demonstrate concrete workflow advantage.
-
-## Next Proof Asset Priority
-
-The next commercially significant public artifact remains a reproducible GPU/batch benchmark campaign against a strong PyMatching + Stim baseline, including full hardware, driver/runtime versions, batch sizes, circuit/DEM details, seeds, wall-clock time, memory usage, output hashes, and environment snapshots.
-
-Claims of universal GPU superiority, specific hardware speedups, real-time hardware decoding readiness, or production SaaS/OEM capability will only be made once such artifacts exist and have been independently reproducible.
-
-## Rights Not Included by Default
-
-Unless explicitly granted in a written commercial agreement, no license tier includes:
-
-- Redistribution rights
-- Sublicensing rights
-- OEM rights
-- Hosted API or SaaS rights
-- Trademark rights
-- Patent rights
-- Exclusivity
-- Warranty or indemnification
-- Government or defense-specific rights
-
-## Official Licensing Portal & Purchasing
-
-The free 14-day trial and self-serve checkout for Pro, Pro Perpetual, Team, Lab and the Pilot are at:
-
-- Pricing and checkout: **[qector.store/pricing](https://qector.store/pricing/)**
-
-Enterprise, Validation Sprints, and custom services are initiated via:
-
-**admin@qector.store**
-
-All commercial licenses are issued under written agreement. Source-available access for non-commercial use continues under the repository license.
-
----
-
-## Metered Billing (v0.7.0)
-
-Enterprise deployments can track decode usage for metered billing:
+Enterprise agreements can include usage-based billing:
 
 ```python
 from qector_decoder_v3 import record_shots, get_accumulated_shots
+from qector_decoder_v3.stripe_integration import flush_metered_usage
+
 record_shots(1000)
 total = get_accumulated_shots()
 ```
 
-Usage is flushed to Stripe on job completion or via `flush_metered_usage(customer_id, api_key)`.
+Usage is reported to Stripe on job completion or with
+`flush_metered_usage(customer_id, api_key)`. Setting `QECTOR_OFFLINE=1`
+disables every outbound billing call.
 
-*This document supersedes all prior commercial pricing and licensing statements for QECTOR Decoder v3.*
+*This document supersedes earlier commercial pricing statements for QECTOR Decoder v3.*

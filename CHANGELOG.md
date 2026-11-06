@@ -147,28 +147,6 @@ exactly on the 1.0.0 source:
   pending usage is kept. Tested in `test_offline_mode.py` with sockets patched
   to fail. See `docs/SECURITY_DEPLOYMENT.md`.
 
-### Measured — circuit-level head-to-head (`benchmarks/stim_head_to_head.py`)
-Stim `rotated_memory_z`, rounds = d, uniform depolarizing p, 10 000 shots per
-point, identical shots for every decoder through the sinter interface, one
-thread on a 2-core Xeon 2.1 GHz. Raw data:
-`benchmark_results/stim_head_to_head_1.0.1.json`.
-
-| d | p | PyMatching 2.4 LER | QECTOR Blossom LER | QECTOR UF LER | PyMatching µs/shot | Blossom µs/shot | UF µs/shot |
-|---|---|---|---|---|---|---|---|
-| 5 | 0.003 | 0.00340 | 0.00340 | 0.00350 | 1.4 | 21 | 3.0 |
-| 5 | 0.007 | 0.03030 | 0.03060 | 0.03280 | 4.1 | 54 | 9.6 |
-| 7 | 0.007 | 0.03180 | 0.03160 | 0.03540 | 17 | 832 | 61 |
-| 9 | 0.003 | 0.00050 | 0.00050 | 0.00060 | 11 | 911 | 49 |
-| 9 | 0.007 | 0.02890 | 0.02890 | 0.03490 | 36 | 6 908 | 216 |
-
-Blossom matches PyMatching's logical error rate (within sampling noise
-everywhere, equal at most points). It is **not** speed-competitive at
-circuit level: 15–50× slower than PyMatching's sparse blossom at d = 5 and
-40–190× at d = 7–9, and
-`SparseBlossomDecoder` is slower still on these graphs. Union-Find is 2–6×
-slower than PyMatching at 1.0–1.2× its LER. Closing the MWPM latency gap needs
-a PyMatching-2-style sparse blossom and is the main open item for 1.1.
-
 ### Notes on the `[Unreleased]` section below
 It was carried in the 1.0.0 freeze working tree. The dual-stream race and the
 `edge_len` leak it lists are fixed here (they were not fixed in that tree). The

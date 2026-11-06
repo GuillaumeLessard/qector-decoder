@@ -5,7 +5,7 @@ build-backend = "maturin"
 [project]
 name = "qector-decoder-v3"
 version = "1.0.1"
-description = "Production-grade Rust/Python quantum error correction decoder. 25+ decoder families: MWPM Blossom, Union-Find (weighted), BP-OSD, Relay-BP for LDPC/qLDPC, belief-matching, colour-code, correlated two-stage matching, ambiguity clustering, CUDA/GPU batch decoding, 7-tier AutoDecoder fallback. PyMatching/Stim/Sinter/qiskit-qec compatible. Ed25519 license verification."
+description = "Quantum error correction decoders for Python with a compiled Rust core: Union-Find, exact MWPM, BP-OSD for qLDPC codes, CPU and GPU batch decoding, Stim and Sinter integration."
 readme = "README.md"
 requires-python = ">=3.9"
 # PEP 639: an SPDX expression plus the licence file(s). PolyForm-Noncommercial-1.0.0
@@ -20,7 +20,6 @@ authors = [
 ]
 keywords = ["quantum", "error correction", "decoder", "union-find", "QEC", "rust", "MWPM", "Stim", "Sinter", "PyMatching", "qiskit", "LDPC", "qLDPC", "blossom", "belief propagation", "belief matching", "BP-OSD", "Relay-BP", "colour code", "color code", "toric code", "GPU decoding", "CUDA", "surface code", "syndrome decoding", "fault tolerance", "quantum computing"]
 classifiers = [
-    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.9",
@@ -34,7 +33,8 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS",
     "Topic :: Scientific/Engineering :: Physics",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering",
+    "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Development Status :: 5 - Production/Stable",
 ]
@@ -136,7 +136,6 @@ Changelog = "https://github.com/GuillaumeLessard/qector-decoder/blob/main/CHANGE
 "Release Notes" = "https://github.com/GuillaumeLessard/qector-decoder/blob/main/RELEASE_NOTES.md"
 Funding = "https://github.com/sponsors/qectorlab"
 Pricing = "https://qector.store/pricing/"
-Purchase = "https://qector.store/pricing/"
 "Commercial Licensing" = "https://github.com/GuillaumeLessard/qector-decoder/blob/main/COMMERCIAL.md"
 License = "https://qector.store/license/"
 Security = "https://github.com/GuillaumeLessard/qector-decoder/blob/main/SECURITY.md"
