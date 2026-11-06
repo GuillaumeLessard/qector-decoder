@@ -474,9 +474,9 @@ def _emit_startup_notice() -> None:
     ]
     if not is_interactive:
         # A script or service is the commercial-use signal; point at the
-        # free 14-day commercial trial on the pricing page.
+        # money-back guarantee and the Pilot on the pricing page.
         lines.append(
-            f"[QECTOR v{__version__}] Free 14-day commercial trial: "
+            f"[QECTOR v{__version__}] Every plan has a 14-day money-back guarantee: "
             f"https://qector.store/pricing | Set QECTOR_SILENT=1 to hide this."
         )
     else:

@@ -261,6 +261,17 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
 
     apply = args.apply and not args.dry_run
+    if apply:
+        # RETIRED 2026-11-06: the descriptions below describe the superseded
+        # per-seat catalog (named users, Team, Solo, Startup). The live catalog
+        # (Pro, Pro Perpetual, Lab, Pilot, Enterprise; no seat counts, air-gapped
+        # licensing) is maintained in the Stripe dashboard. Applying this script
+        # would overwrite it, so writes are refused.
+        print(
+            "stripe_sync_catalog.py is retired: it would overwrite the current Stripe catalog "
+            "with superseded per-seat descriptions. Edit products in the Stripe dashboard instead."
+        )
+        return 2
     mode = "LIVE" if args.live else "TEST"
     print(f"=== QECTOR Stripe catalog sync [{mode}] {'APPLY' if apply else 'DRY RUN'} ===\n")
 
@@ -271,8 +282,10 @@ def main(argv=None) -> int:
     changed = sync_products(stripe, apply, args.rename)
     meter_changed = sync_meter(stripe, apply)
 
-    print(f"\n{changed} product(s) {'updated' if apply else 'would change'}"
-          f"{', meter created' if meter_changed and apply else ''}")
+    print(
+        f"\n{changed} product(s) {'updated' if apply else 'would change'}"
+        f"{', meter created' if meter_changed and apply else ''}"
+    )
     if not apply:
         print("\nRe-run with --apply to write. Add --live to target the live account.")
     return 0
