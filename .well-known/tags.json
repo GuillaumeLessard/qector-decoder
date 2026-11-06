@@ -1,10 +1,10 @@
 {
   "name": "QECTOR Decoder v3",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "canonical": "https://qector.store",
   "pricing": "https://qector.store/pricing",
   "contact": "admin@qector.store",
-  "description": "High-performance, source-available Rust/Python quantum error correction (QEC) decoder. Free for academic use; commercial, lab, and institutional use requires a paid license.",
+  "description": "High-performance, source-available Rust/Python quantum error correction (QEC) decoder. Free for personal, academic and other non-commercial use under PolyForm Noncommercial 1.0.0; company use requires a paid license.",
   "topics": [
     "quantum-error-correction",
     "qec",

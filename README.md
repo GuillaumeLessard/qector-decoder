@@ -10,10 +10,10 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/engine-qector--decoder--v3_1.0.0-E44D26?style=for-the-badge&logo=rust&logoColor=white" alt="Engine"/>
+  <img src="https://img.shields.io/badge/engine-qector--decoder--v3_1.0.1-E44D26?style=for-the-badge&logo=rust&logoColor=white" alt="Engine"/>
   <img src="https://img.shields.io/badge/Workbench-v1.0.1-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Workbench"/>
-  <img src="https://img.shields.io/badge/Claude_Plugin-v1.0.2-8A2BE2?style=for-the-badge&logo=anthropic&logoColor=white" alt="Plugin"/>
-  <img src="https://img.shields.io/badge/Python-3.9_--_3.13-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
+  <img src="https://img.shields.io/badge/Claude_Plugin-v2.0.1-8A2BE2?style=for-the-badge&logo=anthropic&logoColor=white" alt="Plugin"/>
+  <img src="https://img.shields.io/badge/Python-3.9_--_3.14-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
   <img src="https://img.shields.io/badge/license-PolyForm_Noncommercial_1.0.0-blue?style=for-the-badge" alt="License"/>
 </p>
 
@@ -36,14 +36,14 @@ QECTOR is source-available and developed independently. Non-commercial use is fr
 and commercial licences are what keep the decoder maintained.
 
 [![Sponsor qectorlab](https://img.shields.io/badge/GitHub_Sponsors-qectorlab-ea4aaa?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/qectorlab)
-[![Commercial licence](https://img.shields.io/badge/Commercial_Licence-Buy_via_Stripe-635BFF?style=for-the-badge&logo=stripe&logoColor=white)](https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00)
+[![Commercial licence](https://img.shields.io/badge/Commercial_Licence-From_$79%2Fmo_·_14--day_free_trial-635BFF?style=for-the-badge&logo=stripe&logoColor=white)](https://qector.store/pricing/)
 [![Pricing](https://img.shields.io/badge/Pricing_&_Tiers-qector.store-0A7CFF?style=for-the-badge&logo=quantconnect&logoColor=white)](https://www.qector.store/pricing)
 
 | Channel | Who it's for |
 |---|---|
 | [GitHub Sponsors](https://github.com/sponsors/qectorlab) | Individuals and companies funding ongoing development |
-| [Commercial licence](https://www.qector.store/pricing) | Required for company, SaaS, OEM or funded institutional use, see [COMMERCIAL.md](https://github.com/GuillaumeLessard/qector-decoder/blob/main/COMMERCIAL.md) |
-| [Direct purchase](https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00) | Immediate Stripe checkout, licence issued automatically |
+| [Commercial licence](https://www.qector.store/pricing) | Required for company, SaaS and OEM use, see [COMMERCIAL.md](https://github.com/GuillaumeLessard/qector-decoder/blob/main/COMMERCIAL.md) |
+| [Free 14-day trial / buy](https://qector.store/pricing/) | Self-serve trial token or Stripe checkout, licence issued automatically |
 | [admin@qector.store](mailto:admin@qector.store) | Site licences, custom terms, academic partnerships |
 
 
@@ -59,10 +59,10 @@ PyMatching-compatible MWPM validation · Belief-matching accuracy mode · BP-OSD
 pip install qector-decoder-v3
 ```
 
-Supported: **Python 3.9-3.13** (`requires-python = ">=3.9"`) on Linux x86_64,
+Supported: **Python 3.9-3.14** (`requires-python = ">=3.9"`) on Linux x86_64,
 Windows x64, and macOS arm64.
 
-Each release publishes **15 binary wheels**: CPython 3.9/3.10/3.11/3.12/3.13 ×
+Each release publishes **18 binary wheels**: CPython 3.9/3.10/3.11/3.12/3.13/3.14 ×
 `win_amd64` / `manylinux_2_17_x86_64` / `macosx_11_0_arm64`. There is **no sdist
 and no aarch64, musllinux, or macOS x86_64 wheel**, so `pip install` on any other
 platform will fail rather than fall back to a source build. Those targets need a
@@ -303,20 +303,46 @@ Key features:
 
 ---
 
-## Licensing & Activation (v1.0.0)
+## Licensing & Activation
 
-### Ed25519 Cryptographic License Verification
+QECTOR Decoder v3 is source-available under the **PolyForm Noncommercial
+License 1.0.0** (`LICENSE`, SPDX `PolyForm-Noncommercial-1.0.0`). Personal,
+academic and other non-commercial use is free; commercial use needs a paid
+licence (see [pricing](https://qector.store/pricing/) and `COMMERCIAL.md`).
 
-QECTOR uses **offline Ed25519 signature verification** for license tokens. No network calls required.
+### Ed25519 offline licence tokens
 
-**Token format**: Self-contained 3-part tokens (`{receipt_id}.{email_b64}.{signature_b64}`) embed the customer email and cryptographic signature for fully offline verification.
+Licence tokens are verified **offline** against a public key compiled into the
+package: no licence server, no phone-home, works air-gapped. The fulfilment
+service issues `v2.{claims}.{signature}` tokens (base64url JSON claims
+`email`, `rid` = Stripe reference, `tier`, optional `exp`, signed with
+Ed25519); older `QECT-PRO-…`, `QECT-ENT-…` and legacy 3-part tokens still verify.
 
 | Variable | Description |
 | --- | --- |
-| `QECTOR_LICENSE` | Set to a valid Ed25519-signed license token to activate |
-| `QECTOR_SILENT` | Set to `1` to suppress the startup licensing notice |
+| `QECTOR_LICENSE_KEY` | The token; read by the tier manager (`get_license_info()`, GPU and distance checks). `QECTOR_LICENSE_FILE` or `~/.qector/license.key` are alternatives. |
+| `QECTOR_LICENSE` | The same token; read by the import-time licensing notice. Set both. |
+| `QECTOR_SILENT` | `1` suppresses the licensing notice. |
+| `QECTOR_ENFORCE` | `1` turns tier limits into hard errors (off by default). |
+| `QECTOR_OFFLINE` | `1` refuses every outbound billing call (1.0.1+). Decoding never uses the network. |
 
-**Override tokens**: `academic` and `commercial` accepted for development and testing.
+### What a tier changes
+
+| Tier | Distance cap | CUDA / OpenCL batch decoders |
+| --- | --- | --- |
+| Community (no token) | 7 | not available |
+| Pro (trial, Pro, Pro Perpetual, Team, Pilot; legacy Evaluation/Solo/Startup/Professional) | 19 | available |
+| Enterprise (Lab, Enterprise) | 63 | available |
+
+The distance caps are advisory unless `QECTOR_ENFORCE=1`; the CPU decoders
+otherwise run at any distance. The GPU batch decoders refuse to construct
+without a paid (Pro or Enterprise) token; before 1.0.1 they required Enterprise. Check what is active with
+`python -c "import qector_decoder_v3 as q; print(q.get_license_info())"`.
+
+The strings `academic` and `commercial` are accepted as development override
+tokens **only** when `QECTOR_DEBUG=1` is set, and only by the Python
+notice/verifier; they never unlock a tier in the native core. Never set
+`QECTOR_DEBUG` in production.
 
 ## Tuning environment variables
 
@@ -345,7 +371,7 @@ Commercial licenses are issued automatically via Stripe Checkout:
 3. The server generates an Ed25519-signed license token
 4. Token is delivered to the customer
 
-**Direct purchase**: [Buy Commercial License](https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00)
+**Free trial and plans**: [qector.store/pricing](https://qector.store/pricing/): free 14-day trial, Pro $79/month or $790/year, Team $3,900/year, Lab $9,900/year
 
 ---
 
@@ -502,10 +528,10 @@ controlled use; like REST/gRPC, it is not hardened for public SaaS exposure.
 
 ## Licensing
 
-QECTOR Decoder v3 is **source-available** under the **PolyForm Noncommercial License 1.0.0** (see `LICENSE`). Personal, academic, educational, and non-commercial research use is allowed. Company use, funded institutional work, SaaS, hosted API deployment, OEM integration, redistribution, paid consulting, or commercial benchmarking requires a commercial license.
+QECTOR Decoder v3 is **source-available** under the **PolyForm Noncommercial License 1.0.0** (see `LICENSE`). Personal, academic, educational, and non-commercial research use is allowed. Universities, public research organisations, charities and government institutions may use it free whatever their funding source (PolyForm Noncommercial, "Noncommercial Organizations"). Company use, including company work done under a research contract, SaaS, hosted API deployment, OEM integration, redistribution, paid consulting, or commercial benchmarking requires a commercial license.
 
 - **Pricing & tiers**: [https://www.qector.store/pricing](https://www.qector.store/pricing)
-- **Direct purchase**: [Buy via Stripe](https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00)
+- **Free 14-day trial and self-serve checkout**: [qector.store/pricing](https://qector.store/pricing/)
 - **Contact**: [admin@qector.store](mailto:admin@qector.store)
 
 ### DOI references

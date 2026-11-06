@@ -70,7 +70,10 @@ def test_estimate_ler_repetition_matches_theory():
 
 def test_estimate_ler_rejects_code_without_logicals():
     with pytest.raises(ValueError, match="no logicals"):
-        estimate_ler(codes.unrotated_surface_code(3), "blossom", p=0.05, shots=10, seed=0)
+        import dataclasses
+
+        no_logicals = dataclasses.replace(codes.unrotated_surface_code(3), logicals=None)
+        estimate_ler(no_logicals, "blossom", p=0.05, shots=10, seed=0)
 
 
 def test_estimate_ler_batched_equals_theory_on_surface():

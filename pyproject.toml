@@ -1,20 +1,25 @@
 [build-system]
-requires = ["maturin>=1.0,<2.0"]
+requires = ["maturin>=1.9,<2.0"]
 build-backend = "maturin"
 
 [project]
 name = "qector-decoder-v3"
-version = "1.0.0"
+version = "1.0.1"
 description = "Production-grade Rust/Python quantum error correction decoder. 25+ decoder families: MWPM Blossom, Union-Find (weighted), BP-OSD, Relay-BP for LDPC/qLDPC, belief-matching, colour-code, correlated two-stage matching, ambiguity clustering, CUDA/GPU batch decoding, 7-tier AutoDecoder fallback. PyMatching/Stim/Sinter/qiskit-qec compatible. Ed25519 license verification."
 readme = "README.md"
 requires-python = ">=3.9"
-license = { text = "PolyForm-Noncommercial-1.0.0" }
+# PEP 639: an SPDX expression plus the licence file(s). PolyForm-Noncommercial-1.0.0
+# is on the SPDX list; LICENSE carries the full text with its Required Notice.
+# PEP 639 forbids "License ::" trove classifiers alongside an expression, so the
+# old "License :: Other/Proprietary License" classifier (which also contradicted
+# the PolyForm text) is gone. Needs maturin >= 1.9 for License-Expression.
+license = "PolyForm-Noncommercial-1.0.0"
+license-files = ["LICENSE"]
 authors = [
     {name = "Guillaume Lessard / iD01t Productions", email = "admin@qector.store"}
 ]
 keywords = ["quantum", "error correction", "decoder", "union-find", "QEC", "rust", "MWPM", "Stim", "Sinter", "PyMatching", "qiskit", "LDPC", "qLDPC", "blossom", "belief propagation", "belief matching", "BP-OSD", "Relay-BP", "colour code", "color code", "toric code", "GPU decoding", "CUDA", "surface code", "syndrome decoding", "fault tolerance", "quantum computing"]
 classifiers = [
-    "License :: Other/Proprietary License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
@@ -23,6 +28,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Rust",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX :: Linux",
@@ -33,7 +39,7 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
 ]
 dependencies = [
-    "numpy>=1.24.0,<2.3",
+    "numpy>=1.24.0,<3",
     # SECURITY FLOOR. `cryptography` is not incidental here: it performs the
     # Ed25519 licence-token signature verification in
     # `python/qector_decoder_v3/license.py`, so a vulnerable copy undermines
@@ -121,7 +127,7 @@ all = [
 # PyPI gives a few of these keys dedicated icons in the sidebar: Homepage,
 # Documentation, Source, Issues, Changelog and Funding. "Funding" is why the
 # sponsors link is spelled exactly that way -- rename it and the icon is lost.
-Homepage = "https://www.qector.store"
+Homepage = "https://qector.store"
 Documentation = "https://github.com/GuillaumeLessard/qector-decoder/tree/main/docs"
 Source = "https://github.com/GuillaumeLessard/qector-decoder"
 Repository = "https://github.com/GuillaumeLessard/qector-decoder"
@@ -129,9 +135,10 @@ Issues = "https://github.com/GuillaumeLessard/qector-decoder/issues"
 Changelog = "https://github.com/GuillaumeLessard/qector-decoder/blob/main/CHANGELOG.md"
 "Release Notes" = "https://github.com/GuillaumeLessard/qector-decoder/blob/main/RELEASE_NOTES.md"
 Funding = "https://github.com/sponsors/qectorlab"
-Pricing = "https://www.qector.store/pricing"
-Purchase = "https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00"
+Pricing = "https://qector.store/pricing/"
+Purchase = "https://qector.store/pricing/"
 "Commercial Licensing" = "https://github.com/GuillaumeLessard/qector-decoder/blob/main/COMMERCIAL.md"
+License = "https://qector.store/license/"
 Security = "https://github.com/GuillaumeLessard/qector-decoder/blob/main/SECURITY.md"
 
 
@@ -141,11 +148,11 @@ qector-bench-quick = "qector_decoder_v3.bench_quick:main"
 qector-doctor = "qector_decoder_v3.doctor:main"
 
 [project.entry-points.sinter_decoder]
-qector_blossom = "qector_decoder_v3.sinter_compat:QectorSinterDecoder"
-qector_belief = "qector_decoder_v3.sinter_compat:QectorSinterDecoder"
-qector_unionfind = "qector_decoder_v3.sinter_compat:QectorSinterDecoder"
-qector_bposd = "qector_decoder_v3.sinter_compat:QectorSinterDecoder"
-qector_unionfind_unweighted = "qector_decoder_v3.sinter_compat:QectorSinterDecoder"
+qector_blossom = "qector_decoder_v3.sinter_compat:QectorBlossomSinterDecoder"
+qector_belief = "qector_decoder_v3.sinter_compat:QectorBeliefSinterDecoder"
+qector_unionfind = "qector_decoder_v3.sinter_compat:QectorUnionFindSinterDecoder"
+qector_bposd = "qector_decoder_v3.sinter_compat:QectorBpOsdSinterDecoder"
+qector_unionfind_unweighted = "qector_decoder_v3.sinter_compat:QectorUnionFindUnweightedSinterDecoder"
 
 [project.entry-points."qiskit.qec"]
 qector = "qector_decoder_v3.qiskit_plugin"

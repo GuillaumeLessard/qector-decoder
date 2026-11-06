@@ -37,11 +37,14 @@ def test_run_examples():
         "example_advanced_decoders.py",
     ]
 
-    # Set PYTHONPATH to include the python/ directory in the repo
+    # Put python/ on PYTHONPATH only for an in-tree build (`maturin develop`
+    # leaves the compiled extension there). Otherwise the source tree, which has
+    # no native module, would shadow the installed wheel -- the same failure
+    # conftest.py documents for sys.path.
     env = os.environ.copy()
-    python_dir = repo_root / "python"
-    if python_dir.is_dir():
-        env["PYTHONPATH"] = str(python_dir) + os.pathsep + env.get("PYTHONPATH", "")
+    pkg_dir = repo_root / "python" / "qector_decoder_v3"
+    if any(pkg_dir.glob("qector_decoder_v3*.so")) or any(pkg_dir.glob("qector_decoder_v3*.pyd")):
+        env["PYTHONPATH"] = str(pkg_dir.parent) + os.pathsep + env.get("PYTHONPATH", "")
 
     for example in examples:
         example_path = examples_dir / example
@@ -53,7 +56,7 @@ def test_run_examples():
             text=True,
             env=env,
             cwd=str(repo_root),
-            check=True,
+            check=False,
         )
         assert res.returncode == 0, (
             f"Example {example} failed with return code {res.returncode}.\nSTDOUT:\n{res.stdout}\nSTDERR:\n{res.stderr}"

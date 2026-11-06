@@ -40,6 +40,7 @@ accuracy, and hardware selection.  Most users do not need to set any of these.
 | `STRIPE_SECRET_KEY` | unset | Stripe API secret key for metered billing. |
 | `STRIPE_WEBHOOK_SECRET` | unset | Stripe webhook signing secret. |
 | `QECTOR_STRIPE_CUSTOMER_ID` | unset | Fallback customer ID for Rust-side flush. |
+| `QECTOR_OFFLINE` | unset | `1` (or `true`/`yes`/`on`) refuses every outbound call before a socket is opened: the native usage flush, Stripe checkout, the SDK metering fallback and the sales webhook. Pending shots stay in the counter. Decoding never uses the network either way. Since 1.0.1. |
 
 ## Other
 

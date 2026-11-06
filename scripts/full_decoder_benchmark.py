@@ -35,7 +35,7 @@ import time
 from datetime import datetime, timezone
 
 _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(_REPO, "python"))
+sys.path.append(os.path.join(_REPO, "python"))  # after site-packages: an installed build wins over the source tree
 
 os.environ.setdefault("QECTOR_SILENT", "1")
 

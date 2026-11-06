@@ -108,7 +108,7 @@ ENVIRONMENT = {
 def _environment():
     """Live environment for the title page (falls back to the static dict)."""
     try:
-        sys.path.insert(0, os.path.join(_REPO, "python"))
+        sys.path.append(os.path.join(_REPO, "python"))  # after site-packages: an installed build wins over the source tree
         from qector_decoder_v3 import benchmarking as _bm
         e = _bm.capture_environment()
         out = {

@@ -142,10 +142,13 @@ def test_toric_logical_representative_is_nonzero_weight():
 # ---------------------------------------------------------------------------
 # Honest negative + no-regression on pre-existing generators
 # ---------------------------------------------------------------------------
-def test_unrotated_surface_single_sector_has_no_css_logical():
+def test_unrotated_surface_encodes_one_logical_qubit():
+    # 1.0.0 pinned the bug here: its unrotated generator encoded no logical
+    # qubit. 1.0.1 builds the planar code with one logical (left boundary column).
     code = codes.unrotated_surface_code(3)
-    assert code.logicals is None
-    assert code.num_logical_qubits == 0
+    assert code.num_logical_qubits == 1
+    assert code.logicals is not None and len(code.logicals) == 1
+    assert len(code.logicals[0]) == 3
 
 
 def test_preexisting_logicals_unchanged():

@@ -8,20 +8,23 @@ QECTOR decoders consume:
     check_to_qubits : list[list[int]]   # one entry per check (row of H)
     n_qubits        : int               # number of data qubits (columns of H)
 
-All *surface-style* generators here return proper **matching graphs**: every
-qubit appears in at most two checks, so the Union-Find / Blossom / Sparse-Blossom
-/ MWPM decoders apply directly.  The custom-matrix and hypergraph-product helpers
-build arbitrary CSS parity checks for the LDPC / BP-OSD path.
+The surface, toric, repetition, ring and heavy-hex generators return proper
+**matching graphs** (every qubit in at most two checks), so the Union-Find /
+Blossom / Sparse-Blossom / MWPM decoders apply directly. The colour code and
+the custom-matrix / hypergraph-product / bicycle helpers build general CSS
+parity checks for the BP-OSD path.
 
-Every generator is validated empirically by the syndrome-faithfulness test suite
-(``H @ decode(s) == s (mod 2)``) - see ``python/tests/test_codes.py``.
+Every generator's labelled ``distance`` is verified by :func:`code_distance`
+(exact) in ``python/tests/test_code_distances.py``, and every generator is
+checked for syndrome faithfulness (``H @ decode(s) == s (mod 2)``) in
+``python/tests/test_codes.py``.
 
 Examples
 --------
 >>> from qector_decoder_v3 import codes, BlossomDecoder
 >>> code = codes.rotated_surface_code(5)
 >>> code.n_qubits, code.n_checks
-(25, 8)
+(25, 12)
 >>> dec = BlossomDecoder(code.check_to_qubits, code.n_qubits)
 """
 
@@ -29,6 +32,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass, field
+import math
 from typing import Any
 
 import numpy as np
@@ -37,6 +41,7 @@ __all__ = [
     "Code",
     "bicycle_code",
     "bivariate_bicycle_code",
+    "code_distance",
     "color_code",
     "css_logicals",
     "from_parity_check_matrix",
@@ -207,12 +212,22 @@ def ring_code(n: int) -> Code:
 # Surface codes
 # ---------------------------------------------------------------------------
 def rotated_surface_code(distance: int) -> Code:
-    """Rotated surface code, single (Z) sector - a matching graph.
+    """Rotated surface code, single sector - a matching graph with distance ``d``.
 
-    ``d*d`` data qubits on a square grid; weight-4 plaquette checks on the
-    sublattice ``(r+c) even`` plus weight-2 boundary checks so that each interior
-    qubit is shared by two checks.  The logical observable is the top row of data
-    qubits (a horizontal string crossing the lattice).
+    ``d*d`` data qubits on a square grid, numbered row-major. The checks of the
+    decoded sector are the weight-4 plaquettes on the ``(r + c)`` even
+    sublattice plus the weight-2 checks that continue the same checkerboard on
+    the **left and right** boundaries, so every qubit is in at most two checks.
+    The logical observable is the top row, a string joining the two (top and
+    bottom) boundaries that carry no check of this sector.
+
+    .. versionchanged:: 1.0.1
+        1.0.0 placed the weight-2 checks on the top and bottom boundaries, i.e.
+        the boundaries of the *other* sector. That produced duplicate columns in
+        ``H`` (qubits ``0`` and ``d`` at every size), an undetectable weight-2
+        logical error, and a true distance of 2 for every ``d``. The fixed
+        construction has exact distance ``d`` (verified by
+        :func:`code_distance` in the test suite for ``d = 2..15``).
     """
     if distance < 2:
         raise ValueError("surface distance must be >= 2")
@@ -222,78 +237,71 @@ def rotated_surface_code(distance: int) -> Code:
         return r * d + c
 
     checks: list[list[int]] = []
-    # Bulk weight-4 plaquettes on the even sublattice.
     for r in range(d - 1):
         for c in range(d - 1):
             if (r + c) % 2 == 0:
                 checks.append([q(r, c), q(r, c + 1), q(r + 1, c), q(r + 1, c + 1)])
-    # Weight-2 boundary checks on the top and bottom rows to bind the dangling
-    # qubits, keeping the construction a valid matching graph (degree <= 2).
-    for c in range(d - 1):
-        if c % 2 == 1:  # top boundary, complementary parity to the bulk
-            checks.append([q(0, c), q(0, c + 1)])
-        if (d - 2 + c) % 2 == 1:  # bottom boundary
-            checks.append([q(d - 1, c), q(d - 1, c + 1)])
+    for r in range(d - 1):
+        if r % 2 == 1:  # left boundary, same checkerboard as the bulk
+            checks.append([q(r, 0), q(r + 1, 0)])
+        if (r + d - 1) % 2 == 0:  # right boundary
+            checks.append([q(r, d - 1), q(r + 1, d - 1)])
 
-    logical = [q(0, c) for c in range(d)]  # top-row horizontal string
-    code = Code(
+    return Code(
         name=f"rotated_surface_d{d}",
         check_to_qubits=_sorted_checks(checks),
         n_qubits=d * d,
         distance=d,
-        logicals=[logical],
-        description="Rotated surface code, single sector (matching graph).",
+        logicals=[[q(0, c) for c in range(d)]],
+        description="Rotated surface code, single sector (matching graph, exact distance d).",
     )
-    return code
 
 
 def unrotated_surface_code(distance: int) -> Code:
     """Unrotated (planar) surface code, single sector - a matching graph.
 
-    Data qubits on the edges of a ``d x d`` vertex lattice; Z-stabilizers on the
-    vertex stars (weight 2/3/4, boundary qubits degree 1).  Matches the
-    construction validated in the existing faithfulness suite.
+    Checks are the vertex stars of a ``d x (d-1)`` vertex lattice; data qubits
+    are its edges plus one boundary edge at each end of every row (the two
+    rough boundaries of this sector). ``n = d^2 + (d-1)^2`` qubits,
+    ``d (d-1)`` checks, one logical qubit. The logical observable is the set
+    of left boundary edges: a residual that crosses from the left to the
+    right boundary hits it an odd number of times. Exact distance ``d``.
 
-    .. note::
-        As built (every vertex star with >= 2 edges included), this
-        single-sector matching graph has ``k = 0`` in the CSS sense — there is
-        no logical operator, so ``logicals`` is ``None`` and logical error
-        rates are not defined on it.  For LER studies use
-        :func:`rotated_surface_code`, :func:`toric_code`, or the circuit-level
-        DEM path (:mod:`qector_decoder_v3.dem`).
+    .. versionchanged:: 1.0.1
+        1.0.0 built a closed lattice (every vertex star, no boundary edges),
+        which encodes no logical qubit (``k = 0``, ``logicals is None``).
     """
     if distance < 2:
         raise ValueError("surface distance must be >= 2")
     d = int(distance)
-    nh = d * (d - 1)  # horizontal edges
+    cols = d - 1
 
-    def hh(r: int, c: int) -> int:
-        return r * (d - 1) + c
+    def vtx(r: int, c: int) -> int:
+        return r * cols + c
 
-    def vv(r: int, c: int) -> int:
-        return nh + r * d + c
-
-    n_qubits = nh + (d - 1) * d
-    checks: list[list[int]] = []
+    edges: list[tuple[int, int]] = []  # (check, check) or (check, -1) for a boundary edge
+    left: list[int] = []
     for r in range(d):
-        for c in range(d):
-            star: list[int] = []
-            if c - 1 >= 0:
-                star.append(hh(r, c - 1))
-            if c <= d - 2:
-                star.append(hh(r, c))
-            if r - 1 >= 0:
-                star.append(vv(r - 1, c))
-            if r <= d - 2:
-                star.append(vv(r, c))
-            if len(star) >= 2:
-                checks.append(star)
+        left.append(len(edges))
+        edges.append((vtx(r, 0), -1))
+        for c in range(cols - 1):
+            edges.append((vtx(r, c), vtx(r, c + 1)))
+        edges.append((vtx(r, cols - 1), -1))
+    for r in range(d - 1):
+        for c in range(cols):
+            edges.append((vtx(r, c), vtx(r + 1, c)))
+    checks: list[list[int]] = [[] for _ in range(d * cols)]
+    for qubit, (a, b) in enumerate(edges):
+        checks[a].append(qubit)
+        if b >= 0:
+            checks[b].append(qubit)
     return Code(
         name=f"unrotated_surface_d{d}",
         check_to_qubits=_sorted_checks(checks),
-        n_qubits=n_qubits,
+        n_qubits=len(edges),
         distance=d,
-        description="Unrotated / planar surface code, single sector (matching graph).",
+        logicals=[left],
+        description="Unrotated / planar surface code, single sector (matching graph, k=1, exact distance d).",
     )
 
 
@@ -343,48 +351,55 @@ def toric_code(size: int) -> Code:
     return code
 
 
-def heavy_hex_code(distance: int) -> Code:
-    """Heavy-hexagon-style distance-``d`` matching graph (single sector).
+def heavy_hex_code(distance: int, sector: str = "z") -> Code:
+    """Heavy-hexagon code (Chamberland et al., PRX 10, 011022, 2020), one sector.
 
-    A heavy-hex layout interleaves data qubits with flag qubits on the bonds of a
-    hexagonal lattice.  This helper builds the *graphlike* Z-sector: a brick-wall
-    of weight-2 and weight-4 checks in which every data qubit is shared by at most
-    two checks, so the matching decoders apply.  It is intended for layout/scaling
-    studies, not as a bit-exact replica of any specific device.
+    ``d*d`` data qubits on a square grid. The heavy-hex code is a subsystem
+    code whose two sectors behave differently, so the sector is explicit:
+
+    * ``sector="z"`` (default): the Z-type stabilizers, surface-code
+      plaquettes (weight 4 in the bulk, weight 2 on two boundaries). They
+      detect X errors; the matching graph is that of the rotated surface code
+      and has a threshold.
+    * ``sector="x"``: the X-type Bacon-Shor stabilizers, one per pair of
+      adjacent columns (weight ``2d``). They detect Z errors; the matching
+      graph is a chain with ``d`` parallel edges per link, the logical is a
+      column, and this sector has **no threshold** (as for Bacon-Shor codes).
+
+    Both sectors are graphlike and have exact distance ``d`` (odd ``d >= 3``).
+
+    .. versionchanged:: 1.0.1
+        1.0.0 returned a weight-2 "brick-wall" graph that was not the heavy-hex
+        code, left one qubit in no check, and had true distance ``2d - 1``
+        under a label of ``d``.
     """
     if distance < 3 or distance % 2 == 0:
         raise ValueError("heavy_hex distance must be an odd integer >= 3")
     d = int(distance)
+    if sector not in ("z", "x"):
+        raise ValueError("heavy_hex sector must be 'z' (surface-type) or 'x' (Bacon-Shor)")
+    if sector == "z":
+        base = rotated_surface_code(d)
+        return Code(
+            name=f"heavy_hex_z_d{d}",
+            check_to_qubits=base.check_to_qubits,
+            n_qubits=base.n_qubits,
+            distance=d,
+            logicals=base.logicals,
+            description="Heavy-hex code, Z-type (surface-code) stabilizer sector (matching graph, exact distance d).",
+        )
 
     def q(r: int, c: int) -> int:
         return r * d + c
 
-    checks: list[list[int]] = []
-    # Vertical weight-2 bonds (the "heavy" links) on alternating columns/rows.
-    for r in range(d - 1):
-        for c in range(d):
-            if (r + c) % 2 == 0:
-                checks.append([q(r, c), q(r + 1, c)])
-    # Horizontal weight-2 bonds on the complementary sublattice, capped at
-    # degree two so the result stays a matching graph.
-    deg = np.zeros(d * d, dtype=np.int64)
-    for ch in checks:
-        for x in ch:
-            deg[x] += 1
-    for r in range(d):
-        for c in range(d - 1):
-            if (r + c) % 2 == 1 and deg[q(r, c)] < 2 and deg[q(r, c + 1)] < 2:
-                checks.append([q(r, c), q(r, c + 1)])
-                deg[q(r, c)] += 1
-                deg[q(r, c + 1)] += 1
-    logical = [q(0, c) for c in range(d)]
+    checks = [[q(r, c) for r in range(d) for c in (j, j + 1)] for j in range(d - 1)]
     return Code(
-        name=f"heavy_hex_d{d}",
+        name=f"heavy_hex_x_d{d}",
         check_to_qubits=_sorted_checks(checks),
         n_qubits=d * d,
         distance=d,
-        logicals=[logical],
-        description="Heavy-hexagon-style matching graph (single sector).",
+        logicals=[[q(r, 0) for r in range(d)]],
+        description="Heavy-hex code, X-type Bacon-Shor stabilizer sector (matching graph with parallel edges, exact distance d, no threshold).",
     )
 
 
@@ -394,88 +409,58 @@ def heavy_hex_code(distance: int) -> Code:
 
 
 def color_code(distance: int) -> Code:
-    """Triangular 6.6.6 color code (C2).  Qubits on vertices of a honeycomb
-    lattice tiling of side length ``distance``.  X-checks are the "red" faces
-    (hexagons); Z-checks are derived from the complementary "green+blue" faces
-    to compute logical operators via the CSS quotient.  Returns a graphlike
-    single-sector ``Code`` with ``logicals`` populated (``k=2`` for the planar
-    code).  Distances < 2 are unsupported.
+    """Triangular 6.6.6 colour code with exact distance ``d`` (odd ``d >= 3``).
+
+    Qubits are the vertices of a honeycomb tiling of a triangle; checks are
+    its faces (weight 6 in the bulk, 4 on the boundary). The code is
+    self-dual CSS (``H_X = H_Z = H``), so this one matrix serves either
+    sector. ``n = (3 d^2 + 1) / 4`` qubits (7, 19, 37, 61 for d = 3, 5, 7, 9;
+    d = 3 is the Steane code), ``(n - 1) / 2`` checks, ``k = 1``. The logical
+    observable is one side of the triangle (``d`` qubits).
+
+    Colour codes are **not graphlike**: interior qubits lie in three checks,
+    so matching decoders do not apply. Decode with :class:`BPOSDDecoder` (or
+    :mod:`qector_decoder_v3.colour_code` for circuit-level Stim models).
+
+    .. versionchanged:: 1.0.1
+        1.0.0 returned a graphlike subset of faces that encoded no logical
+        qubit (``k = 0``) and, at ``d = 3``, a single check.
     """
-    if distance < 2:
-        raise ValueError("color code distance must be >= 2")
+    if distance < 3 or distance % 2 == 0:
+        raise ValueError("triangular colour code distance must be an odd integer >= 3")
     d = int(distance)
+    side = 3 * (d - 1) // 2
+    points = [(i, j) for i in range(side + 1) for j in range(side + 1 - i)]
 
-    # Qubits are vertices of a triangular lattice of width d.
-    # Each vertex is indexed by row r [0..d) and column c [0..d-r).
-    # A vertex's neighbours in the six directions are used only to define
-    # the faces; the actual parity checks are the hexagonal faces themselves.
-    def qidx(r: int, c: int) -> int | None:
-        if 0 <= r < d and 0 <= c < d - r:
-            # Cumulative count before row r: sum_{i=0}^{r-1} (d-i) = r*d - r*(r-1)//2
-            return r * d - r * (r - 1) // 2 + c
-        return None
+    def colour(i: int, j: int) -> int:
+        return (i - j + 1) % 3
 
-    n_q = (d * (d + 1)) // 2
-    # Each interior vertex belongs to exactly 3 hexagons (one per colour).
-    # Build the "red" faces: centres at positions (r+1/3, c+2/3) in skewed
-    # coordinates — these are the faces whose top vertex is at (r,c) with
-    # r >= 1 and c >= 1.
-    red_faces: list[list[int]] = []
-    for r in range(1, d):
-        for c in range(1, d - r):
-            vs = [
-                qidx(r, c),
-                qidx(r, c - 1),
-                qidx(r - 1, c - 1),
-                qidx(r - 1, c),
-                qidx(r - 1, c + 1),
-                qidx(r, c + 1),
-            ]
-            all_v = [v for v in vs if v is not None]
-            if len(all_v) >= 3:
-                red_faces.append(sorted(set(all_v)))
-
-    # Build the dual "green" faces: shifted by one lattice unit from red faces.
-    # Centres at (r+2/3, c+1/3) — the faces whose top-left vertex is (r,c-1).
-    green_faces: list[list[int]] = []
-    for r in range(1, d):
-        for c in range(1, d - r + 1):
-            vs = [
-                qidx(r, c - 1),
-                qidx(r - 1, c - 1),
-                qidx(r - 1, c),
-                qidx(r, c),
-                qidx(r + 1, c),
-                qidx(r + 1, c - 1),
-            ]
-            all_v = [v for v in vs if v is not None]
-            if len(all_v) >= 3:
-                green_faces.append(sorted(set(all_v)))
-
-    # Use red faces as the primary checks (Hx). If too few, fall back.
-    checks = red_faces if red_faces else (green_faces if green_faces else [[0]])
+    qubits = [pt for pt in points if colour(*pt) != 0]
+    index = {pt: k for k, pt in enumerate(qubits)}
+    faces: list[list[int]] = []
+    for i, j in points:
+        if colour(i, j) != 0:
+            continue
+        around = [(i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1), (i + 1, j - 1), (i - 1, j + 1)]
+        face = [index[pt] for pt in around if pt in index]
+        if face:
+            faces.append(face)
+    logical = [index[(i, 0)] for i in range(side + 1) if (i, 0) in index]
     code = Code(
         name=f"color_code_d{d}",
-        check_to_qubits=_sorted_checks(checks),
-        n_qubits=n_q,
+        check_to_qubits=_sorted_checks(faces),
+        n_qubits=len(qubits),
         distance=d,
-        description=f"Triangular 6.6.6 color code (dist {d}, planar, k=2).",
+        logicals=[sorted(logical)],
+        description="Triangular 6.6.6 colour code (self-dual CSS, k=1, exact distance d; not graphlike).",
     )
-    # Derive logicals from the two face colours.
-    Hx = code.parity_check_matrix()
-    n = code.n_qubits
-    if green_faces:
-        Hz = np.zeros((len(green_faces), n), dtype=np.uint8)
-        for ci, qs in enumerate(green_faces):
-            for qb in qs:
-                if qb < n:
-                    Hz[ci, qb] ^= 1
-        if not np.any((Hx @ Hz.T) % 2):
-            Lx, Lz = css_logicals(Hx, Hz)
-            code.logicals = _matrix_to_logicals(Lx)
-            code._meta["n_logical_qubits"] = int(Lx.shape[0])
-            code._meta["logical_x_ops"] = Lx
-            code._meta["logical_z_ops"] = Lz
+    H = code.parity_check_matrix()
+    code._meta["self_dual"] = True
+    code._meta["n_logical_qubits"] = 1
+    code._meta["logical_x_ops"] = code.logicals_matrix()
+    code._meta["logical_z_ops"] = code.logicals_matrix()
+    code._meta["hx"] = H
+    code._meta["hz"] = H
     return code
 
 
@@ -829,6 +814,125 @@ def hypergraph_product(H1: Any, H2: Any | None = None) -> tuple[Code, Code]:
     code_z.description = "Hypergraph-product CSS code, Z sector."
     _attach_css_logicals(code_x, code_z, Hx, Hz)
     return code_x, code_z
+
+
+# ---------------------------------------------------------------------------
+# Distance verification
+# ---------------------------------------------------------------------------
+def code_distance(
+    code: Code,
+    *,
+    max_weight: int | None = None,
+    max_supports: int = 50_000_000,
+) -> dict[str, Any]:
+    """Minimum weight of an undetectable logical error, computed, not assumed.
+
+    The distance of a single-sector code is the smallest ``|e|`` with
+    ``H e = 0`` and ``L e != 0`` (``L`` = :meth:`Code.logicals_matrix`).
+
+    * **Graphlike codes** (every qubit in at most two checks): exact and
+      polynomial. Qubits are edges of the matching graph (checks plus one
+      boundary node); undetectable errors are its cycles; the distance is the
+      shortest cycle that crosses the logical observables an odd number of
+      times, found by breadth-first search over ``(node, logical parity)``.
+    * **Other codes**: vectorised enumeration of error supports by increasing
+      weight, exact when it finds a logical error or exhausts every weight up
+      to ``max_weight`` (default: ``code.distance``); otherwise a lower bound.
+
+    Returns ``{"distance", "exact", "lower_bound", "witness", "method"}``;
+    ``witness`` is a minimum-weight undetectable logical error (qubit list).
+    ``distance`` is ``None`` when the code has no logical observable.
+    """
+    import itertools
+    from collections import deque
+
+    H = code.parity_check_matrix()
+    L = code.logicals_matrix()
+    n = code.n_qubits
+    if L is None or L.shape[0] == 0:
+        return {"distance": None, "exact": True, "lower_bound": None, "witness": None, "method": "no logical observable"}
+    degree = H.sum(axis=0)
+    for qubit in np.flatnonzero(degree == 0):
+        if L[:, qubit].any():
+            return {"distance": 1, "exact": True, "lower_bound": 1, "witness": [int(qubit)], "method": "unchecked qubit carries a logical"}
+
+    if int(degree.max(initial=0)) <= 2 and L.shape[0] <= 12:
+        n_checks = H.shape[0]
+        boundary = n_checks
+        adjacency: list[list[tuple[int, int, int]]] = [[] for _ in range(n_checks + 1)]
+        for qubit in range(n):
+            rows = np.flatnonzero(H[:, qubit])
+            if len(rows) == 0:
+                continue
+            a, b = (int(rows[0]), int(rows[1])) if len(rows) == 2 else (int(rows[0]), boundary)
+            parity = 0
+            for row in range(L.shape[0]):
+                if L[row, qubit]:
+                    parity |= 1 << row
+            adjacency[a].append((b, parity, qubit))
+            adjacency[b].append((a, parity, qubit))
+        states = 1 << L.shape[0]
+        best: tuple[int, list[int]] | None = None
+        for start in range(n_checks + 1):
+            if not adjacency[start]:
+                continue
+            dist = [[-1] * states for _ in range(n_checks + 1)]
+            via: list[list[tuple[int, int, int] | None]] = [[None] * states for _ in range(n_checks + 1)]
+            dist[start][0] = 0
+            queue = deque([(start, 0)])
+            found = None
+            while queue and found is None:
+                node, par = queue.popleft()
+                depth = dist[node][par]
+                if best is not None and depth + 1 >= best[0]:
+                    break
+                for nxt, edge_parity, qubit in adjacency[node]:
+                    new_par = par ^ edge_parity
+                    if nxt == start and new_par:
+                        found = (depth + 1, node, par, qubit)
+                        break
+                    if dist[nxt][new_par] == -1:
+                        dist[nxt][new_par] = depth + 1
+                        via[nxt][new_par] = (node, par, qubit)
+                        queue.append((nxt, new_par))
+            if found and (best is None or found[0] < best[0]):
+                weight, node, par, qubit = found
+                counts = {qubit: 1}
+                while not (node == start and par == 0):
+                    step = via[node][par]
+                    if step is None:
+                        break
+                    node, par, used = step
+                    counts[used] = counts.get(used, 0) + 1
+                best = (weight, sorted(q for q, c in counts.items() if c % 2))
+        if best is None:
+            return {"distance": None, "exact": True, "lower_bound": None, "witness": None, "method": "matching graph has no odd-parity cycle"}
+        return {"distance": best[0], "exact": True, "lower_bound": best[0], "witness": best[1], "method": "shortest odd-parity cycle of the matching graph"}
+
+    limit = int(max_weight if max_weight is not None else (code.distance or n))
+    Ht = H.astype(np.int32).T
+    Lt = L.astype(np.int32).T
+    examined = 0
+    for weight in range(1, min(limit, n) + 1):
+        total = math.comb(n, weight)
+        if examined + total > max_supports:
+            return {"distance": None, "exact": False, "lower_bound": weight, "witness": None, "method": f"enumeration budget exhausted at weight {weight}"}
+        combos = itertools.combinations(range(n), weight)
+        while True:
+            block = list(itertools.islice(combos, 65536))
+            if not block:
+                break
+            idx = np.asarray(block, dtype=np.int64)
+            E = np.zeros((len(block), n), dtype=np.int32)
+            np.put_along_axis(E, idx, 1, axis=1)
+            undetected = ~((E @ Ht) % 2).any(axis=1)
+            if undetected.any():
+                logical = ((E[undetected] @ Lt) % 2).any(axis=1)
+                if logical.any():
+                    hit = np.flatnonzero(undetected)[np.flatnonzero(logical)[0]]
+                    return {"distance": weight, "exact": True, "lower_bound": weight, "witness": [int(x) for x in block[hit]], "method": "exhaustive enumeration by weight"}
+        examined += total
+    return {"distance": None, "exact": False, "lower_bound": min(limit, n) + 1, "witness": None, "method": f"no logical error of weight <= {min(limit, n)}"}
 
 
 # ---------------------------------------------------------------------------

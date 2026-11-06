@@ -361,7 +361,9 @@ def test_logical_flips_match_manual_parity():
 
 
 def test_no_logicals_means_none():
-    code = codes.unrotated_surface_code(4)  # no logicals attached
+    import dataclasses
+
+    code = dataclasses.replace(codes.unrotated_surface_code(4), logicals=None)  # logicals stripped
     assert code.logicals is None
     rounds = _reachable_stream(code, n_rounds=10, p=0.1, seed=11)
     res = sliding_window_decode(rounds, code=code, window_size=3)

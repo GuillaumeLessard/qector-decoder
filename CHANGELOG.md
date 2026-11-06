@@ -5,6 +5,175 @@ on [Keep a Changelog](https://keepachangelog.com/), and the project aims to foll
 semantic versioning. Every benchmark artifact is stamped with the git commit and
 environment so report figures trace back to a specific build.
 
+## [1.0.1] — 2026-11-05
+
+Correctness and packaging release. Every item below is covered by a test that
+fails on 1.0.0.
+
+### Fixed — code families (`qector_decoder_v3.codes`)
+The 1.0.0 generators did not build the codes their names promised. Measured
+exactly on the 1.0.0 source:
+
+| Generator (1.0.0) | What it actually built | 1.0.1 |
+|---|---|---|
+| `rotated_surface_code(d)` | distance **2** for every `d` | distance `d`, `n = d²`, `k = 1` |
+| `unrotated_surface_code(d)` | `2d(d−1)` qubits, **no logical qubit** (`k = 0`) | planar code, `n = d² + (d−1)²`, `k = 1`, distance `d` |
+| `heavy_hex_code(d)` | distance `2d − 1` | `sector="z"` (surface-like) or `"x"` (Bacon–Shor), distance `d` |
+| `color_code(d)` | **no logical qubit** (`k = 0`) | triangular 6.6.6 code, `n = (3d²+1)/4`, `k = 1`, distance `d` |
+
+- New `codes.code_distance(code)`: exact distance (shortest odd-parity cycle on
+  the matching graph for graphlike codes, vectorised enumeration otherwise),
+  with a lower bound and a minimum-weight logical witness.
+- `python/tests/test_code_distances.py` checks exact distance = label for
+  rotated 2–11, unrotated 2–8, heavy-hex z/x 3–11, toric 2–7, repetition, ring
+  and colour 3/5/7.
+- Results produced with the 1.0.0 generators (scaling figures, LER tables built
+  from `codes.*`) should be regenerated. Stim-circuit benchmarks are unaffected:
+  they build their codes in Stim.
+
+### Fixed — Union-Find decoder (CPU, CUDA, OpenCL)
+- **Peeling now uses grown edges only, one boundary vertex per tree**
+  (Delfosse–Nickerson / Delfosse–Zémor). 1.0.0 peeled over every intra-cluster
+  edge, including boundary edges that never grew, and could discharge parity
+  through a far boundary, turning some weight-1 errors next to the boundary into
+  logical errors. Union-Find now corrects every error of weight ≤ ⌊(d−1)/2⌋
+  (exhaustive tests in Python and in `uf_core` for all growers).
+- **Weighted growth sentinel collision.** The rate cache used `2` for both
+  "two odd ends" and "already absorbed", so an edge joining two odd clusters
+  fused at time zero whatever its weight. Absorbed edges now use a distinct
+  sentinel.
+- **Weighted CUDA kernel is now bit-identical to the weighted CPU decoder.** The
+  CPU peels a minimum-weight spanning forest (Kruskal, ties by edge id); the
+  kernel peeled every grown edge and differed on 4–8 % of shots. The kernel now
+  runs the same selection in per-thread scratch.
+- **Dual-stream weighted CUDA race.** For batches ≥ 128 the second stream reused
+  the first stream's float support scratch. Each stream now has its own base.
+- `CUDABatchDecoder` now frees its `edge_len` device buffer on drop.
+- `opencl_is_available()` **aborted the Python process** on machines with an
+  OpenCL loader but no driver (`ocl::Platform::list` panics under
+  `panic = "abort"`). Platform enumeration is now fallible.
+- New `python/tests/test_gpu_kernel_sources.py` runs the CUDA kernel source
+  (compiled as host C++) and the OpenCL kernel (any OpenCL CPU device) against
+  the CPU decoder without a GPU: unweighted, weighted, and Stim circuit-level
+  DEMs, all bit-identical.
+
+### Fixed — integrations and packaging
+- **Sinter entry points.** All five `sinter_decoder` entry points resolved to
+  the same class with default kind `"belief"`, so `qector_blossom`,
+  `qector_unionfind`, … all ran belief-matching. Each now has its own preset
+  class; `qector_sinter_decoders()` returns all five, including
+  `qector_unionfind_unweighted`.
+- `numpy` upper bound raised from `<2.3` to `<3`; CPython 3.14 added to the
+  classifiers and the CI/release matrices (18 wheels).
+- Scripts and `test_examples.py` no longer put the source tree ahead of the
+  installed wheel on `sys.path`, which made 13 `--help` checks and the examples
+  test fail against any installed build.
+- `test_stripe_integration.py` skips cleanly when the optional `stripe` extra is
+  absent.
+
+### Fixed — licensing and publishing (audit of GitHub, PyPI, qector.store, Cloudflare)
+- **GPU batch decoders now unlock on every paid tier.** The pricing page and
+  `COMMERCIAL.md` sell CUDA/OpenCL batch paths with the Evaluation, Solo,
+  Startup and Professional licences (all map to Pro), but the core reserved GPU
+  for Enterprise, so those buyers got "requires Enterprise Tier". Pro now has
+  `gpu_enabled = true` (Rust core and Python fallback); Community stays without.
+- **Stray module-level functions in every PyPI wheel.** `decode_correction` and
+  `decode_observables` sat at `except`-block indentation in the no-OpenCL
+  fallback, so all CUDA-only wheels (every published wheel) exported two broken
+  top-level functions taking `self`, and the public-API contract test failed on
+  official builds. Removed.
+- **PEP 639 licence metadata.** `license = "PolyForm-Noncommercial-1.0.0"` (SPDX
+  expression) with `license-files = ["LICENSE"]`; wheels now carry
+  `Metadata-Version: 2.4`, `License-Expression` and the licence file, and drop
+  the `License :: Other/Proprietary License` classifier that contradicted the
+  PolyForm text (PEP 639 forbids licence classifiers next to an expression).
+  Build requirement raised to `maturin>=1.9`.
+- `codemeta.json` licence URL pointed at `qector.store/license.html` (404); it
+  is now the SPDX URL. Project URLs use the canonical `https://qector.store/`
+  (the `www` host only redirects) and gain a `License` link.
+- **Dead purchase link.** PyPI's "Purchase" URL, the README badge, the release
+  notes, `FUNDING.yml` and `stripe_integration.py` pointed at
+  `buy.stripe.com/7sY9…U00`, a payment link that is inactive in Stripe (the
+  page loads but cannot take payment). All now point at
+  `https://qector.store/pricing/`, which carries the 2026-11 plans (free
+  14-day trial, Pro $79/month or $790/year, Team, Lab) and never goes stale
+  when a Stripe link is rotated. COMMERCIAL.md pricing table updated to match.
+- **Licence wording matches PolyForm Noncommercial.** README, COMMERCIAL.md and
+  `.well-known/tags.json` said funded or institutional use needs a commercial
+  licence; PolyForm NC 1.0.0 ("Noncommercial Organizations") permits use by
+  educational, public research, charitable and government institutions
+  whatever their funding. The wording now says so; company work, including
+  under a research contract, still needs a paid licence.
+- `.zenodo.json` licence `other-proprietary` → `polyform-noncommercial-1.0.0`
+  (Zenodo's SPDX vocabulary id) and `version` 1.0.1; `CITATION.cff` version
+  1.0.1. Set `date-released` to the actual PyPI publish date.
+- The import notice for scripts and services pointed at the retired
+  "60-day commercial evaluation (creditable)"; it now points at the free
+  14-day commercial trial on the pricing page.
+- **Release workflow proves every wheel on its own OS.** A new
+  `verify-wheels` job installs each of the 18 wheels in a clean venv on Linux,
+  Windows and macOS (CPython 3.9-3.14), checks `H c = s` on 200 random errors
+  for Union-Find and Blossom, the console scripts, the PEP 639 licence metadata
+  and that GPU is refused without a token, and uploads a JSON receipt. PyPI
+  publishing now waits for all 18.
+- **Provenance is required, not best-effort.** Sigstore build provenance
+  (`actions/attest-build-provenance`) is generated for every wheel before the
+  PyPI upload and the release no longer publishes without it; PyPI keeps its
+  own PEP 740 attestations. A new `github-release` job creates the GitHub
+  Release for the tag (marked latest) with the wheels, `SHA256SUMS`,
+  `platform-proof.json` and verification instructions, and attests the
+  checksums. 1.0.0 had a tag but no GitHub Release.
+- `build.rs` restored: it compiles `proto/qector.proto` for the `grpc` feature.
+  Without it `cargo test --features full` (tests.yml, "Rust tests") has failed
+  on main since 2026-08-09 with `unresolved import qector::qector_decoder_server`.
+- README licensing section rewritten to match the code: `v2.` token format,
+  both `QECTOR_LICENSE_KEY` and `QECTOR_LICENSE`, `QECTOR_ENFORCE`,
+  `QECTOR_OFFLINE`, a tier table, and the fact that the `academic` /
+  `commercial` override strings work only with `QECTOR_DEBUG=1`.
+- Public GitHub changes made after the 1.0.0 freeze are kept (logo banner,
+  `Production/Stable` classifier, revised README benchmark wording); `build.rs`
+  and `docs/INSTALL.md`, deleted on GitHub but still required by the
+  `grpc` build and referenced from the docs, are restored.
+
+### Added — network isolation
+- Cargo feature `billing` (default on) gates `ureq`, the crate's only HTTP/TLS
+  client. `--no-default-features --features cuda` builds a core with no network
+  stack at all. Release wheels keep it (`--features cuda,billing`).
+- `QECTOR_OFFLINE=1` refuses every outbound call (native usage flush, Stripe
+  checkout, SDK metering fallback, sales webhook) before a socket is opened;
+  pending usage is kept. Tested in `test_offline_mode.py` with sockets patched
+  to fail. See `docs/SECURITY_DEPLOYMENT.md`.
+
+### Measured — circuit-level head-to-head (`benchmarks/stim_head_to_head.py`)
+Stim `rotated_memory_z`, rounds = d, uniform depolarizing p, 10 000 shots per
+point, identical shots for every decoder through the sinter interface, one
+thread on a 2-core Xeon 2.1 GHz. Raw data:
+`benchmark_results/stim_head_to_head_1.0.1.json`.
+
+| d | p | PyMatching 2.4 LER | QECTOR Blossom LER | QECTOR UF LER | PyMatching µs/shot | Blossom µs/shot | UF µs/shot |
+|---|---|---|---|---|---|---|---|
+| 5 | 0.003 | 0.00340 | 0.00340 | 0.00350 | 1.4 | 21 | 3.0 |
+| 5 | 0.007 | 0.03030 | 0.03060 | 0.03280 | 4.1 | 54 | 9.6 |
+| 7 | 0.007 | 0.03180 | 0.03160 | 0.03540 | 17 | 832 | 61 |
+| 9 | 0.003 | 0.00050 | 0.00050 | 0.00060 | 11 | 911 | 49 |
+| 9 | 0.007 | 0.02890 | 0.02890 | 0.03490 | 36 | 6 908 | 216 |
+
+Blossom matches PyMatching's logical error rate (within sampling noise
+everywhere, equal at most points). It is **not** speed-competitive at
+circuit level: 15–50× slower than PyMatching's sparse blossom at d = 5 and
+40–190× at d = 7–9, and
+`SparseBlossomDecoder` is slower still on these graphs. Union-Find is 2–6×
+slower than PyMatching at 1.0–1.2× its LER. Closing the MWPM latency gap needs
+a PyMatching-2-style sparse blossom and is the main open item for 1.1.
+
+### Notes on the `[Unreleased]` section below
+It was carried in the 1.0.0 freeze working tree. The dual-stream race and the
+`edge_len` leak it lists are fixed here (they were not fixed in that tree). The
+f64 CUDA kernel (`precision="f64"`), `SbScratch` for `SparseBlossomDecoder` and
+the external verification-harness files it describes are **not** in this
+source tree and are not part of 1.0.1. The CS-OSD/damping and
+`cluster_bposd` Python features it lists are present and ship in 1.0.1.
+
 ## [Unreleased]
 
 ### Added

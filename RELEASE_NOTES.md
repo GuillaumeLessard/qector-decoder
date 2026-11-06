@@ -1,5 +1,33 @@
 # Release Notes
 
+## [1.0.1] — 2026-11-05
+
+Correctness and packaging release; no API removals. Highlights:
+
+- **Code families fixed.** In 1.0.0, rotated surface codes had distance 2 at
+  every `d`, the unrotated and colour generators encoded no logical qubit, and
+  heavy-hex `d` had distance `2d−1`. All families now have exactly the distance
+  their name states (new `codes.code_distance` proves it). Re-run any study
+  built on `codes.*` from 1.0.0.
+- **Union-Find decoder fixed** on CPU, CUDA and OpenCL: it now corrects every
+  error up to half the distance; the weighted GPU path is bit-identical to the
+  CPU; a dual-stream CUDA race and a crash in `opencl_is_available()` are gone.
+- **Sinter entry points** now select the decoder they name.
+- **GPU on every paid tier.** CUDA/OpenCL batch decoding now unlocks with Pro
+  tokens (Evaluation, Solo, Startup, Professional), as the pricing page sells it;
+  1.0.0 reserved it for Enterprise.
+- **Packaging:** PEP 639 licence metadata (`PolyForm-Noncommercial-1.0.0`), and the
+  two stray top-level functions every 1.0.0 PyPI wheel exported are gone.
+- **numpy 2.3+ and Python 3.14** supported.
+- **Air-gapped deployments:** `QECTOR_OFFLINE=1`, and a `billing` Cargo feature
+  that removes the HTTP client from the build entirely.
+- **Benchmark (circuit level, vs PyMatching 2.4):** Blossom matches PyMatching's
+  logical error rate; it is not yet latency-competitive (15–50× slower at
+  d = 5, 40–190× at d = 7–9). Union-Find is 2–6× slower at 1.0–1.2× the LER. Full table in
+  `CHANGELOG.md`.
+
+---
+
 ## [1.0.0] — 2026-08-05
 
 QECTOR Decoder v3 enters its 1.x line. The public API contract is defined in
@@ -191,7 +219,7 @@ withdrawn rather than corrected, since there is nothing yet to correct it to.
 ### Added
 - **Self-Auto-Debug Backend**: `AutoDecoder` implements a 7-tier fault-tolerant fallback engine (`CUDA` -> `OpenCL` -> `CPU Rayon` -> `CPU Batch` -> `CPU Single` -> `Blossom` -> `Lookup Table`) with automatic exception trapping, per-tier health scoring, and transparent recovery. `reset_backend_health()` restores suspended tiers.
 - **Ed25519 Offline License Verification**: `verify_license_token()` validates signed license tokens fully offline against an embedded public key. Supports both legacy 2-part and self-contained 3-part (`receipt_id.email_b64.sig_b64`) token formats. Configurable via `QECTOR_LICENSE` and `QECTOR_SILENT` environment variables.
-- **Stripe Checkout & Webhook Fulfillment**: `stripe_integration.py` and `stripe_webhook_server.py` provide end-to-end commercial license fulfillment - Checkout Session creation, webhook signature verification, and automatic Ed25519 token issuance on payment confirmation. Direct purchase link: [Buy Commercial License](https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00?locale=en&__embed_source=buy_btn_1TsoKxRsa9cg9l8A7ExMmc77).
+- **Stripe Checkout & Webhook Fulfillment**: `stripe_integration.py` and `stripe_webhook_server.py` provide end-to-end commercial license fulfillment - Checkout Session creation, webhook signature verification, and automatic Ed25519 token issuance on payment confirmation. Direct purchase link: [Buy Commercial License](https://qector.store/pricing/).
 - **DecoderPool LRU Caching**: Added LRU pool caching for `get_decoder_pool` in `decoder_cache.py`, preventing redundant process pool initialization across repeated multi-process decodes.
 
 ### Fixed

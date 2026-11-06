@@ -280,7 +280,7 @@ def get_tier_info() -> dict:
     return {
         "tier": tier_name,
         "max_distance": _TIER_MAX_DISTANCE.get(tier, 7),
-        "gpu_enabled": tier == "enterprise",
+        "gpu_enabled": tier in ("pro", "enterprise"),  # 1.0.1: every paid tier
         "gnn_enabled": tier in ("pro", "enterprise"),
         "key_status": "valid" if key else "no_key",
     }

@@ -46,21 +46,16 @@ if CUDABatchDecoder.is_available():
 
 ---
 
-## Growth-Accumulator Precision: f32 vs f64
+## Growth-Accumulator Precision and CPU Identity
 
-The weighted kernel's default `precision="f32"` reproduces the historical build
-bit-for-bit. `precision="f64"` runs `uf_decode_batch_cuda_f64`: identical control
-flow, but the adaptive time-step growth accumulates in double precision against
-the exact (pre-cast) f64 edge lengths — the fusion schedule stays faithful when
-DEM weights span orders of magnitude (circuit-level noise).
+The weighted kernel accumulates cluster growth in f32 against the same f32 edge
+lengths as the CPU `UnionFindDecoder` (`uf_core::grow_weighted`), and since
+1.0.1 it also peels the same minimum-weight spanning forest (Kruskal over the
+grown edges, cheapest first, ties by edge id). Weighted GPU corrections are
+therefore bit-identical to the weighted CPU decoder, not merely equal in LER;
+1.0.0's kernel peeled every grown edge and differed on a few percent of shots.
+`python/tests/test_gpu_kernel_sources.py` checks this on any machine with a C++
+compiler, by compiling the kernel source for the host.
 
-```python
-decoder = CUDABatchDecoder(c2q, n_qubits=model.num_errors, edge_weights=weights, precision="f64")
-print(decoder.precision)  # "f64"
-```
-
-Costs: 2x the support-scratch VRAM and the device's FP64 throughput (consumer
-cards are FP64-limited). Measured acceptance: GPU-f64 weighted LER matches the
-weighted CPU LER within sampling noise at d=13 (see
-`python/tests/test_cuda_f64_precision.py`). On an unweighted graph the flag is a
-no-op (the unweighted branch is integer).
+An f64 accumulation mode (`precision="f64"`) was described in an earlier draft
+of this guide but is not part of the 1.x kernels.

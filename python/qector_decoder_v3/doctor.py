@@ -16,7 +16,7 @@ project:
    visible.
 2. **A GPU is present but the licence tier gates it.** ``cuda_is_available()``
    reports the *hardware*; ``CUDABatchDecoder(...)`` additionally requires
-   Enterprise. Check ``cuda`` constructs a two-node decoder to tell those apart,
+   a paid tier (Pro or Enterprise since 1.0.1). Check ``cuda`` constructs a two-node decoder to tell those apart,
    because "GPU detected" plus "GPU decoder refuses to build" is otherwise
    indistinguishable from a driver problem.
 3. **A missing optional extra** silently changes which code path runs.
@@ -307,9 +307,9 @@ def _classify_gpu_error(exc: BaseException) -> tuple[str, str]:
     if "enterprise" in low or "tier" in low:
         return (
             f"device present but gated by licence tier: {msg}",
-            "The hardware is fine. GPU decoding requires the Enterprise tier - set "
-            "QECTOR_LICENSE_KEY (or QECTOR_LICENSE_FILE) to an Enterprise key. "
-            "See https://qector.store/pricing",
+            "The hardware is fine. GPU decoding requires a paid licence (Pro or Enterprise) - set "
+            "QECTOR_LICENSE_KEY (or QECTOR_LICENSE_FILE) to your licence token. "
+            "See https://qector.store/pricing/",
         )
     if "not available" in low or "without cuda" in low or "cuda-only wheel" in low:
         return (
@@ -328,7 +328,7 @@ def _classify_gpu_error(exc: BaseException) -> tuple[str, str]:
 def check_cuda(qd: Any) -> Check:
     """CUDA: is a device visible, and can a CUDA decoder actually be constructed?
 
-    ``cuda_is_available()`` reports hardware only. Enterprise-tier enforcement
+    ``cuda_is_available()`` reports hardware only. Paid-tier enforcement
     happens in the constructor, so a Community install on a working GPU reports
     ``True`` here and still cannot decode on it.
     """
@@ -343,7 +343,7 @@ def check_cuda(qd: Any) -> Check:
             PASS,
             "no CUDA device usable (wheel built without CUDA, or no NVIDIA driver/device)",
             "Not a defect on a CPU-only machine. For GPU decoding you need an NVIDIA "
-            "driver, a CUDA-enabled wheel, and an Enterprise licence.",
+            "driver, a CUDA-enabled wheel, and a paid (Pro or Enterprise) licence.",
         )
 
     try:
@@ -404,7 +404,7 @@ def check_licence(qd: Any) -> list[Check]:
     gnn = bool(info.get("gnn_enabled", False))
     gated = [
         f"code distance d<={cap}",
-        f"GPU decoding {'enabled' if gpu else 'DISABLED (Enterprise only)'}",
+        f"GPU decoding {'enabled' if gpu else 'DISABLED (paid tiers: Pro or Enterprise)'}",
         f"GNN/neural paths {'enabled' if gnn else 'DISABLED (Pro or Enterprise)'}",
     ]
     out.append(Check("licence-tier", PASS, f"{tier} tier - " + "; ".join(gated)))

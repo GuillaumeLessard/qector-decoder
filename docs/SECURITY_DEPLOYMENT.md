@@ -13,6 +13,22 @@ QECTOR Decoder is safest when used as a local Rust/Python research library. Opti
 | SaaS / hosted API | Contact-only beta review | Requires separate commercial agreement and hardening plan |
 | OEM / embedded | Contact-only partner validation | Requires hardware/platform scope and support terms |
 
+## Network isolation (air-gapped deployments)
+
+Decoding, licence verification and every code-family helper are offline by
+construction. The only code that can open an outbound connection is explicit
+billing: `flush_usage()` (Rust, `ureq`), and in the Python
+`stripe_integration` module the checkout, metering fallback and sales webhook.
+Two independent switches close it (since 1.0.1):
+
+| Switch | Effect |
+|---|---|
+| `QECTOR_OFFLINE=1` at run time | Every one of those calls raises (or, for the fire-and-forget webhook, returns `False`) before any socket is opened. Covered by `python/tests/test_offline_mode.py`, which fails if a connection is even attempted. |
+| Build without the `billing` Cargo feature | `maturin build --release --no-default-features --features cuda` links no HTTP or TLS client at all (`cargo tree` shows no `ureq`, `rustls` or `ring`). `flush_usage()` then reports that the build has no transport. |
+
+Published wheels are built with `--features cuda,billing`; an air-gapped site
+that compiles its own core can drop `billing`.
+
 ## Minimum production checklist
 
 Before using QECTOR in a customer-facing or network-accessible system:

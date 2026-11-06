@@ -1,0 +1,279 @@
+{
+ "meta": {
+  "qector": "1.0.1",
+  "pymatching": "2.4.0",
+  "stim": "1.16.0",
+  "python": "3.13.18",
+  "cpu": "x86_64",
+  "cores": 2,
+  "shots": 10000,
+  "seed": 20261105,
+  "circuit": "surface_code:rotated_memory_z, rounds=d, uniform depolarizing p"
+ },
+ "rows": [
+  {
+   "distance": 3,
+   "p": 0.003,
+   "decoder": "pymatching",
+   "shots": 10000,
+   "errors": 79,
+   "ler": 0.0079,
+   "ler_lo": 0.0063438782578385455,
+   "ler_hi": 0.009834052944541219,
+   "us_per_shot": 0.17069670000182668
+  },
+  {
+   "distance": 3,
+   "p": 0.003,
+   "decoder": "qector_blossom",
+   "shots": 10000,
+   "errors": 79,
+   "ler": 0.0079,
+   "ler_lo": 0.0063438782578385455,
+   "ler_hi": 0.009834052944541219,
+   "us_per_shot": 0.6629201999885481
+  },
+  {
+   "distance": 3,
+   "p": 0.003,
+   "decoder": "qector_unionfind",
+   "shots": 10000,
+   "errors": 79,
+   "ler": 0.0079,
+   "ler_lo": 0.0063438782578385455,
+   "ler_hi": 0.009834052944541219,
+   "us_per_shot": 0.29756010001165123
+  },
+  {
+   "distance": 3,
+   "p": 0.007,
+   "decoder": "pymatching",
+   "shots": 10000,
+   "errors": 321,
+   "ler": 0.0321,
+   "ler_lo": 0.02882092242228196,
+   "ler_hi": 0.03573842325866397,
+   "us_per_shot": 0.3971664999880886
+  },
+  {
+   "distance": 3,
+   "p": 0.007,
+   "decoder": "qector_blossom",
+   "shots": 10000,
+   "errors": 321,
+   "ler": 0.0321,
+   "ler_lo": 0.02882092242228196,
+   "ler_hi": 0.03573842325866397,
+   "us_per_shot": 2.297988100008297
+  },
+  {
+   "distance": 3,
+   "p": 0.007,
+   "decoder": "qector_unionfind",
+   "shots": 10000,
+   "errors": 320,
+   "ler": 0.032,
+   "ler_lo": 0.028726158019706034,
+   "ler_hi": 0.03563326446091525,
+   "us_per_shot": 0.6076991999862003
+  },
+  {
+   "distance": 5,
+   "p": 0.003,
+   "decoder": "pymatching",
+   "shots": 10000,
+   "errors": 34,
+   "ler": 0.0034,
+   "ler_lo": 0.0024341818099404278,
+   "ler_hi": 0.004747205377829924,
+   "us_per_shot": 1.4061292000178582
+  },
+  {
+   "distance": 5,
+   "p": 0.003,
+   "decoder": "qector_blossom",
+   "shots": 10000,
+   "errors": 34,
+   "ler": 0.0034,
+   "ler_lo": 0.0024341818099404278,
+   "ler_hi": 0.004747205377829924,
+   "us_per_shot": 20.95636670001113
+  },
+  {
+   "distance": 5,
+   "p": 0.003,
+   "decoder": "qector_unionfind",
+   "shots": 10000,
+   "errors": 35,
+   "ler": 0.0035,
+   "ler_lo": 0.0025177784991367476,
+   "ler_hi": 0.0048635318889582585,
+   "us_per_shot": 2.998525599991808
+  },
+  {
+   "distance": 5,
+   "p": 0.007,
+   "decoder": "pymatching",
+   "shots": 10000,
+   "errors": 303,
+   "ler": 0.0303,
+   "ler_lo": 0.027116566045499352,
+   "ler_hi": 0.03384416202960282,
+   "us_per_shot": 4.070387000001574
+  },
+  {
+   "distance": 5,
+   "p": 0.007,
+   "decoder": "qector_blossom",
+   "shots": 10000,
+   "errors": 306,
+   "ler": 0.0306,
+   "ler_lo": 0.02740041463329068,
+   "ler_hi": 0.03416008304278544,
+   "us_per_shot": 54.048204699984126
+  },
+  {
+   "distance": 5,
+   "p": 0.007,
+   "decoder": "qector_unionfind",
+   "shots": 10000,
+   "errors": 328,
+   "ler": 0.0328,
+   "ler_lo": 0.029484520387846786,
+   "ler_hi": 0.03647428769537173,
+   "us_per_shot": 9.608274200013511
+  },
+  {
+   "distance": 7,
+   "p": 0.003,
+   "decoder": "pymatching",
+   "shots": 10000,
+   "errors": 10,
+   "ler": 0.001,
+   "ler_lo": 0.0005432859839604467,
+   "ler_hi": 0.0018399443960182191,
+   "us_per_shot": 4.691273299999921
+  },
+  {
+   "distance": 7,
+   "p": 0.003,
+   "decoder": "qector_blossom",
+   "shots": 10000,
+   "errors": 9,
+   "ler": 0.0009,
+   "ler_lo": 0.0004735770582653053,
+   "ler_hi": 0.001709730121388707,
+   "us_per_shot": 194.5370464000007
+  },
+  {
+   "distance": 7,
+   "p": 0.003,
+   "decoder": "qector_unionfind",
+   "shots": 10000,
+   "errors": 13,
+   "ler": 0.0013,
+   "ler_lo": 0.0007599118694358472,
+   "ler_hi": 0.002223088111516779,
+   "us_per_shot": 15.846585700001015
+  },
+  {
+   "distance": 7,
+   "p": 0.007,
+   "decoder": "pymatching",
+   "shots": 10000,
+   "errors": 318,
+   "ler": 0.0318,
+   "ler_lo": 0.028536656093499313,
+   "ler_hi": 0.035422919986472665,
+   "us_per_shot": 16.97658410000713
+  },
+  {
+   "distance": 7,
+   "p": 0.007,
+   "decoder": "qector_blossom",
+   "shots": 10000,
+   "errors": 316,
+   "ler": 0.0316,
+   "ler_lo": 0.028347190278009436,
+   "ler_hi": 0.03521253940131324,
+   "us_per_shot": 832.1810697999808
+  },
+  {
+   "distance": 7,
+   "p": 0.007,
+   "decoder": "qector_unionfind",
+   "shots": 10000,
+   "errors": 354,
+   "ler": 0.0354,
+   "ler_lo": 0.03195291813309499,
+   "ler_hi": 0.03920389315856451,
+   "us_per_shot": 61.09124800000245
+  },
+  {
+   "distance": 9,
+   "p": 0.003,
+   "decoder": "pymatching",
+   "shots": 10000,
+   "errors": 5,
+   "ler": 0.0005,
+   "ler_lo": 0.00021358842481129363,
+   "ler_hi": 0.0011700259535441045,
+   "us_per_shot": 11.426880700014408
+  },
+  {
+   "distance": 9,
+   "p": 0.003,
+   "decoder": "qector_blossom",
+   "shots": 10000,
+   "errors": 5,
+   "ler": 0.0005,
+   "ler_lo": 0.00021358842481129363,
+   "ler_hi": 0.0011700259535441045,
+   "us_per_shot": 910.5051213000024
+  },
+  {
+   "distance": 9,
+   "p": 0.003,
+   "decoder": "qector_unionfind",
+   "shots": 10000,
+   "errors": 6,
+   "ler": 0.0006,
+   "ler_lo": 0.00027501347471946605,
+   "ler_hi": 0.0013085241039605855,
+   "us_per_shot": 49.44323170000189
+  },
+  {
+   "distance": 9,
+   "p": 0.007,
+   "decoder": "pymatching",
+   "shots": 10000,
+   "errors": 289,
+   "ler": 0.0289,
+   "ler_lo": 0.025793112225207575,
+   "ler_hi": 0.03236869104534944,
+   "us_per_shot": 36.182913400011785
+  },
+  {
+   "distance": 9,
+   "p": 0.007,
+   "decoder": "qector_blossom",
+   "shots": 10000,
+   "errors": 289,
+   "ler": 0.0289,
+   "ler_lo": 0.025793112225207575,
+   "ler_hi": 0.03236869104534944,
+   "us_per_shot": 6907.773845399992
+  },
+  {
+   "distance": 9,
+   "p": 0.007,
+   "decoder": "qector_unionfind",
+   "shots": 10000,
+   "errors": 349,
+   "ler": 0.0349,
+   "ler_lo": 0.03147780237120514,
+   "ler_hi": 0.038679392918831094,
+   "us_per_shot": 215.9980872999995
+  }
+ ]
+}

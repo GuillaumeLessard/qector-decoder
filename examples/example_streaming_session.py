@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-example_streaming_session.py — QECTOR Decoder v3 (v1.0.0) streaming orchestration
+example_streaming_session.py — QECTOR Decoder v3 (v1.0.1) streaming orchestration
 
 Demonstrates the higher-level Python streaming layer
 ``qector_decoder_v3.streaming`` (``StreamingSession`` + ``sliding_window_decode``),
@@ -43,7 +43,7 @@ def make_stream(code, n_rounds, p, rng):
 
 def main():
     print("=" * 70)
-    print("QECTOR v3 (1.0.0) — Streaming Session (window + commit) orchestration")
+    print("QECTOR v3 (1.0.1) — Streaming Session (window + commit) orchestration")
     print("=" * 70)
     print(f"\nGPU backend active module: {gb.get_backend().summary()['active_module']}")
 

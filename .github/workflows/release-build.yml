@@ -24,8 +24,8 @@ name: Build
 #   * a smoke test that decodes and asserts H@c == s rather than only importing.
 #
 # What is deliberately DROPPED: the sdist job, musllinux, Linux aarch64, and
-# macos-intel (it hangs). The result is 3 platforms x 5 CPython versions = the
-# 15 wheels README documents and PyPI already carries for 0.6.9.
+# macos-intel (it hangs). The result is 3 platforms x 6 CPython versions
+# (3.9-3.14 since 1.0.1) = the 18 wheels README documents.
 
 on:
   push:
@@ -42,7 +42,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  MATURIN_ARGS: --release --no-default-features --features cuda --out dist
+  # `billing` (Stripe metering transport, the only HTTP client) is opt-in since
+  # 1.0.1 because it is a default feature; --no-default-features would drop it.
+  MATURIN_ARGS: --release --no-default-features --features cuda,billing --out dist
 
 jobs:
   linux-x86_64:
@@ -51,7 +53,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -92,7 +94,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -133,7 +135,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -167,6 +169,103 @@ jobs:
           name: wheels-macos-aarch64-py${{ matrix.python-version }}
           path: dist/*.whl
 
+  # Proof that every published wheel installs and decodes on its own OS. Each
+  # cell downloads the wheel built above (never rebuilds), installs it into a
+  # clean venv with only its declared dependencies, checks H@c == s for the CPU
+  # decoders, runs the console scripts, checks the PEP 639 licence metadata and
+  # that GPU is refused without a token, then uploads a JSON receipt. The
+  # receipts are attached to the GitHub Release as platform-proof.json.
+  verify-wheels:
+    name: verify-${{ matrix.os-label }}-py${{ matrix.python-version }}
+    needs: [linux-x86_64, windows-x64, macos-arm]
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        include-platform: [linux, windows, macos]
+        include:
+          - include-platform: linux
+            runner: ubuntu-latest
+            os-label: linux-x86_64
+            artifact: wheels-linux-x86_64-py
+          - include-platform: windows
+            runner: windows-latest
+            os-label: windows-x64
+            artifact: wheels-windows-x64-py
+          - include-platform: macos
+            runner: macos-14
+            os-label: macos-arm64
+            artifact: wheels-macos-aarch64-py
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}${{ matrix.python-version }}
+          path: wheel
+      - name: Install the wheel in a clean venv and prove it
+        shell: bash
+        env:
+          QECTOR_SILENT: "1"
+          OS_LABEL: ${{ matrix.os-label }}
+          PYV: ${{ matrix.python-version }}
+        run: |
+          set -euo pipefail
+          python -m venv venv
+          if [ -x venv/Scripts/python.exe ]; then PY=venv/Scripts/python.exe; BIN=venv/Scripts; else PY=venv/bin/python; BIN=venv/bin; fi
+          "$PY" -m pip install --upgrade pip >/dev/null
+          WHEEL=$(ls wheel/*.whl | head -1)
+          "$PY" -m pip install "$WHEEL"
+          "$BIN/qector" --help >/dev/null
+          "$BIN/qector-doctor" --help >/dev/null || true
+          "$PY" - "$WHEEL" <<'PY'
+          import hashlib, json, os, platform, sys
+          from importlib.metadata import metadata
+          import numpy as np
+          import qector_decoder_v3 as qd
+          wheel = sys.argv[1]
+          md = metadata("qector-decoder-v3")
+          assert md["License-Expression"] == "PolyForm-Noncommercial-1.0.0", md["License-Expression"]
+          assert not [c for c in md.get_all("Classifier") or [] if c.startswith("License ::")]
+          assert "Development Status :: 5 - Production/Stable" in (md.get_all("Classifier") or [])
+          c2q = [[0, 1], [1, 2], [2, 3], [3, 4]]
+          n = 5
+          H = np.zeros((4, n), dtype=np.uint8)
+          for i, ch in enumerate(c2q):
+              for q in ch:
+                  H[i, q] ^= 1
+          rng = np.random.default_rng(1)
+          checked = {}
+          for name in ("UnionFindDecoder", "BlossomDecoder"):
+              dec = getattr(qd, name)(c2q, n)
+              for _ in range(200):
+                  err = (rng.random(n) < 0.2).astype(np.uint8)
+                  syn = (H @ err) % 2
+                  corr = np.asarray(dec.decode(syn), dtype=np.uint8).reshape(-1)
+                  assert (((H @ corr) % 2) == syn).all(), f"{name} not syndrome-faithful"
+              checked[name] = 200
+          info = qd.get_license_info()
+          assert str(info["tier"]).lower() == "community" and info["gpu_enabled"] is False, info
+          receipt = {
+              "os": os.environ["OS_LABEL"], "python": platform.python_version(),
+              "platform": platform.platform(), "machine": platform.machine(),
+              "package_version": qd.__version__, "wheel": os.path.basename(wheel),
+              "wheel_sha256": hashlib.sha256(open(wheel, "rb").read()).hexdigest(),
+              "license_expression": md["License-Expression"],
+              "syndrome_checks": checked, "tier_without_token": info["tier"],
+              "github_run": f'{os.environ.get("GITHUB_SERVER_URL")}/{os.environ.get("GITHUB_REPOSITORY")}/actions/runs/{os.environ.get("GITHUB_RUN_ID")}',
+          }
+          json.dump(receipt, open("receipt.json", "w"), indent=1)
+          print(json.dumps(receipt, indent=1))
+          PY
+          mv receipt.json "receipt-${OS_LABEL}-py${PYV}.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: receipt-${{ matrix.os-label }}-py${{ matrix.python-version }}
+          path: receipt-*.json
+
   # Blocking half of the dependency policy. This is what caught
   # RUSTSEC-2026-0204 before it could ship.
   dependency-gate:
@@ -196,14 +295,14 @@ jobs:
       startsWith(github.ref, 'refs/tags/v') &&
       github.repository == 'GuillaumeLessard/qector-decoder' &&
       github.event_name != 'pull_request'
-    needs: [linux-x86_64, windows-x64, macos-arm, dependency-gate]
+    needs: [linux-x86_64, windows-x64, macos-arm, verify-wheels, dependency-gate]
     environment:
       name: pypi
       url: https://pypi.org/p/qector-decoder-v3
     permissions:
-      id-token: write        # PyPI Trusted Publishing (OIDC) — no stored token
+      id-token: write        # PyPI Trusted Publishing (OIDC) + Sigstore provenance
       contents: read
-      attestations: write    # build provenance, non-gating (see 49ba957)
+      attestations: write    # build provenance (required, see step below)
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -213,6 +312,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: dist
+          pattern: wheels-*
           merge-multiple: true
 
       - name: Wheels only — no sdist may reach PyPI
@@ -224,8 +324,8 @@ jobs:
           fi
           n=$(ls dist/*.whl 2>/dev/null | wc -l)
           echo "wheels collected: $n"
-          if [ "$n" -lt 15 ]; then
-            echo "::error::expected 15 wheels (3 platforms x 5 CPython versions), found $n"
+          if [ "$n" -lt 18 ]; then
+            echo "::error::expected 18 wheels (3 platforms x 6 CPython versions), found $n"
             exit 1
           fi
 
@@ -294,24 +394,97 @@ jobs:
           pip install twine
           twine check dist/*.whl
 
-      # Non-gating by design: commit 49ba957 ("artifact attestation must not gate
-      # publishing"). Provenance requires a public repo or GHAS, and on a private
-      # repo the API returns "Feature not available", which must not fail a
-      # release that is otherwise good.
+      # Build provenance (SLSA, Sigstore-signed) for every wheel. The repository
+      # is public, so this is now required: a release without provenance does
+      # not publish. Verify with:
+      #   gh attestation verify <wheel> --repo GuillaumeLessard/qector-decoder
+      # PyPI additionally stores its own PEP 740 attestation for each file
+      # (pypa/gh-action-pypi-publish uploads them by default).
       - name: Generate artifact attestations
-        if: ${{ github.event.repository.private == false }}
-        continue-on-error: true
         uses: actions/attest-build-provenance@v2
         with:
-          subject-path: "dist/*"
+          subject-path: "dist/*.whl"
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist/
           # Idempotent upload. PyPI rejects re-uploading a file that already
-          # exists, so without this a run that uploaded 9 of 15 wheels and then
+          # exists, so without this a run that uploaded 9 of 18 wheels and then
           # failed could never be retried - the retry would die on the first
           # duplicate and the release would be stuck half-published. With it,
           # a re-run completes the remaining wheels.
           skip-existing: true
+
+  # GitHub Release for the tag, marked "latest": the wheels, SHA256SUMS, the
+  # per-platform install receipts and how to verify provenance. Runs only after
+  # PyPI accepted the upload, so a release page never advertises files PyPI
+  # does not have.
+  github-release:
+    name: github-release
+    needs: [publish]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: wheels-*
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          path: receipts
+          pattern: receipt-*
+          merge-multiple: true
+      - name: Checksums, platform proof and notes
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          (cd dist && sha256sum *.whl > SHA256SUMS)
+          python - <<'PY'
+          import glob, json
+          rows = [json.load(open(p)) for p in sorted(glob.glob("receipts/*.json"))]
+          json.dump(rows, open("dist/platform-proof.json", "w"), indent=1)
+          print(f"{len(rows)} platform receipts")
+          assert len(rows) == 18, f"expected 18 receipts, got {len(rows)}"
+          PY
+          VERSION="${TAG#v}"
+          {
+            echo "## qector-decoder-v3 ${VERSION}"
+            echo
+            echo "\`pip install --upgrade \"qector-decoder-v3==${VERSION}\"\` (PyPI: https://pypi.org/project/qector-decoder-v3/${VERSION}/)"
+            echo
+            echo "18 wheels: CPython 3.9-3.14 on Linux x86_64 (manylinux_2_17), Windows x64 and macOS arm64."
+            echo "Each wheel was installed in a clean venv on its own OS in this run and checked (H c = s for Union-Find and Blossom, console scripts, licence metadata); see \`platform-proof.json\`."
+            echo
+            echo "### Provenance"
+            echo "- Built and published by GitHub Actions run ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID} via PyPI Trusted Publishing (no API token)."
+            echo "- Sigstore build provenance for every wheel: \`gh attestation verify <wheel> --repo ${GITHUB_REPOSITORY}\`."
+            echo "- PyPI PEP 740 attestations: https://pypi.org/project/qector-decoder-v3/${VERSION}/#files"
+            echo "- \`SHA256SUMS\` lists every wheel; it is attested too."
+            echo
+            echo "Licence: PolyForm-Noncommercial-1.0.0; commercial plans at https://qector.store/pricing/. Changes: CHANGELOG.md."
+          } > notes.md
+      - name: Attest checksums and platform proof
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            dist/SHA256SUMS
+            dist/platform-proof.json
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/*.whl dist/SHA256SUMS dist/platform-proof.json --clobber
+          else
+            gh release create "$TAG" dist/*.whl dist/SHA256SUMS dist/platform-proof.json \
+              --title "qector-decoder-v3 ${TAG#v}" --notes-file notes.md --verify-tag --latest
+          fi

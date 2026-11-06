@@ -67,10 +67,11 @@ def test_pyproject_declares_license():
     project = pyproject["project"]
     license_field = project.get("license")
     # license points at the LICENSE file (PEP 621 table form)
-    assert isinstance(license_field, dict) and (license_field.get("file") == "LICENSE" or "text" in license_field), (
-        f"pyproject [project] license not declared via file/text: {license_field!r}"
-    )
+    # PEP 639 (1.0.1): an SPDX expression string plus license-files; no
+    # "License ::" classifier may accompany it.
+    assert license_field == "PolyForm-Noncommercial-1.0.0", f"unexpected license expression: {license_field!r}"
+    assert "LICENSE" in project.get("license-files", []), "LICENSE must be listed in license-files"
     classifiers = project.get("classifiers", [])
-    assert any(c == "License :: Other/Proprietary License" for c in classifiers), (
-        "expected the proprietary trove classifier"
+    assert not any(c.startswith("License ::") for c in classifiers), (
+        "PEP 639 forbids License classifiers alongside a license expression"
     )

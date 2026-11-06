@@ -9,7 +9,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 import qector_decoder_v3 as qd
-import stripe
+
+# `stripe` is an optional extra (`pip install qector-decoder-v3[stripe]`); the
+# decoder never needs it, so its absence skips this module instead of erroring.
+stripe = pytest.importorskip("stripe")
 from qector_decoder_v3.license import verify_license_token
 from qector_decoder_v3.stripe_integration import (
     create_checkout_session,

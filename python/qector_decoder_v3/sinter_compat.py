@@ -27,7 +27,15 @@ from __future__ import annotations
 
 import numpy as np
 
-__all__ = ["QectorSinterDecoder", "qector_sinter_decoders"]
+__all__ = [
+    "QectorSinterDecoder",
+    "QectorBlossomSinterDecoder",
+    "QectorBeliefSinterDecoder",
+    "QectorUnionFindSinterDecoder",
+    "QectorUnionFindUnweightedSinterDecoder",
+    "QectorBpOsdSinterDecoder",
+    "qector_sinter_decoders",
+]
 
 try:
     import sinter
@@ -201,13 +209,63 @@ class _BpOsdSinter:
         return ((self._L @ corr.T) & 1).T.astype(np.uint8)
 
 
+# One preset class per entry point. ``[project.entry-points.sinter_decoder]``
+# used to map all five names to ``QectorSinterDecoder`` itself, whose default
+# kind is "belief" -- so a tool instantiating ``ep.load()()`` received
+# belief-matching for "qector_blossom", "qector_unionfind", ... (fixed in 1.0.1).
+class QectorBlossomSinterDecoder(QectorSinterDecoder):
+    """Sinter decoder preset: exact weighted MWPM (Blossom)."""
+
+    def __init__(self):
+        super().__init__("blossom")
+
+
+class QectorBeliefSinterDecoder(QectorSinterDecoder):
+    """Sinter decoder preset: belief-matching."""
+
+    def __init__(self):
+        super().__init__("belief")
+
+
+class QectorUnionFindSinterDecoder(QectorSinterDecoder):
+    """Sinter decoder preset: weighted Union-Find."""
+
+    def __init__(self):
+        super().__init__("unionfind")
+
+
+class QectorUnionFindUnweightedSinterDecoder(QectorSinterDecoder):
+    """Sinter decoder preset: unweighted Union-Find."""
+
+    def __init__(self):
+        super().__init__("unionfind_unweighted")
+
+
+class QectorBpOsdSinterDecoder(QectorSinterDecoder):
+    """Sinter decoder preset: BP-OSD."""
+
+    def __init__(self):
+        super().__init__("bposd")
+
+
+_PRESETS = {
+    "qector_blossom": QectorBlossomSinterDecoder,
+    "qector_belief": QectorBeliefSinterDecoder,
+    "qector_unionfind": QectorUnionFindSinterDecoder,
+    "qector_unionfind_unweighted": QectorUnionFindUnweightedSinterDecoder,
+    "qector_bposd": QectorBpOsdSinterDecoder,
+}
+
+
 def qector_sinter_decoders() -> dict[str, QectorSinterDecoder]:
-    """Return the ``custom_decoders`` mapping to pass to ``sinter.collect``."""
+    """Return the ``custom_decoders`` mapping to pass to ``sinter.collect``.
+
+    From the sinter command line::
+
+        sinter collect ... --decoders qector_blossom qector_unionfind \\
+            --custom_decoders_module_function \\
+            "qector_decoder_v3.sinter_compat:qector_sinter_decoders"
+    """
     if not _HAS_SINTER:  # pragma: no cover
         raise ImportError("sinter is not installed (pip install sinter)")
-    return {
-        "qector_blossom": QectorSinterDecoder("blossom"),
-        "qector_belief": QectorSinterDecoder("belief"),
-        "qector_unionfind": QectorSinterDecoder("unionfind"),
-        "qector_bposd": QectorSinterDecoder("bposd"),
-    }
+    return {name: cls() for name, cls in _PRESETS.items()}

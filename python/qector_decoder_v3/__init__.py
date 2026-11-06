@@ -409,7 +409,7 @@ import numpy as _np
 # wheel). We never overwrite a real compiled ``__version__`` with it - doing so
 # would falsely claim a version the loaded binary is not - so after a version bump
 # ``__version__`` keeps reporting the *built* value until the Rust wheel is rebuilt.
-__fallback_version__ = "1.0.0"
+__fallback_version__ = "1.0.1"
 
 try:
     __version__ = _native_module.__version__
@@ -474,9 +474,9 @@ def _emit_startup_notice() -> None:
     ]
     if not is_interactive:
         # A script or service is the commercial-use signal; point at the
-        # 60-day evaluation, which is creditable toward any annual licence.
+        # free 14-day commercial trial on the pricing page.
         lines.append(
-            f"[QECTOR v{__version__}] 60-day commercial evaluation (creditable): "
+            f"[QECTOR v{__version__}] Free 14-day commercial trial: "
             f"https://qector.store/pricing | Set QECTOR_SILENT=1 to hide this."
         )
     else:
@@ -1338,22 +1338,9 @@ except (ImportError, AttributeError):
                 "Build from source: maturin develop --features opencl"
             )
 
-    def decode_correction(self, syndrome):
-        """Explicit API: decode syndrome into physical correction vector (length n_qubits)."""
-        return self.decode(syndrome)
-
-    def decode_observables(self, syndrome, observables_matrix=None):
-        """Explicit API: decode syndrome into logical observable prediction vector.
-
-        When ``observables_matrix`` (shape ``(n_obs, n_qubits)``) is supplied, the
-        observables are predicted as ``(observables_matrix @ correction) & 1``.
-        Otherwise this falls back to :meth:`decode`, matching the physical-correction
-        convention used by the graph decoder wrappers.
-        """
-        correction = _np.asarray(self.decode(syndrome), dtype=_np.uint8).reshape(-1)
-        if observables_matrix is None:
-            return correction
-        return (_np.asarray(observables_matrix, dtype=_np.uint8) @ correction) & 1
+    # 1.0.1: two methods (decode_correction / decode_observables) used to sit
+    # here at except-block indentation, so every CUDA-only wheel (all PyPI
+    # wheels) exported them as broken module-level functions taking `self`.
 
 
 class SparseBlossomDecoder:

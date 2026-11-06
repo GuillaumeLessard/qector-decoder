@@ -5,8 +5,12 @@
 | Tier | Max Distance | GPU | Pricing |
 |---|---|---|---|
 | Community | d≤7 | No | Free (source-available) |
-| Pro | d≤19 | Yes | See https://qector.store/pricing |
+| Pro (trial, Pro, Pro Perpetual, Team, Pilot; legacy Evaluation/Solo/Startup/Professional) | d≤19 | Yes | See https://qector.store/pricing |
 | Enterprise | d≤63 | Yes | See https://qector.store/pricing |
+
+Distance caps are enforced as errors only with `QECTOR_ENFORCE=1`; GPU batch
+decoders always require a paid (Pro or Enterprise) token. Before 1.0.1 the
+code reserved GPU for Enterprise despite this table.
 
 ## Key Formats
 

@@ -17,8 +17,13 @@ For a matching code of distance `d`:
 | Peak Python allocation per decode | `benchmark_decoder(...)["peak_python_alloc_kib"]` |
 
 `rotated_surface_code(d)` has `d²` qubits; `toric_code(L)` has `2L²`;
-`unrotated_surface_code(d)` has `2d(d−1)`. These are exact and printed by the
-benchmark CSV (`n_qubits`, `n_checks` columns).
+`unrotated_surface_code(d)` has `d² + (d−1)²`; `color_code(d)` has `(3d²+1)/4`.
+These are exact and printed by the benchmark CSV (`n_qubits`, `n_checks`
+columns). Since 1.0.1 every family's true code distance equals its label;
+`codes.code_distance(code)` computes it exactly (see `test_code_distances.py`).
+Scaling figures produced with 1.0.0 used the old generators (rotated `d` had
+distance 2 for every `d`; unrotated had `2d(d−1)` qubits and encoded no logical
+qubit) and should be regenerated.
 
 ## Measuring the empirical scaling slope
 

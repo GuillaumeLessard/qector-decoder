@@ -9,8 +9,7 @@ Commercial use includes, but is not limited to:
 - company use
 - startup use
 - commercial R&D
-- government use
-- institutional or funded use
+- company work on government, defence or university contracts
 - paid consulting
 - SaaS use
 - hosted API use
@@ -37,23 +36,25 @@ PyMatching and Stim provide excellent free baselines. QECTOR is the appropriate 
 | Multi-decoder experimentation     | Union-Find, Blossom, Sparse Blossom, BP-OSD, batch, streaming, and hybrid workflows in a single source-available platform |
 | LDPC / qLDPC coverage             | BP-OSD and LDPC workflows beyond standard graph-like MWPM                   |
 | Reproducible evidence             | Benchmark artifacts, environment snapshots, reproducibility scripts, and Workbench report bundles |
-| Commercial permission             | Written license terms for company, lab, funded, product, hosted, or revenue-generating use |
+| Commercial permission             | Written license terms for company, product, hosted, or revenue-generating use |
 | Rapid proof of workflow value     | Productized Validation Sprints that deliver customer-specific, reproducible results within weeks |
 
 The commercial pitch centers on workflow velocity, reproducible proof, legal clarity, and decoder breadth. QECTOR is not offered as a universal replacement for PyMatching on pure latency.
 
 ## Public Pricing Tiers
 
-All tiers below grant internal commercial use rights under the terms of a written license agreement. Self-serve purchasing is available for qualifying tiers via the official licensing portal.
+All paid tiers grant internal commercial use rights. Prices are in USD; tax is added at checkout. Every plan carries a 14-day money-back guarantee on the first payment. Holders of earlier Evaluation, Solo/Indie, Startup/Growth or Professional licences keep their original terms.
 
 | Tier                              | Price                                      | Scope                                                                 | Notes |
 |-----------------------------------|--------------------------------------------|-----------------------------------------------------------------------|-------|
 | Personal / Academic               | Free                                       | Personal, academic, educational, and non-commercial research use under the repository license | No commercial rights included |
-| Commercial Evaluation License     | $499 USD for 60 days                       | Full decoder suite (MWPM variants, Union-Find, BP-OSD, batch/GPU paths) and reproducibility toolkit. Internal evaluation use only. Unlimited internal seats for the pilot duration. 100% credit toward any annual license | Self-serve via qector.store. Primary low-friction entry point for commercial validation |
-| Solo / Indie Commercial           | $1,299 USD / year<br>or $3,299 USD one-time (perpetual internal use) | Single named user. Full decoder suite and reproducibility tools for internal commercial use. Includes 12 months of updates (annual) or perpetual core license rights for the major version purchased, with patch updates included (one-time). No redistribution or OEM rights | One-time perpetual option available. Designed for independent researchers and solo practitioners |
-| Startup / Growth Team             | $4,499 USD / year                          | Up to 10 named users. Complete decoder suite, including advanced BP-OSD/LDPC and batch/GPU workflows, plus reproducibility tools. Includes 90 days of priority email support | Optimized for early-stage quantum companies and internal prototype development |
-| Professional / Lab                | $11,500 USD / year                         | Up to 25 named users. Full platform access including advanced workflows and batch processing. Includes credit for one Validation Report Package | Built-in proof-of-value service. Suitable for funded laboratories and commercial R&D teams |
-| Enterprise R&D                    | $28,000+ USD / year                        | Custom user volume. Full platform capabilities with options for dedicated support, integration assistance, and strategic workflow development | Contact sales for scoping and proposal |
+| Free Commercial Trial             | $0 for 14 days                             | Pro features for up to 5 internal users. Evaluation only, no card. One per e-mail per year | Self-serve at qector.store/pricing |
+| Pro                               | $79 USD / month or $790 USD / year         | One named user. Full decoder suite, GPU (CUDA/OpenCL) batch decoding, internal production use, priority e-mail support | Renews automatically; cancel any time |
+| Pro Perpetual                     | $1,990 USD one-time                        | One named user. Pro rights for every 3.x release; a major version such as 4.0 is a new licence | 12 months of support included |
+| Team                              | $3,900 USD / year                          | Up to 10 named users. Everything in Pro, priority support, onboarding call | Renews automatically; 40% academic discount for academic institutions |
+| Lab                               | $9,900 USD / year                          | Up to 25 named users. Everything in Team, code distances up to 63, support SLA, one Validation Report | Renews automatically; 40% academic discount |
+| Pilot                             | $1,500 USD one-time                        | 60-day evaluation licence for larger teams, with an integration call | 100% creditable toward Team or Lab within 90 days |
+| Enterprise R&D                    | From $25,000 USD / year                    | Unlimited seats, SaaS/hosted API and OEM options, named support engineer | Contact sales |
 | SaaS / Hosted API                 | Contact sales                              | Rights for production hosted API or SaaS deployment. Requires demonstrated production infrastructure, support processes, and hosted-value proof | Contact sales. Currently in beta review phase |
 | OEM / Embedded                    | Contact sales                              | Rights for embedding QECTOR in hardware products or platforms, including redistribution. Requires validated hardware/platform integration and redistribution terms | Contact sales. Reserved for established hardware or platform partners |
 | Strategic Partnership             | Custom                                     | Custom terms for significant IP alignment, joint development, or acquisition-related discussions | Contact sales. No public pricing floor |
@@ -83,7 +84,7 @@ This service is the recommended fast-track entry point for teams seeking immedia
 | Custom Workflow Integration    | $7,500–$12,000 (scoped)| License plus targeted engineering to embed QECTOR into existing pipelines or custom LDPC/qLDPC code families |
 | Priority Support (add-on)      | $5,000 / year          | Private email support and priority bug review for licensed users |
 | Integration Support            | $10,000 / year         | Benchmark review, install support, and integration guidance |
-| Validation Report Package      | $5,000 one-time        | Independent review of customer benchmark setup and reproducibility package (credit available within Professional tier) |
+| Validation Report Package      | $5,000 one-time        | Independent review of customer benchmark setup and reproducibility package (one included with Lab) |
 | Custom Engineering             | $150 / hour            | Private fixes, special reports, scripts, or workflow adaptation |
 | Technical Advisory             | $2,000 / day           | Architecture review and QEC workflow consulting |
 
@@ -123,12 +124,11 @@ Unless explicitly granted in a written commercial agreement, no license tier inc
 
 ## Official Licensing Portal & Purchasing
 
-Self-serve purchasing for the Commercial Evaluation License and Solo / Indie tiers is available at:
+The free 14-day trial and self-serve checkout for Pro, Pro Perpetual, Team, Lab and the Pilot are at:
 
-- Licensing Portal: **https://www.qector.store**
-- Direct Stripe Checkout (60-day Commercial Evaluation License): **[Buy Commercial License via Stripe](https://buy.stripe.com/6oU00l77Xc8ifsegEqeUU07)**
+- Pricing and checkout: **[qector.store/pricing](https://qector.store/pricing/)**
 
-Higher tiers, Validation Sprints, and custom services are initiated via:
+Enterprise, Validation Sprints, and custom services are initiated via:
 
 **admin@qector.store**
 

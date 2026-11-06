@@ -47,6 +47,22 @@ except ImportError:
     )
 
 
+def offline_mode() -> bool:
+    """True when ``QECTOR_OFFLINE`` is set (to anything but empty/0/false/no/off).
+
+    Mirrors ``stripe_billing::offline_mode`` in the Rust core. Every outbound
+    call in this module checks it first, so an air-gapped deployment can set one
+    variable and be certain the package never opens a network connection.
+    """
+    v = os.environ.get("QECTOR_OFFLINE", "").strip().lower()
+    return v not in ("", "0", "false", "no", "off")
+
+
+def _require_network(action: str) -> None:
+    if offline_mode():
+        raise RuntimeError(f"[QECTOR] QECTOR_OFFLINE is set: refusing to {action} (network egress disabled).")
+
+
 def _env_hint() -> str:
     """Suffix explaining *why* a secret may be missing, when .env went unread."""
     if _DOTENV_LOADED or not _DOTENV_ERROR:
@@ -76,7 +92,7 @@ STRIPE_PUBLISHABLE_KEY: str = os.getenv("STRIPE_PUBLISHABLE_KEY", "") or os.gete
 STRIPE_WEBHOOK_SECRET: str = os.getenv("STRIPE_WEBHOOK_SECRET", "")
 STRIPE_PURCHASE_LINK: str = os.getenv(
     "STRIPE_PURCHASE_LINK",
-    "https://buy.stripe.com/7sY9AVdwlgoyfse9bYeUU00?locale=en&__embed_source=buy_btn_1TsoKxRsa9cg9l8A7ExMmc77",
+    "https://qector.store/pricing/",
 )
 # Discord/Slack-compatible webhook for sales notifications (QECTOR Labs bot).
 QECTOR_LABS_BOT_WEBHOOK_URL: str = os.getenv("QECTOR_LABS_BOT_WEBHOOK_URL", "")
@@ -225,6 +241,7 @@ def create_checkout_session(
     # eligible methods per customer, configured from the Dashboard instead of in
     # code. To restrict methods, use `payment_method_configuration` or
     # `excluded_payment_method_types`, never `payment_method_types`.
+    _require_network("create a Stripe checkout session")
     session = stripe.checkout.Session.create(
         customer_email=customer_email,
         line_items=[
@@ -285,6 +302,9 @@ def _notify_labs_bot(message: str, fields: dict[str, Any] | None = None) -> bool
                 "fields": [{"name": k, "value": str(v), "inline": True} for k, v in fields.items()],
             }
         ]
+    if offline_mode():
+        logger.info("[QECTOR-Stripe] QECTOR_OFFLINE is set; labs-bot notification skipped.")
+        return False
     try:
         import urllib.request
 
@@ -463,6 +483,7 @@ def flush_metered_usage(customer_id: str, api_key: str | None = None) -> dict[st
         )
     if not key:
         raise RuntimeError("[QECTOR-Stripe] STRIPE_SECRET_KEY is not configured." + _env_hint())
+    _require_network("flush metered usage")
     stripe.api_key = key
     event = stripe.billing.MeterEvent.create(
         event_name="qec_syndrome_decodes",

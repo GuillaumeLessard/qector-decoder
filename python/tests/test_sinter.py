@@ -64,3 +64,31 @@ def test_sinter_collect_runs_and_is_sane():
     pm_ler = pm5.errors / pm5.shots
     bm_ler = bm5.errors / bm5.shots
     assert bm_ler <= pm_ler * 1.5 + 0.002, (bm_ler, pm_ler)
+
+
+def test_entry_points_select_distinct_backends():
+    """Each declared sinter_decoder entry point builds the backend it names (1.0.1)."""
+    import sys
+    if sys.version_info >= (3, 11):
+        import tomllib
+    else:  # pragma: no cover
+        import tomli as tomllib
+    import importlib
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[2]
+    eps = tomllib.loads((root / "pyproject.toml").read_text())["project"]["entry-points"]["sinter_decoder"]
+    factory = qector_sinter_decoders()
+    assert set(eps) == set(factory)
+    expected = {
+        "qector_blossom": "blossom",
+        "qector_belief": "belief",
+        "qector_unionfind": "unionfind",
+        "qector_unionfind_unweighted": "unionfind_unweighted",
+        "qector_bposd": "bposd",
+    }
+    for name, target in eps.items():
+        mod, attr = target.split(":")
+        obj = getattr(importlib.import_module(mod), attr)()
+        assert obj.kind == expected[name], (name, obj.kind)
+        assert factory[name].kind == expected[name]
