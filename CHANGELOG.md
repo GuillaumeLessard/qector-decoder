@@ -126,6 +126,9 @@ exactly on the 1.0.0 source:
 - `build.rs` restored: it compiles `proto/qector.proto` for the `grpc` feature.
   Without it `cargo test --features full` (tests.yml, "Rust tests") has failed
   on main since 2026-08-09 with `unresolved import qector::qector_decoder_server`.
+- Clean under Rust 1.99 clippy (`-D warnings`, default and `full` features):
+  `.is_multiple_of(2)` in the rotated-surface builder, and
+  `allow(clippy::double_must_use)` on the tonic-generated gRPC module.
 - README licensing section rewritten to match the code: `v2.` token format,
   both `QECTOR_LICENSE_KEY` and `QECTOR_LICENSE`, `QECTOR_ENFORCE`,
   `QECTOR_OFFLINE`, a tier table, and the fact that the `academic` /
