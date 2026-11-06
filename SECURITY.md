@@ -6,9 +6,8 @@ QECTOR Decoder is primarily a local Rust/Python research and validation library.
 
 | Version | Security Support |
 | :--- | :--- |
-| `0.6.x` (Current: `0.6.6`) | **Active.** Supported for source-available review, private vulnerability disclosure, and commercial-license security discussion. |
-| `0.5.x` | **Legacy.** Supported only for private vulnerability disclosure and commercial-license security discussion. |
-| Older snapshots | Best-effort only. No guaranteed patches. |
+| `1.0.x` (Current: `1.0.1`) | **Active.** Security fixes, private vulnerability disclosure, and commercial-license security discussion. |
+| `0.6.x` and earlier | **End of life.** Upgrade to 1.0.x; no further patches. |
 
 ## Report a Vulnerability Privately
 
@@ -56,7 +55,7 @@ Please include the following information in your report:
 
 ## Expected Response
 
-For serious private reports, the maintainer will attempt to acknowledge receipt within 3–5 business days. Resolution time depends on severity, reproducibility, commercial-license obligations, and whether the issue affects only optional service layers or the default local library path. 
+For serious private reports, the maintainer acknowledges receipt within 5 business days and coordinates disclosure with the reporter. Security and procurement pack: https://qector.store/security/ Resolution time depends on severity, reproducibility, commercial-license obligations, and whether the issue affects only optional service layers or the default local library path. 
 
 *Note: Full security review of the proprietary Rust core is available exclusively under a Non-Disclosure Agreement (NDA) or Commercial License.*
 

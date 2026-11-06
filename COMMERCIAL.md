@@ -26,7 +26,7 @@ automatically and can be cancelled at any time.
 | Plan | Price | Includes |
 | --- | --- | --- |
 | Pro | $79 / month or $790 / year | Pro licence tier (code distance 19). All decoders, GPU (CUDA/OpenCL) batch decoding, internal production use, e-mail support |
-| Pro Perpetual | $1,990 one-time | Pro rights for every 3.x release, 12 months of support |
+| Pro Perpetual | $1,990 one-time | Pro rights for every 1.x release of qector-decoder-v3, 12 months of support |
 | Lab | $9,900 / year | Enterprise licence tier (code distance 63), priority support with SLA, onboarding call, one Validation Report |
 | Pilot | $1,500 one-time | 60-day evaluation licence with an integration call; creditable toward Lab within 90 days |
 | Enterprise | From $25,000 / year | SaaS / hosted API and OEM options, named support engineer, signed agreement |
