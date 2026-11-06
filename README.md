@@ -143,14 +143,38 @@ decoder = BpOsdDecoder(H, error_rate=0.01, osd_order=0)
 
 ```python
 import sinter
+import stim
 from qector_decoder_v3.sinter_compat import qector_sinter_decoders
 
-samples = sinter.collect(
-    num_workers=4, tasks=tasks,
-    decoders=["qector_blossom", "qector_unionfind"],
-    custom_decoders=qector_sinter_decoders(),
-)
+
+def main():
+    tasks = [
+        sinter.Task(
+            circuit=stim.Circuit.generated(
+                "surface_code:rotated_memory_z", distance=d, rounds=d,
+                after_clifford_depolarization=0.004,
+            ),
+            json_metadata={"d": d},
+        )
+        for d in (3, 5)
+    ]
+    stats = sinter.collect(
+        num_workers=4, tasks=tasks,
+        decoders=["qector_blossom", "qector_unionfind"],
+        custom_decoders=qector_sinter_decoders(),
+        max_shots=10_000, max_errors=100,
+    )
+    for s in stats:
+        print(s.decoder, s.json_metadata, s.errors, "/", s.shots)
+
+
+if __name__ == "__main__":   # required: Sinter starts worker processes
+    main()
 ```
+
+Registered decoder names: `qector_blossom`, `qector_unionfind`,
+`qector_unionfind_unweighted`, `qector_bposd`, `qector_belief`. A complete,
+tested walkthrough is at https://qector.store/getting-started/.
 
 Available decoders: `qector_blossom`, `qector_unionfind`,
 `qector_unionfind_unweighted`, `qector_bposd`, `qector_belief`.
