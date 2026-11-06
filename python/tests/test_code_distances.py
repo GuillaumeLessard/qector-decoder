@@ -8,16 +8,15 @@ colour generators encoded no logical qubit, heavy-hex "d" had distance 2d-1), an
 Union-Find peel that could miscorrect weight-1 errors next to the boundary.
 These tests pin both fixes.
 """
+
 from __future__ import annotations
 
 import itertools
 
 import numpy as np
 import pytest
-
 import qector_decoder_v3 as q
 from qector_decoder_v3 import codes
-
 
 FAMILIES = [
     ("rotated", codes.rotated_surface_code, range(2, 12)),

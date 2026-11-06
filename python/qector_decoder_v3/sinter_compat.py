@@ -28,12 +28,12 @@ from __future__ import annotations
 import numpy as np
 
 __all__ = [
-    "QectorSinterDecoder",
-    "QectorBlossomSinterDecoder",
     "QectorBeliefSinterDecoder",
+    "QectorBlossomSinterDecoder",
+    "QectorBpOsdSinterDecoder",
+    "QectorSinterDecoder",
     "QectorUnionFindSinterDecoder",
     "QectorUnionFindUnweightedSinterDecoder",
-    "QectorBpOsdSinterDecoder",
     "qector_sinter_decoders",
 ]
 

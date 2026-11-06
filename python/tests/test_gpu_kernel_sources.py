@@ -14,6 +14,7 @@ instead:
 Both must reproduce `UnionFindDecoder` bit-for-bit. The Rust sources are
 proprietary and absent from the public repository, so the test skips there.
 """
+
 from __future__ import annotations
 
 import ctypes
@@ -25,7 +26,6 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-
 import qector_decoder_v3 as qd
 from qector_decoder_v3 import codes
 
@@ -47,8 +47,13 @@ def _edges(code):
 
 def _cases(seed):
     rng = np.random.default_rng(seed)
-    for code in (codes.rotated_surface_code(7), codes.unrotated_surface_code(5), codes.toric_code(6),
-                 codes.heavy_hex_code(5, "x"), codes.repetition_code(11)):
+    for code in (
+        codes.rotated_surface_code(7),
+        codes.unrotated_surface_code(5),
+        codes.toric_code(6),
+        codes.heavy_hex_code(5, "x"),
+        codes.repetition_code(11),
+    ):
         H = code.parity_check_matrix()
         probs = rng.uniform(0.002, 0.08, code.n_qubits)
         err = (rng.random((300, code.n_qubits)) < probs).astype(np.uint8)
@@ -105,8 +110,19 @@ def _run_cuda_host(lib, code, S, edge_len):
     for base, count in ((0, half), (half, B - half)):  # the two CUDA streams
         for shot in range(count):
             lib.qx_run(
-                shot, ptr(S, base * m), ptr(ea), ptr(eb), ptr(eq), ptr(corr, base * n),
-                ptr(s32, 4 * base * s32_stride), ptr(s8, base * s8_stride), n, m, N, E, count,
+                shot,
+                ptr(S, base * m),
+                ptr(ea),
+                ptr(eb),
+                ptr(eq),
+                ptr(corr, base * n),
+                ptr(s32, 4 * base * s32_stride),
+                ptr(s8, base * s8_stride),
+                n,
+                m,
+                N,
+                E,
+                count,
                 ptr(edge_len) if edge_len is not None else None,
                 ptr(sf, 4 * base * E) if edge_len is not None else None,
             )
@@ -146,7 +162,7 @@ def test_opencl_kernel_source_matches_cpu():
     devices = [dv for p in platforms for dv in p.get_devices()]
     if not devices:
         pytest.skip("no OpenCL device")
-    kernel = re.search(r'const KERNEL_GLOBAL: &str = r#"(.*?)"#;', OCL.read_text(), re.S).group(1)
+    kernel = re.search(r'const KERNEL_GLOBAL: &str = r#"(.*?)"#;', OCL.read_text(), re.DOTALL).group(1)
     ctx = cl.Context(devices[:1])
     queue = cl.CommandQueue(ctx)
     knl = cl.Kernel(cl.Program(ctx, kernel).build(), "uf_decode_batch")

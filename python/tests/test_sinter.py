@@ -69,6 +69,7 @@ def test_sinter_collect_runs_and_is_sane():
 def test_entry_points_select_distinct_backends():
     """Each declared sinter_decoder entry point builds the backend it names (1.0.1)."""
     import sys
+
     if sys.version_info >= (3, 11):
         import tomllib
     else:  # pragma: no cover

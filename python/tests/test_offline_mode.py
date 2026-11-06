@@ -4,13 +4,13 @@ The decoders never touch the network. The only egress paths in the package are
 explicit billing calls (Stripe metering, checkout, a sales webhook); with
 QECTOR_OFFLINE set each of them refuses before opening a socket.
 """
+
 from __future__ import annotations
 
 import socket
 import urllib.request
 
 import pytest
-
 import qector_decoder_v3 as qd
 
 

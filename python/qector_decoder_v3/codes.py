@@ -30,9 +30,9 @@ Examples
 
 from __future__ import annotations
 
+import math
 from collections.abc import Sequence
 from dataclasses import dataclass, field
-import math
 from typing import Any
 
 import numpy as np
@@ -850,11 +850,23 @@ def code_distance(
     L = code.logicals_matrix()
     n = code.n_qubits
     if L is None or L.shape[0] == 0:
-        return {"distance": None, "exact": True, "lower_bound": None, "witness": None, "method": "no logical observable"}
+        return {
+            "distance": None,
+            "exact": True,
+            "lower_bound": None,
+            "witness": None,
+            "method": "no logical observable",
+        }
     degree = H.sum(axis=0)
     for qubit in np.flatnonzero(degree == 0):
         if L[:, qubit].any():
-            return {"distance": 1, "exact": True, "lower_bound": 1, "witness": [int(qubit)], "method": "unchecked qubit carries a logical"}
+            return {
+                "distance": 1,
+                "exact": True,
+                "lower_bound": 1,
+                "witness": [int(qubit)],
+                "method": "unchecked qubit carries a logical",
+            }
 
     if int(degree.max(initial=0)) <= 2 and L.shape[0] <= 12:
         n_checks = H.shape[0]
@@ -906,8 +918,20 @@ def code_distance(
                     counts[used] = counts.get(used, 0) + 1
                 best = (weight, sorted(q for q, c in counts.items() if c % 2))
         if best is None:
-            return {"distance": None, "exact": True, "lower_bound": None, "witness": None, "method": "matching graph has no odd-parity cycle"}
-        return {"distance": best[0], "exact": True, "lower_bound": best[0], "witness": best[1], "method": "shortest odd-parity cycle of the matching graph"}
+            return {
+                "distance": None,
+                "exact": True,
+                "lower_bound": None,
+                "witness": None,
+                "method": "matching graph has no odd-parity cycle",
+            }
+        return {
+            "distance": best[0],
+            "exact": True,
+            "lower_bound": best[0],
+            "witness": best[1],
+            "method": "shortest odd-parity cycle of the matching graph",
+        }
 
     limit = int(max_weight if max_weight is not None else (code.distance or n))
     Ht = H.astype(np.int32).T
@@ -916,7 +940,13 @@ def code_distance(
     for weight in range(1, min(limit, n) + 1):
         total = math.comb(n, weight)
         if examined + total > max_supports:
-            return {"distance": None, "exact": False, "lower_bound": weight, "witness": None, "method": f"enumeration budget exhausted at weight {weight}"}
+            return {
+                "distance": None,
+                "exact": False,
+                "lower_bound": weight,
+                "witness": None,
+                "method": f"enumeration budget exhausted at weight {weight}",
+            }
         combos = itertools.combinations(range(n), weight)
         while True:
             block = list(itertools.islice(combos, 65536))
@@ -930,9 +960,21 @@ def code_distance(
                 logical = ((E[undetected] @ Lt) % 2).any(axis=1)
                 if logical.any():
                     hit = np.flatnonzero(undetected)[np.flatnonzero(logical)[0]]
-                    return {"distance": weight, "exact": True, "lower_bound": weight, "witness": [int(x) for x in block[hit]], "method": "exhaustive enumeration by weight"}
+                    return {
+                        "distance": weight,
+                        "exact": True,
+                        "lower_bound": weight,
+                        "witness": [int(x) for x in block[hit]],
+                        "method": "exhaustive enumeration by weight",
+                    }
         examined += total
-    return {"distance": None, "exact": False, "lower_bound": min(limit, n) + 1, "witness": None, "method": f"no logical error of weight <= {min(limit, n)}"}
+    return {
+        "distance": None,
+        "exact": False,
+        "lower_bound": min(limit, n) + 1,
+        "witness": None,
+        "method": f"no logical error of weight <= {min(limit, n)}",
+    }
 
 
 # ---------------------------------------------------------------------------
