@@ -129,6 +129,15 @@ exactly on the 1.0.0 source:
 - Clean under Rust 1.99 clippy (`-D warnings`, default and `full` features):
   `.is_multiple_of(2)` in the rotated-surface builder, and
   `allow(clippy::double_must_use)` on the tonic-generated gRPC module.
+- **Security: dependency advisories fixed.** The release gate blocked 1.0.1 on
+  9 RustSec advisories in `Cargo.lock`, all in the optional network/gRPC stack:
+  `rustls` 0.23.40 -> 0.23.46 (RUSTSEC-2026-0285, -0346, -0348, -0349),
+  `rustls-webpki` 0.103.13 -> 0.103.16 (RUSTSEC-2026-0382), `webpki-roots`
+  1.0.9 -> 1.0.11 (RUSTSEC-2026-0381), `h2` 0.4.15 -> 0.4.20
+  (RUSTSEC-2026-0258), `pulldown-cmark` 0.13.4 -> 0.13.6 (RUSTSEC-2026-0414,
+  -0433). Also `tokio` 1.54.1 and `anyhow` 1.0.104 (unsound-API notices).
+  `cargo audit`: 0 vulnerabilities; `cargo deny`: licences, bans, sources ok.
+  Lock-file only; no source change.
 - README licensing section rewritten to match the code: `v2.` token format,
   both `QECTOR_LICENSE_KEY` and `QECTOR_LICENSE`, `QECTOR_ENFORCE`,
   `QECTOR_OFFLINE`, a tier table, and the fact that the `academic` /
