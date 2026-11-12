@@ -306,7 +306,8 @@ Related records on Zenodo:
 
 ## Related projects
 
-- [QECTOR Workbench](https://github.com/qectorlab/qector-decoder-workbench-windows/releases/latest): free desktop application (Windows, Linux, macOS)
+- [QECTOR Workbench](https://github.com/qectorlab/qector-decoder-workbench-windows/releases/latest): free desktop application for Windows and [Linux](https://github.com/qectorlab/qector-decoder-workbench-linux/releases/latest)
+- [QECTOR Research Archive](https://zenodo.org/communities/id01t): papers, machine-checked proofs and datasets on Zenodo, including the [[832, 10, 15]] code proofs
 - [QECTOR Claude plugin](https://github.com/GuillaumeLessard/qector-claude-plugin): QEC tools for Claude Code and Claude Desktop
 
 ## Contact
